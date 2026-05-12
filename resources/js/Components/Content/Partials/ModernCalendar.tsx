@@ -9,8 +9,8 @@ import Modal from '@/Components/common/ui/Modal';
 import { getActivePlatformKeys, getPlatformConfig } from '@/Constants/socialPlatforms';
 import { useCalendar } from '@/Hooks/calendar/useCalendar';
 import { validateDate } from '@/Utils/dateValidation';
-import { formatTime } from '@/Utils/formatDate';
-import { formatDate } from '@/Utils/i18nHelpers';
+import { formatDate, formatTimeString } from '@/Utils/formatters';
+
 import { useLockStore } from '@/stores/lockStore';
 import type { CalendarView } from '@/types/calendar';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -714,7 +714,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                             <div className="flex items-center gap-1">
                               <Clock className="h-4 w-4" />
-                              <span>{formatTime(event.start)}</span>
+                              <span>{formatTimeString(event.start)}</span>
                             </div>
                             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-gray-700">
                               {event.status}
@@ -1090,7 +1090,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             )}
                             <div className="mt-1 flex items-center gap-2">
                               <span className="rounded-full bg-white/50 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-500 backdrop-blur-sm dark:bg-neutral-900/50 dark:text-gray-400">
-                                {formatTime(event.start)}
+                                {formatTimeString(event.start)}
                               </span>
                               <span
                                 className="text-[10px] font-bold uppercase tracking-tight"

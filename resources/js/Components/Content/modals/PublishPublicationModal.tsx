@@ -10,8 +10,8 @@ import { useConfirm } from '@/Hooks/useConfirm';
 import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
 import { usePublicationStore } from '@/stores/publicationStore';
 import type { Publication } from '@/types/Publication';
-import { formatDateTimeStyled } from '@/Utils/dateHelpers';
-import { formatDateTime } from '@/Utils/formatDate';
+import { formatDateTimeStyled } from '@/Utils/formatters';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, ChevronDown, Clock, Share2, X, XCircle } from 'lucide-react';
@@ -513,7 +513,7 @@ export default function PublishPublicationModal({
                               </div>
                               <span className="opacity-75">•</span>
                               <span className="opacity-90">
-                                {formatDateTime(latestLog.requested_at)}
+                                {formatDateTimeString(latestLog.requested_at)}
                               </span>
                             </div>
                           ) : null;
@@ -566,7 +566,7 @@ export default function PublishPublicationModal({
                       {publication.rejected_at && (
                         <div className="flex items-center gap-1.5 opacity-80">
                           <Clock className="h-3.5 w-3.5" />
-                          <span>{formatDateTime(publication.rejected_at)}</span>
+                          <span>{formatDateTimeString(publication.rejected_at)}</span>
                         </div>
                       )}
 

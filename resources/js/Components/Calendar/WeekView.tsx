@@ -1,5 +1,5 @@
 import type { CalendarEvent } from '@/types/calendar';
-import { formatTime } from '@/Utils/formatDate';
+import { formatTimeString } from '@/Utils/formatters';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
   DndContext,
@@ -79,7 +79,7 @@ const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
           </div>
           <div className="mt-1 flex items-center gap-1">
             <Clock className="h-3 w-3 text-gray-400" />
-            <span className="text-[10px] text-gray-500">{formatTime(event.start)}</span>
+            <span className="text-[10px] text-gray-500">{formatTimeString(event.start)}</span>
           </div>
         </div>
         <PlatformIcon platform={event.extendedProps.platform} className="h-4 w-4" />

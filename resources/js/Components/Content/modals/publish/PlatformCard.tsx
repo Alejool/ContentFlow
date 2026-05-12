@@ -1,6 +1,6 @@
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
 import { queryKeys } from '@/lib/queryKeys';
-import { formatDateTimeStyled } from '@/Utils/dateHelpers';
+import { formatDateTimeStyled } from '@/Utils/formatters';
 import { validateVideoDuration } from '@/Utils/validationUtils';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Check, CheckCircle, Clock, Loader2, X, XCircle } from 'lucide-react';

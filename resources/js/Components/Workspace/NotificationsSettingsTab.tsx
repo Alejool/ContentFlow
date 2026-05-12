@@ -17,7 +17,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { formatDateString, formatTimeString } from '@/Utils/dateHelpers';
+import { formatDateString, formatTimeString } from '@/Utils/formatters';
 
 interface NotificationsSettingsTabProps {
   workspace: any;

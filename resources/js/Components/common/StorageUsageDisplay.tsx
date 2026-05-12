@@ -4,7 +4,7 @@ import {
     formatStorageUsage,
     getStorageBgColorClass,
     getStorageColorClass,
-} from '@/Utils/storageHelpers';
+} from '@/Utils/formatters';
 import React from 'react';
 
 interface StorageUsageDisplayProps {
@@ -33,7 +33,7 @@ interface StorageUsageDisplayProps {
  * />
  * 
  * // Si el backend envía en GB
- * import { gbToBytes } from '@/Utils/storageHelpers';
+ * import { gbToBytes } from '@/Utils/formatters';
  * <StorageUsageDisplay
  *   used={gbToBytes(704994.0)}
  *   total={gbToBytes(1073741824000.0)}

@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
-import { formatDateString } from '@/Utils/dateHelpers';
+import { formatDateString } from '@/Utils/formatters';
 import { router, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
@@ -275,14 +275,8 @@ export default function SubscriptionSection({
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    return formatDateString(dateString, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  const formatDate = (dateString?: string) =>
+    formatDateString(dateString, { year: 'numeric', month: 'long', day: 'numeric' });
 
   const handleUpgrade = () => {
     router.visit('/pricing');

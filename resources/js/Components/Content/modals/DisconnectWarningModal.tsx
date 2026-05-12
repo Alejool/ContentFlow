@@ -2,7 +2,7 @@ import { useTheme } from '@/Hooks/useTheme';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { AlertTriangle, Calendar, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatDateTimeString } from '@/Utils/dateHelpers';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 interface DisconnectWarningModalProps {
   isOpen: boolean;

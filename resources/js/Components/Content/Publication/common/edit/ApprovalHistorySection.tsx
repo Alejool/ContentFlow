@@ -1,6 +1,6 @@
 import { Avatar } from '@/Components/common/Avatar';
 import type { ApprovalLog as ApprovalLogType } from '@/types/ApprovalTypes';
-import { formatDateTime } from '@/Utils/formatDate';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { CheckCircle, Clock, MessageSquare, User, XCircle } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -266,7 +266,7 @@ export default function ApprovalHistorySection({
                       </div>
                       <div className="flex flex-col items-end gap-0.5">
                         <span className="text-[10px] font-bold text-gray-900 dark:text-gray-100 sm:text-xs">
-                          {formatDateTime(log.created_at || log.requested_at || '')}
+                          {formatDateTimeString(log.created_at || log.requested_at || '')}
                         </span>
                       </div>
                     </div>

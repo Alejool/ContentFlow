@@ -95,8 +95,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
     hoverBg: isDark ? 'hover:bg-neutral-800' : 'hover:bg-gray-100',
     hoverText: isDark ? 'hover:text-primary-400' : 'hover:text-primary-600',
     activeGradient: isDark
-      ? 'bg-gradient-to-r from-primary-600 to-primary-800'
-      : 'bg-gradient-to-r from-primary-600 to-primary-700',
+      ? 'bg-linear-to-r from-primary-600 to-primary-800'
+      : 'bg-linear-to-r from-primary-600 to-primary-700',
     buttonHoverBg: isDark ? 'hover:bg-neutral-800' : 'hover:bg-gray-100',
     logoGradient: isDark ? 'from-primary-500 to-primary-700' : 'from-primary-600 to-primary-800',
     titleGradient: isDark ? 'from-gray-200 to-gray-400' : 'from-gray-900 to-gray-700',
@@ -128,11 +128,11 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               }`}
             >
               <div
-                className={`relative h-14 w-12 ${!auth?.current_workspace?.white_label_logo_url ? 'bg-gradient-to-r' : ''} flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg`}
+                className={`relative h-14 w-12 ${!auth?.current_workspace?.white_label_logo_url ? 'bg-linear-to-r' : ''} flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg`}
               >
                 {!logoLoaded && !logoError && (
                   <div className="absolute inset-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-neutral-700">
-                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
+                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-linear-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
                   </div>
                 )}
                 {logoError ? (
@@ -157,7 +157,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               {isSidebarOpen && (
                 <div className="ml-4 opacity-100 transition-opacity duration-300">
                   <h1
-                    className={`bg-gradient-to-r text-xl font-bold ${classes.titleGradient} bg-clip-text text-transparent`}
+                    className={`bg-linear-to-r text-xl font-bold ${classes.titleGradient} bg-clip-text text-transparent`}
                   >
                     {auth?.current_workspace?.white_label_logo_url
                       ? auth.current_workspace.name

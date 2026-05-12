@@ -1,5 +1,5 @@
 import SearchableSelector from '@/Components/common/Modern/SearchableSelector';
-import { formatDate as formatDateHelper } from '@/Utils/i18nHelpers';
+import { formatDateString } from '@/Utils/formatters';
 import { Calendar, Target } from 'lucide-react';
 import React from 'react';
 
@@ -40,15 +40,8 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      return formatDateHelper(date, 'medium');
-    } catch {
-      return '';
-    }
-  };
+  const formatDate = (dateString?: string) =>
+    formatDateString(dateString, { year: 'numeric', month: 'short', day: 'numeric' });
 
   if (loading) {
     return (

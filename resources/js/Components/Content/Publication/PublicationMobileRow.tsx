@@ -113,9 +113,6 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
     return t(`publications.status.${status || 'draft'}`);
   };
 
-  const formatDate = (dateString?: string) => {
-    return formatPublicationDate(dateString);
-  };
 
   return (
     <div className="w-full space-y-3 px-1">
@@ -196,7 +193,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                   {item.scheduled_at && (
                     <div className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
                       <Calendar className="h-3.5 w-3.5" />
-                      <span>{formatDate(item.scheduled_at)}</span>
+                      <span>{formatPublicationDate(item.scheduled_at)}</span>
                     </div>
                   )}
                 </div>

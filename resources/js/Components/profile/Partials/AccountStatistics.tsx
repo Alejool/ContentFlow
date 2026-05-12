@@ -1,4 +1,5 @@
 import type { PageProps } from '@/types';
+import { formatDateString } from '@/Utils/formatters';
 import { Link, usePage } from '@inertiajs/react';
 import { Calendar, CheckCircle, Clock, MailWarning, Shield } from 'lucide-react';
 import React, { useState } from 'react';
@@ -20,15 +21,7 @@ export default function AccountStatistics({
 
   const formatDate = (dateString: string | null): string => {
     if (!dateString) return t('profile.statistics.notAvailable');
-    try {
-      return new Date(dateString).toLocaleDateString(i18n.language, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return t('profile.statistics.notAvailable');
-    }
+    return formatDateString(dateString) || t('profile.statistics.notAvailable');
   };
 
   const getDaysSinceJoining = (dateString: string | null): number => {

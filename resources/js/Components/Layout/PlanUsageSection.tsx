@@ -1,4 +1,4 @@
-import { formatBytes, formatStorageUsage } from '@/Utils/storageHelpers';
+import { formatBytes, formatStorageUsage } from '@/Utils/formatters';
 import { Link } from '@inertiajs/react';
 import { ChevronDown, FileText, HardDrive, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

@@ -191,9 +191,9 @@ export default function UserEventModal({
   const currentColor = tailwindColors.find((c) => c.value === selectedColor) || tailwindColors[0];
 
   return (
-    <Modal show={show} onClose={onClose} maxWidth="lg">
+    <Modal show={show} onClose={onClose} maxWidth="md">
       <div
-        className="flex max-h-[90vh] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl transition-colors dark:bg-neutral-900 md:max-h-[85vh]"
+        className="flex flex-col overflow-hidden rounded-lg border bg-white shadow-2xl transition-colors dark:bg-neutral-900"
         style={{
           borderColor: `${selectedColor}40`,
         }}

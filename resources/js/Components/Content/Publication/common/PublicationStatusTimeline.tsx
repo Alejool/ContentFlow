@@ -1,4 +1,4 @@
-import { formatDateTimeStyled } from '@/Utils/dateHelpers';
+import { formatDateTimeStyled } from '@/Utils/formatters';
 import {
   AlertCircle,
   Calendar,

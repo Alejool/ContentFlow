@@ -1,6 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
-import { formatTime } from '@/Utils/formatDate';
+import { formatTimeString } from '@/Utils/formatters';
 import type { CalendarEvent } from '@/types/calendar';
 import { format, parseISO } from 'date-fns';
 import {
@@ -160,7 +160,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               )}
               <div className="mt-1 flex items-center gap-1 text-gray-600 dark:text-gray-400">
                 <Clock className="h-4 w-4" />
-                <span className="text-sm">{formatTime(event.start)}</span>
+                <span className="text-sm">{formatTimeString(event.start)}</span>
               </div>
             </div>
           </div>

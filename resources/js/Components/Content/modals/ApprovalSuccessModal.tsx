@@ -1,5 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
-import { formatDateTime } from '@/Utils/formatDate';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { CheckCircle, User, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,7 @@ export default function ApprovalSuccessModal({
                   </p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">{approverName}</p>
                   <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {formatDateTime(approvedAt)}
+                    {formatDateTimeString(approvedAt)}
                   </p>
                 </div>
               </div>

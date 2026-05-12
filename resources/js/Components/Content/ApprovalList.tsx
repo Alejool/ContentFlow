@@ -5,7 +5,7 @@ import Button from '@/Components/common/Modern/Button';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import { VirtualList } from '@/Components/common/ui/VirtualList';
-import { formatDateTimeString } from '@/Utils/dateHelpers';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import { usePublicationStore } from '@/stores/publicationStore';

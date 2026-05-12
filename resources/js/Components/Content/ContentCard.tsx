@@ -4,7 +4,7 @@ import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTyp
 import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import { PublicationStatusBadge } from '@/Components/Content/PublicationStatusBadge';
 import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
-import { formatDateString } from '@/Utils/dateHelpers';
+import { formatDateString } from '@/Utils/formatters';
 import {
   countMediaFiles,
   getLockedByFirstName,

@@ -18,7 +18,7 @@ import { AlertCircle, Edit2, Info, Shield, ShieldAlert, ShieldCheck, Trash2 } fr
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import route from 'ziggy-js';
+import { route } from 'ziggy-js';
 
 export default function RolesManagementTab({
   roles,

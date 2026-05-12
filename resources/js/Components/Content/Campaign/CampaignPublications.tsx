@@ -1,7 +1,6 @@
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
-import { formatDate } from '@/Utils/i18nHelpers';
+import { formatDateString } from '@/Utils/formatters';
 import type { Campaign } from '@/types/Campaign';
-import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
 interface CampaignPublicationsProps {
@@ -13,7 +12,7 @@ export default function CampaignPublications({
   campaign,
   getStatusColor,
 }: CampaignPublicationsProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const publications = campaign.publications || [];
 
   return (
@@ -41,7 +40,7 @@ export default function CampaignPublications({
                           {pub.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {formatDate(new Date(pub.created_at), 'medium')}
+                          {formatDateString(pub.created_at)}
                         </div>
                       </div>
                     </div>

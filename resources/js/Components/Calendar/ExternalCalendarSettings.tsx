@@ -7,7 +7,7 @@ import {
   useRetrySync,
 } from '@/Hooks/useExternalCalendar';
 import type { ExternalCalendarConnection } from '@/stores/externalCalendarStore';
-import { formatDateTimeString } from '@/Utils/dateHelpers';
+import { formatDateTimeString } from '@/Utils/formatters';
 import {
   AlertCircle,
   Calendar,

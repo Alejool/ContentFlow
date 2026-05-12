@@ -1,4 +1,4 @@
-import { formatDate } from '@/Utils/i18nHelpers';
+import { formatDate } from '@/Utils/i18nHelpers'; // Uses locale-specific named format presets (monthYear, dayWeekMonthYear)
 import type { CalendarView } from '@/types/calendar';
 import { format, setMonth, setYear } from 'date-fns';
 import {

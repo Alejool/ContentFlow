@@ -1,6 +1,6 @@
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatformsConfig';
 import type { CalendarEvent } from '@/types/calendar';
-import { formatTime } from '@/Utils/formatDate';
+import { formatTimeString } from '@/Utils/formatters';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
   DndContext,
@@ -175,7 +175,7 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
               className={`flex items-center gap-1 text-[11px] font-medium ${platformConfig ? platformConfig.textColor + ' ' + platformConfig.darkTextColor : 'text-gray-500 dark:text-gray-400'}`}
             >
               <Clock className="h-3 w-3" />
-              {formatTime(event.start)}
+              {formatTimeString(event.start)}
             </span>
             {event.status && (
               <span

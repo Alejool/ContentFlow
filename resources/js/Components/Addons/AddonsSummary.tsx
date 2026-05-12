@@ -1,5 +1,5 @@
 import { useAddonsSummary } from '@/Hooks/useAddonsSummary';
-import { formatOptionalDate } from '@/Utils/i18nHelpers';
+import { formatDateString } from '@/Utils/formatters';
 import { useTranslation } from 'react-i18next';
 import AddonExtensionInfo from './AddonExtensionInfo';
 import AddonsSummaryEmpty from './AddonsSummaryEmpty';
@@ -11,10 +11,8 @@ export default function AddonsSummary() {
   const { t } = useTranslation();
   const { data, loading, error } = useAddonsSummary();
 
-  // Helper para formatear fechas con el formato largo
-  const formatDate = (dateString?: string) => {
-    return formatOptionalDate(dateString, 'datetimeLong');
-  };
+  const formatDate = (dateString?: string) =>
+    formatDateString(dateString, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   if (loading) {
     return (

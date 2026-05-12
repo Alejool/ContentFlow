@@ -7,7 +7,7 @@ import { Edit2, Shield, User, UserCheck, UserX } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import route from 'ziggy-js';
+import { route } from 'ziggy-js';
 
 interface Role {
   id: number;

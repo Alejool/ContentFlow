@@ -1,7 +1,7 @@
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
-import { formatDateString, formatDateTimeStyled } from '@/Utils/dateHelpers';
+import { formatDateString, formatDateTimeStyled } from '@/Utils/formatters';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import {

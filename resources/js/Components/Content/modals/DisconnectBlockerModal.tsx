@@ -1,7 +1,7 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { AlertTriangle, Calendar, Clock, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatDateTime } from '@/Utils/formatDate';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 interface DisconnectBlockerModalProps {
   isOpen: boolean;
@@ -108,7 +108,7 @@ export default function DisconnectBlockerModal({
                                   <Calendar className="h-3 w-3 opacity-60" />
                                   {post.scheduled_at ? (
                                     <span className="text-xs">
-                                      {formatDateTime(post.scheduled_at)}
+                                      {formatDateTimeString(post.scheduled_at)}
                                     </span>
                                   ) : (
                                     <span className="text-xs opacity-50">

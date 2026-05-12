@@ -1,5 +1,5 @@
 import { AlertTriangle, Info } from 'lucide-react';
-import { formatDateTimeString } from '@/Utils/dateHelpers';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 interface PlatformStatus {
   platform: string;

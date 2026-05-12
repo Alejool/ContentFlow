@@ -6,7 +6,7 @@ import PlanUsageCard from '@/Components/Subscription/PlanUsageCard';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { formatDateString } from '@/Utils/dateHelpers';
+import { formatDateString } from '@/Utils/formatters';
 import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import {
@@ -120,13 +120,8 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
     }
   }, [flash]);
 
-  const formatDate = (dateString: string) => {
-    return formatDateString(dateString, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  const formatDate = (dateString: string) =>
+    formatDateString(dateString, { year: 'numeric', month: 'long', day: 'numeric' });
 
   const formatAmount = (amount: string | number) => {
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;

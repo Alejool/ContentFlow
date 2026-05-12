@@ -1,4 +1,4 @@
-import { formatBytesAsGB, gbToBytes } from '@/Utils/storageHelpers';
+import { formatBytesAsGB, gbToBytes } from '@/Utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 interface AddonUsageProps {

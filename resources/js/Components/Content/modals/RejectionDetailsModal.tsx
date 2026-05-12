@@ -2,7 +2,7 @@ import type { Publication } from '@/types/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { formatDateTime } from '@/Utils/formatDate';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { Edit, User, X, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -80,7 +80,7 @@ export default function RejectionDetailsModal({
                   </p>
                   {publication.rejected_at && (
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDateTime(publication.rejected_at)}
+                      {formatDateTimeString(publication.rejected_at)}
                     </p>
                   )}
                 </div>

@@ -6,7 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { AlertCircle, TrendingUp, Zap } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '@/Utils/i18nHelpers';
+import { formatDateString } from '@/Utils/formatters';
 
 interface UsageMetric {
   type: string;
@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function UsageDashboard({ subscription, usage }: Props) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpgrade = async (plan: string) => {
@@ -122,7 +122,7 @@ export default function UsageDashboard({ subscription, usage }: Props) {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {t('subscription.usage.trialEndsOn')}{' '}
-            <strong>{formatDate(subscription.trial_ends_at, 'long', i18n.language)}</strong>
+            <strong>{formatDateString(subscription.trial_ends_at)}</strong>
           </AlertDescription>
         </Alert>
       )}

@@ -1,6 +1,6 @@
 import { useCalendar } from '@/Hooks/calendar/useCalendar';
 import { useTheme } from '@/Hooks/useTheme';
-import { formatTime } from '@/Utils/formatDate';
+import { formatTimeString } from '@/Utils/formatters';
 import {
   eachDayOfInterval,
   endOfMonth,
@@ -155,7 +155,7 @@ export default function EditorialCalendar() {
                     {event.start && (
                       <div className="hidden items-center gap-1 text-[9px] text-gray-500 sm:flex">
                         <Clock className="h-2.5 w-2.5" />
-                        {formatTime(event.start)}
+                        {formatTimeString(event.start)}
                       </div>
                     )}
                   </div>

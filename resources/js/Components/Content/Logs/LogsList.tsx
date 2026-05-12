@@ -3,7 +3,7 @@ import FilterSection from '@/Components/Content/common/FilterSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/ui/TableContainer';
-import { formatDate } from '@/Utils/i18nHelpers';
+import { formatDateTimeString } from '@/Utils/formatters';
 import type { SocialPostLog } from '@/types/Publication';
 import {
   AlertCircle,
@@ -247,7 +247,7 @@ const LogsList = memo(
                         className="group transition-colors hover:bg-gray-50/30 dark:hover:bg-neutral-700/30"
                       >
                         <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
-                          {formatDate(new Date(log.updated_at), 'datetime', localeLang)}
+                          {formatDateTimeString(log.updated_at)}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-1">
@@ -376,7 +376,7 @@ const LogsList = memo(
                     >
                       <div className="mb-3 flex items-start justify-between">
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {formatDate(new Date(log.updated_at), 'datetime', localeLang)}
+                          {formatDateTimeString(log.updated_at)}
                         </div>
                         <div
                           className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getStatusColor(

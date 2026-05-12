@@ -1,5 +1,5 @@
 import type { CalendarEvent } from '@/types/calendar';
-import { formatTime } from '@/Utils/formatDate';
+import { formatTimeString } from '@/Utils/formatters';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
   DndContext,
@@ -86,7 +86,7 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
           <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              <span>{formatTime(event.start)}</span>
+              <span>{formatTimeString(event.start)}</span>
             </div>
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-gray-700">
               {event.status}

@@ -1,3 +1,4 @@
+import { parseUserAgent, maskIpAddress } from '@/Utils/formatters';
 import type { TFunction } from 'i18next';
 import { AlertCircle, Lock } from 'lucide-react';
 import { Trans } from 'react-i18next';
@@ -18,9 +19,8 @@ interface AlertsSectionProps {
   hasPublishedPlatform: boolean;
   allowConfiguration: boolean;
   publicationStatus?: string;
-  parseUserAgent: (userAgent?: string) => string;
-  maskIpAddress: (ip?: string) => string;
 }
+
 
 export const AlertsSection = ({
   t,
@@ -31,8 +31,6 @@ export const AlertsSection = ({
   hasPublishedPlatform,
   allowConfiguration,
   publicationStatus,
-  parseUserAgent,
-  maskIpAddress,
 }: AlertsSectionProps) => {
   return (
     <div className="space-y-3">

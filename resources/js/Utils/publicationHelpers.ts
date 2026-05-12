@@ -1,7 +1,7 @@
 import type { Publication } from '@/types/Publication';
 import { Calendar, CheckCircle, Clock, Edit, Eye, Sparkles, TrendingUp } from 'lucide-react';
 import type React from 'react';
-import { formatDateTime } from './formatDate';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 /**
  * Cuenta los archivos multimedia por tipo
@@ -103,7 +103,7 @@ export function prepareMediaForPreview(publication: Publication) {
 export function formatPublicationDate(dateString?: string): string {
   if (!dateString) return '';
   try {
-    return formatDateTime(dateString);
+    return formatDateTimeString(dateString);
   } catch {
     return '';
   }
