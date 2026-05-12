@@ -14,6 +14,7 @@ import { useLogs } from '@/Hooks/useLogs';
 import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
 import { queryKeys } from '@/lib/queryKeys';
 import { ToastService } from '@/Services/ToastService';
+import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import { usePublicationStore } from '@/stores/publicationStore';
 import type { PageProps } from '@/types';
@@ -33,13 +34,24 @@ export const usePublications = () => {
   const user = props.auth.user;
   const queryClient = useQueryClient();
 
+  // Page and itemsPerPage live in a global store so that create/update
+  // mutations can call resetToFirstPage() and surface the updated item
+  // immediately at the top of the list regardless of which page the user
+  // was previously viewing.
+  const { page, itemsPerPage, setPage, setItemsPerPage } = useContentPaginationStore(
+    useShallow((s) => ({
+      page: s.page,
+      itemsPerPage: s.itemsPerPage,
+      setPage: s.setPage,
+      setItemsPerPage: s.setItemsPerPage,
+    })),
+  );
+
   const [activeTabState, setActiveTabState] = useState<ContentTab>('publications');
   const [filters, setFilters] = useState<any>(() => {
     const saved = localStorage.getItem(`contentPage_filters_${activeTabState}`);
     return saved ? JSON.parse(saved) : {};
   });
-  const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // TanStack Query hooks — only fetch when the relevant tab is active
   const pubQuery = usePublicationsList(
@@ -156,15 +168,20 @@ export const usePublications = () => {
         ? isCampLoading
         : isLogsLoading;
 
-  const handlePageChange = useCallback((newPage: number) => {
-    setPage(newPage);
-  }, []);
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      setPage(newPage);
+    },
+    [setPage],
+  );
 
-  const handlePerPageChange = useCallback((val: number) => {
-    setItemsPerPage(val);
-    setPage(1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  const handlePerPageChange = useCallback(
+    (val: number) => {
+      setItemsPerPage(val);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [setItemsPerPage],
+  );
 
   const handleFilterChange = useCallback(
     (newFilters: any) => {
@@ -172,7 +189,7 @@ export const usePublications = () => {
       setPage(1);
       localStorage.setItem(`contentPage_filters_${activeTab}`, JSON.stringify(newFilters));
     },
-    [activeTab],
+    [activeTab, setPage],
   );
 
   const handleSingleFilterChange = useCallback(
@@ -183,25 +200,24 @@ export const usePublications = () => {
       setPage(1);
       localStorage.setItem(`contentPage_filters_${activeTab}`, JSON.stringify(newFilters));
     },
-    [filters, activeTab],
+    [filters, activeTab, setPage],
   );
 
   const handleResetFilters = useCallback(() => {
     setFilters({});
     setPage(1);
     localStorage.removeItem(`contentPage_filters_${activeTab}`);
-  }, [activeTab]);
+  }, [activeTab, setPage]);
 
   const handleRefresh = useCallback(() => {
-    // Clear publication store cache before refetching to ensure fresh data
     if (activeTab === 'publications' || activeTab === 'approvals') {
       usePublicationStore.getState().clearPageData();
-      // Invalidate ALL publication queries to force fresh fetch without optimistic state
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
-      // Force refetch after invalidation
+      // Remove list caches completely (not just mark stale) so the refetch
+      // shows fresh server-ordered data with no stale placeholder flash
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
       pubQuery.refetch();
     } else if (activeTab === 'campaigns') {
-      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
       campQuery.refetch();
     } else {
       logsQuery.refetch();

@@ -2,6 +2,7 @@ import type { Publication } from '@/types/Publication';
 import axios, { type AxiosError } from 'axios';
 import { create } from 'zustand';
 import { useCalendarStore } from './calendarStore';
+import { useContentPaginationStore } from './contentPaginationStore';
 
 interface PublicationState {
   publications: Publication[];
@@ -484,9 +485,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         };
       }
 
+      // Move the updated publication to the front of the list to match
+      // the backend's `ORDER BY updated_at DESC` sort.
+      const updatedPub = state.publications.find((p) => p.id === id);
+      const rest = state.publications.filter((p) => p.id !== id);
+      const merged = updatedPub ? { ...updatedPub, ...updated } : (updated as Publication);
+
       return {
         ...newPlatformStatusUpdates,
-        publications: state.publications.map((p) => (p.id === id ? { ...p, ...updated } : p)),
+        publications: [merged, ...rest],
         currentPublication:
           state.currentPublication?.id === id
             ? { ...state.currentPublication, ...updated }
@@ -511,8 +518,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         get().addPublication(publication);
       }
       set({ isLoading: false });
-      // Refresh calendar store to reflect changes
       useCalendarStore.getState().fetchEvents();
+      useContentPaginationStore.getState().resetToFirstPage();
       return publication;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -527,7 +534,6 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   updatePublicationStore: async (id, formData) => {
     set({ isLoading: true, error: null });
     try {
-      // Ensure _method is PUT for Laravel to handle multipart/form-data with PUT
       if (!formData.has('_method')) {
         formData.append('_method', 'PUT');
       }
@@ -539,8 +545,9 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         get().updatePublication(id, publication);
       }
       set({ isLoading: false });
-      // Refresh calendar store to reflect updated publication
       useCalendarStore.getState().fetchEvents();
+      // Move to page 1 so the updated publication appears first
+      useContentPaginationStore.getState().resetToFirstPage();
       return publication;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -559,6 +566,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       get().removePublication(id);
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
+      useContentPaginationStore.getState().resetToFirstPage();
       return true;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -580,6 +588,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       }
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
+      useContentPaginationStore.getState().resetToFirstPage();
       return true;
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;

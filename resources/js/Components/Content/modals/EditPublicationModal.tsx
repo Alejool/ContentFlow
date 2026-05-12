@@ -115,8 +115,8 @@ const EditPublicationModal = ({
     onClose,
     onSubmitSuccess: async (success) => {
       if (success) {
-        // Invalidate TanStack Query cache — triggers automatic refetch everywhere
-        queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+        // Remove TanStack Query cache to force a completely fresh fetch and avoid stale placeholder data.
+        queryClient.removeQueries({ queryKey: queryKeys.publications.all });
         queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       }
       onSubmit(success);

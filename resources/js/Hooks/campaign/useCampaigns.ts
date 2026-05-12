@@ -1,4 +1,5 @@
 import { queryKeys } from '@/lib/queryKeys';
+import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -63,7 +64,6 @@ export function useCampaignsList(filters: Record<string, any> = {}, page = 1) {
     queryKey: queryKeys.campaigns.list(filters, page),
     queryFn: () => fetchCampaignsFn(filters, page),
     staleTime: 2 * 60 * 1000, // 2 min — campaigns don't change that often
-    placeholderData: (prev) => prev, // keep previous page data while loading next
   });
 }
 
@@ -76,8 +76,10 @@ export function useDeleteCampaign() {
   return useMutation({
     mutationFn: (id: number) => axios.delete(route('api.v1.campaigns.destroy', id)),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+      useContentPaginationStore.getState().resetToFirstPage();
     },
   });
 }
@@ -92,7 +94,9 @@ export function useDuplicateCampaign() {
     mutationFn: (id: number) =>
       axios.post(route('api.v1.campaigns.duplicate', id)).then((r) => r.data?.campaign),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.all });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      useContentPaginationStore.getState().resetToFirstPage();
     },
   });
 }

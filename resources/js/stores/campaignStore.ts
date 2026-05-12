@@ -1,4 +1,5 @@
 import { useCalendarStore } from '@/stores/calendarStore';
+import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 import axios from 'axios';
 import { create } from 'zustand';
 
@@ -133,6 +134,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       get().removeCampaign(id);
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
+      useContentPaginationStore.getState().resetToFirstPage();
       return true;
     } catch (error) {
       set({
@@ -153,6 +155,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       }
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
+      useContentPaginationStore.getState().resetToFirstPage();
       return true;
     } catch (error) {
       set({

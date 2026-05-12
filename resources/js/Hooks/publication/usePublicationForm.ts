@@ -1116,7 +1116,7 @@ export const usePublicationForm = ({
       toast.success(t('publications.messages.cancelSuccess') || 'Publicación cancelada');
 
       // Invalidate TanStack Query cache
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      queryClient.removeQueries({ queryKey: queryKeys.publications.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
     } catch (err) {
       // silent
@@ -1134,7 +1134,7 @@ export const usePublicationForm = ({
       toast.success(t('publications.messages.platformCancelSuccess') || 'Plataforma cancelada');
 
       // Invalidate TanStack Query cache
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      queryClient.removeQueries({ queryKey: queryKeys.publications.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
     } catch (err) {
       toast.error(

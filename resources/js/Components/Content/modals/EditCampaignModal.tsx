@@ -13,6 +13,7 @@ import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import { useEditCampaignForm } from '@/Hooks/campaign/useEditCampaignForm';
 import { usePublicationsForCampaignEdit } from '@/Hooks/campaign/usePublicationsForCampaignEdit';
 import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 import { usePage } from '@inertiajs/react';
 import ModalFooter from './common/ModalFooter';
 
@@ -98,6 +99,8 @@ export default function EditCampaignModal({
       const success = await updateCampaign(campaign.id, payload, 'campaigns');
       if (success) {
         toast.success(t('campaigns.messages.updateSuccess') || 'Campaign updated successfully');
+        // Reset pagination to page 1 so the updated campaign appears at the top
+        useContentPaginationStore.getState().resetToFirstPage();
         if (onSubmit) {
           onSubmit(true);
         }

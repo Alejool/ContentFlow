@@ -1,4 +1,5 @@
 import { queryKeys } from '@/lib/queryKeys';
+import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 import type { Publication } from '@/types/Publication';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -36,7 +37,7 @@ function serializeParams(filters: Record<string, any>, page: number) {
     },
     {} as Record<string, any>,
   );
-  return { ...clean, page };
+  return { sort: 'newest', ...clean, page };
 }
 
 async function fetchPublicationsFn(
@@ -116,7 +117,6 @@ export function usePublicationsList(
       return { ...incoming, data: merged };
     },
     staleTime: 2 * 60 * 1000,
-    placeholderData: (prev) => prev,
   });
 }
 
@@ -126,8 +126,11 @@ export function useDeletePublication() {
   return useMutation({
     mutationFn: (id: number) => axios.delete(route('api.v1.publications.destroy', id)),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      // Remove list caches entirely so there is no stale placeholder when going back to page 1
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+      useContentPaginationStore.getState().resetToFirstPage();
     },
   });
 }
@@ -139,8 +142,11 @@ export function useDuplicatePublication() {
     mutationFn: (id: number) =>
       axios.post(route('api.v1.publications.duplicate', id)).then((r) => r.data?.publication),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      // Remove list caches entirely so there is no stale placeholder when going back to page 1
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+      useContentPaginationStore.getState().resetToFirstPage();
     },
   });
 }
@@ -156,8 +162,11 @@ export function useCreatePublication() {
         })
         .then((r) => r.data.publication as Publication),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
+      // Remove list caches entirely so there is no stale placeholder when going back to page 1
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+      useContentPaginationStore.getState().resetToFirstPage();
     },
   });
 }
@@ -175,8 +184,17 @@ export function useUpdatePublication() {
         .then((r) => (r.data.publication ?? r.data.data) as Publication);
     },
     onSuccess: (publication) => {
+      // 1. Wipe all paginated list caches so no stale placeholder is shown
+      //    (invalidateQueries only marks stale — the old order is still displayed
+      //     via placeholderData while the refetch runs in the background)
+      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      // 2. Reset to page 1 AFTER cache removal so the fresh fetch targets page 1
+      useContentPaginationStore.getState().resetToFirstPage();
+      // 3. Invalidate non-list queries (detail, calendar, etc.)
       queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
+      // 4. Keep the detail cache up to date
       if (publication?.id) {
         queryClient.setQueryData(queryKeys.publications.detail(publication.id), publication);
       }

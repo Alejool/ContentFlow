@@ -17,6 +17,7 @@ import PublicationSelector from '@/Components/Content/Campaign/common/Publicatio
 import { useAddCampaignForm } from '@/Hooks/campaign/useAddCampaignForm';
 import { usePublicationsForCampaign } from '@/Hooks/campaign/usePublicationsForCampaign';
 import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 
 import { DollarSign, FileText } from 'lucide-react';
 import ModalFooter from './common/ModalFooter';
@@ -115,6 +116,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
         addCampaign(response.data.campaign);
         handleClose();
         toast.success(t('campaigns.messages.success') || 'Campaign created successfully');
+        // Reset pagination to page 1 so the newly created campaign appears at the top
+        useContentPaginationStore.getState().resetToFirstPage();
         if (onSubmit) {
           onSubmit(true);
         }

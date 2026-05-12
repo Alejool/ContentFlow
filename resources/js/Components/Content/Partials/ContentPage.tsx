@@ -200,26 +200,23 @@ export default function ManageContentPage() {
     channel.listen('.PublicationStatusUpdated', handleStatusUpdate);
 
     // CRITICAL: Listen on workspace channel for approval level advancement
-    // This is a SPECIFIC event for when a publication moves to the next approval level
     const workspaceChannel = window.Echo.private(`workspace.${auth.user.current_workspace_id}`);
 
-    const handleApprovalLevelAdvanced = (event: any) => {
-      console.log('[ContentPage] Approval level advanced:', event);
-      console.log(
-        `  Publication ${event.publication_id} moved from level ${event.from_level.number} to ${event.to_level.number}`,
-      );
-
-      // Refresh to show updated publications
-      // - Users in the OLD level will see it disappear
-      // - Users in the NEW level will see it appear
+    const handleApprovalUpdate = (event: any) => {
+      console.log('[ContentPage] Content updated or approval advanced:', event);
       handleRefresh();
     };
 
-    workspaceChannel.listen('.approval.level.advanced', handleApprovalLevelAdvanced);
+    workspaceChannel
+      .listen('.publication.updated', handleApprovalUpdate)
+      .listen('.publication.created', handleApprovalUpdate)
+      .listen('.approval.level.advanced', handleApprovalUpdate);
 
     return () => {
-      channel.stopListening('.PublicationStatusUpdated', handleStatusUpdate);
-      workspaceChannel.stopListening('.approval.level.advanced', handleApprovalLevelAdvanced);
+      channel.stopListening('.PublicationStatusUpdated');
+      workspaceChannel.stopListening('.publication.updated');
+      workspaceChannel.stopListening('.publication.created');
+      workspaceChannel.stopListening('.approval.level.advanced');
     };
   }, [auth.user?.id, auth.user?.current_workspace_id, handleRefresh]);
 
