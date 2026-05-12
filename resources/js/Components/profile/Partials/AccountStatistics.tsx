@@ -2,7 +2,7 @@ import type { PageProps } from '@/types';
 import { formatDateString } from '@/Utils/formatters';
 import { Link, usePage } from '@inertiajs/react';
 import { Calendar, CheckCircle, Clock, MailWarning, Shield } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface AccountStatisticsProps {
@@ -89,7 +89,7 @@ export default function AccountStatistics({
       {!user?.email_verified_at && (
         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800/30 dark:bg-amber-900/10">
           <div className="flex items-start gap-3">
-            <MailWarning className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+            <MailWarning className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
             <div className="min-w-0 flex-1">
               <p className="mb-3 text-sm text-amber-800 dark:text-amber-300">
                 {t('profile.information.emailUnverified')}
@@ -100,7 +100,7 @@ export default function AccountStatistics({
                   method="post"
                   as="button"
                   onClick={() => setRecentlySent(true)}
-                  className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+                  className="bg-primary-600 hover:bg-primary-700 rounded-lg px-4 py-2 text-sm font-medium text-white"
                 >
                   {t('profile.information.sendVerification')}
                 </Link>

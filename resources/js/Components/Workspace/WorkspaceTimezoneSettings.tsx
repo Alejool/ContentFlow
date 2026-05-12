@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useTimezoneStore } from '@/stores/common/timezoneStore';
-import { useTranslation } from 'react-i18next';
 import Select from '@/Components/common/Modern/Select';
+import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import { Globe } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WorkspaceTimezoneSettingsProps {
   canManage?: boolean;
@@ -98,7 +98,7 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
         {/* Current Timezone Info */}
         <div className="mb-6 rounded-lg border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-5 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-neutral-950">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
               <i className="bi bi-info-circle text-lg"></i>
             </div>
             <div className="flex-1">
@@ -165,7 +165,7 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
             <button
               onClick={handleSave}
               disabled={!hasChanges || isLoading}
-              className="rounded-lg bg-primary-600 px-6 py-2.5 font-medium text-white shadow-sm transition-all hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-300"
+              className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg px-6 py-2.5 font-medium text-white shadow-sm transition-all hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               {isLoading ? (
                 <>
@@ -185,7 +185,7 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
         {!canManage && (
           <div className="rounded-lg border border-yellow-100 bg-gradient-to-br from-yellow-50 to-white p-4 dark:border-yellow-800/30 dark:from-yellow-900/10 dark:to-neutral-950">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">
                 <i className="bi bi-lock text-lg"></i>
               </div>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">

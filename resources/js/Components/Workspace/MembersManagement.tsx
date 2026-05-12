@@ -1,14 +1,14 @@
+import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
 import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
-import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
 import { getRoleStyle } from '@/Constants/Roles/RoleConstants';
-import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import {
   useRemoveWorkspaceMember,
   useUpdateMemberRole,
   useWorkspaceMembers,
 } from '@/Hooks/Workspace/useWorkspaceMembers';
+import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import { queryKeys } from '@/lib/common/queryKeys';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -131,7 +131,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
   if (isLoading) {
     return (
       <div className="p-12 text-center">
-        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary-600"></div>
+        <div className="border-primary-600 mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2"></div>
         <p className="text-gray-500">{t('workspace.loading')}</p>
       </div>
     );
@@ -165,7 +165,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
             return (
               <div
                 key={member.id}
-                className="flex flex-col justify-between gap-4 p-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-700/30 md:flex-row md:items-center"
+                className="flex flex-col justify-between gap-4 p-4 transition-colors hover:bg-gray-50 md:flex-row md:items-center dark:hover:bg-neutral-700/30"
               >
                 <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-4">
                   <div className="h-10 w-10 min-w-[2.5rem] shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-200 dark:border-neutral-600 dark:bg-neutral-700">
@@ -185,7 +185,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                     <div className="flex items-center gap-2 truncate font-semibold text-gray-900 dark:text-white">
                       {member.name}
                       {isMe && (
-                        <span className="shrink-0 rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                        <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
                           {t('workspace.you')}
                         </span>
                       )}
@@ -199,7 +199,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                 <div className="flex w-full items-center justify-end gap-3 pl-14 md:w-auto md:gap-4 md:pl-0">
                   {isCreator || !canManageMembers ? (
                     <span
-                      className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${
+                      className={`rounded-full border px-3 py-1 text-xs font-bold tracking-wider uppercase ${
                         getRoleStyle(currentRole.slug ?? 'member').badge
                       }`}
                     >
@@ -237,7 +237,7 @@ export default function MembersManagement({ roles = [], workspace }: MembersMana
                       onClick={() => initiateRemoveMember(member.id)}
                       buttonStyle="icon"
                       size="xs"
-                      className="flex-shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                      className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                       title={t('workspace.remove_member')}
                     >
                       <Trash2 className="h-4 w-4" />

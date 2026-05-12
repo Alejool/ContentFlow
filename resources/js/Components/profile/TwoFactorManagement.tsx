@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { router } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
-import { Shield, ShieldCheck, ShieldOff, RefreshCw, AlertTriangle } from 'lucide-react';
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Modal from '@/Components/common/Modern/Modal';
+import { router } from '@inertiajs/react';
+import { AlertTriangle, RefreshCw, Shield, ShieldCheck, ShieldOff } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TwoFactorManagementProps {
   isEnabled: boolean;
@@ -148,7 +148,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
         <div className="space-y-4">
           <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-700 dark:text-yellow-400" />
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-700 dark:text-yellow-400" />
               <div>
                 <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">Warning</p>
                 <p className="mt-1 text-xs text-yellow-600 dark:text-yellow-500">

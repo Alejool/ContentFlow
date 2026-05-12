@@ -79,7 +79,7 @@ export default function AiConfigSection({
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <header className="mb-8">
         <div className="mb-2 flex items-center gap-4">
-          <div className="rounded-lg border border-primary-500/20 bg-primary-500/10 p-2.5 text-primary-600 dark:text-primary-400">
+          <div className="border-primary-500/20 bg-primary-500/10 text-primary-600 dark:text-primary-400 rounded-lg border p-2.5">
             <BrainCircuit className="h-5 w-5" />
           </div>
           <div>
@@ -95,7 +95,7 @@ export default function AiConfigSection({
       </header>
 
       <div className="mb-8 flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/10">
-        <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+        <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
         <p className="text-sm text-blue-700 dark:text-blue-300">
           {t('profile.ai.hint') ||
             'Si configuras un proveedor aquí, el sistema usará tu clave personal en lugar de la predeterminada del sistema. Esto te da más control sobre el uso y las capacidades.'}
@@ -112,7 +112,7 @@ export default function AiConfigSection({
               key={provider.id}
               className={`group rounded-lg border p-6 transition-all duration-300 ${
                 isEnabled
-                  ? 'border-primary-500/30 bg-white shadow-md ring-1 ring-primary-500/10 dark:bg-neutral-800/60'
+                  ? 'border-primary-500/30 ring-primary-500/10 bg-white shadow-md ring-1 dark:bg-neutral-800/60'
                   : 'border-gray-200 bg-gray-50/50 opacity-80 dark:border-neutral-800 dark:bg-neutral-900/30'
               } `}
             >
@@ -140,7 +140,7 @@ export default function AiConfigSection({
                     href={provider.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary-500 transition-colors hover:text-primary-600"
+                    className="text-primary-500 hover:text-primary-600 flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase transition-colors"
                   >
                     {t('profile.ai.get_key') || 'Obtener Clave'}
                     <ExternalLink className="h-3 w-3" />
@@ -171,7 +171,7 @@ export default function AiConfigSection({
                       showPasswordToggle
                       containerClassName="max-w-xl"
                     />
-                    <div className="mt-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                    <div className="mt-2 flex items-center gap-2 text-[10px] font-bold tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
                       <ShieldCheck className="h-3.5 w-3.5" />
                       {t('profile.ai.secured_storage') || 'Almacenamiento Seguro Encriptado'}
                     </div>

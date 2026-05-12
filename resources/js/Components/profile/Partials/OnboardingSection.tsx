@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { RotateCcw, Info, AlertTriangle } from 'lucide-react';
 import Button from '@/Components/common/Modern/Button';
 import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
+import { AlertTriangle, Info, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ function ConfirmationDialog({ isOpen, onClose, onConfirm, isLoading }: Confirmat
             disabled={isLoading}
             loading={isLoading}
             icon={RotateCcw}
-            className="bg-primary-600 px-4 py-2 text-white hover:bg-primary-700"
+            className="bg-primary-600 hover:bg-primary-700 px-4 py-2 text-white"
           >
             {t('profile.onboarding.confirmButton') || 'Restart'}
           </Button>
@@ -85,7 +85,7 @@ export default function OnboardingSection() {
         {/* Section Header */}
         <div className="border-b border-gray-200 pb-4 dark:border-neutral-700">
           <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
-            <RotateCcw className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+            <RotateCcw className="text-primary-600 dark:text-primary-400 h-5 w-5" />
             {t('profile.onboarding.title') || 'Onboarding'}
           </h3>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -96,7 +96,7 @@ export default function OnboardingSection() {
 
         {/* Info Box */}
         <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800/50 dark:bg-blue-900/20">
-          <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div className="flex-1">
             <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
               {t('profile.onboarding.infoTitle') || 'What happens when you restart?'}

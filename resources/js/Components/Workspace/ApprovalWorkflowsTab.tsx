@@ -121,19 +121,19 @@ export default function ApprovalWorkflowsTab({
             </p>
             <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center">
-                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
+                <CheckCircle className="mr-2 h-4 w-4 shrink-0 text-green-500" />
                 {t('common.approvals.upgrade.benefits.custom_workflows')}
               </li>
               <li className="flex items-center">
-                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
+                <CheckCircle className="mr-2 h-4 w-4 shrink-0 text-green-500" />
                 {t('common.approvals.upgrade.benefits.content_control')}
               </li>
               <li className="flex items-center">
-                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
+                <CheckCircle className="mr-2 h-4 w-4 shrink-0 text-green-500" />
                 {t('common.approvals.upgrade.benefits.role_assignment')}
               </li>
               <li className="flex items-center">
-                <CheckCircle className="mr-2 h-4 w-4 flex-shrink-0 text-green-500" />
+                <CheckCircle className="mr-2 h-4 w-4 shrink-0 text-green-500" />
                 {t('common.approvals.upgrade.benefits.approval_history')}
               </li>
             </ul>
@@ -398,7 +398,7 @@ export default function ApprovalWorkflowsTab({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary-600"></div>
+        <div className="border-primary-600 h-10 w-10 animate-spin rounded-full border-b-2"></div>
       </div>
     );
   }
@@ -406,7 +406,7 @@ export default function ApprovalWorkflowsTab({
   if (isEditing && editingWorkflow) {
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <div className="flex flex-col border-b border-gray-200 bg-gray-50 p-6 dark:border-neutral-800 dark:bg-neutral-800/50 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col border-b border-gray-200 bg-gray-50 p-6 md:flex-row md:items-center md:justify-between dark:border-neutral-800 dark:bg-neutral-800/50">
           <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {editingWorkflow.id === 0
@@ -492,7 +492,7 @@ export default function ApprovalWorkflowsTab({
             {rolesWithApprovePermission.length === 0 && usersWithApprovePermission.length === 0 && (
               <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                 <div className="flex items-start gap-3">
-                  <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+                  <Shield className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
                   <div>
                     <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-300">
                       No hay roles o usuarios con permiso de aprobación
@@ -511,10 +511,10 @@ export default function ApprovalWorkflowsTab({
               {editingWorkflow.steps.map((step, index) => (
                 <div
                   key={index}
-                  className="animate-in fade-in slide-in-from-top-2 group flex flex-col items-start gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 duration-300 dark:border-neutral-800 dark:bg-neutral-800/20 xl:flex-row xl:items-center"
+                  className="animate-in fade-in slide-in-from-top-2 group flex flex-col items-start gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 duration-300 xl:flex-row xl:items-center dark:border-neutral-800 dark:bg-neutral-800/20"
                 >
                   <div className="flex w-full flex-1 items-center gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                    <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
                       {index + 1}
                     </div>
                     <Input
@@ -674,8 +674,8 @@ export default function ApprovalWorkflowsTab({
 
       {workflows.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center dark:border-neutral-700 dark:bg-neutral-900">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 dark:bg-primary-900/10">
-            <CheckCircle className="h-8 w-8 text-primary-600" />
+          <div className="bg-primary-50 dark:bg-primary-900/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <CheckCircle className="text-primary-600 h-8 w-8" />
           </div>
           <h4 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
             {t('common.approvals.noWorkflowsTitle')}
@@ -687,7 +687,7 @@ export default function ApprovalWorkflowsTab({
             variant="primary"
             buttonStyle="solid"
             onClick={handleCreate}
-            className="shadow-lg shadow-primary-500/20"
+            className="shadow-primary-500/20 shadow-lg"
             icon={Plus}
           >
             {t('common.approvals.configureFirstWorkflow')}
@@ -698,11 +698,11 @@ export default function ApprovalWorkflowsTab({
           {workflows.map((workflow) => (
             <div
               key={workflow.id}
-              className="group rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-700"
+              className="group hover:border-primary-300 dark:hover:border-primary-700 rounded-xl border border-gray-200 bg-white p-5 transition-all dark:border-neutral-800 dark:bg-neutral-900"
             >
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/20">
+                  <div className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 rounded-lg p-2">
                     <Shield className="h-5 w-5" />
                   </div>
                   <div>

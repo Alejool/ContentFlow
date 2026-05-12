@@ -1,15 +1,15 @@
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import {
-    canDeleteRole,
-    canEditRole,
-    getMemberCount,
-    isProtectedRole,
+  canDeleteRole,
+  canEditRole,
+  getMemberCount,
+  isProtectedRole,
 } from '@/Components/Workspace/rolesManagement.helpers';
 import type {
-    Permission,
-    Role,
-    RolesManagementTabProps,
+  Permission,
+  Role,
+  RolesManagementTabProps,
 } from '@/Components/Workspace/rolesManagement.types';
 import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import { router } from '@inertiajs/react';
@@ -148,7 +148,7 @@ export default function RolesManagementTab({
                 key={role.id}
                 className={`rounded-lg border p-5 transition-all duration-300 hover:shadow-lg ${
                   isCurrentRole
-                    ? 'border-primary-300 bg-gradient-to-br from-primary-50 to-white dark:border-primary-700 dark:from-primary-900/10 dark:to-neutral-950'
+                    ? 'border-primary-300 from-primary-50 dark:border-primary-700 dark:from-primary-900/10 bg-gradient-to-br to-white dark:to-neutral-950'
                     : 'border-gray-200 bg-gradient-to-br from-white to-gray-50 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950'
                 }`}
               >
@@ -164,7 +164,7 @@ export default function RolesManagementTab({
                       <h4 className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                         {role.name}
                         {isCurrentRole && (
-                          <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                          <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-xs font-bold">
                             {t('workspace.your_role')}
                           </span>
                         )}
@@ -223,20 +223,20 @@ export default function RolesManagementTab({
                   {role.description ?? t('workspace.no_description')}
 
                   {role.slug === 'editor' && (
-                    <span className="mt-2 flex items-start gap-2 text-xs font-medium text-primary-600 dark:text-primary-400">
-                      <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <span className="text-primary-600 dark:text-primary-400 mt-2 flex items-start gap-2 text-xs font-medium">
+                      <Info className="mt-0.5 h-4 w-4 shrink-0" />
                       <span>{t('roles.editor_publish_info')}</span>
                     </span>
                   )}
                   {role.slug === 'admin' && (
                     <span className="mt-2 flex items-start gap-2 text-xs font-medium text-blue-600 dark:text-blue-400">
-                      <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
                       <span>{t('roles.admin_publish_info')}</span>
                     </span>
                   )}
                   {role.slug === 'owner' && (
                     <span className="mt-2 flex items-start gap-2 text-xs font-medium text-purple-600 dark:text-purple-400">
-                      <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                       <span>{t('roles.owner_info')}</span>
                     </span>
                   )}
@@ -271,14 +271,14 @@ export default function RolesManagementTab({
 
         {/* No-permission notice */}
         {!canManageWorkspace && (
-          <div className="mt-6 rounded-lg border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
+          <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 mt-6 rounded-lg border p-4">
             <div className="flex items-start gap-3">
-              <ShieldAlert className="mt-0.5 h-5 w-5 text-primary-500" />
+              <ShieldAlert className="text-primary-500 mt-0.5 h-5 w-5" />
               <div>
-                <p className="text-sm font-medium text-primary-800 dark:text-primary-400">
+                <p className="text-primary-800 dark:text-primary-400 text-sm font-medium">
                   {t('workspace.permissions_required')}
                 </p>
-                <p className="mt-1 text-sm text-primary-700 dark:text-primary-300">
+                <p className="text-primary-700 dark:text-primary-300 mt-1 text-sm">
                   {t('workspace.owner_admin_required')}
                 </p>
               </div>
@@ -312,7 +312,7 @@ export default function RolesManagementTab({
                   type="checkbox"
                   checked={selectedPermissions.includes(permission.id)}
                   onChange={(e) => togglePermission(permission.id, e.target.checked)}
-                  className="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  className="text-primary-600 focus:ring-primary-500 mt-0.5 rounded border-gray-300"
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -361,7 +361,7 @@ export default function RolesManagementTab({
       >
         <div className="space-y-6">
           <div className="flex items-start gap-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-            <AlertCircle className="mt-0.5 h-6 w-6 flex-shrink-0 text-red-600 dark:text-red-400" />
+            <AlertCircle className="mt-0.5 h-6 w-6 shrink-0 text-red-600 dark:text-red-400" />
             <div>
               <h4 className="mb-1 text-sm font-bold text-red-900 dark:text-red-200">
                 {t('roles.delete_confirmation_title')}

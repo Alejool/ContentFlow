@@ -2,8 +2,8 @@ import Button from '@/Components/common/Modern/Button';
 import ModernCard from '@/Components/common/Modern/Card';
 import Input from '@/Components/common/Modern/Input';
 import Modal from '@/Components/common/ui/Modal';
-import { deleteUserSchema } from '@/schemas/Auth/user';
 import type { DeleteUserFormData } from '@/schemas/Auth/user';
+import { deleteUserSchema } from '@/schemas/Auth/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -62,15 +62,15 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
       className={className}
     >
       <div className="space-y-6">
-        <div className="flex gap-4 rounded-lg border border-primary-200 bg-primary-50 p-5 shadow-inner dark:border-primary-800/30 dark:bg-primary-900/10">
-          <div className="h-fit flex-shrink-0 rounded-lg bg-primary-100 p-2 dark:bg-primary-800/40">
-            <AlertTriangle className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+        <div className="border-primary-200 bg-primary-50 dark:border-primary-800/30 dark:bg-primary-900/10 flex gap-4 rounded-lg border p-5 shadow-inner">
+          <div className="bg-primary-100 dark:bg-primary-800/40 h-fit shrink-0 rounded-lg p-2">
+            <AlertTriangle className="text-primary-600 dark:text-primary-400 h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wide text-primary-800 dark:text-primary-300">
+            <h3 className="text-primary-800 dark:text-primary-300 text-sm font-bold tracking-wide uppercase">
               {t('profile.delete.warningTitle')}
             </h3>
-            <p className="mt-1 text-sm font-medium text-primary-700 dark:text-primary-400">
+            <p className="text-primary-700 dark:text-primary-400 mt-1 text-sm font-medium">
               {t('profile.delete.warningMessage')}
             </p>
           </div>
@@ -80,7 +80,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
           variant="danger"
           onClick={confirmUserDeletion}
           icon={Trash2 as any}
-          className="rounded-lg font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20 transition-transform active:scale-95"
+          className="shadow-primary-500/20 rounded-lg font-bold tracking-wider uppercase shadow-lg transition-transform active:scale-95"
         >
           {t('profile.delete.deleteButton')}
         </Button>
@@ -89,15 +89,15 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
       <Modal show={confirmingUserDeletion} onClose={closeModal}>
         <form onSubmit={handleSubmit(deleteUser)} className="p-8 dark:bg-neutral-900">
           <div className="mb-6 flex items-center gap-4">
-            <div className="rounded-lg bg-primary-50 p-3 dark:bg-primary-900/20">
-              <AlertTriangle className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3">
+              <AlertTriangle className="text-primary-600 dark:text-primary-400 h-8 w-8" />
             </div>
             <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
               {t('profile.delete.confirmTitle')}
             </h2>
           </div>
 
-          <p className="mb-8 font-medium leading-relaxed text-gray-600 dark:text-gray-400">
+          <p className="mb-8 leading-relaxed font-medium text-gray-600 dark:text-gray-400">
             {t('profile.delete.confirmMessage')}
           </p>
 
@@ -119,7 +119,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
               type="button"
               variant="secondary"
               onClick={closeModal}
-              className="w-full rounded-lg font-bold uppercase tracking-wider sm:w-auto"
+              className="w-full rounded-lg font-bold tracking-wider uppercase sm:w-auto"
             >
               {t('profile.delete.cancel')}
             </Button>
@@ -127,7 +127,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
             <Button
               variant="danger"
               disabled={isSubmitting}
-              className={`w-full rounded-lg font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20 sm:w-auto ${
+              className={`shadow-primary-500/20 w-full rounded-lg font-bold tracking-wider uppercase shadow-lg sm:w-auto ${
                 isSubmitting ? 'opacity-50' : 'transition-transform active:scale-95'
               }`}
               type="submit"

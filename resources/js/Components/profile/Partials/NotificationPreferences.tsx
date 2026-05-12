@@ -1,8 +1,8 @@
 import { useCompletionNotifications } from '@/Hooks/Notifications/useCompletionNotifications';
-import { Bell, BellOff, Check } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Notification Preferences Component
@@ -67,8 +67,8 @@ export default function NotificationPreferences() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
-          <Bell className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+        <div className="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-2">
+          <Bell className="text-primary-600 dark:text-primary-400 h-5 w-5" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -135,7 +135,7 @@ export default function NotificationPreferences() {
                 <button
                   onClick={handleRequestBrowserPermission}
                   disabled={isRequestingPermission || browserNotificationPermission === 'denied'}
-                  className="rounded-md bg-primary-100 px-3 py-1.5 text-xs text-primary-600 transition-colors hover:bg-primary-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
+                  className="bg-primary-100 text-primary-600 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 rounded-md px-3 py-1.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isRequestingPermission
                     ? t('profile.notifications.requesting') || 'Requesting...'
@@ -227,7 +227,7 @@ export default function NotificationPreferences() {
       {/* Info Box */}
       <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
         <div className="flex gap-3">
-          <Bell className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <Bell className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div className="flex-1">
             <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">
               {t('profile.notifications.info_title') || 'About Notifications'}

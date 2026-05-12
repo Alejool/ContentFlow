@@ -168,7 +168,7 @@ export default function WhiteLabelSettingsTab({
       {/* Introduction */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div className="flex items-center gap-4">
-          <div className="rounded-lg bg-primary-600 p-3 shadow-lg shadow-primary-500/20">
+          <div className="bg-primary-600 shadow-primary-500/20 rounded-lg p-3 shadow-lg">
             <Palette className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -184,7 +184,7 @@ export default function WhiteLabelSettingsTab({
 
         <div className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 dark:border-blue-800/30 dark:bg-blue-900/20">
           <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+          <span className="text-xs font-semibold tracking-wider text-blue-700 uppercase dark:text-blue-300">
             Enterprise Exclusive
           </span>
         </div>
@@ -209,7 +209,7 @@ export default function WhiteLabelSettingsTab({
                     </p>
                   </div>
 
-                  <div className="group relative flex aspect-video items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 hover:border-primary-500 dark:border-neutral-700 dark:bg-neutral-800/40 dark:hover:border-primary-500">
+                  <div className="group hover:border-primary-500 dark:hover:border-primary-500 relative flex aspect-video items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-800/40">
                     {logoPreview ? (
                       <img
                         src={logoPreview}
@@ -245,7 +245,7 @@ export default function WhiteLabelSettingsTab({
 
                     {/* Upload Success Overlay */}
                     {logoTempId && progress[logoTempId] === 100 && (
-                      <div className="absolute right-2 top-2 rounded-full bg-green-500 p-1 text-white">
+                      <div className="absolute top-2 right-2 rounded-full bg-green-500 p-1 text-white">
                         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
@@ -316,7 +316,7 @@ export default function WhiteLabelSettingsTab({
                     </p>
                   </div>
 
-                  <div className="group relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 hover:border-primary-500 dark:border-neutral-700 dark:bg-neutral-800/40 dark:hover:border-primary-500">
+                  <div className="group hover:border-primary-500 dark:hover:border-primary-500 relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-800/40">
                     {faviconPreview ? (
                       <img
                         src={faviconPreview}
@@ -329,7 +329,7 @@ export default function WhiteLabelSettingsTab({
 
                     {/* Upload Success Overlay */}
                     {faviconTempId && progress[faviconTempId] === 100 && (
-                      <div className="absolute right-1 top-1 rounded-full bg-green-500 p-1 text-white">
+                      <div className="absolute top-1 right-1 rounded-full bg-green-500 p-1 text-white">
                         <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
@@ -427,7 +427,7 @@ export default function WhiteLabelSettingsTab({
         {/* Live Preview Section */}
         <div className="space-y-6">
           <div className="sticky top-24">
-            <h4 className="mb-4 ml-2 text-sm font-bold uppercase tracking-widest text-gray-500 dark:text-neutral-500">
+            <h4 className="mb-4 ml-2 text-sm font-bold tracking-widest text-gray-500 uppercase dark:text-neutral-500">
               {t('workspace.white_label.live_preview') || 'Vista Previa en Vivo'}
             </h4>
 
@@ -470,12 +470,12 @@ export default function WhiteLabelSettingsTab({
 
               {/* Sidebar Header Preview */}
               <div className="relative overflow-hidden rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-                <p className="mb-4 text-xs font-bold uppercase text-gray-400 dark:text-neutral-500">
+                <p className="mb-4 text-xs font-bold text-gray-400 uppercase dark:text-neutral-500">
                   {t('workspace.white_label.sidebar_header') || 'Cabecera del Menú'}
                 </p>
 
                 <div className="flex items-center gap-3 rounded-lg border bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-black/20">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-neutral-800">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-neutral-800">
                     {logoPreview ? (
                       <img src={logoPreview} className="max-h-[80%] max-w-[80%] object-contain" />
                     ) : (
@@ -491,7 +491,7 @@ export default function WhiteLabelSettingsTab({
                     <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
                       {workspace.name}
                     </p>
-                    <p className="text-[10px] font-bold uppercase tracking-tighter opacity-60">
+                    <p className="text-[10px] font-bold tracking-tighter uppercase opacity-60">
                       {t('workspace.white_label.workspace_branding') || 'Workspace Branding'}
                     </p>
                   </div>
@@ -502,7 +502,7 @@ export default function WhiteLabelSettingsTab({
               <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-6 dark:border-emerald-900/20 dark:bg-emerald-900/10">
                 <div className="flex gap-3">
                   <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
-                  <p className="text-sm font-medium leading-relaxed text-emerald-800 dark:text-emerald-400">
+                  <p className="text-sm leading-relaxed font-medium text-emerald-800 dark:text-emerald-400">
                     {t('workspace.white_label.impact_notice') ||
                       'Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo.'}
                   </p>
