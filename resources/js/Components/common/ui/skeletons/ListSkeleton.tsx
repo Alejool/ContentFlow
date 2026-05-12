@@ -1,4 +1,3 @@
-import React from 'react';
 import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface ListSkeletonProps {
@@ -15,7 +14,7 @@ const ListSkeleton = ({ items = 5, hasAvatar = true, hasActions = true }: ListSk
           key={index}
           className="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
         >
-          {hasAvatar && <Skeleton variant="circle" className="h-10 w-10 flex-shrink-0" />}
+          {hasAvatar && <Skeleton variant="circle" className="h-10 w-10 shrink-0" />}
 
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-3/4" />

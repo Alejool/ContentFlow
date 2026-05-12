@@ -67,7 +67,7 @@ export default function ConfirmDialogModern({
       <div className="p-6">
         <div className="flex items-start gap-4">
           <div
-            className={`h-12 w-12 flex-shrink-0 rounded-full ${styles.iconBg} flex items-center justify-center`}
+            className={`h-12 w-12 shrink-0 rounded-full ${styles.iconBg} flex items-center justify-center`}
           >
             <AlertTriangle className={`h-6 w-6 ${styles.iconColor}`} />
           </div>
@@ -79,7 +79,7 @@ export default function ConfirmDialogModern({
 
           <button
             onClick={() => setIsOpen(false)}
-            className="flex-shrink-0 rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
+            className="shrink-0 rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
             aria-label="Cerrar diálogo"
           >
             <X className="h-5 w-5" />

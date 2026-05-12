@@ -98,7 +98,7 @@ export default function AlertCard({ type = 'info', title, message, className }: 
   return (
     <Alert className={cn(bgColor, borderColor, 'shadow-sm', className)}>
       <div className="flex items-start gap-3">
-        <Icon className={cn('mt-0.5 h-5 w-5 flex-shrink-0', iconColor)} />
+        <Icon className={cn('mt-0.5 h-5 w-5 shrink-0', iconColor)} />
         <div className="flex-1">
           {title && <p className={cn('mb-1 font-semibold', titleColor)}>{title}</p>}
           <AlertDescription className={cn('text-sm', textColor)}>{message}</AlertDescription>

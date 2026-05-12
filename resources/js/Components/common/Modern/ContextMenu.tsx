@@ -67,7 +67,7 @@ export function ContextMenu({ trigger, sections, placement = 'bottom end' }: Con
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800'
                 }`}
               >
-                {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
+                {item.icon && <span className="shrink-0">{item.icon}</span>}
                 <span>{item.label}</span>
               </button>
             ))}

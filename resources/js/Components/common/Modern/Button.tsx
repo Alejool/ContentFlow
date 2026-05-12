@@ -273,7 +273,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           } as const
         )[size];
 
-        return <IconComponent size={iconSize} className="flex-shrink-0" />;
+        return <IconComponent size={iconSize} className="shrink-0" />;
       }
 
       // Si ya es un elemento React válido
@@ -294,7 +294,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           } as const
         )[size];
 
-        return <IconComponent size={iconSize} className="flex-shrink-0" />;
+        return <IconComponent size={iconSize} className="shrink-0" />;
       }
 
       // Fallback: intentar renderizar como está

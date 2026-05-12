@@ -1,7 +1,7 @@
 import Label from '@/Components/common/Modern/Label';
 import { CheckCircle, TriangleAlert } from 'lucide-react';
-import { isValidElement, useState } from 'react';
 import type { TextareaHTMLAttributes } from 'react';
+import { isValidElement, useState } from 'react';
 import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
@@ -123,7 +123,7 @@ export default function Textarea<T extends FieldValues>({
 
       <div className="relative">
         {Icon && (
-          <div className="absolute left-3 top-3">
+          <div className="absolute top-3 left-3">
             {isValidElement(Icon) ? (
               Icon
             ) : (
@@ -171,14 +171,14 @@ export default function Textarea<T extends FieldValues>({
 
         {error && (
           <div className={getMessageStyles('error')} role="alert">
-            <TriangleAlert className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
+            <TriangleAlert className={`${currentSize.icon} mt-0.5 shrink-0`} />
             <span>{error}</span>
           </div>
         )}
 
         {success && !error && (
           <div className={getMessageStyles('success')} role="status">
-            <CheckCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
+            <CheckCircle className={`${currentSize.icon} mt-0.5 shrink-0`} />
             <span>{success}</span>
           </div>
         )}

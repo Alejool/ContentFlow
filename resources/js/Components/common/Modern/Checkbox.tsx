@@ -1,277 +1,148 @@
-import { useTheme } from '@/Hooks/Layout/useTheme';
-import type { LucideIcon } from 'lucide-react';
-import { AlertCircle, Check, CheckCircle } from 'lucide-react';
-import { ReactNode } from 'react';
-import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
+import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
+import React, { forwardRef } from 'react';
 
-interface CheckboxProps<T extends FieldValues = FieldValues> {
-  id: string;
-  label?: string | ReactNode;
-  error?: string;
-  success?: string;
-  register?: UseFormRegister<T>;
-  name?: Path<T>;
-  checked?: boolean;
-  disabled?: boolean;
-  className?: string;
-  containerClassName?: string;
-  icon?: LucideIcon;
-  theme?: 'dark' | 'light';
-  hint?: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'filled' | 'outlined';
-  required?: boolean;
-  onChange?: (checked: boolean) => void;
-  value?: string | number | boolean;
+interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  label?: string;
   description?: string;
+  variant?: 'default' | 'primary' | 'success' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  indeterminate?: boolean;
 }
 
-export default function Checkbox<T extends FieldValues>({
-  id,
-  label,
-  error,
-  success,
-  register,
-  name,
-  checked,
-  disabled = false,
-  className = '',
-  containerClassName = '',
-  icon: Icon,
-  theme: propTheme,
-  hint,
-  size = 'md',
-  variant = 'default',
-  required = false,
-  onChange,
-  value,
-  description,
-  ...props
-}: CheckboxProps<T>) {
-  const { theme: themeFromHook } = useTheme();
-  const theme = propTheme || themeFromHook;
-
-  // Configuración de tamaños
-  const sizeConfig = {
-    sm: {
-      checkbox: 'w-4 h-4',
-      icon: 'w-3 h-3',
-      label: 'text-xs',
-      description: 'text-xs',
+/**
+ * Componente Checkbox moderno con animaciones
+ */
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
+  (
+    {
+      label,
+      description,
+      variant = 'primary',
+      size = 'md',
+      indeterminate = false,
+      className = '',
+      disabled = false,
+      checked,
+      ...props
     },
-    md: {
-      checkbox: 'w-5 h-5',
-      icon: 'w-4 h-4',
-      label: 'text-sm',
-      description: 'text-xs',
-    },
-    lg: {
-      checkbox: 'w-6 h-6',
-      icon: 'w-5 h-5',
-      label: 'text-base',
-      description: 'text-sm',
-    },
-  };
+    ref,
+  ) => {
+    const sizeClasses = {
+      sm: 'h-4 w-4',
+      md: 'h-5 w-5',
+      lg: 'h-6 w-6',
+    };
 
-  const currentSize = sizeConfig[size];
+    const iconSizes = {
+      sm: 'h-3 w-3',
+      md: 'h-4 w-4',
+      lg: 'h-5 w-5',
+    };
 
-  const getContainerStyles = () => {
-    const baseStyles = 'flex items-start gap-3 transition-all duration-200';
+    const variantClasses = {
+      default: {
+        border: 'border-gray-300 dark:border-gray-600',
+        checked: 'bg-gray-600 border-gray-600 dark:bg-gray-500 dark:border-gray-500',
+        hover: 'hover:border-gray-400 dark:hover:border-gray-500',
+      },
+      primary: {
+        border: 'border-gray-300 dark:border-gray-600',
+        checked: 'bg-primary-600 border-primary-600 dark:bg-primary-500 dark:border-primary-500',
+        hover: 'hover:border-primary-400 dark:hover:border-primary-500',
+      },
+      success: {
+        border: 'border-gray-300 dark:border-gray-600',
+        checked: 'bg-green-600 border-green-600 dark:bg-green-500 dark:border-green-500',
+        hover: 'hover:border-green-400 dark:hover:border-green-500',
+      },
+      danger: {
+        border: 'border-gray-300 dark:border-gray-600',
+        checked: 'bg-red-600 border-red-600 dark:bg-red-500 dark:border-red-500',
+        hover: 'hover:border-red-400 dark:hover:border-red-500',
+      },
+    };
 
-    if (disabled) {
-      return `${baseStyles} opacity-60 cursor-not-allowed`;
-    }
+    const currentVariant = variantClasses[variant];
 
-    if (error) {
-      return `${baseStyles} ${theme === 'dark' ? 'animate-pulse' : ''}`;
-    }
-
-    return baseStyles;
-  };
-
-  const getCheckboxStyles = () => {
-    const baseStyles = `
-      rounded transition-all duration-200 flex items-center justify-center
-      border-2 focus:outline-none focus:ring-2 focus:ring-offset-2
-      ${currentSize.checkbox}
-    `;
-
-    if (theme === 'dark') {
-      switch (variant) {
-        case 'filled':
-          return `
-            ${baseStyles}
-            ${
-              checked
-                ? 'bg-primary-500 border-primary-500'
-                : 'bg-neutral-800 border-neutral-600 hover:border-neutral-500'
-            }
-            focus:ring-primary-500/30
-          `;
-
-        case 'outlined':
-          return `
-            ${baseStyles}
-            bg-transparent
-            ${
-              checked
-                ? 'border-primary-500 bg-primary-500/10'
-                : 'border-neutral-600 hover:border-neutral-500'
-            }
-            focus:ring-primary-500/30
-          `;
-
-        default:
-          return `
-            ${baseStyles}
-            ${
-              checked
-                ? 'bg-primary-500 border-primary-500'
-                : 'bg-neutral-800/50 border-neutral-600 hover:border-neutral-500'
-            }
-            focus:ring-primary-500/30
-          `;
-      }
-    } else {
-      switch (variant) {
-        case 'filled':
-          return `
-            ${baseStyles}
-            ${
-              checked
-                ? 'bg-primary-500 border-primary-500'
-                : 'bg-gray-100 border-gray-300 hover:border-gray-400'
-            }
-            focus:ring-primary-500/20
-          `;
-
-        case 'outlined':
-          return `
-            ${baseStyles}
-            bg-transparent
-            ${
-              checked ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'
-            }
-            focus:ring-primary-500/20
-          `;
-
-        default:
-          return `
-            ${baseStyles}
-            ${
-              checked
-                ? 'bg-primary-500 border-primary-500'
-                : 'bg-white border-gray-300 hover:border-gray-400'
-            }
-            focus:ring-primary-500/20
-          `;
-      }
-    }
-  };
-
-  const getLabelStyles = () => {
-    const base = `font-medium cursor-pointer select-none ${currentSize.label}`;
-
-    if (theme === 'dark') {
-      return `${base} ${error ? 'text-primary-400' : success ? 'text-green-400' : 'text-gray-300'}`;
-    }
-    return `${base} ${error ? 'text-primary-600' : success ? 'text-green-600' : 'text-gray-700'}`;
-  };
-
-  const getDescriptionStyles = () => {
-    return theme === 'dark' ? 'text-gray-400 mt-1' : 'text-gray-500 mt-1';
-  };
-
-  const getMessageStyles = (type: 'error' | 'success') => {
-    const base = 'flex items-start gap-2 px-3 py-2 rounded-lg text-sm mt-2';
-
-    if (theme === 'dark') {
-      return type === 'error'
-        ? `${base} text-primary-300 bg-primary-900/30 border border-primary-800/50`
-        : `${base} text-green-300 bg-green-900/30 border border-green-800/50`;
-    }
-    return type === 'error'
-      ? `${base} text-primary-600 bg-primary-50/80 border border-primary-100`
-      : `${base} text-green-600 bg-green-50/80 border border-green-100`;
-  };
-
-  const fieldName = name || (id as Path<T>);
-
-  return (
-    <div className={`space-y-2 ${containerClassName}`}>
-      <div className={getContainerStyles()}>
+    return (
+      <label
+        className={`inline-flex items-start gap-3 ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${className}`}
+      >
         <div className="relative flex items-center">
+          {/* Hidden native checkbox */}
           <input
-            id={id}
+            ref={ref}
             type="checkbox"
-            disabled={disabled}
-            {...(register ? register(fieldName) : {})}
             checked={checked}
-            onChange={(e) => {
-              if (onChange) {
-                onChange(e.target.checked);
-              }
-            }}
-            value={value}
-            className={`absolute h-full w-full cursor-pointer opacity-0 ${disabled ? 'cursor-not-allowed' : ''} `}
-            aria-invalid={!!error}
-            aria-describedby={error ? `${id}-error` : success ? `${id}-success` : undefined}
+            disabled={disabled}
+            className="peer sr-only"
             {...props}
           />
-          <div className={getCheckboxStyles()}>
-            {checked && <Check className={`${currentSize.icon} stroke-[3] text-white`} />}
-          </div>
-        </div>
 
-        <div className="flex-1">
-          <label htmlFor={id} className={getLabelStyles()}>
-            {label}
-            {required && <span className="ml-1 text-primary-500">*</span>}
-          </label>
-
-          {description && (
-            <p className={`${getDescriptionStyles()} ${currentSize.description}`}>{description}</p>
-          )}
-
-          {hint && (
-            <p className={`${getDescriptionStyles()} ${currentSize.description} mt-1`}>{hint}</p>
-          )}
-        </div>
-
-        {Icon && (
-          <div
-            className={` ${
-              theme === 'dark'
-                ? error
-                  ? 'text-primary-400'
-                  : success
-                    ? 'text-green-400'
-                    : 'text-gray-400'
-                : error
-                  ? 'text-primary-500'
-                  : success
-                    ? 'text-green-500'
-                    : 'text-gray-400'
-            } `}
+          {/* Custom checkbox */}
+          <motion.div
+            initial={false}
+            animate={{
+              scale: checked || indeterminate ? 1 : 1,
+              backgroundColor: checked || indeterminate ? undefined : 'transparent',
+            }}
+            whileTap={{ scale: disabled ? 1 : 0.95 }}
+            className={`
+              ${sizeClasses[size]}
+              flex items-center justify-center rounded-md border-2 transition-all duration-200
+              ${checked || indeterminate ? currentVariant.checked : currentVariant.border}
+              ${!disabled && !checked && !indeterminate ? currentVariant.hover : ''}
+              ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+              peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2
+              dark:peer-focus-visible:ring-offset-gray-900
+            `}
           >
-            <Icon className={currentSize.icon} />
+            {/* Check icon */}
+            {checked && !indeterminate && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+              >
+                <Check className={`${iconSizes[size]} text-white`} strokeWidth={3} />
+              </motion.div>
+            )}
+
+            {/* Indeterminate icon */}
+            {indeterminate && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                className={`${size === 'sm' ? 'h-0.5 w-2' : size === 'md' ? 'h-0.5 w-2.5' : 'h-1 w-3'} rounded-full bg-white`}
+              />
+            )}
+          </motion.div>
+        </div>
+
+        {/* Label and description */}
+        {(label || description) && (
+          <div className="flex-1">
+            {label && (
+              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {label}
+              </div>
+            )}
+            {description && (
+              <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                {description}
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </label>
+    );
+  },
+);
 
-      {error && (
-        <div id={`${id}-error`} className={getMessageStyles('error')} role="alert">
-          <AlertCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
-          <span>{error}</span>
-        </div>
-      )}
+Checkbox.displayName = 'Checkbox';
 
-      {success && !error && (
-        <div id={`${id}-success`} className={getMessageStyles('success')} role="status">
-          <CheckCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
-          <span>{success}</span>
-        </div>
-      )}
-    </div>
-  );
-}
+export default Checkbox;

@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  Loader2,
-  X,
+    AlertCircle,
+    AlertTriangle,
+    CheckCircle,
+    Info,
+    Loader2,
+    X,
 } from "lucide-react";
 import * as React from "react";
 
@@ -159,7 +159,7 @@ const ToastItem = ({ toast }: { toast: ToastProps }) => {
       )}
 
       <div className="flex items-start gap-3 p-4">
-        <div className="flex-shrink-0 mt-0.5">{ToastIcons[toast.type]}</div>
+        <div className="shrink-0 mt-0.5">{ToastIcons[toast.type]}</div>
 
         <div className="flex-1 min-w-0">
           {toast.title && (
@@ -192,7 +192,7 @@ const ToastItem = ({ toast }: { toast: ToastProps }) => {
         {toast.type !== "loading" && (
           <button
             onClick={handleClose}
-            className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 -m-1"
+            className="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 -m-1"
             aria-label="Close toast"
           >
             <X className="w-4 h-4" />

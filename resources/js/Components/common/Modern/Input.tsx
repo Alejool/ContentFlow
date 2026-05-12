@@ -1,8 +1,8 @@
-import { forwardRef, isValidElement, useState } from 'react';
-import type { InputHTMLAttributes, ReactNode } from 'react';
-import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
-import { CheckCircle, Eye, EyeOff, TriangleAlert } from 'lucide-react';
 import Label from '@/Components/common/Modern/Label';
+import { CheckCircle, Eye, EyeOff, TriangleAlert } from 'lucide-react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
+import { forwardRef, isValidElement, useState } from 'react';
+import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
 interface InputProps<T extends FieldValues = FieldValues> extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -177,7 +177,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
         <div className={getContainerStyles()}>
           {(Icon || prefix) && (
             <div
-              className={`absolute left-3 top-1/2 flex -translate-y-1/2 items-center ${
+              className={`absolute top-1/2 left-3 flex -translate-y-1/2 items-center ${
                 isSolidActive
                   ? 'text-white'
                   : error
@@ -250,7 +250,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
           />
 
           {(suffix || showPasswordToggle || error || success) && (
-            <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+            <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-2">
               {suffix}
 
               {showPasswordToggle && !disabled && (
@@ -274,14 +274,14 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
 
         {error && (
           <div className={getMessageStyles('error')} role="alert">
-            <TriangleAlert className={`${currentSize.icon} flex-shrink-0`} />
+            <TriangleAlert className={`${currentSize.icon} shrink-0`} />
             <span>{error}</span>
           </div>
         )}
 
         {success && !error && (
           <div className={getMessageStyles('success')} role="status">
-            <CheckCircle className={`${currentSize.icon} flex-shrink-0`} />
+            <CheckCircle className={`${currentSize.icon} shrink-0`} />
             <span>{success}</span>
           </div>
         )}

@@ -155,7 +155,7 @@ export default function ListBox({
             id={item.id}
             textValue={item.textValue || item.label}
             className={({ isSelected, isHovered, isFocusVisible, isDisabled }) => {
-              const baseClasses = `flex items-center gap-3 ${sizeClasses[size]} cursor-pointer transition-all duration-150 ${isDisabled ? 'cursor-not-allowed opacity-50' : ''} ${isFocusVisible ? 'outline-none ring-2 ring-inset ring-primary-500' : ''} `;
+              const baseClasses = `flex items-center gap-3 ${sizeClasses[size]} cursor-pointer transition-all duration-150 ${isDisabled ? 'cursor-not-allowed opacity-50' : ''} ${isFocusVisible ? 'ring-primary-500 ring-2 outline-none ring-inset' : ''} `;
 
               if (isSelected) {
                 return `${baseClasses} bg-primary-500 font-semibold text-white`;
@@ -170,12 +170,12 @@ export default function ListBox({
           >
             {({ isSelected }) => (
               <>
-                {item.icon && <div className={`flex-shrink-0 ${iconSizes[size]}`}>{item.icon}</div>}
+                {item.icon && <div className={`shrink-0 ${iconSizes[size]}`}>{item.icon}</div>}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate font-medium">{item.label}</span>
                     {isSelected && selectionMode !== 'none' && (
-                      <CheckCircle className={`flex-shrink-0 ${iconSizes[size]}`} />
+                      <CheckCircle className={`shrink-0 ${iconSizes[size]}`} />
                     )}
                   </div>
                   {item.description && (
@@ -197,8 +197,8 @@ export default function ListBox({
 
       {/* Error Message */}
       {error && (
-        <div className="mt-2 flex items-start gap-2 text-sm text-primary-600" role="alert">
-          <TriangleAlert className="h-4 w-4 flex-shrink-0" />
+        <div className="text-primary-600 mt-2 flex items-start gap-2 text-sm" role="alert">
+          <TriangleAlert className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -206,7 +206,7 @@ export default function ListBox({
       {/* Success Message */}
       {success && !error && (
         <div className="mt-2 flex items-start gap-2 text-sm text-green-600" role="status">
-          <CheckCircle className="h-4 w-4 flex-shrink-0" />
+          <CheckCircle className="h-4 w-4 shrink-0" />
           <span>{success}</span>
         </div>
       )}

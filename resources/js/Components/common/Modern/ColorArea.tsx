@@ -97,7 +97,7 @@ export default function ColorArea({
           yChannel="brightness"
           className="relative h-48 w-full rounded-lg border-2 border-gray-300 shadow-sm dark:border-neutral-700"
         >
-          <ColorThumb className="z-10 h-6 w-6 rounded-full border-2 border-white shadow-lg ring-2 ring-black/20 transition-transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-500/50" />
+          <ColorThumb className="focus:ring-primary-500/50 z-10 h-6 w-6 rounded-full border-2 border-white shadow-lg ring-2 ring-black/20 transition-transform hover:scale-110 focus:ring-4 focus:outline-none" />
         </AriaColorArea>
 
         {/* Hue Slider */}
@@ -120,7 +120,7 @@ export default function ColorArea({
                     'linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0))',
                 }}
               >
-                <ColorThumb className="top-1/2 h-7 w-7 -translate-y-1/2 rounded-full border-2 border-white shadow-lg ring-2 ring-black/20 transition-transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-primary-500/50" />
+                <ColorThumb className="focus:ring-primary-500/50 top-1/2 h-7 w-7 -translate-y-1/2 rounded-full border-2 border-white shadow-lg ring-2 ring-black/20 transition-transform hover:scale-110 focus:ring-4 focus:outline-none" />
               </SliderTrack>
             </ColorSlider>
           </div>
@@ -130,7 +130,7 @@ export default function ColorArea({
         {showHexInput && (
           <div className="flex items-center gap-3">
             <div
-              className="h-12 w-12 flex-shrink-0 rounded-lg border-2 border-gray-300 shadow-sm dark:border-neutral-700"
+              className="h-12 w-12 shrink-0 rounded-lg border-2 border-gray-300 shadow-sm dark:border-neutral-700"
               style={{ backgroundColor: colorValue.toString('hex') }}
             />
             <div className="relative flex-1">
@@ -139,16 +139,16 @@ export default function ColorArea({
                 value={colorValue.toString('hex').toUpperCase()}
                 onChange={handleHexInputChange}
                 disabled={disabled}
-                className={`block h-12 w-full rounded-lg border pl-10 pr-4 font-mono text-sm font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                className={`block h-12 w-full rounded-lg border pr-4 pl-10 font-mono text-sm font-bold transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none ${
                   error
-                    ? 'border-primary-500 bg-white text-gray-900 focus:ring-primary-500/20 dark:bg-neutral-800 dark:text-white dark:focus:ring-primary-500/30'
+                    ? 'border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30 bg-white text-gray-900 dark:bg-neutral-800 dark:text-white'
                     : success
                       ? 'border-green-500 bg-white text-gray-900 focus:ring-green-500/20 dark:bg-neutral-800 dark:text-white dark:focus:ring-green-500/30'
-                      : 'border-gray-300 bg-white text-gray-900 hover:border-gray-400 focus:ring-primary-500/20 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:text-white dark:hover:border-neutral-600/70 dark:focus:ring-primary-500/30'
+                      : 'focus:ring-primary-500/20 dark:focus:ring-primary-500/30 border-gray-300 bg-white text-gray-900 hover:border-gray-400 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:text-white dark:hover:border-neutral-600/70'
                 } ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
                 placeholder="#000000"
               />
-              <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-gray-400">
+              <div className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 font-mono text-sm text-gray-400">
                 #
               </div>
             </div>
@@ -158,10 +158,10 @@ export default function ColorArea({
         {/* Error Message */}
         {error && (
           <div
-            className="flex items-start gap-2 rounded-lg py-2 text-sm text-primary-600"
+            className="text-primary-600 flex items-start gap-2 rounded-lg py-2 text-sm"
             role="alert"
           >
-            <TriangleAlert className="h-4 w-4 flex-shrink-0" />
+            <TriangleAlert className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -172,7 +172,7 @@ export default function ColorArea({
             className="flex items-start gap-2 rounded-lg py-2 text-sm text-green-600"
             role="status"
           >
-            <CheckCircle className="h-4 w-4 flex-shrink-0" />
+            <CheckCircle className="h-4 w-4 shrink-0" />
             <span>{success}</span>
           </div>
         )}

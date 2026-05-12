@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
+import type { MenuItemProps, MenuProps } from 'react-aria-components';
 import {
   Menu as AriaMenu,
   MenuItem as AriaMenuItem,
@@ -7,7 +8,6 @@ import {
   Popover,
   Separator,
 } from 'react-aria-components';
-import type { MenuItemProps, MenuProps } from 'react-aria-components';
 
 interface ModernMenuProps<T> extends Omit<MenuProps<T>, 'children'> {
   children: ReactNode;
@@ -60,9 +60,9 @@ export function MenuItem({
   return (
     <AriaMenuItem
       {...props}
-      className={`flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium outline-none transition-colors focus:bg-primary-50 focus:text-primary-600 dark:focus:bg-primary-900/20 dark:focus:text-primary-400 ${variantStyles[variant]}`}
+      className={`focus:bg-primary-50 focus:text-primary-600 dark:focus:bg-primary-900/20 dark:focus:text-primary-400 flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none ${variantStyles[variant]}`}
     >
-      {Icon && <Icon className="h-4 w-4 flex-shrink-0" />}
+      {Icon && <Icon className="h-4 w-4 shrink-0" />}
       <span>{children}</span>
     </AriaMenuItem>
   );

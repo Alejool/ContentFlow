@@ -85,7 +85,7 @@ function DropdownPortal({
         !usePortal
           ? dropdownDirection === 'up'
             ? 'bottom-full left-0 mb-1'
-            : 'left-0 top-full mt-1'
+            : 'top-full left-0 mt-1'
           : ''
       }`}
     >
@@ -444,7 +444,7 @@ export default function Select<T extends FieldValues>({
           <div className="relative">
             {Icon && (
               <div
-                className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 ${
+                className={`absolute top-1/2 left-3 z-10 -translate-y-1/2 ${
                   isSolidActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
@@ -516,7 +516,7 @@ export default function Select<T extends FieldValues>({
                 )}
               </span>
 
-              <div className="ml-2 flex flex-shrink-0 items-center gap-1">
+              <div className="ml-2 flex shrink-0 items-center gap-1">
                 {clearable &&
                   ((multiple && Array.isArray(value) && value.length > 0) ||
                     (!multiple && value && value !== '')) &&
@@ -545,7 +545,7 @@ export default function Select<T extends FieldValues>({
                 <ChevronDown
                   className={` ${
                     currentSize.icon
-                  } flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${
+                  } shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${
                     isSolidActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
                   } `}
                   aria-hidden="true"
@@ -580,7 +580,7 @@ export default function Select<T extends FieldValues>({
               {searchable && (
                 <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
                   <div className="relative">
-                    <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                    <Search className="absolute top-1/2 left-2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <input
                       ref={inputRef}
                       type="text"
@@ -589,7 +589,7 @@ export default function Select<T extends FieldValues>({
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pl-8 pr-2 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-primary-500"
+                      className="focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pr-2 pl-8 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500"
                       aria-label="Search options"
                     />
                   </div>
@@ -627,11 +627,11 @@ export default function Select<T extends FieldValues>({
                         aria-selected={isSelected}
                         aria-disabled={option.disabled}
                       >
-                        {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
-                        <span className="flex-1 whitespace-nowrap text-left">{option.label}</span>
+                        {option.icon && <span className="shrink-0">{option.icon}</span>}
+                        <span className="flex-1 text-left whitespace-nowrap">{option.label}</span>
                         {isSelected && (
                           <Check
-                            className={`h-4 w-4 flex-shrink-0 ${
+                            className={`h-4 w-4 shrink-0 ${
                               activeColor ? 'text-white' : 'text-primary-500 dark:text-primary-400'
                             }`}
                           />
@@ -647,14 +647,14 @@ export default function Select<T extends FieldValues>({
 
         {error && (
           <div id={`${id}-error`} className={getMessageStyles('error')} role="alert">
-            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span className="text-sm">{error}</span>
           </div>
         )}
 
         {success && !error && (
           <div id={`${id}-success`} className={getMessageStyles('success')} role="status">
-            <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+            <CheckCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span className="text-sm">{success}</span>
           </div>
         )}

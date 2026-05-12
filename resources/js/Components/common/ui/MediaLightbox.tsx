@@ -70,7 +70,7 @@ export default function MediaLightbox({
         onClick={onClose}
         buttonStyle="icon"
         icon={X}
-        className="absolute right-6 top-6 z-50 !text-white"
+        className="absolute top-6 right-6 z-50 !text-white"
         aria-label="Close lightbox"
       >
         {''}
@@ -138,9 +138,9 @@ export default function MediaLightbox({
                   }
                 }}
                 aria-label={`Go to media ${idx + 1} of ${mediaArray.length}`}
-                className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                   idx === currentIndex
-                    ? 'scale-105 border-primary-500 dark:border-primary-400'
+                    ? 'border-primary-500 dark:border-primary-400 scale-105'
                     : 'border-transparent hover:border-gray-400'
                 }`}
               >
@@ -184,7 +184,7 @@ export default function MediaLightbox({
       </div>
 
       {currentMedia.title && (
-        <div className="absolute left-1/2 top-6 -translate-x-1/2 text-lg font-medium text-white opacity-70">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 text-lg font-medium text-white opacity-70">
           {currentMedia.title}
         </div>
       )}

@@ -1,7 +1,8 @@
-import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
-import React, { ReactNode } from 'react';
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { type ReactNode } from 'react';
 
-type MaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type MaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
 
 interface ModalProps {
   children: ReactNode;
@@ -30,45 +31,54 @@ export default function Modal({
     lg: 'sm:max-w-lg',
     xl: 'sm:max-w-xl',
     '2xl': 'sm:max-w-2xl',
+    '3xl': 'sm:max-w-3xl',
+    '4xl': 'sm:max-w-4xl',
   };
   const maxWidthClass = maxWidthMap[maxWidth];
 
   return (
-    <Transition show={show} leave="duration-200">
-      <Dialog
-        as="div"
-        id="modal"
-        className="fixed inset-0 z-50 flex transform items-center overflow-y-auto px-4 py-6 transition-all sm:px-0"
-        onClose={close}
-      >
-        <TransitionChild
-          as={React.Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+    <AnimatePresence mode="wait">
+      {show && (
+        <Dialog
+          static
+          as="div"
+          open={show}
+          onClose={close}
+          className="fixed inset-0 z-[9999]"
         >
-          <div className="absolute inset-0 bg-gray-500/75" />
-        </TransitionChild>
+          {/* Backdrop animado con Framer Motion */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm dark:bg-black/80"
+            onClick={close}
+          />
 
-        <TransitionChild
-          as={React.Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          enterTo="opacity-100 translate-y-0 sm:scale-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-          leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        >
-          <DialogPanel
-            className={`mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all dark:bg-neutral-900 sm:mx-auto sm:w-full ${maxWidthClass}`}
-          >
-            {children}
-          </DialogPanel>
-        </TransitionChild>
-      </Dialog>
-    </Transition>
+          {/* Contenedor centrado con scroll */}
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{
+                  duration: 0.3,
+                  ease: [0.4, 0, 0.2, 1],
+                }}
+                className="w-full"
+              >
+                <DialogPanel
+                  className={`relative mx-auto w-full overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10 ${maxWidthClass}`}
+                >
+                  {children}
+                </DialogPanel>
+              </motion.div>
+            </div>
+          </div>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 }

@@ -149,10 +149,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       {videoPreviewUrl && (
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
           <div className="flex items-center gap-3">
-            <div
-              className="group relative flex-shrink-0 cursor-pointer"
-              onClick={handleShowVideoModal}
-            >
+            <div className="group relative shrink-0 cursor-pointer" onClick={handleShowVideoModal}>
               {/* Thumbnail estático sin cargar el video */}
               <div className="relative flex h-20 w-32 items-center justify-center overflow-hidden rounded border border-gray-300 bg-gradient-to-br from-gray-800 to-gray-900 dark:border-gray-600">
                 <Play className="h-12 w-12 text-white/60" />
@@ -169,7 +166,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
               <button
                 type="button"
                 onClick={handleShowVideoModal}
-                className="mt-1 text-xs text-primary-500 hover:text-primary-600"
+                className="text-primary-500 hover:text-primary-600 mt-1 text-xs"
               >
                 Click to preview
               </button>
@@ -220,7 +217,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <button
             type="button"
             onClick={handleInputClick}
-            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-opacity-80 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
+            className="hover:bg-opacity-80 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
           >
             {t('publications.modal.publish.button.change')}
           </button>
@@ -234,7 +231,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-all ${
             isDragging
               ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-              : 'border-gray-200 bg-gray-50 hover:border-primary-400 dark:border-neutral-700 dark:bg-neutral-800'
+              : 'hover:border-primary-400 border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800'
           }`}
         >
           <Upload

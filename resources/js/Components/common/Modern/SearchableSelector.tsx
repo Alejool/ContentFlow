@@ -75,7 +75,7 @@ export default function SearchableSelector<T>({
   if (loading) {
     return (
       <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-        <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-primary-500"></div>
+        <div className="border-primary-500 mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
         Loading...
       </div>
     );
@@ -84,7 +84,7 @@ export default function SearchableSelector<T>({
   return (
     <div className={`flex flex-col ${className}`}>
       {/* Search Input - Sticky at top */}
-      <div className="relative mb-3 flex-shrink-0">
+      <div className="relative mb-3 shrink-0">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <Search className="h-4 w-4 text-gray-400" />
         </div>
@@ -93,7 +93,7 @@ export default function SearchableSelector<T>({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={searchPlaceholder}
-          className="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500"
+          className="focus:ring-primary-500 block w-full rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500"
           disabled={disabled}
         />
         {searchQuery && (

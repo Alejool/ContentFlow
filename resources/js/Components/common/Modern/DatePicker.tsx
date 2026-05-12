@@ -159,8 +159,8 @@ const CustomTimeSelector = ({
   };
 
   return (
-    <div className="flex w-full flex-shrink-0 flex-col border-t border-gray-100 bg-white pb-14 dark:border-neutral-800 dark:bg-neutral-900 md:w-[220px] md:border-l md:border-t-0">
-      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-gray-300 md:h-16 md:gap-2 md:px-4 md:text-sm">
+    <div className="flex w-full shrink-0 flex-col border-t border-gray-100 bg-white pb-14 md:w-[220px] md:border-t-0 md:border-l dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 md:h-16 md:gap-2 md:px-4 md:text-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-gray-300">
         <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
         <span>{currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}</span>
       </div>
@@ -204,11 +204,11 @@ const CustomTimeSelector = ({
           >
             <span className="sr-only">Decrement hours</span>
           </Button>
-          <span className="text-[0.5625rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-600 md:text-[0.6875rem]">
+          <span className="text-[0.5625rem] font-semibold tracking-wider text-gray-400 uppercase md:text-[0.6875rem] dark:text-neutral-600">
             {currentLocale === 'es' ? 'Horas' : 'Hours'}
           </span>
         </div>
-        <div className="-mt-0.5 self-center text-xl font-semibold text-gray-400 dark:text-neutral-600 md:-mt-2 md:text-4xl">
+        <div className="-mt-0.5 self-center text-xl font-semibold text-gray-400 md:-mt-2 md:text-4xl dark:text-neutral-600">
           :
         </div>
         <div className="flex flex-col items-center gap-1.5 md:gap-3">
@@ -250,7 +250,7 @@ const CustomTimeSelector = ({
           >
             <span className="sr-only">Decrement minutes</span>
           </Button>
-          <span className="text-[0.5625rem] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-600 md:text-[0.6875rem]">
+          <span className="text-[0.5625rem] font-semibold tracking-wider text-gray-400 uppercase md:text-[0.6875rem] dark:text-neutral-600">
             {currentLocale === 'es' ? 'Minutos' : 'Minutes'}
           </span>
         </div>
@@ -467,7 +467,7 @@ const DatePickerModern = <T extends FieldValues>({
               className="fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[2px]"
               onClick={() => setIsOpen(false)}
             />
-            <div className="fixed left-1/2 top-1/2 z-[9999] max-h-[90vh] w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-2 border-primary-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900 sm:max-w-fit">
+            <div className="border-primary-100 fixed top-1/2 left-1/2 z-[9999] max-h-[90vh] w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-neutral-900">
               <div className="flex max-w-full flex-col justify-center overflow-auto md:flex-row">
                 <div className="">
                   <div
@@ -569,7 +569,7 @@ const DatePickerModern = <T extends FieldValues>({
                     <CalendarGrid className="w-full">
                       <CalendarGridHeader>
                         {(day: string) => (
-                          <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                          <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
                             {day}
                           </CalendarHeaderCell>
                         )}
@@ -592,14 +592,14 @@ const DatePickerModern = <T extends FieldValues>({
                               [
                                 'flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all duration-200',
                                 isSelected
-                                  ? 'scale-105 bg-primary-500 font-semibold text-white shadow-lg shadow-primary-500/30'
+                                  ? 'bg-primary-500 shadow-primary-500/30 scale-105 font-semibold text-white shadow-lg'
                                   : isToday
-                                    ? 'border-2 border-primary-500 bg-primary-50 font-semibold text-primary-600 dark:bg-primary-500/10 dark:text-primary-400'
+                                    ? 'border-primary-500 bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400 border-2 font-semibold'
                                     : isDisabled
                                       ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
                                       : 'text-gray-700 hover:scale-105 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800',
                                 isFoc && !isSelected
-                                  ? 'ring-2 ring-primary-400/40 ring-offset-2 dark:ring-offset-neutral-900'
+                                  ? 'ring-primary-400/40 ring-2 ring-offset-2 dark:ring-offset-neutral-900'
                                   : '',
                               ].join(' ')
                             }
@@ -613,14 +613,14 @@ const DatePickerModern = <T extends FieldValues>({
 
                   {/* Footer */}
                   <div
-                    className="absolute bottom-0 left-0 right-0 flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900"
+                    className="absolute right-0 bottom-0 left-0 flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900"
                     style={{
                       borderBottomLeftRadius: '0.75rem',
                       borderBottomRightRadius: showTimeSelect ? 0 : '0.75rem',
                     }}
                   >
                     <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      <Calendar className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                      <Calendar className="h-4 w-4 shrink-0 text-gray-400" />
                       <span className="truncate">{formatDisplayDate(displayDate)}</span>
                       {showTimezone && useUTC && (
                         <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">

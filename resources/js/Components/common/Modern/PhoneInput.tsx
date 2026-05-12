@@ -1,14 +1,14 @@
+import Select from '@/Components/common/Modern/Select';
+import type { CountryCode } from 'libphonenumber-js';
 import {
   getCountryCallingCode,
-  parsePhoneNumber,
   isPossiblePhoneNumber,
   isValidPhoneNumber,
+  parsePhoneNumber,
 } from 'libphonenumber-js';
-import type { CountryCode } from 'libphonenumber-js';
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { CheckCircle, TriangleAlert } from 'lucide-react';
-import Select from '@/Components/common/Modern/Select';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PhoneInputProps {
   value?: string;
@@ -253,7 +253,7 @@ export default function PhoneInput({
         {/* Input de número */}
         <div className="col-span-7">
           <div className="relative">
-            <div className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-base font-medium text-gray-500 dark:text-gray-400">
+            <div className="absolute top-1/2 left-3 z-10 -translate-y-1/2 text-base font-medium text-gray-500 dark:text-gray-400">
               +{callingCode}
             </div>
             <input
@@ -262,7 +262,7 @@ export default function PhoneInput({
               onChange={handleNumberChange}
               disabled={disabled}
               placeholder={placeholder || t('profile.information.phonePlaceholder')}
-              className={`w-full rounded-lg border bg-gray-50 py-3 pr-4 text-base text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-neutral-800/50 dark:text-white ${validationError ? 'border-red-500 focus:ring-red-500/20' : 'border-gray-200 hover:border-primary-400 focus:border-primary-500 focus:ring-primary-500/20 dark:border-neutral-700 dark:hover:border-primary-600'} ${disabled ? 'cursor-not-allowed opacity-60' : ''} `}
+              className={`w-full rounded-lg border bg-gray-50 py-3 pr-4 text-base text-gray-900 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:bg-neutral-800/50 dark:text-white ${validationError ? 'border-red-500 focus:ring-red-500/20' : 'hover:border-primary-400 focus:border-primary-500 focus:ring-primary-500/20 dark:hover:border-primary-600 border-gray-200 dark:border-neutral-700'} ${disabled ? 'cursor-not-allowed opacity-60' : ''} `}
               style={{ paddingLeft: `${2.5 + callingCode.length * 0.6}rem` }}
             />
           </div>
@@ -272,14 +272,14 @@ export default function PhoneInput({
       {/* Mensajes de validación */}
       {validationError && (
         <div className="animate-shake mt-2 flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
-          <TriangleAlert className="h-4 w-4 flex-shrink-0" />
+          <TriangleAlert className="h-4 w-4 shrink-0" />
           <span>{validationError}</span>
         </div>
       )}
 
       {isValid && !validationError && nationalNumber && (
         <div className="mt-2 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
-          <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" />
+          <CheckCircle className="h-3.5 w-3.5 shrink-0" />
           <span>
             {(() => {
               try {
