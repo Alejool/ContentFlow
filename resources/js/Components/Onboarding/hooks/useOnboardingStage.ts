@@ -61,12 +61,16 @@ export function useOnboardingStage(): OnboardingStageActions {
 
   // Derive stage from state — pure function, no side-effects
   const deriveStage = useCallback((): OnboardingStage => {
+    // If onboarding is already completed, always return 'complete'
+    if (state.completedAt !== null) return 'complete';
+    
     if (!state.businessInfoCompleted) return 'businessInfo';
     if (!state.planSelected) return 'planSelection';
     if (!state.tourCompleted && !state.tourSkipped) return 'tour';
     if (!state.wizardCompleted && !state.wizardSkipped) return 'wizard';
     return 'complete';
   }, [
+    state.completedAt,
     state.businessInfoCompleted,
     state.planSelected,
     state.tourCompleted,

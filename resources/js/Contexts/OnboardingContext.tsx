@@ -75,7 +75,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     if (onboardingProps) {
       // 2. CRITICAL: Always trust backend's completedAt status
       // If backend says onboarding is completed, override local cache
-      if (onboardingProps.completedAt !== null && onboardingProps.completedAt !== store.completedAt) {
+      if (onboardingProps.completedAt !== null) {
         console.log('OnboardingContext: Backend shows onboarding completed. Syncing local state.');
         store.setState(onboardingProps);
         return;

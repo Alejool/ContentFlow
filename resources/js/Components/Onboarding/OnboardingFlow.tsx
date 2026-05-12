@@ -172,7 +172,10 @@ export default function OnboardingFlow({
   const { state } = useOnboarding();
 
   // Don't render if onboarding is already completed
-  if (currentStage === 'complete' || state.completedAt !== null) return null;
+  // Check both the derived stage and the completedAt timestamp
+  if (currentStage === 'complete' || state.completedAt !== null) {
+    return null;
+  }
 
   const currentTourStep =
     tourSteps[Math.min(/* state.tourCurrentStep */ 0, tourSteps.length - 1)] ?? tourSteps[0];
