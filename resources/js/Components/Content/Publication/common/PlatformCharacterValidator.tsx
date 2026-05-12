@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { useMemo } from 'react';
 
 /**
@@ -138,42 +138,16 @@ export default function PlatformCharacterValidator({
     );
   }
 
+  if (!hasErrors && !hasWarnings) return null;
+
   return (
     <div
       className={`rounded-lg border p-3 text-sm ${
         hasErrors
           ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
-          : hasWarnings
-            ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'
-            : 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+          : 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'
       }`}
     >
-      {/* Header */}
-      <div className="mb-2.5 flex items-center gap-1.5">
-        {hasErrors ? (
-          <AlertTriangle className="h-4 w-4 flex-shrink-0 text-red-500 dark:text-red-400" />
-        ) : hasWarnings ? (
-          <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-500 dark:text-amber-400" />
-        ) : (
-          <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400" />
-        )}
-        <span
-          className={`text-xs font-semibold ${
-            hasErrors
-              ? 'text-red-800 dark:text-red-300'
-              : hasWarnings
-                ? 'text-amber-800 dark:text-amber-300'
-                : 'text-green-800 dark:text-green-300'
-          }`}
-        >
-          {hasErrors
-            ? 'El texto supera el límite de algunas plataformas'
-            : hasWarnings
-              ? 'El texto se acerca al límite'
-              : 'Texto dentro del límite en todas las plataformas'}
-        </span>
-      </div>
-
       {/* Per-platform rows */}
       <div className="space-y-1.5">
         {results.map((r) => (
