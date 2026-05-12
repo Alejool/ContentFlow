@@ -116,7 +116,8 @@ export function usePublicationsList(
 
       return { ...incoming, data: merged };
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 30 * 1000,  // 30s — publicaciones cambian frecuentemente
+    refetchOnMount: 'always', // siempre refresca al montar si los datos son stale
   });
 }
 
@@ -126,9 +127,9 @@ export function useDeletePublication() {
   return useMutation({
     mutationFn: (id: number) => axios.delete(route('api.v1.publications.destroy', id)),
     onSuccess: () => {
-      // Remove list caches entirely so there is no stale placeholder when going back to page 1
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      // Invalidate list caches to trigger background refetch without losing current filters
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       useContentPaginationStore.getState().resetToFirstPage();
     },
@@ -142,9 +143,9 @@ export function useDuplicatePublication() {
     mutationFn: (id: number) =>
       axios.post(route('api.v1.publications.duplicate', id)).then((r) => r.data?.publication),
     onSuccess: () => {
-      // Remove list caches entirely so there is no stale placeholder when going back to page 1
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      // Invalidate list caches to trigger background refetch without losing current filters
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       useContentPaginationStore.getState().resetToFirstPage();
     },
@@ -162,9 +163,9 @@ export function useCreatePublication() {
         })
         .then((r) => r.data.publication as Publication),
     onSuccess: () => {
-      // Remove list caches entirely so there is no stale placeholder when going back to page 1
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      // Invalidate list caches to trigger background refetch without losing current filters
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       useContentPaginationStore.getState().resetToFirstPage();
     },
@@ -184,20 +185,54 @@ export function useUpdatePublication() {
         .then((r) => (r.data.publication ?? r.data.data) as Publication);
     },
     onSuccess: (publication) => {
-      // 1. Wipe all paginated list caches so no stale placeholder is shown
-      //    (invalidateQueries only marks stale — the old order is still displayed
-      //     via placeholderData while the refetch runs in the background)
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
-      // 2. Reset to page 1 AFTER cache removal so the fresh fetch targets page 1
-      useContentPaginationStore.getState().resetToFirstPage();
-      // 3. Invalidate non-list queries (detail, calendar, etc.)
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
-      // 4. Keep the detail cache up to date
+      // 1. Mantener el detalle actualizado en caché
       if (publication?.id) {
         queryClient.setQueryData(queryKeys.publications.detail(publication.id), publication);
       }
+
+      if (publication?.id) {
+        // 2a. Para las queries de PÁGINA 1: mover la publicación actualizada al tope.
+        //     Esto da retroalimentación visual inmediata sin flash de lista vacía.
+        queryClient.setQueriesData<PublicationsListResponse>(
+          {
+            queryKey: queryKeys.publications.lists(),
+            // Solo aplica a queries cuya clave tenga page === 1
+            predicate: (query) => {
+              const key = query.queryKey as unknown[];
+              // key shape: ['publications', 'list', filters, page]
+              return key.length === 4 && key[3] === 1;
+            },
+          },
+          (oldData) => {
+            if (!oldData?.data) return oldData;
+            // Quitar la pub de su posición actual (puede que no esté si es pág 1 sin ella)
+            const without = oldData.data.filter((p) => p.id !== publication.id);
+            // Ponerla al top con los datos frescos del servidor
+            return { ...oldData, data: [publication, ...without] };
+          },
+        );
+
+        // 2b. Para páginas > 1: eliminar silenciosamente de caché para que refetcheen
+        //     cuando el usuario navegue a ellas (no causa flash en la vista actual).
+        queryClient.removeQueries({
+          queryKey: queryKeys.publications.lists(),
+          predicate: (query) => {
+            const key = query.queryKey as unknown[];
+            return key.length === 4 && key[3] !== 1;
+          },
+        });
+      }
+
+      // 3. Ir a página 1 para que el usuario vea la publicación actualizada al tope
+      useContentPaginationStore.getState().resetToFirstPage();
+
+      // 4. Invalidar en background para que el servidor confirme el orden correcto.
+      //    Como ya hay datos en caché (paso 2a), el usuario no verá ningún spinner.
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
+
+      // 5. Invalidar queries relacionadas
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
     },
   });
 }

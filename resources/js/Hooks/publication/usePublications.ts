@@ -212,12 +212,12 @@ export const usePublications = () => {
   const handleRefresh = useCallback(() => {
     if (activeTab === 'publications' || activeTab === 'approvals') {
       usePublicationStore.getState().clearPageData();
-      // Remove list caches completely (not just mark stale) so the refetch
-      // shows fresh server-ordered data with no stale placeholder flash
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      // Invalidate list caches completely so the refetch
+      // shows fresh server-ordered data without losing local filters immediately
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
       pubQuery.refetch();
     } else if (activeTab === 'campaigns') {
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
       campQuery.refetch();
     } else {
       logsQuery.refetch();

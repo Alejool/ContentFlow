@@ -76,8 +76,8 @@ export function useDeleteCampaign() {
   return useMutation({
     mutationFn: (id: number) => axios.delete(route('api.v1.campaigns.destroy', id)),
     onSuccess: () => {
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       useContentPaginationStore.getState().resetToFirstPage();
     },
@@ -94,8 +94,8 @@ export function useDuplicateCampaign() {
     mutationFn: (id: number) =>
       axios.post(route('api.v1.campaigns.duplicate', id)).then((r) => r.data?.campaign),
     onSuccess: () => {
-      queryClient.removeQueries({ queryKey: queryKeys.campaigns.lists() });
-      queryClient.removeQueries({ queryKey: queryKeys.publications.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
       useContentPaginationStore.getState().resetToFirstPage();
     },
   });

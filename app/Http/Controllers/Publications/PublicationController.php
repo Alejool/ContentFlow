@@ -73,7 +73,7 @@ class PublicationController extends Controller
       $request->query('page', 1)
     );
 
-    return cache()->remember($cacheKey, 10, function () use ($request, $workspaceId) {
+    return cache()->remember($cacheKey, 5, function () use ($request, $workspaceId) {
 
       // Optimized eager loading: select only necessary columns to reduce memory usage
       // We avoid loading deep derivatives and all logs for every item in the list view
