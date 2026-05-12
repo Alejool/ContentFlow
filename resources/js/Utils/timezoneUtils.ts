@@ -1,7 +1,16 @@
-import { format, parseISO } from 'date-fns';
-import { toZonedTime, fromZonedTime } from 'date-fns-tz';
-import { es, enUS } from 'date-fns/locale';
 import { useTimezoneStore } from '@/stores/timezoneStore';
+import { format, parseISO } from 'date-fns';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
+import { enUS, es } from 'date-fns/locale';
+
+/**
+ * Utilidades avanzadas para manejo de timezones con date-fns-tz
+ * 
+ * IMPORTANTE: Estas funciones manejan la conversión entre UTC (backend)
+ * y la zona horaria efectiva del usuario (workspace > user > browser > UTC).
+ * 
+ * Para formateo simple, usar formatDate.ts o i18nHelpers.ts
+ */
 
 /**
  * Obtiene el locale de date-fns según el idioma actual
@@ -12,15 +21,21 @@ const getDateLocale = () => {
 };
 
 /**
- * Convierte fecha UTC del backend a timezone del workspace para MOSTRAR
+ * Convierte fecha UTC del backend a timezone del usuario para MOSTRAR
  *
  * @param utcDateString - Fecha en UTC del backend (ISO 8601)
  * @param formatStr - Formato de salida (default: 'PPpp')
- * @returns Fecha formateada en timezone del workspace
+ * @returns Fecha formateada en timezone del usuario
  *
  * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Colombia (UTC-5):
  * formatDate('2026-03-08T20:30:00Z')
- * // → "8 de marzo de 2026, 15:30" (si workspace es America/Bogota)
+ * // → "8 de marzo de 2026, 15:30"
+ * 
+ * // Usuario en Alemania (UTC+1):
+ * formatDate('2026-03-08T20:30:00Z')
+ * // → "8 de marzo de 2026, 21:30"
  */
 export function formatDate(
   utcDateString: string | null | undefined,
@@ -34,7 +49,7 @@ export function formatDate(
     // Parsear fecha UTC del backend
     const utcDate = parseISO(utcDateString);
 
-    // Convertir a timezone del workspace
+    // Convertir a timezone del usuario
     const zonedDate = toZonedTime(utcDate, timezone);
 
     // Formatear
@@ -48,12 +63,17 @@ export function formatDate(
 /**
  * Convierte fecha local a UTC para ENVIAR al backend
  *
- * @param localDate - Fecha en timezone del workspace
+ * @param localDate - Fecha en timezone del usuario
  * @returns Fecha en UTC (ISO 8601)
  *
  * @example
+ * // Usuario en Colombia (UTC-5) ingresa: "2026-03-08T15:30:00"
  * toUTC(new Date('2026-03-08T15:30:00'))
- * // → "2026-03-08T20:30:00.000Z" (si workspace es America/Bogota)
+ * // → "2026-03-08T20:30:00.000Z" (convertido a UTC para guardar en BD)
+ * 
+ * // Usuario en Tokio (UTC+9) ingresa: "2026-03-08T15:30:00"
+ * toUTC(new Date('2026-03-08T15:30:00'))
+ * // → "2026-03-08T06:30:00.000Z" (convertido a UTC para guardar en BD)
  */
 export function toUTC(localDate: Date | string | null | undefined): string | null {
   if (!localDate) return null;
@@ -76,10 +96,20 @@ export function toUTC(localDate: Date | string | null | undefined): string | nul
 }
 
 /**
- * Convierte fecha UTC a Date local del workspace
+ * Convierte fecha UTC a Date local del usuario
  *
  * @param utcDateString - Fecha en UTC (ISO 8601)
- * @returns Date en timezone del workspace
+ * @returns Date en timezone del usuario
+ * 
+ * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Argentina (UTC-3):
+ * toLocalDate("2026-03-08T20:30:00Z")
+ * // → Date object representando "2026-03-08T17:30:00" en hora local
+ * 
+ * // Usuario en Singapur (UTC+8):
+ * toLocalDate("2026-03-08T20:30:00Z")
+ * // → Date object representando "2026-03-09T04:30:00" en hora local
  */
 export function toLocalDate(utcDateString: string | null | undefined): Date | null {
   if (!utcDateString) return null;
@@ -95,9 +125,9 @@ export function toLocalDate(utcDateString: string | null | undefined): Date | nu
 }
 
 /**
- * Obtiene fecha/hora actual en timezone del workspace
+ * Obtiene fecha/hora actual en timezone del usuario
  *
- * @returns Fecha actual en timezone del workspace
+ * @returns Fecha actual en timezone del usuario
  */
 export function getNow(): Date {
   const timezone = useTimezoneStore.getState().effectiveTimezone();

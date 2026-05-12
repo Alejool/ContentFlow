@@ -2,9 +2,21 @@ import { useTimezoneStore } from '@/stores/timezoneStore';
 import i18n from 'i18next';
 
 /**
- * Obtiene el timezone del workspace
+ * Obtiene el timezone efectivo del usuario para VISUALIZACIÓN (uso interno)
+ * 
+ * JERARQUÍA PARA MOSTRAR FECHAS:
+ * 1. User timezone (preferencia configurada por el usuario)
+ * 2. Browser timezone (detectado automáticamente según ubicación)
+ * 3. UTC (fallback)
+ * 
+ * IMPORTANTE: El workspace timezone NO se usa para visualización.
+ * Solo se usa para seguimiento interno. Las fechas siempre se muestran
+ * según la zona horaria real del usuario para mayor coherencia.
+ * 
+ * Esto asegura que las fechas UTC almacenadas en la BD se muestren
+ * en la zona horaria correcta según donde esté ubicado el usuario.
  */
-const getWorkspaceTimezone = (): string => {
+const getEffectiveUserTimezone = (): string => {
   return useTimezoneStore.getState().effectiveTimezone();
 };
 
@@ -75,7 +87,25 @@ export const dateTimeFormats: Record<string, Intl.DateTimeFormatOptions> = {
 };
 
 /**
- * Formatea una fecha según el idioma actual y timezone del workspace
+ * Formatea una fecha según el idioma actual y timezone del usuario
+ * 
+ * IMPORTANTE: Esta función convierte automáticamente fechas UTC (del backend)
+ * a la zona horaria del usuario (user timezone > browser timezone > UTC).
+ * 
+ * @param date - Fecha a formatear (puede ser Date, string ISO, o timestamp)
+ * @param format - Formato predefinido (short, medium, long, datetime, etc.)
+ * @param locale - Locale opcional (por defecto usa el idioma actual de i18n)
+ * @returns Fecha formateada en la zona horaria del usuario
+ * 
+ * @example
+ * // BD almacena: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Colombia (UTC-5):
+ * formatDate("2026-03-08T20:30:00Z", "datetime")
+ * // → "8 mar 2026, 15:30" (convertido a hora local del usuario)
+ * 
+ * // Usuario en España (UTC+1):
+ * formatDate("2026-03-08T20:30:00Z", "datetime")
+ * // → "8 mar 2026, 21:30" (convertido a hora local del usuario)
  */
 export const formatDate = (
   date: Date | string | number,
@@ -85,7 +115,7 @@ export const formatDate = (
   const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
   const currentLocale = locale || i18n.language || 'es';
-  const timezone = getWorkspaceTimezone();
+  const timezone = getEffectiveUserTimezone();
 
   return new Intl.DateTimeFormat(currentLocale, {
     ...dateTimeFormats[format],
@@ -186,14 +216,83 @@ export const formatRelativeTime = (date: Date | string | number, locale?: string
 export const getBrowserLocale = (): string => {
   const browserLang =
     navigator.language || (navigator as unknown as { userLanguage: string }).userLanguage;
-  return browserLang.split('-')[0]; // 'es-ES' -> 'es'
+  return browserLang?.split('-')[0] || 'es'; // 'es-ES' -> 'es'
 };
 
 /**
- * Detecta la zona horaria del usuario
+ * Detecta la zona horaria del usuario desde el navegador
+ * Esta es una función de utilidad que detecta el timezone del navegador.
+ * Para obtener el timezone efectivo (con fallbacks), usar el timezoneStore.
  */
 export const getUserTimezone = (): string => {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+};
+
+/**
+ * Formatea bytes a la unidad más apropiada automáticamente
+ * 
+ * @param bytes - Cantidad de bytes
+ * @param decimals - Número de decimales (default: 2)
+ * @param locale - Locale para formateo de números (default: idioma actual)
+ * @returns String formateado con la unidad apropiada
+ * 
+ * @example
+ * formatBytes(1024) // → "1 KB"
+ * formatBytes(1048576) // → "1 MB"
+ * formatBytes(1073741824) // → "1 GB"
+ * formatBytes(704994 * 1024 * 1024 * 1024) // → "688.96 TB"
+ */
+export const formatBytes = (
+  bytes: number | null | undefined,
+  decimals: number = 2,
+  locale?: string,
+): string => {
+  if (bytes === null || bytes === undefined || bytes === 0) {
+    return '0 Bytes';
+  }
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+
+  const i = Math.floor(Math.log(Math.abs(bytes)) / Math.log(k));
+  const value = bytes / Math.pow(k, i);
+
+  const currentLocale = locale || i18n.language || 'es';
+  const formattedNumber = new Intl.NumberFormat(currentLocale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: dm,
+  }).format(value);
+
+  return `${formattedNumber} ${sizes[i]}`;
+};
+
+/**
+ * Formatea el uso de almacenamiento con formato "usado / total"
+ * 
+ * @param used - Bytes usados
+ * @param total - Bytes totales
+ * @param decimals - Número de decimales (default: 2)
+ * @param locale - Locale para formateo
+ * @returns String formateado "usado / total"
+ * 
+ * @example
+ * formatStorageUsage(536870912, 1073741824) // → "512 MB / 1 GB"
+ * formatStorageUsage(750000000, 1000000000) // → "715.26 MB / 953.67 MB"
+ */
+export const formatStorageUsage = (
+  used: number | null | undefined,
+  total: number | null | undefined,
+  decimals: number = 2,
+  locale?: string,
+): string => {
+  if (used === null || used === undefined) used = 0;
+  if (total === null || total === undefined) total = 0;
+
+  const usedFormatted = formatBytes(used, decimals, locale);
+  const totalFormatted = formatBytes(total, decimals, locale);
+
+  return `${usedFormatted} / ${totalFormatted}`;
 };
 
 /**
@@ -235,6 +334,28 @@ export const pluralize = (
 /**
  * Formatea una fecha opcional con un fallback
  * Útil para campos que pueden ser undefined/null
+ * 
+ * IMPORTANTE: Esta función convierte automáticamente fechas UTC (del backend)
+ * a la zona horaria del usuario (user timezone > browser timezone > UTC).
+ * 
+ * @param date - Fecha a formatear (puede ser Date, string ISO, timestamp, undefined o null)
+ * @param format - Formato predefinido (short, medium, long, datetime, etc.)
+ * @param fallback - Texto a mostrar si la fecha es null/undefined
+ * @param locale - Locale opcional (por defecto usa el idioma actual de i18n)
+ * @returns Fecha formateada en la zona horaria del usuario, o el fallback
+ * 
+ * @example
+ * // BD almacena: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en España (UTC+1):
+ * formatOptionalDate("2026-03-08T20:30:00Z", "datetimeLong")
+ * // → "8 de marzo de 2026, 21:30" (convertido a hora local del usuario)
+ * 
+ * // Usuario en México (UTC-6):
+ * formatOptionalDate("2026-03-08T20:30:00Z", "datetimeLong")
+ * // → "8 de marzo de 2026, 14:30" (convertido a hora local del usuario)
+ * 
+ * formatOptionalDate(null, "medium")
+ * // → "No disponible" (fallback)
  */
 export const formatOptionalDate = (
   date: Date | string | number | undefined | null,

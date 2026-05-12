@@ -1,18 +1,22 @@
 /**
- * Helpers centralizados para formateo de fechas con timezone del workspace
+ * Helpers centralizados para formateo de fechas con timezone del usuario
  *
  * IMPORTANTE: Usar estos helpers en lugar de:
  * - new Date().toLocaleString()
  * - new Date().toLocaleDateString()
  * - new Date().toLocaleTimeString()
+ * 
+ * Estos helpers convierten fechas UTC del backend a la zona horaria del usuario
+ * (user timezone > browser timezone > UTC). El workspace timezone NO se usa
+ * para visualización, solo para seguimiento interno.
  */
 
 import { useTimezoneStore } from '@/stores/timezoneStore';
 
 /**
- * Obtiene el timezone del workspace
+ * Obtiene el timezone del usuario para visualización
  */
-const getWorkspaceTimezone = (): string => {
+const getUserTimezone = (): string => {
   return useTimezoneStore.getState().effectiveTimezone();
 };
 
@@ -33,11 +37,17 @@ const getUserLocale = (): string => {
  *
  * @param date - Fecha a formatear (Date, string ISO, o timestamp)
  * @param options - Opciones adicionales de formato
- * @returns Fecha formateada con timezone del workspace
+ * @returns Fecha formateada con timezone del usuario
  *
  * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Colombia (UTC-5):
  * formatDateTimeString("2026-03-08T20:30:00Z")
- * // → "8 mar 2026, 15:30" (si workspace es America/Bogota)
+ * // → "8 mar 2026, 15:30"
+ * 
+ * // Usuario en Japón (UTC+9):
+ * formatDateTimeString("2026-03-08T20:30:00Z")
+ * // → "9 mar 2026, 05:30"
  */
 export function formatDateTimeString(
   date: Date | string | number | null | undefined,
@@ -50,7 +60,7 @@ export function formatDateTimeString(
 
     if (isNaN(dateObj.getTime())) return '';
 
-    const timezone = getWorkspaceTimezone();
+    const timezone = getUserTimezone();
     const locale = getUserLocale();
 
     const defaultOptions: Intl.DateTimeFormatOptions = {
@@ -91,7 +101,7 @@ export function formatDateTimeString(
     return dateObj.toLocaleString(locale, {
       ...defaultOptions,
       ...validOptions,
-      timeZone: timezone, // Siempre usar timezone del workspace
+      timeZone: timezone, // Siempre usar timezone del usuario
     });
   } catch (error) {
     console.error('Error formatting datetime:', error);
@@ -104,11 +114,17 @@ export function formatDateTimeString(
  *
  * @param date - Fecha a formatear
  * @param options - Opciones adicionales de formato
- * @returns Fecha formateada con timezone del workspace
+ * @returns Fecha formateada con timezone del usuario
  *
  * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Colombia (UTC-5):
  * formatDateString("2026-03-08T20:30:00Z")
- * // → "8 mar 2026" (si workspace es America/Bogota)
+ * // → "8 mar 2026"
+ * 
+ * // Usuario en Australia (UTC+10):
+ * formatDateString("2026-03-08T20:30:00Z")
+ * // → "9 mar 2026" (día siguiente)
  */
 export function formatDateString(
   date: Date | string | number | null | undefined,
@@ -121,7 +137,7 @@ export function formatDateString(
 
     if (isNaN(dateObj.getTime())) return '';
 
-    const timezone = getWorkspaceTimezone();
+    const timezone = getUserTimezone();
     const locale = getUserLocale();
 
     const defaultOptions: Intl.DateTimeFormatOptions = {
@@ -147,11 +163,17 @@ export function formatDateString(
  *
  * @param date - Fecha a formatear
  * @param options - Opciones adicionales de formato
- * @returns Hora formateada con timezone del workspace
+ * @returns Hora formateada con timezone del usuario
  *
  * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Colombia (UTC-5):
  * formatTimeString("2026-03-08T20:30:00Z")
- * // → "15:30" (si workspace es America/Bogota)
+ * // → "15:30"
+ * 
+ * // Usuario en India (UTC+5:30):
+ * formatTimeString("2026-03-08T20:30:00Z")
+ * // → "02:00" (día siguiente)
  */
 export function formatTimeString(
   date: Date | string | number | null | undefined,
@@ -164,7 +186,7 @@ export function formatTimeString(
 
     if (isNaN(dateObj.getTime())) return '';
 
-    const timezone = getWorkspaceTimezone();
+    const timezone = getUserTimezone();
     const locale = getUserLocale();
 
     const defaultOptions: Intl.DateTimeFormatOptions = {
@@ -194,8 +216,10 @@ export function formatTimeString(
  * @returns Fecha formateada
  *
  * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en España (UTC+1):
  * formatDateTimeStyled("2026-03-08T20:30:00Z", "short", "short")
- * // → "08/03/26, 15:30"
+ * // → "08/03/26, 21:30"
  */
 export function formatDateTimeStyled(
   date: Date | string | number | null | undefined,
@@ -209,7 +233,7 @@ export function formatDateTimeStyled(
 
     if (isNaN(dateObj.getTime())) return '';
 
-    const timezone = getWorkspaceTimezone();
+    const timezone = getUserTimezone();
     const locale = getUserLocale();
 
     return dateObj.toLocaleString(locale, {
@@ -225,6 +249,12 @@ export function formatDateTimeStyled(
 
 /**
  * Formatea fecha para mostrar solo fecha en formato styled
+ * 
+ * @example
+ * // BD: "2026-03-08T20:30:00Z" (UTC)
+ * // Usuario en Nueva York (UTC-5):
+ * formatDateStyled("2026-03-08T20:30:00Z", "medium")
+ * // → "Mar 8, 2026"
  */
 export function formatDateStyled(
   date: Date | string | number | null | undefined,
@@ -237,7 +267,7 @@ export function formatDateStyled(
 
     if (isNaN(dateObj.getTime())) return '';
 
-    const timezone = getWorkspaceTimezone();
+    const timezone = getUserTimezone();
     const locale = getUserLocale();
 
     return dateObj.toLocaleDateString(locale, {

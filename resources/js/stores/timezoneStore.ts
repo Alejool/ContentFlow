@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import axios from 'axios';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface TimezoneState {
   workspaceTimezone: string | null;
@@ -23,11 +23,12 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   userTimezone: null,
   isLoaded: false,
 
-  // Timezone efectivo con jerarquía: Workspace > User > Browser > UTC
+  // Timezone efectivo con jerarquía: User > Browser > UTC
+  // IMPORTANTE: Siempre prioriza el timezone del usuario para mostrar fechas
+  // El workspace timezone solo se usa para seguimiento interno, no para visualización
   effectiveTimezone: () => {
     const state = get();
     return (
-      state.workspaceTimezone ||
       state.userTimezone ||
       Intl.DateTimeFormat().resolvedOptions().timeZone ||
       'UTC'
@@ -37,11 +38,12 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Etiqueta para mostrar en UI
   timezoneLabel: () => {
     const state = get();
-    if (state.workspaceTimezone) {
-      return `${state.workspaceTimezone} (Workspace)`;
-    }
     if (state.userTimezone) {
-      return `${state.userTimezone} (Personal)`;
+      return `${state.userTimezone}`;
+    }
+    const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (browserTz) {
+      return `${browserTz} (Auto-detectado)`;
     }
     return 'UTC';
   },
