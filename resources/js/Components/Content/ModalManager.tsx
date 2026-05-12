@@ -2,7 +2,7 @@ import { usePublishPublication } from '@/Hooks/publication/usePublishPublication
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import type { Campaign } from '@/types/Campaign';
 import type { Publication } from '@/types/Publication';
-import React, { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 // Modals
@@ -54,9 +54,9 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
   // IMPORTANT: Stabilize publication data while publishing to prevent re-renders
   // that cause connectedAccounts to become empty momentarily
-  const [stablePublication, setStablePublication] = React.useState<Publication | null>(null);
+  const [stablePublication, setStablePublication] = useState<Publication | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isPublishModalOpen && targetIsPublication && selectedItem?.id) {
       const freshPub = publications.find((p) => p.id === selectedItem.id) as Publication;
       const pubToUse = freshPub || (selectedItem as Publication);

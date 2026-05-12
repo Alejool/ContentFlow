@@ -484,7 +484,7 @@ export default function ManageContentPage() {
     >
       <Head title={t('manageContent.title')} />
 
-      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+      <div className=" w-full min-w-0 max-w-full  bg-gray-50/30 dark:bg-neutral-900/10">
         <div className="mx-auto min-w-0 max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
           <div className="mb-8">
             <SocialMediaAccounts />
@@ -547,7 +547,7 @@ export default function ManageContentPage() {
                         id: 'pending',
                         label: t('approvals.tabs.pending'),
                         icon: Clock,
-                        badge: pendingApprovals > 0 ? pendingApprovals : undefined,
+                        ...(pendingApprovals > 0 && { badge: pendingApprovals }),
                       },
                       {
                         id: 'history',
@@ -635,9 +635,9 @@ export default function ManageContentPage() {
             )}
           </div>
         </div>
-      </div>
 
       <ModalManager onRefresh={handleRefreshWrapped} />
+    
 
       <ExcelImporter
         type={excelImporter.type}
@@ -678,6 +678,8 @@ export default function ManageContentPage() {
           cancelStyle="outline"
         />
       </Modal>
+
+      </div>
     </AuthenticatedLayout>
   );
 }
