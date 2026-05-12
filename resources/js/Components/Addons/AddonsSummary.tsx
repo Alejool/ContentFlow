@@ -1,48 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useAddonsSummary } from '@/Hooks/useAddonsSummary';
+import { formatOptionalDate } from '@/Utils/i18nHelpers';
+import { useTranslation } from 'react-i18next';
+import AddonExtensionInfo from './AddonExtensionInfo';
+import AddonsSummaryEmpty from './AddonsSummaryEmpty';
+import AddonsSummaryHeader from './AddonsSummaryHeader';
+import AddonTrackingInfo from './AddonTrackingInfo';
 import AddonUsageDisplay from './AddonUsageDisplay';
 
-interface AddonSummary {
-  total: number;
-  used: number;
-  available: number;
-  percentage: number;
-  plan_limit: number;
-  current_usage: number;
-  excess_usage: number;
-}
-
-interface AddonsSummaryData {
-  summary: {
-    ai_credits: AddonSummary;
-    storage: AddonSummary;
-    publications: AddonSummary;
-    team_members: AddonSummary;
-  };
-  plan_info: {
-    current_plan: string;
-    limits: Record<string, number | boolean | null>;
-    plan_started_at?: string;
-  };
-}
-
 export default function AddonsSummary() {
-  const [data, setData] = useState<AddonsSummaryData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
+  const { data, loading, error } = useAddonsSummary();
 
-  useEffect(() => {
-    fetchAddonsSummary();
-  }, []);
-
-  const fetchAddonsSummary = async () => {
-    try {
-      const response = await fetch('/api/v1/addons/summary');
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error('Error fetching addons summary:', error);
-    } finally {
-      setLoading(false);
-    }
+  // Helper para formatear fechas con el formato largo
+  const formatDate = (dateString?: string) => {
+    return formatOptionalDate(dateString, 'datetimeLong');
   };
 
   if (loading) {
@@ -50,9 +21,17 @@ export default function AddonsSummary() {
       <div className="animate-pulse">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-48 rounded-lg bg-gray-200"></div>
+            <div key={i} className="h-48 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-red-500 dark:text-red-400">{error}</p>
       </div>
     );
   }
@@ -60,7 +39,7 @@ export default function AddonsSummary() {
   if (!data) {
     return (
       <div className="py-8 text-center">
-        <p className="text-gray-500">Error al cargar el resumen de addons</p>
+        <p className="text-gray-500 dark:text-gray-400">{t('subscription.addons.loadingError')}</p>
       </div>
     );
   }
@@ -68,57 +47,37 @@ export default function AddonsSummary() {
   const addonTypes = [
     {
       key: 'ai_credits',
-      name: 'Créditos de IA',
-      unit: 'créditos',
+      name: t('subscription.addons.aiCredits'),
+      unit: t('subscription.addons.credits'),
     },
     {
       key: 'storage',
-      name: 'Almacenamiento',
+      name: t('subscription.addons.storage'),
       unit: 'GB',
     },
     {
       key: 'publications',
-      name: 'Publicaciones',
-      unit: 'publicaciones',
+      name: t('subscription.addons.publications'),
+      unit: t('subscription.addons.posts'),
     },
     {
       key: 'team_members',
-      name: 'Miembros del Equipo',
-      unit: 'miembros',
+      name: t('subscription.addons.teamMembers'),
+      unit: t('subscription.addons.members'),
     },
   ];
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'No disponible';
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const hasActiveAddons = Object.values(data.summary).some((s) => s.total > 0);
+  const hasNoAddons = Object.values(data.summary).every((s) => s.total === 0 && s.excess_usage === 0);
 
   return (
     <div className="space-y-6">
       {/* Plan Info Header */}
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <h2 className="mb-2 text-lg font-semibold text-blue-900">
-          Plan Actual:{' '}
-          {data.plan_info.current_plan.charAt(0).toUpperCase() +
-            data.plan_info.current_plan.slice(1)}
-        </h2>
-        <div className="space-y-1 text-sm text-blue-700">
-          <p>
-            <strong>Inicio del plan:</strong> {formatDate(data.plan_info.plan_started_at)}
-          </p>
-          <p>
-            Los addons de extensión se activan automáticamente cuando excedes los límites de tu plan
-            base.
-            <strong> El uso se cuenta desde el inicio de tu plan actual.</strong>
-          </p>
-        </div>
-      </div>
+      <AddonsSummaryHeader
+        currentPlan={data.plan_info.current_plan}
+        planStartedAt={data.plan_info.plan_started_at}
+        formatDate={formatDate}
+      />
 
       {/* Addons Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -147,82 +106,13 @@ export default function AddonsSummary() {
       </div>
 
       {/* No Addons Message */}
-      {Object.values(data.summary).every((s) => s.total === 0 && s.excess_usage === 0) && (
-        <div className="rounded-lg bg-gray-50 py-12 text-center">
-          <div className="mb-4 text-gray-400">
-            <svg
-              className="mx-auto h-12 w-12"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              />
-            </svg>
-          </div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900">No tienes addons activos</h3>
-          <p className="mb-4 text-gray-500">
-            Los addons de extensión te permiten exceder los límites de tu plan actual.
-          </p>
-          <button className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700">
-            Comprar Addons
-          </button>
-        </div>
-      )}
+      {hasNoAddons && <AddonsSummaryEmpty />}
 
       {/* Plan Tracking Explanation */}
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-        <h3 className="mb-2 text-sm font-semibold text-green-800">
-          ✅ Nuevo Sistema de Trazabilidad por Plan
-        </h3>
-        <ul className="space-y-1 text-sm text-green-700">
-          <li>
-            • <strong>Uso independiente por plan:</strong> Cada plan empieza desde 0
-          </li>
-          <li>
-            • <strong>Fecha de inicio:</strong> El uso se cuenta desde{' '}
-            {formatDate(data.plan_info.plan_started_at)}
-          </li>
-          <li>
-            • <strong>Addons intactos:</strong> Tus addons se mantienen al cambiar de plan
-          </li>
-          <li>
-            • <strong>Consumo inteligente:</strong> Solo se usan cuando excedes tu plan base
-          </li>
-        </ul>
-      </div>
+      <AddonTrackingInfo planStartedAt={data.plan_info.plan_started_at} formatDate={formatDate} />
 
       {/* FIFO Explanation */}
-      {Object.values(data.summary).some((s) => s.total > 0) && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-          <h3 className="mb-2 text-sm font-semibold text-yellow-800">
-            📋 Cómo funcionan los Addons de Extensión
-          </h3>
-          <ul className="space-y-1 text-sm text-yellow-700">
-            <li>
-              • <strong>Independientes del plan:</strong> Tus addons se mantienen al cambiar de plan
-            </li>
-            <li>
-              • <strong>Solo se usan cuando es necesario:</strong> Se activan automáticamente al
-              exceder tu plan base
-            </li>
-            <li>
-              • <strong>FIFO (Primero en entrar, primero en salir):</strong> Se consumen en orden de
-              compra
-            </li>
-            <li>
-              • <strong>Sin expiración:</strong> Los addons de extensión no caducan
-            </li>
-            <li>
-              • <strong>Trazabilidad por plan:</strong> El uso se resetea con cada cambio de plan
-            </li>
-          </ul>
-        </div>
-      )}
+      {hasActiveAddons && <AddonExtensionInfo />}
     </div>
   );
 }

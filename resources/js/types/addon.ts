@@ -70,3 +70,27 @@ export interface CurrencyInfo {
   exchange_rate: number;
   symbol: string;
 }
+
+export interface AddonSummaryItem {
+  total: number;
+  used: number;
+  available: number;
+  percentage: number;
+  plan_limit: number;
+  current_usage: number;
+  excess_usage: number;
+}
+
+export interface AddonsSummaryData {
+  summary: {
+    ai_credits: AddonSummaryItem;
+    storage: AddonSummaryItem;
+    publications: AddonSummaryItem;
+    team_members: AddonSummaryItem;
+  };
+  plan_info: {
+    current_plan: string;
+    limits: Record<string, number | boolean | null>;
+    plan_started_at?: string;
+  };
+}
