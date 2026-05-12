@@ -1,8 +1,8 @@
-import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
 import axios from 'axios';
+import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface MediaFile {
   id: number;
@@ -108,7 +108,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
         {/* Platform Badge */}
         <div
-          className={`absolute left-4 top-4 rounded-full bg-gradient-to-r px-3 py-1.5 ${getPlatformColor(currentReel.metadata?.platform)} flex items-center gap-2 text-sm font-bold text-white shadow-lg`}
+          className={`absolute top-4 left-4 rounded-full bg-gradient-to-r px-3 py-1.5 ${getPlatformColor(currentReel.metadata?.platform)} flex items-center gap-2 text-sm font-bold text-white shadow-lg`}
         >
           <span className="text-base">{getPlatformIcon(currentReel.metadata?.platform)}</span>
           <span className="capitalize">{currentReel.metadata?.platform || 'Reel'}</span>
@@ -116,7 +116,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
         {/* Duration Badge */}
         {currentReel.metadata?.duration && (
-          <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm">
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm">
             <Film className="h-4 w-4" />
             {Math.floor(currentReel.metadata.duration)}s
           </div>
@@ -127,14 +127,14 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
           <>
             <button
               onClick={prevReel}
-              className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white backdrop-blur-sm transition-all hover:bg-white/20"
+              className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white backdrop-blur-sm transition-all hover:bg-white/20"
               aria-label="Previous reel"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
             <button
               onClick={nextReel}
-              className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white backdrop-blur-sm transition-all hover:bg-white/20"
+              className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white backdrop-blur-sm transition-all hover:bg-white/20"
               aria-label="Next reel"
             >
               <ChevronRight className="h-6 w-6" />
@@ -143,7 +143,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
         )}
 
         {/* Action Buttons */}
-        <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+        <div className="absolute right-4 bottom-4 z-10 flex gap-2">
           <button
             onClick={handleDeleteReel}
             disabled={deleting}
@@ -176,7 +176,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
             <button
               key={reel.id}
               onClick={() => setCurrentIndex(index)}
-              className={`relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg transition-all ${
+              className={`relative h-28 w-20 shrink-0 overflow-hidden rounded-lg transition-all ${
                 index === currentIndex
                   ? 'scale-105 ring-4 ring-purple-500'
                   : 'opacity-60 hover:opacity-100'
@@ -184,7 +184,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
             >
               <video src={reel.file_path} className="h-full w-full object-cover" muted />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-1 left-1 right-1 text-center">
+              <div className="absolute right-1 bottom-1 left-1 text-center">
                 <span className="text-xs font-medium text-white">
                   {getPlatformIcon(reel.metadata?.platform)}
                 </span>

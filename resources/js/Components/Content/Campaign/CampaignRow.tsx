@@ -1,8 +1,8 @@
+import { getDateFnsLocale } from '@/Utils/common/dateLocales';
+import { formatCurrency } from '@/Utils/formatters/number';
 import type { Campaign } from '@/types/Campaign/Campaign';
 import { usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { getDateFnsLocale } from '@/Utils/common/dateLocales';
-import { formatCurrency } from '@/Utils/formatters/number';
 import {
   Calendar,
   ChevronDown,
@@ -69,7 +69,7 @@ const CampaignRow = memo(
         </td>
         <td className="px-6 py-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800">
               <Layers className="h-6 w-6 text-gray-400" />
             </div>
             <div className="min-w-0 flex-1">
@@ -104,16 +104,14 @@ const CampaignRow = memo(
                 )}
                 {item.goal && (
                   <div className="flex items-center gap-1 rounded bg-gray-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-white/5 dark:text-gray-400">
-                    <Target className="h-3 w-3 text-primary-500" />
+                    <Target className="text-primary-500 h-3 w-3" />
                     <span className="max-w-[150px] truncate">{item.goal}</span>
                   </div>
                 )}
                 {item.budget && (
                   <div className="flex items-center gap-1 rounded bg-green-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
                     <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
-                    <span>
-                      {formatCurrency(item.budget)}
-                    </span>
+                    <span>{formatCurrency(item.budget)}</span>
                   </div>
                 )}
               </div>
@@ -123,7 +121,7 @@ const CampaignRow = memo(
         <td className="px-6 py-4">
           {item.user && (
             <div className="flex items-center">
-              <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
+              <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                 {item.user.photo_url ? (
                   <img
                     src={item.user.photo_url}
@@ -131,7 +129,7 @@ const CampaignRow = memo(
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-xs font-medium uppercase text-gray-500">
+                  <div className="flex h-full w-full items-center justify-center text-xs font-medium text-gray-500 uppercase">
                     {item.user.name.charAt(0)}
                   </div>
                 )}

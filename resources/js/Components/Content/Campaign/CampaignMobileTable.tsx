@@ -1,9 +1,8 @@
+import { getDateFnsLocale } from '@/Utils/common/dateLocales';
+import { formatCurrency } from '@/Utils/formatters/number';
 import type { Campaign } from '@/types/Campaign/Campaign';
 import { usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { getDateFnsLocale } from '@/Utils/common/dateLocales';
-import { formatCurrency } from '@/Utils/formatters/number';
-import { useTranslation } from 'react-i18next';
 import {
   Calendar,
   ChevronDown,
@@ -15,6 +14,7 @@ import {
   Target,
   Trash2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 
@@ -68,7 +68,7 @@ export default function CampaignMobileTable({
                   </p>
                 </div>
                 <div
-                  className={`whitespace-nowrap rounded-full px-2 py-1 text-[10px] font-medium sm:text-xs ${getStatusColor(
+                  className={`rounded-full px-2 py-1 text-[10px] font-medium whitespace-nowrap sm:text-xs ${getStatusColor(
                     item.status,
                   )}`}
                 >
@@ -81,16 +81,14 @@ export default function CampaignMobileTable({
                 <div className="mb-3 flex flex-wrap gap-2">
                   {item.goal && (
                     <div className="flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-xs text-gray-500 dark:bg-neutral-900/50 dark:text-gray-400">
-                      <Target className="h-3 w-3 text-primary-500" />
+                      <Target className="text-primary-500 h-3 w-3" />
                       <span className="line-clamp-1">{item.goal}</span>
                     </div>
                   )}
                   {item.budget && (
                     <div className="flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
                       <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
-                      <span>
-                      {formatCurrency(item.budget)}
-                      </span>
+                      <span>{formatCurrency(item.budget)}</span>
                     </div>
                   )}
                 </div>
@@ -128,7 +126,7 @@ export default function CampaignMobileTable({
                       onClick={() => toggleExpand(item.id)}
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
-                          ? 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800'
+                          ? 'bg-primary-50 text-primary-700 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800 ring-1'
                           : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
                       }`}
                     >
@@ -153,7 +151,7 @@ export default function CampaignMobileTable({
                 <div className="flex items-center gap-1.5 rounded-lg border border-gray-100 bg-gray-50/50 p-1 dark:border-neutral-700/50 dark:bg-neutral-800/30">
                   <button
                     onClick={() => onViewDetails(item)}
-                    className="rounded-lg p-2 text-gray-500 transition-all hover:bg-white hover:text-primary-600 dark:hover:bg-neutral-800 dark:hover:text-primary-400"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 rounded-lg p-2 text-gray-500 transition-all hover:bg-white dark:hover:bg-neutral-800"
                     title={t('common.view')}
                   >
                     <Eye className="h-4 w-4" />
@@ -191,7 +189,7 @@ export default function CampaignMobileTable({
               item.publications &&
               item.publications.length > 0 && (
                 <div className="border-t border-gray-200 p-4 dark:border-neutral-700">
-                  <div className="mb-3 border-l-2 border-primary-500 pl-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <div className="border-primary-500 mb-3 border-l-2 pl-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
                     {t('campaigns.modal.view.associatedPublications')}
                   </div>
                   <div className="space-y-2">
@@ -201,7 +199,7 @@ export default function CampaignMobileTable({
                         className="flex items-center justify-between rounded bg-gray-50 p-3 dark:bg-neutral-700/50"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0">
+                          <div className="shrink-0">
                             <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-gray-200 bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800">
                               <PublicationThumbnail publication={pub} />
                             </div>
@@ -218,7 +216,7 @@ export default function CampaignMobileTable({
                           </div>
                         </div>
                         <div
-                          className={`flex-shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium ${getStatusColor(
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium whitespace-nowrap ${getStatusColor(
                             pub.status,
                           )}`}
                         >

@@ -5,8 +5,8 @@ import Button from '@/Components/common/Modern/Button';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import { VirtualList } from '@/Components/common/ui/VirtualList';
-import { formatDateTimeString } from '@/Utils/formatters';
 import { getDateFnsLocale } from '@/Utils/common/dateLocales';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
 import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
@@ -54,17 +54,17 @@ function ApprovalRequestItem({
   const mediaPreview = firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
 
   return (
-    <div className="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:border-primary-400 hover:shadow-xl dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-primary-600">
+    <div className="group hover:border-primary-400 dark:hover:border-primary-600 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl dark:border-neutral-700 dark:bg-neutral-800">
       {/* Header Section */}
       <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 dark:border-neutral-700 dark:from-neutral-900 dark:to-neutral-800">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-wider shadow-sm ${getStatusColor(request.status)}`}
+            className={`rounded-full border px-3 py-1.5 text-xs font-bold tracking-wider uppercase shadow-sm ${getStatusColor(request.status)}`}
           >
             {t(`approvals.status.${request.status}`) || request.status}
           </span>
           {request.currentStep && (
-            <span className="flex items-center gap-1.5 rounded-full border border-primary-300 bg-primary-100 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-700 shadow-sm dark:border-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
+            <span className="border-primary-300 bg-primary-100 text-primary-700 dark:border-primary-700 dark:bg-primary-900/40 dark:text-primary-300 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold tracking-wider uppercase shadow-sm">
               <Layers className="h-3.5 w-3.5" />
               {request.currentStep.level_name}
               {request.workflow?.levels &&
@@ -94,8 +94,8 @@ function ApprovalRequestItem({
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Media Preview */}
           {mediaPreview && (
-            <div className="flex-shrink-0">
-              <div className="relative h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-md transition-shadow group-hover:shadow-lg dark:from-neutral-900 dark:to-neutral-800 lg:w-40">
+            <div className="shrink-0">
+              <div className="relative h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-md transition-shadow group-hover:shadow-lg lg:w-40 dark:from-neutral-900 dark:to-neutral-800">
                 <img
                   src={mediaPreview}
                   alt={publication.title}
@@ -110,7 +110,7 @@ function ApprovalRequestItem({
           <div className="min-w-0 flex-1 space-y-4">
             {/* Title */}
             <div>
-              <h3 className="mb-2 line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+              <h3 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 line-clamp-2 text-xl font-bold text-gray-900 transition-colors dark:text-white">
                 {publication.title}
               </h3>
               {publication.description && (
@@ -124,8 +124,8 @@ function ApprovalRequestItem({
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {/* Submitter */}
               <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-neutral-900/50">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-                  <User className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                <div className="bg-primary-100 dark:bg-primary-900/30 flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                  <User className="text-primary-600 dark:text-primary-400 h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -140,14 +140,14 @@ function ApprovalRequestItem({
               {/* Content Type */}
               {publication.content_type && (
                 <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-neutral-900/50">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
                     <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                       {t('common.type') || 'Tipo'}
                     </p>
-                    <p className="text-sm font-semibold capitalize text-gray-900 dark:text-white">
+                    <p className="text-sm font-semibold text-gray-900 capitalize dark:text-white">
                       {publication.content_type}
                     </p>
                   </div>
@@ -162,13 +162,13 @@ function ApprovalRequestItem({
                   <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                     {t('approvals.progress') || 'Progreso de Aprobación'}
                   </span>
-                  <span className="text-xs font-bold text-primary-600 dark:text-primary-400">
+                  <span className="text-primary-600 dark:text-primary-400 text-xs font-bold">
                     {request.currentStep.level_number} / {request.workflow.levels.length}
                   </span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500"
+                    className="from-primary-500 to-primary-600 h-full rounded-full bg-gradient-to-r transition-all duration-500"
                     style={{
                       width: `${(request.currentStep.level_number / request.workflow.levels.length) * 100}%`,
                     }}
@@ -187,7 +187,7 @@ function ApprovalRequestItem({
             variant="ghost"
             buttonStyle="outline"
             onClick={() => onViewDetail(publication)}
-            className="flex-1 border-gray-300 hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-neutral-800 sm:flex-none"
+            className="flex-1 border-gray-300 hover:bg-gray-100 sm:flex-none dark:border-neutral-600 dark:hover:bg-neutral-800"
             icon={Eye}
             rounded="lg"
           >
@@ -363,8 +363,8 @@ export default function ApprovalList({
             <div className="p-6">
               <div className="flex flex-col gap-6 lg:flex-row">
                 {/* Media skeleton */}
-                <div className="flex-shrink-0">
-                  <div className="h-40 w-full animate-pulse rounded-xl bg-gray-200 dark:bg-neutral-700 lg:w-40" />
+                <div className="shrink-0">
+                  <div className="h-40 w-full animate-pulse rounded-xl bg-gray-200 lg:w-40 dark:bg-neutral-700" />
                 </div>
 
                 {/* Details skeleton */}

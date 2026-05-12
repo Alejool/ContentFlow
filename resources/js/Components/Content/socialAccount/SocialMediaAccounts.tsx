@@ -311,7 +311,7 @@ const SocialMediaAccounts = memo(() => {
                 transition={{ duration: 0.4, ease: 'easeInOut' }}
                 className="rounded-lg bg-gray-100 p-2 dark:bg-black/50"
               >
-                <BarChart3 className="h-5 w-5 text-primary-500" />
+                <BarChart3 className="text-primary-500 h-5 w-5" />
               </motion.div>
               <div className="text-left">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">
@@ -365,16 +365,16 @@ const SocialMediaAccounts = memo(() => {
                             animate="visible"
                             exit="exit"
                             whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                            className={`group relative rounded-lg border border-gray-100 bg-white p-4 transition-colors duration-300 hover:border-primary-100 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-900/30 sm:p-5 ${
+                            className={`group hover:border-primary-100 dark:hover:border-primary-900/30 relative rounded-lg border border-gray-100 bg-white p-4 transition-colors duration-300 hover:shadow-xl sm:p-5 dark:border-neutral-800 dark:bg-neutral-900 ${
                               account.isConnected
                                 ? 'ring-1 ring-emerald-500/10 dark:ring-emerald-500/5'
                                 : 'opacity-90 hover:opacity-100'
                             }`}
                           >
                             {/* Status badge */}
-                            <div className="absolute right-4 top-4 z-10">
+                            <div className="absolute top-4 right-4 z-10">
                               <div
-                                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight transition-colors ${
+                                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-tight uppercase transition-colors ${
                                   account.isConnected
                                     ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/80 dark:bg-emerald-900/30 dark:text-emerald-400'
                                     : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400'
@@ -437,14 +437,14 @@ const SocialMediaAccounts = memo(() => {
                                       damping: 15,
                                       delay: 0.1,
                                     }}
-                                    className="absolute -bottom-1 -right-1 rounded-full border-2 border-white bg-emerald-500 p-1 shadow-lg dark:border-neutral-900"
+                                    className="absolute -right-1 -bottom-1 rounded-full border-2 border-white bg-emerald-500 p-1 shadow-lg dark:border-neutral-900"
                                   >
                                     <Check className="h-2.5 w-2.5 text-white" />
                                   </motion.div>
                                 )}
                               </motion.div>
 
-                              <h3 className="w-full truncate px-2 text-lg font-bold leading-tight text-gray-900 dark:text-gray-100">
+                              <h3 className="w-full truncate px-2 text-lg leading-tight font-bold text-gray-900 dark:text-gray-100">
                                 {account.isConnected && account.accountDetails?.account_name
                                   ? account.accountDetails.account_name
                                   : account.name}
@@ -458,7 +458,7 @@ const SocialMediaAccounts = memo(() => {
                                       : `ID: ${account.accountDetails.account_id}`}
                                   </p>
                                   {account.connectedBy && (
-                                    <p className="text-[9px] font-bold uppercase tracking-wider text-primary-500">
+                                    <p className="text-primary-500 text-[9px] font-bold tracking-wider uppercase">
                                       {t('manageContent.socialMedia.connectedBy') ||
                                         'Conectado por'}
                                       : {account.connectedBy}
@@ -545,9 +545,9 @@ const SocialMediaAccounts = memo(() => {
                                 return (
                                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5 dark:border-amber-800/50 dark:bg-amber-900/20">
                                     <div className="mb-2 flex items-start gap-2">
-                                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
                                       <div className="flex-1">
-                                        <p className="text-[10px] font-bold leading-tight text-amber-800 dark:text-amber-300">
+                                        <p className="text-[10px] leading-tight font-bold text-amber-800 dark:text-amber-300">
                                           {t('manageContent.socialMedia.oauth1Required') ||
                                             'OAuth 1.0a requerido'}
                                         </p>
@@ -624,7 +624,7 @@ const SocialMediaAccounts = memo(() => {
                                     accountsWithPublishing.has(account.accountId as number))
                                     ? 'cursor-not-allowed bg-gray-100 text-gray-400 opacity-60 dark:bg-neutral-700/50'
                                     : account.isConnected
-                                      ? 'border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 hover:bg-primary-100 dark:border-primary-900/30 dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:hover:bg-primary-900/20'
+                                      ? 'border-primary-200 from-primary-50 to-primary-50 text-primary-600 hover:bg-primary-100 dark:border-primary-900/30 dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:hover:bg-primary-900/20 border bg-gradient-to-r'
                                       : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl`
                                 }`}
                               >

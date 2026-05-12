@@ -185,7 +185,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
         {/* Download Template Section */}
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Download className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+            <Download className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
               <h3 className="mb-1 text-sm font-semibold text-blue-900 dark:text-blue-300">
                 {t('excel.downloadTemplateTitle') || 'Paso 1: Descarga la plantilla'}
@@ -220,7 +220,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
             onClick={() => !file && fileInputRef.current?.click()}
             className={`group relative cursor-pointer transition-all duration-300 ${
               isDragging
-                ? 'scale-[1.02] ring-2 ring-primary-500 ring-offset-2 dark:ring-primary-400'
+                ? 'ring-primary-500 dark:ring-primary-400 scale-[1.02] ring-2 ring-offset-2'
                 : ''
             }`}
           >
@@ -236,15 +236,15 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
               className={`flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
                 isDragging
                   ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
-                  : 'border-gray-300 bg-gray-50 hover:border-primary-400 dark:border-gray-600 dark:bg-neutral-900/90 dark:hover:border-primary-500'
+                  : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-neutral-900/90'
               }`}
             >
               {!file ? (
                 <div className="space-y-4">
                   <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-primary-500/10 blur-xl dark:bg-primary-400/10"></div>
+                    <div className="bg-primary-500/10 dark:bg-primary-400/10 absolute inset-0 rounded-full blur-xl"></div>
                     <div className="relative rounded-full bg-white p-4 shadow-lg dark:bg-neutral-800">
-                      <Upload className="h-10 w-10 text-primary-500 dark:text-primary-400" />
+                      <Upload className="text-primary-500 dark:text-primary-400 h-10 w-10" />
                     </div>
                   </div>
                   <div>
@@ -272,7 +272,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                   <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800">
                     <div className="flex items-center justify-between">
                       <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <FileSpreadsheet className="h-5 w-5 flex-shrink-0 text-green-500 dark:text-green-400" />
+                        <FileSpreadsheet className="h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                             {file.name}
@@ -287,7 +287,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                           e.stopPropagation();
                           setFile(null);
                         }}
-                        className="ml-3 flex-shrink-0 rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                        className="ml-3 shrink-0 rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -312,9 +312,9 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
           >
             <div className="flex items-start gap-3">
               {result.success && result.data?.failed_count === 0 ? (
-                <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
               ) : (
-                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
               )}
               <div className="min-w-0 flex-1">
                 <h4 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">

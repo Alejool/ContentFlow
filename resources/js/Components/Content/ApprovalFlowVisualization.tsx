@@ -108,7 +108,7 @@ export default function ApprovalFlowVisualization({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+        <Loader2 className="text-primary-600 h-8 w-8 animate-spin" />
         <span className="ml-3 text-gray-600 dark:text-gray-400">{t('common.loading')}...</span>
       </div>
     );
@@ -152,7 +152,7 @@ export default function ApprovalFlowVisualization({
         </div>
         <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
           <div
-            className="h-2 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500"
+            className="from-primary-500 to-primary-600 h-2 rounded-full bg-gradient-to-r transition-all duration-500"
             style={{ width: `${progressPct}%` }}
           />
         </div>
@@ -189,7 +189,7 @@ export default function ApprovalFlowVisualization({
                 <div key={level.id} className="relative">
                   {index < levels.length - 1 && (
                     <div
-                      className={`absolute left-5 top-10 h-full w-0.5 ${
+                      className={`absolute top-10 left-5 h-full w-0.5 ${
                         isDone
                           ? 'bg-green-400'
                           : isRejected
@@ -201,13 +201,13 @@ export default function ApprovalFlowVisualization({
                   <div className="flex items-start gap-3">
                     {/* Círculo indicador */}
                     <div
-                      className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                      className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                         isDone
                           ? 'bg-green-500 text-white'
                           : isRejected
                             ? 'bg-red-500 text-white'
                             : isCurrent
-                              ? 'bg-primary-500 text-white ring-4 ring-primary-200 dark:ring-primary-900'
+                              ? 'bg-primary-500 ring-primary-200 dark:ring-primary-900 text-white ring-4'
                               : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
                       }`}
                     >
@@ -223,13 +223,13 @@ export default function ApprovalFlowVisualization({
                     </div>
 
                     {/* Info del nivel */}
-                    <div className="flex-1 pb-4 pt-1.5">
+                    <div className="flex-1 pt-1.5 pb-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-gray-900 dark:text-white">
                           {level.level_name}
                         </span>
                         {isCurrent && (
-                          <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                          <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-xs font-medium">
                             {t('approvals.inProgress') || 'En revisión'}
                           </span>
                         )}
@@ -281,12 +281,12 @@ export default function ApprovalFlowVisualization({
                       : ''}
                   </span>
                   {log.comment && (
-                    <p className="mt-0.5 italic text-gray-600 dark:text-gray-400">
+                    <p className="mt-0.5 text-gray-600 italic dark:text-gray-400">
                       "{log.comment}"
                     </p>
                   )}
                 </div>
-                <span className="whitespace-nowrap text-xs text-gray-400">
+                <span className="text-xs whitespace-nowrap text-gray-400">
                   {new Date(log.created_at).toLocaleString()}
                 </span>
               </div>
@@ -305,7 +305,7 @@ export default function ApprovalFlowVisualization({
           {/* Comentario opcional */}
           {!showRejectInput && (
             <textarea
-              className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-900 dark:text-white"
+              className="focus:ring-primary-500 w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:outline-none dark:border-neutral-600 dark:bg-neutral-900 dark:text-white"
               rows={2}
               placeholder={t('approvals.commentOptional') || 'Comentario opcional...'}
               value={comment}
@@ -317,7 +317,7 @@ export default function ApprovalFlowVisualization({
           {showRejectInput && (
             <div className="space-y-2">
               <textarea
-                className="w-full resize-none rounded-lg border border-red-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 dark:border-red-700 dark:bg-neutral-900 dark:text-white"
+                className="w-full resize-none rounded-lg border border-red-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-red-700 dark:bg-neutral-900 dark:text-white"
                 rows={3}
                 placeholder={
                   t('approvals.rejectionReasonRequired') || 'Razón del rechazo (requerida)...'
@@ -375,7 +375,7 @@ export default function ApprovalFlowVisualization({
       {/* Aprobado final */}
       {approvalRequest.status === 'approved' && (
         <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
-          <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+          <CheckCircle className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <p className="text-sm font-medium text-green-800 dark:text-green-200">
             {t('approvals.approvedReadyToPublish') || 'Aprobado. Listo para publicar.'}
           </p>
@@ -386,7 +386,7 @@ export default function ApprovalFlowVisualization({
       {approvalRequest.status === 'rejected' && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <div className="flex items-start gap-3">
-            <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
             <div>
               <p className="text-sm font-semibold text-red-800 dark:text-red-200">
                 {t('approvals.requestRejected') || 'Solicitud rechazada'}
@@ -440,7 +440,7 @@ function LogEntry({ log, t }: { log: ApprovalLog; t: any }) {
 }
 
 function ActionIcon({ action }: { action: string }) {
-  const cls = 'w-4 h-4 flex-shrink-0 mt-0.5';
+  const cls = 'w-4 h-4 shrink-0 mt-0.5';
   switch (action) {
     case 'approved':
       return <CheckCircle className={`${cls} text-green-500`} />;

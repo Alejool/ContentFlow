@@ -1,4 +1,3 @@
-import React from 'react';
 import Skeleton from '@/Components/common/ui/Skeleton';
 
 const CampaignRowSkeleton = () => {
@@ -9,7 +8,7 @@ const CampaignRowSkeleton = () => {
       </td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-12 w-12 flex-shrink-0 rounded-lg" />
+          <Skeleton className="h-12 w-12 shrink-0 rounded-lg" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />

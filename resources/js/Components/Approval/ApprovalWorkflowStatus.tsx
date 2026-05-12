@@ -66,7 +66,7 @@ export default function ApprovalWorkflowStatus({
       {/* Estado actual */}
       <div className={`rounded-xl border p-4 ${cfg.bg}`}>
         <div className="flex items-start gap-3">
-          <StatusIcon className={`mt-0.5 h-6 w-6 flex-shrink-0 ${cfg.color}`} />
+          <StatusIcon className={`mt-0.5 h-6 w-6 shrink-0 ${cfg.color}`} />
           <div className="flex-1">
             <h4 className="mb-1 font-semibold text-gray-900 dark:text-white">{cfg.label}</h4>
             {isPending && currentStep && (
@@ -89,7 +89,7 @@ export default function ApprovalWorkflowStatus({
       {isRejected && (lastRejection || rejection_reason) && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <div className="flex items-start gap-3">
-            <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
             <div className="flex-1">
               {lastRejection?.user && (
                 <h5 className="mb-1 font-semibold text-red-900 dark:text-red-100">
@@ -132,7 +132,7 @@ export default function ApprovalWorkflowStatus({
               </div>
               <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
                 <div
-                  className="h-2 rounded-full bg-primary-600 transition-all duration-300"
+                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                   style={{
                     width: `${totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0}%`,
                   }}
@@ -158,7 +158,7 @@ export default function ApprovalWorkflowStatus({
                 <div key={level.id} className="relative">
                   {index < levels.length - 1 && (
                     <div
-                      className={`absolute bottom-0 left-5 top-10 w-0.5 ${
+                      className={`absolute top-10 bottom-0 left-5 w-0.5 ${
                         isDone
                           ? 'bg-green-500'
                           : isRejectedHere
@@ -169,13 +169,13 @@ export default function ApprovalWorkflowStatus({
                   )}
                   <div className="flex items-start gap-3">
                     <div
-                      className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                      className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                         isDone
                           ? 'bg-green-500 text-white'
                           : isRejectedHere
                             ? 'bg-red-500 text-white'
                             : isCurrent
-                              ? 'animate-pulse bg-primary-500 text-white'
+                              ? 'bg-primary-500 animate-pulse text-white'
                               : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
                       }`}
                     >
@@ -190,13 +190,13 @@ export default function ApprovalWorkflowStatus({
                       )}
                     </div>
 
-                    <div className="flex-1 pb-4 pt-1">
+                    <div className="flex-1 pt-1 pb-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-gray-900 dark:text-white">
                           {level.level_name}
                         </span>
                         {isCurrent && (
-                          <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                          <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-xs font-medium">
                             {t('approvals.inProgress') || 'En revisión'}
                           </span>
                         )}

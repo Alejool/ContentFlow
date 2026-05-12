@@ -20,7 +20,7 @@ export default function VideoValidationAlert({
   if (validation.isValid && validation.warnings.length === 0) {
     return (
       <div className="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
-        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+        <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
         <div className="flex-1">
           <p className="text-sm font-medium text-green-800 dark:text-green-300">
             {t('videoValidation.valid')}
@@ -40,7 +40,7 @@ export default function VideoValidationAlert({
     return (
       <div className="space-y-3">
         <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-          <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-300">
               {t('videoValidation.invalid')}
@@ -57,7 +57,7 @@ export default function VideoValidationAlert({
 
         {validation.suggestedType && onTypeChange && (
           <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-            <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
               <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
                 {t('videoValidation.suggestion')}
@@ -85,7 +85,7 @@ export default function VideoValidationAlert({
   if (validation.warnings.length > 0) {
     return (
       <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
-        <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
         <div className="flex-1">
           <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
             {t('videoValidation.warnings')}

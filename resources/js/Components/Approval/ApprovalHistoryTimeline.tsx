@@ -51,7 +51,7 @@ export default function ApprovalHistoryTimeline({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary-600" />
+        <div className="border-primary-600 h-8 w-8 animate-spin rounded-full border-b-2" />
       </div>
     );
   }
@@ -90,11 +90,11 @@ export default function ApprovalHistoryTimeline({
           return (
             <div key={entry.id} className="relative">
               {!isLast && (
-                <div className="absolute bottom-0 left-5 top-12 w-0.5 bg-gray-200 dark:bg-neutral-700" />
+                <div className="absolute top-12 bottom-0 left-5 w-0.5 bg-gray-200 dark:bg-neutral-700" />
               )}
               <div className="flex gap-4">
                 <div
-                  className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${color}`}
+                  className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${color}`}
                 >
                   <Icon className="h-5 w-5" />
                 </div>
@@ -134,7 +134,7 @@ export default function ApprovalHistoryTimeline({
                   {entry.comment && (
                     <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
                       <div className="flex items-start gap-2">
-                        <MessageSquare className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                        <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
                         <p className="text-sm text-gray-700 dark:text-gray-300">{entry.comment}</p>
                       </div>
                     </div>

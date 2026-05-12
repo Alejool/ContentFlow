@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import Button from '@/Components/common/Modern/Button';
 import Label from '@/Components/common/Modern/Label';
-import { Sparkles, Loader2, Trash2, Film, Download, ExternalLink, Play } from 'lucide-react';
-import toast from 'react-hot-toast';
 import axios from 'axios';
+import { Download, ExternalLink, Film, Loader2, Play, Sparkles, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 interface MediaFile {
@@ -222,17 +222,17 @@ export default function ReelsSection({
             {generatedReels.map((reel) => (
               <div
                 key={reel.id}
-                className="group relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all hover:border-primary-300 dark:border-neutral-700 dark:bg-neutral-900/50 dark:hover:border-primary-600"
+                className="group hover:border-primary-300 dark:hover:border-primary-600 relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all dark:border-neutral-700 dark:bg-neutral-900/50"
               >
                 {/* Video Thumbnail */}
-                <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-md bg-black">
+                <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-black">
                   <video src={reel.file_path} className="h-full w-full object-cover" muted />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
                     <Play className="h-6 w-6 text-white" fill="white" />
                   </div>
                   {/* Platform Badge on thumbnail */}
                   <div
-                    className={`absolute left-1 top-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-[10px] font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
+                    className={`absolute top-1 left-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-[10px] font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
                   >
                     {getPlatformIcon(reel.metadata?.platform)}
                   </div>
@@ -241,10 +241,10 @@ export default function ReelsSection({
                 {/* Reel Info */}
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="text-sm font-semibold capitalize text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-gray-900 capitalize dark:text-white">
                       {reel.metadata?.platform || 'Reel'}
                     </span>
-                    <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+                    <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
                       Reel
                     </span>
                   </div>
@@ -265,14 +265,14 @@ export default function ReelsSection({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenInNewTab(reel)}
-                    className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-primary-50 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
+                    className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400"
                     title={t('common.openInNewTab')}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDownload(reel)}
-                    className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-primary-50 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
+                    className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400"
                     title={t('common.download')}
                   >
                     <Download className="h-4 w-4" />
@@ -297,8 +297,8 @@ export default function ReelsSection({
       ) : (
         <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center dark:border-gray-700 dark:bg-neutral-800/50">
           <div className="flex flex-col items-center gap-3">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30">
-              <Sparkles className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br">
+              <Sparkles className="text-primary-600 dark:text-primary-400 h-8 w-8" />
             </div>
             <div>
               <p className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">
