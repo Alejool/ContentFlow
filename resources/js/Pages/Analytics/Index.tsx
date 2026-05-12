@@ -159,7 +159,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           <StatCard
             title={t('analytics.stats.totalViews')}
             value={overview.total_views || 0}
-            change={overview.changes?.views}
+            {...(overview.changes?.views !== undefined && { change: overview.changes.views })}
             icon={<Eye className="h-6 w-6" />}
             color="primary"
             variant={1}
@@ -168,7 +168,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           <StatCard
             title={t('analytics.stats.totalClicks')}
             value={overview.total_clicks || 0}
-            change={overview.changes?.clicks}
+            {...(overview.changes?.clicks !== undefined && { change: overview.changes.clicks })}
             icon={<MousePointer2 className="h-6 w-6" />}
             color="primary"
             variant={2}
@@ -177,7 +177,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           <StatCard
             title={t('analytics.stats.conversions')}
             value={overview.total_conversions || 0}
-            change={overview.changes?.conversions}
+            {...(overview.changes?.conversions !== undefined && { change: overview.changes.conversions })}
             icon={<TrendingUp className="h-6 w-6" />}
             color="primary"
             variant={3}
@@ -186,7 +186,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           <StatCard
             title={t('analytics.stats.totalReach')}
             value={overview.total_reach || 0}
-            change={overview.changes?.engagement}
+            {...(overview.changes?.engagement !== undefined && { change: overview.changes.engagement })}
             icon={<Users className="h-6 w-6" />}
             color="primary"
             variant={4}

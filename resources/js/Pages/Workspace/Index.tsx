@@ -7,8 +7,8 @@ import Button from '@/Components/common/Modern/Button';
 import CreateWorkspaceCard from '@/Components/Workspace/CreateWorkspaceCard';
 import CreateWorkspaceModal from '@/Components/Workspace/CreateWorkspaceModal';
 import WorkspaceCard from '@/Components/Workspace/WorkspaceCard';
-import { Plus } from 'lucide-react';
 import type { AuthPageProps, Role, Workspace } from '@/types';
+import { Plus } from 'lucide-react';
 
 export default function Index({ workspaces, roles }: { workspaces: Workspace[]; roles: Role[] }) {
   const { t } = useTranslation();
@@ -40,7 +40,7 @@ export default function Index({ workspaces, roles }: { workspaces: Workspace[]; 
       }
     >
       <Head title={t('workspace.my_workspaces')} />
-      <div className="mx-auto h-screen   max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {workspaces.map((workspace) => ( 
             <WorkspaceCard

@@ -7,15 +7,15 @@ import { useUploadQueue } from '@/stores/uploadQueueStore';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
-  AlertTriangle,
-  CheckCircle2,
-  Cpu,
-  FileUp,
-  Loader2,
-  Minus,
-  Radio,
-  Trash2,
-  X,
+    AlertTriangle,
+    CheckCircle2,
+    Cpu,
+    FileUp,
+    Loader2,
+    Minus,
+    Radio,
+    Trash2,
+    X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ProgressDisplay } from './Upload/ProgressDisplay';
@@ -37,7 +37,11 @@ export default function GlobalUploadIndicator() {
   const processingJobs = useProcessingProgress((state) => state.jobs);
   const cancelJob = useProcessingProgress((state) => state.cancelJob);
 
-  const [isMinimized, setIsMinimized] = useState(false);
+  // Persist minimized state across page navigations
+  const [isMinimized, setIsMinimized] = useState(() => {
+    const saved = localStorage.getItem('globalUploadIndicator:minimized');
+    return saved === 'true';
+  });
   const [isClosed, setIsClosed] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('uploads');
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
@@ -172,14 +176,16 @@ export default function GlobalUploadIndicator() {
     wasClosedManually.current = true;
   };
 
-  // Handle minimize button
+  // Handle minimize button - persist to localStorage
   const handleMinimize = () => {
     setIsMinimized(true);
+    localStorage.setItem('globalUploadIndicator:minimized', 'true');
   };
 
-  // Handle restore from minimized
+  // Handle restore from minimized - persist to localStorage
   const handleRestore = () => {
     setIsMinimized(false);
+    localStorage.setItem('globalUploadIndicator:minimized', 'false');
     wasClosedManually.current = false;
   };
 

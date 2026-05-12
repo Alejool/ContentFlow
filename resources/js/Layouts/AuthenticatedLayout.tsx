@@ -81,7 +81,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
               />
 
               <main
-                className={`min-w-0 max-w-full flex-1 overflow-y-auto overflow-x-hidden transition-all duration-500 ease-in-out ${
+                className={`min-w-0 max-w-full flex-1  overflow-x-hidden transition-all duration-500 ease-in-out ${
                   isSidebarOpen ? 'lg:ml-80' : 'lg:ml-32'
                 }`}
                 role="main"
