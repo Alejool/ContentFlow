@@ -1,21 +1,21 @@
-import { useConfirm } from '@/Hooks/common/useConfirm';
 import { usePublicationStatus } from '@/Hooks/Publications/usePublicationStatus';
 import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { useUploadWarning } from '@/Hooks/Upload/useUploadWarning';
+import { useConfirm } from '@/Hooks/common/useConfirm';
 import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
-    AlertTriangle,
-    CheckCircle2,
-    Cpu,
-    FileUp,
-    Loader2,
-    Minus,
-    Radio,
-    Trash2,
-    X,
+  AlertTriangle,
+  CheckCircle2,
+  Cpu,
+  FileUp,
+  Loader2,
+  Minus,
+  Radio,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ProgressDisplay } from './Upload/ProgressDisplay';
@@ -215,7 +215,7 @@ export default function GlobalUploadIndicator() {
           >
             {statusIcon}
             {totalActive > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold text-gray-800 shadow">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold text-gray-800 shadow">
                 {totalActive}
               </span>
             )}
@@ -307,13 +307,13 @@ export default function GlobalUploadIndicator() {
                 title={tab.title}
                 className={`relative flex flex-1 items-center justify-center py-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-400 border-b-2'
                     : 'text-gray-400 hover:text-gray-600 dark:hover:text-neutral-300'
                 }`}
               >
                 {tab.icon}
                 {tab.activeCount > 0 && (
-                  <span className="absolute right-2 top-1 h-1.5 w-1.5 rounded-full bg-primary-500" />
+                  <span className="bg-primary-500 absolute top-1 right-2 h-1.5 w-1.5 rounded-full" />
                 )}
               </button>
             ))}
@@ -346,7 +346,9 @@ export default function GlobalUploadIndicator() {
                       <ProgressDisplay
                         percentage={upload.progress}
                         {...(upload.stats?.eta !== undefined ? { eta: upload.stats.eta } : {})}
-                        {...(upload.stats?.speed !== undefined ? { speed: upload.stats.speed } : {})}
+                        {...(upload.stats?.speed !== undefined
+                          ? { speed: upload.stats.speed }
+                          : {})}
                         status={upload.status}
                         {...(upload.isPausable && upload.status === 'uploading'
                           ? { onPause: () => pauseUpload(upload.id) }
@@ -363,7 +365,9 @@ export default function GlobalUploadIndicator() {
                         isPausable={upload.isPausable}
                         isPaused={upload.status === 'paused'}
                         {...(upload.error !== undefined ? { error: upload.error } : {})}
-                        {...(upload.retryCount !== undefined ? { retryCount: upload.retryCount } : {})}
+                        {...(upload.retryCount !== undefined
+                          ? { retryCount: upload.retryCount }
+                          : {})}
                         {...(upload.canRetry !== undefined ? { canRetry: upload.canRetry } : {})}
                       />
                     </div>
@@ -371,7 +375,7 @@ export default function GlobalUploadIndicator() {
                     {(upload.status === 'completed' || upload.status === 'error') && (
                       <button
                         onClick={() => handleRemoveUpload(upload.id)}
-                        className="mt-0.5 flex-shrink-0 rounded p-0.5 text-gray-300 hover:bg-gray-100 hover:text-red-400 dark:hover:bg-neutral-700"
+                        className="mt-0.5 shrink-0 rounded p-0.5 text-gray-300 hover:bg-gray-100 hover:text-red-400 dark:hover:bg-neutral-700"
                         title="Eliminar de la lista"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

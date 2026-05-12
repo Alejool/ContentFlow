@@ -1,6 +1,6 @@
-import React from 'react';
 import { useOnlineStatus } from '@/Hooks/Offline/useOnlineStatus';
 import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
+import React from 'react';
 
 /**
  * OfflineIndicator component
@@ -19,7 +19,7 @@ export const OfflineIndicator: React.FC = () => {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-50 rounded-lg px-4 py-3 shadow-lg transition-all ${
+      className={`fixed right-4 bottom-4 z-50 rounded-lg px-4 py-3 shadow-lg transition-all ${
         isOffline
           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
           : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
@@ -28,7 +28,7 @@ export const OfflineIndicator: React.FC = () => {
       aria-live="polite"
     >
       <div className="flex items-center gap-3">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {isOffline ? (
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path

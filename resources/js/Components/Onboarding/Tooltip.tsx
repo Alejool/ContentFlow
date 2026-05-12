@@ -75,7 +75,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
                           close();
                           onDismiss?.(id);
                         }}
-                        className="flex flex-shrink-0 items-center justify-center rounded p-1 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white dark:hover:bg-gray-700"
+                        className="flex shrink-0 items-center justify-center rounded p-1 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white dark:hover:bg-gray-700"
                         aria-label="Dismiss tooltip"
                       >
                         <X size={14} />

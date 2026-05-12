@@ -1,8 +1,8 @@
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
-import { AlertCircle, Upload, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { router } from '@inertiajs/react';
+import { AlertCircle, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export function ResumeUploadsPrompt() {
   const persistedState = useUploadQueue((state) => state.persistedState);
@@ -33,11 +33,11 @@ export function ResumeUploadsPrompt() {
   };
 
   return (
-    <div className="animate-slide-in-right fixed right-4 top-4 z-[101] w-96 overflow-hidden rounded-lg border border-primary-200 bg-white shadow-2xl dark:border-primary-700 dark:bg-neutral-800">
-      <div className="border-b border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100 p-4 dark:border-primary-700 dark:from-primary-900/30 dark:to-primary-800/30">
+    <div className="animate-slide-in-right border-primary-200 dark:border-primary-700 fixed top-4 right-4 z-[101] w-96 overflow-hidden rounded-lg border bg-white shadow-2xl dark:bg-neutral-800">
+      <div className="border-primary-200 from-primary-50 to-primary-100 dark:border-primary-700 dark:from-primary-900/30 dark:to-primary-800/30 border-b bg-gradient-to-r p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-primary-500 p-2 dark:bg-primary-600">
+            <div className="bg-primary-500 dark:bg-primary-600 rounded-lg p-2">
               <Upload className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -72,7 +72,7 @@ export function ResumeUploadsPrompt() {
               key={upload.id}
               className="flex items-center gap-2 rounded bg-gray-50 p-2 text-xs text-gray-700 dark:bg-neutral-700/50 dark:text-neutral-300"
             >
-              <AlertCircle className="h-3 w-3 flex-shrink-0 text-primary-500" />
+              <AlertCircle className="text-primary-500 h-3 w-3 shrink-0" />
               <span className="flex-1 truncate" title={upload.id}>
                 {upload.publicationTitle || upload.id}
               </span>
@@ -97,7 +97,7 @@ export function ResumeUploadsPrompt() {
         <div className="flex gap-2">
           <button
             onClick={handleGoToContent}
-            className="flex-1 rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700"
+            className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700 flex-1 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
           >
             {t('common.upload.resume_prompt.go_to_content')}
           </button>

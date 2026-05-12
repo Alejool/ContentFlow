@@ -38,11 +38,11 @@ export function ErrorNotification() {
   }
 
   return (
-    <div className="animate-slide-up fixed bottom-4 right-4 z-50 max-w-md">
+    <div className="animate-slide-up fixed right-4 bottom-4 z-50 max-w-md">
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-lg dark:border-red-800 dark:bg-red-900/20">
         <div className="flex items-start gap-3">
           {/* Error Icon */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <svg
               className="h-5 w-5 text-red-600 dark:text-red-400"
               fill="none"
@@ -86,7 +86,7 @@ export function ErrorNotification() {
           {/* Close Button */}
           <button
             onClick={handleDismiss}
-            className="flex-shrink-0 text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
+            className="shrink-0 text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

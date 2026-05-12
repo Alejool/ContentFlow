@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { router } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
 import type { SocialPlatform } from '@/types/Onboarding/onboarding';
-import { Loader2, Check, AlertCircle } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { AlertCircle, Check, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PlatformCardProps {
   platform: SocialPlatform;
@@ -221,7 +221,7 @@ export default function PlatformCard({
       className={`relative rounded-xl border-2 p-6 transition-all ${
         isConnected
           ? 'border-green-500 bg-green-50 dark:bg-green-900/10'
-          : 'border-gray-200 bg-white hover:border-primary-500 hover:shadow-md dark:border-neutral-700 dark:border-neutral-900 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-900'
+          : 'hover:border-primary-500 border-gray-200 bg-white hover:shadow-md dark:border-neutral-700 dark:border-neutral-900 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-900'
       }`}
     >
       {/* Platform Icon */}
@@ -277,7 +277,7 @@ export default function PlatformCard({
           <button
             onClick={handleConnect}
             disabled={isConnecting}
-            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 font-medium text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary-600 hover:bg-primary-700 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={t('platform.connectTo', { platform: platform.name })}
           >
             {isConnecting ? (
@@ -293,7 +293,7 @@ export default function PlatformCard({
           {error && (
             <div className="space-y-2">
               <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400">
-                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{error}</span>
               </div>
               <button

@@ -97,13 +97,13 @@ export default function QueueNotificationFloat({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 50, scale: 0.95 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]"
+        className="fixed right-4 bottom-4 z-50 w-96 max-w-[calc(100vw-2rem)]"
       >
         <div
           className={`rounded-lg border-2 p-4 shadow-lg backdrop-blur-sm ${getBackgroundColor()}`}
         >
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">{getIcon()}</div>
+            <div className="shrink-0">{getIcon()}</div>
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
@@ -113,7 +113,7 @@ export default function QueueNotificationFloat({
                 {onClose && (
                   <button
                     onClick={onClose}
-                    className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     <X className="h-4 w-4" />
                   </button>

@@ -15,11 +15,11 @@ export function ServiceWorkerUpdate() {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg bg-white p-4 shadow-lg ring-1 ring-black ring-opacity-5"
+      className="ring-opacity-5 fixed right-4 bottom-4 z-50 max-w-sm rounded-lg bg-white p-4 shadow-lg ring-1 ring-black"
       role="alert"
     >
       <div className="flex items-start">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <svg
             className="h-6 w-6 text-blue-500"
             fill="none"

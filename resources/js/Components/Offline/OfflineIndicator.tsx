@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
 import { useOffline } from '@/Hooks/Offline/useOffline';
-import { WifiOff, Wifi, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Wifi, WifiOff } from 'lucide-react';
+import React, { useState } from 'react';
 
 /**
  * OfflineIndicator Component
@@ -28,7 +28,7 @@ export const OfflineIndicator: React.FC = () => {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-50 max-w-md rounded-lg shadow-lg transition-all"
+      className="fixed right-4 bottom-4 z-50 max-w-md rounded-lg shadow-lg transition-all"
       role="alert"
       aria-live="polite"
       aria-atomic="true"
@@ -43,7 +43,7 @@ export const OfflineIndicator: React.FC = () => {
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className="mt-0.5 flex-shrink-0">
+          <div className="mt-0.5 shrink-0">
             {!isOnline ? (
               <WifiOff className="h-5 w-5" aria-hidden="true" />
             ) : (
@@ -69,7 +69,7 @@ export const OfflineIndicator: React.FC = () => {
           {pendingCount > 0 && (
             <button
               onClick={handleToggleExpand}
-              className="flex-shrink-0 rounded p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+              className="shrink-0 rounded p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
               aria-label={isExpanded ? 'Hide details' : 'Show details'}
               aria-expanded={isExpanded}
             >

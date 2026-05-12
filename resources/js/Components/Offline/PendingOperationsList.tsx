@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
 import { useOffline } from '@/Hooks/Offline/useOffline';
 import type { QueuedOperation } from '@/types/common/optimistic';
 import {
-  RefreshCw,
-  Trash2,
-  Clock,
   AlertCircle,
+  Calendar,
   CheckCircle,
-  Loader2,
+  Clock,
   FileText,
   Image as ImageIcon,
+  Loader2,
+  RefreshCw,
   Video,
-  Calendar,
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * PendingOperationsList Component
@@ -185,7 +184,7 @@ export const PendingOperationsList: React.FC = () => {
           >
             <div className="flex items-start gap-3">
               {/* Resource icon */}
-              <div className="mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400">
+              <div className="mt-1 shrink-0 text-gray-500 dark:text-gray-400">
                 {getResourceIcon(operation.resource)}
               </div>
 
@@ -219,7 +218,7 @@ export const PendingOperationsList: React.FC = () => {
 
               {/* Actions */}
               {operation.status === 'failed' && (
-                <div className="flex flex-shrink-0 items-center gap-1">
+                <div className="flex shrink-0 items-center gap-1">
                   <button
                     onClick={() => handleRetry(operation.id)}
                     disabled={!isOnline || retryingId === operation.id}

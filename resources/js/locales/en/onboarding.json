@@ -153,6 +153,7 @@
   },
   "progress": {
     "title": "Setup Progress",
+    "complete": "Complete",
     "inProgress": "In progress",
     "stages": {
       "businessInfo": "Business Info",
