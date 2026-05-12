@@ -1,7 +1,7 @@
 import { useCampaignStore } from '@/stores/campaignStore';
 import axios from 'axios';
 import { Target } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -35,6 +35,19 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
   // Integrate focus trap for modal accessibility
   // Requirements: 5.5
   const modalRef = useModalFocusTrap(isOpen);
+
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const { register, handleSubmit, setValue, watch, reset, errors } = useAddCampaignForm(t);
 

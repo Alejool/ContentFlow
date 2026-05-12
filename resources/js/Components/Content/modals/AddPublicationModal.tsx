@@ -25,7 +25,8 @@ import { ToastService } from '@/Services/ToastService';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { FileText, Hash, Save, Target } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 interface AddPublicationModalProps {
@@ -48,6 +49,19 @@ export default function AddPublicationModal({
 
   const { invalidAccountIds, expiringSoonAccountIds } = useTokenHealth();
   const [isTextValid, setIsTextValid] = useState(true);
+
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const {
     t,
@@ -112,7 +126,7 @@ export default function AddPublicationModal({
   const { uploadFile, uploading, progress: uploadProgress, errors: uploadErrors } = useS3Upload(); // Use hook
 
   // Custom submit handler to intercept fields and upload first
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     // We need to check if there are any NEW files to upload
@@ -202,7 +216,7 @@ export default function AddPublicationModal({
   // Re-thinking: Modifying `usePublicationForm` might be cleaner, but I can't see it right now.
   // Let's implement a wrapper `onFormSubmit` that does the work and then calls `handleSubmit`.
 
-  const handleUploadAndSubmit = async (e: React.FormEvent) => {
+  const handleUploadAndSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const filesToUpload = mediaFiles.filter(

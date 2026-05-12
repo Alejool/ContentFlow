@@ -57,7 +57,7 @@ export default function ModalFooter({
 }: ModalFooterProps) {
   return (
     <div
-      className="sticky bottom-0 z-20 flex items-center justify-between gap-4 border-t border-gray-100 bg-opacity-95 bg-gradient-to-r from-gray-50 to-white p-4 backdrop-blur-sm dark:border-neutral-700 dark:bg-opacity-95 dark:from-neutral-900 dark:to-neutral-800"
+      className="sticky shadow-xl bottom-0 z-20 flex items-center justify-between gap-4 border-t border-gray-100 bg-opacity-95 bg-gradient-to-r from-gray-50 to-white p-4 backdrop-blur-sm dark:border-neutral-700 dark:bg-opacity-95 dark:from-neutral-900 dark:to-neutral-800"
       style={style}
     >
       <div className="flex flex-1 flex-col gap-4 overflow-x-auto">
@@ -106,7 +106,7 @@ export default function ModalFooter({
             <Button
               type={onPrimarySubmit ? 'button' : formId ? 'submit' : 'button'}
               form={onPrimarySubmit ? undefined : formId}
-              onClick={(e) => {
+              onClick={() => {
                 console.log('=== Submit button clicked ===');
                 console.log('onPrimarySubmit:', !!onPrimarySubmit);
                 console.log('formId:', formId);

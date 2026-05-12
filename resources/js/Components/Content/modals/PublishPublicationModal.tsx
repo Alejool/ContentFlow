@@ -128,7 +128,7 @@ export default function PublishPublicationModal({
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
 
-  // Fetch platform capabilities for this publication
+
   const {
     capabilities,
     loading: capabilitiesLoading,

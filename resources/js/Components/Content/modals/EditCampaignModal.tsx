@@ -40,6 +40,19 @@ export default function EditCampaignModal({
   // Requirements: 5.5
   const modalRef = useModalFocusTrap(isOpen);
 
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const { register, handleSubmit, setValue, watch, reset, errors } = useEditCampaignForm(
     t,
     campaign,

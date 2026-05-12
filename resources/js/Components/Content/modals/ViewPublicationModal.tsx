@@ -50,6 +50,19 @@ export default function ViewPublicationModal({
   const publicationsFromStore = usePublicationStore((s) => s.publications);
   const [item, setItem] = useState(initialItem);
 
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   // Update item when store changes (e.g., after approval)
   useEffect(() => {
     if (initialItem && (initialItem as any).title && initialItem.id) {
