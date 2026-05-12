@@ -175,17 +175,17 @@ class PublicationController extends Controller
 
       switch ($sort) {
         case 'oldest':
-          $query->orderBy('created_at', 'asc');
+          $query->orderBy('updated_at', 'asc')->orderBy('id', 'asc');
           break;
         case 'title_asc':
-          $query->orderBy('title', 'asc')->orderBy('updated_at', 'desc');
+          $query->orderBy('title', 'asc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc');
           break;
         case 'title_desc':
-          $query->orderBy('title', 'desc')->orderBy('updated_at', 'desc');
+          $query->orderBy('title', 'desc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc');
           break;
         case 'newest':
         default:
-          $query->orderBy('updated_at', 'desc');
+          $query->orderBy('updated_at', 'desc')->orderBy('id', 'desc');
           break;
       }
 
