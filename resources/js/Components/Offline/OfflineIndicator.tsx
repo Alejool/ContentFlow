@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useOffline } from '@/Hooks/useOffline';
+import { useOffline } from '@/Hooks/Offline/useOffline';
 import { WifiOff, Wifi, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**

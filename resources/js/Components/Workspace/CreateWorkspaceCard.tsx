@@ -1,6 +1,6 @@
 import { ChevronRight, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useKeyboardClick } from '@/Hooks/useKeyboardClick';
+import { useKeyboardClick } from '@/Hooks/ui/useKeyboardClick';
 
 interface CreateWorkspaceCardProps {
   onClick: () => void;

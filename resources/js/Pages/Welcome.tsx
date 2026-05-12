@@ -3,7 +3,7 @@ import Button from '@/Components/common/Modern/Button';
 import ThemeLanguageContainer from '@/Components/common/ThemeLanguageContainer';
 import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Head, Link } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {

@@ -1,4 +1,4 @@
-import { useContentManagement } from '@/Hooks/useContentManagement';
+import { useContentManagement } from '@/Hooks/Content/useContentManagement';
 import type { Campaign } from '@/types/Campaign';
 import { AlertTriangle, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -10,9 +10,9 @@ import CampaignFormFields from '@/Components/Content/Campaign/common/CampaignFor
 import PublicationSelector from '@/Components/Content/Campaign/common/PublicationSelector';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 
-import { useEditCampaignForm } from '@/Hooks/campaign/useEditCampaignForm';
-import { usePublicationsForCampaignEdit } from '@/Hooks/campaign/usePublicationsForCampaignEdit';
-import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { useEditCampaignForm } from '@/Hooks/Campaign/useEditCampaignForm';
+import { usePublicationsForCampaignEdit } from '@/Hooks/Campaign/usePublicationsForCampaignEdit';
+import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 import { usePage } from '@inertiajs/react';
 import ModalFooter from './common/ModalFooter';

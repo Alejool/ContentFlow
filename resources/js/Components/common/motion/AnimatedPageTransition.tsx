@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { useReducedMotion } from '@/Hooks/useReducedMotion';
+import { useReducedMotion } from '@/Hooks/ui/useReducedMotion';
 
 interface AnimatedPageTransitionProps {
   children: React.ReactNode;

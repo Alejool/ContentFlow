@@ -1,12 +1,12 @@
 import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { getMediaRulesForContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { CONTENT_TYPE_DISPLAY } from '@/Constants/contentTypes';
-import { useContentTypeSuggestion } from '@/Hooks/publication/useContentTypeSuggestion';
+import { useContentTypeSuggestion } from '@/Hooks/Publications/useContentTypeSuggestion';
 import {
   useCreatePublication,
   useUpdatePublication,
-} from '@/Hooks/publication/usePublicationsList';
-import { useS3Upload } from '@/Hooks/useS3Upload';
+} from '@/Hooks/Publications/usePublicationsList';
+import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { queryKeys } from '@/lib/queryKeys';
 import type { PublicationFormData } from '@/schemas/publication';
 import { publicationSchema } from '@/schemas/publication';

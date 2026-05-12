@@ -3,8 +3,8 @@ import { AddonsPromotionCard } from '@/Components/Dashboard/AddonsPromotionCard'
 import { PublicationStatusCards } from '@/Components/Dashboard/PublicationStatusCards';
 import StatCard from '@/Components/Statistics/StatCard';
 import Skeleton from '@/Components/common/ui/Skeleton';
-import { useDashboardStats } from '@/Hooks/useDashboardStats';
-import { useTheme } from '@/Hooks/useTheme';
+import { useDashboardStats } from '@/Hooks/Dashboard/useDashboardStats';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';

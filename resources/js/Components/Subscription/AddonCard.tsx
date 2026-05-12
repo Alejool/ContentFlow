@@ -1,4 +1,4 @@
-import type { ActiveAddon } from '@/Hooks/useActiveAddons';
+import type { ActiveAddon } from '@/Hooks/Addons/useActiveAddons';
 import { FileText, HardDrive, Package, Sparkles, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency, formatPercent, formatNumber } from '@/Utils/formatters/number';

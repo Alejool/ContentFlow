@@ -1,6 +1,6 @@
 import NotificationsModal from '@/Components/Notifications/NotificationsModal';
-import { useNotifications } from '@/Hooks/useNotifications';
-import { useTheme } from '@/Hooks/useTheme';
+import { useNotifications } from '@/Hooks/Notifications/useNotifications';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Bell } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

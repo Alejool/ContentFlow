@@ -1,6 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import ColorArea from '@/Components/common/Modern/ColorArea';
-import { useS3Upload } from '@/Hooks/useS3Upload';
+import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Image as ImageIcon, Palette, ShieldCheck, Upload } from 'lucide-react';

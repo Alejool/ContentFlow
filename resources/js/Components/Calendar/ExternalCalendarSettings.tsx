@@ -5,7 +5,7 @@ import {
   useDisconnectCalendar,
   useExternalCalendarStatus,
   useRetrySync,
-} from '@/Hooks/useExternalCalendar';
+} from '@/Hooks/Calendar/useExternalCalendar';
 import type { ExternalCalendarConnection } from '@/stores/externalCalendarStore';
 import { formatDateTimeString } from '@/Utils/formatters';
 import {

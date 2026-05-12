@@ -1,4 +1,4 @@
-import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
+import { useCompletionNotifications } from '@/Hooks/Notifications/useCompletionNotifications';
 import { Bell, BellOff, Check } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

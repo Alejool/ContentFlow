@@ -3,7 +3,7 @@ import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
 import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import { PublicationStatusBadge } from '@/Components/Content/PublicationStatusBadge';
-import { usePublicationActions } from '@/Hooks/publication/usePublicationActions';
+import { usePublicationActions } from '@/Hooks/Publications/usePublicationActions';
 import { formatDateString } from '@/Utils/formatters';
 import {
   countMediaFiles,

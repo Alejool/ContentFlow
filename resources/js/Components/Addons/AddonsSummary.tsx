@@ -1,4 +1,4 @@
-import { useAddonsSummary } from '@/Hooks/useAddonsSummary';
+import { useAddonsSummary } from '@/Hooks/Addons/useAddonsSummary';
 import { formatDateString } from '@/Utils/formatters';
 import { useTranslation } from 'react-i18next';
 import AddonExtensionInfo from './AddonExtensionInfo';

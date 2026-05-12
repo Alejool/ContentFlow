@@ -3,7 +3,7 @@ import PlatformSettingsModal from '@/Components/ConfigSocialMedia/PlatformSettin
 import DisconnectBlockerModal from '@/Components/Content/modals/DisconnectBlockerModal';
 import DisconnectWarningModal from '@/Components/Content/modals/DisconnectWarningModal';
 import { SOCIAL_PLATFORMS } from '@/Constants/socialPlatforms';
-import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
+import { useSocialMediaAuth } from '@/Hooks/ConfigSocialMedia/useSocialMediaAuth';
 import { getPlatformSchema } from '@/schemas/platformSettings';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { router, usePage } from '@inertiajs/react';

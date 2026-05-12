@@ -1,10 +1,10 @@
 import enFlag from '@/../assets/Icons/Flags/en.svg';
 import esFlag from '@/../assets/Icons/Flags/es.svg';
-import { Avatar } from '@Components/common/Avatar';
-import { useSubscriptionUsage } from '@Hooks/useSubscriptionUsage';
-import { useTheme } from '@Hooks/useTheme';
-import { cssPropertiesManager } from '@Utils/CSSCustomPropertiesManager';
-import { transitionTheme } from '@Utils/themeTransition';
+import { Avatar } from '@/Components/common/Avatar';
+import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
+import { useTheme } from '@/Hooks/Layout/useTheme';
+import { cssPropertiesManager } from '@/Utils/CSSCustomPropertiesManager';
+import { transitionTheme } from '@/Utils/themeTransition';
 import { Menu, MenuButton, MenuItems, Radio, RadioGroup } from '@headlessui/react';
 import { Link as InertiaLink, usePage } from '@inertiajs/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

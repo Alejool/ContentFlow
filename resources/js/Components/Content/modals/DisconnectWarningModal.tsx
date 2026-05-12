@@ -1,4 +1,4 @@
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { AlertTriangle, Calendar, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

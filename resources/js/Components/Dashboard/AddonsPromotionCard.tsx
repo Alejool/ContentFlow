@@ -2,9 +2,9 @@ import { Sparkles } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
+import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
 import { PlanUsageCards } from '@/Components/Subscription/PlanUsageCards';
-import { useActiveAddons } from '@/Hooks/useActiveAddons';
+import { useActiveAddons } from '@/Hooks/Addons/useActiveAddons';
 import { AddonCard } from '@/Components/Subscription/AddonCard';
 
 interface AddonsPromotionCardProps {

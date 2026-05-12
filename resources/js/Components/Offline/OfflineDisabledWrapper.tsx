@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { useOfflineDisable } from '@/Hooks/useOfflineDisable';
+import { useOfflineDisable } from '@/Hooks/Offline/useOfflineDisable';
 import { WifiOff } from 'lucide-react';
 
 /**

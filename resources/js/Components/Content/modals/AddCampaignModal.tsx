@@ -14,9 +14,9 @@ import Textarea from '@/Components/common/Modern/Textarea';
 import CampaignDateFields from '@/Components/Content/Campaign/common/CampaignDateFields';
 import PublicationSelector from '@/Components/Content/Campaign/common/PublicationSelector';
 
-import { useAddCampaignForm } from '@/Hooks/campaign/useAddCampaignForm';
-import { usePublicationsForCampaign } from '@/Hooks/campaign/usePublicationsForCampaign';
-import { useModalFocusTrap } from '@/Hooks/useModalFocusTrap';
+import { useAddCampaignForm } from '@/Hooks/Campaign/useAddCampaignForm';
+import { usePublicationsForCampaign } from '@/Hooks/Campaign/usePublicationsForCampaign';
+import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import { useContentPaginationStore } from '@/stores/contentPaginationStore';
 
 import { DollarSign, FileText } from 'lucide-react';

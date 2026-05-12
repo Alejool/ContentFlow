@@ -6,8 +6,8 @@
 
 import React from 'react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
-import { useTheme } from '@/Hooks/useTheme';
-import { useReducedMotion } from '@/Hooks/useReducedMotion';
+import { useTheme } from '@/Hooks/Layout/useTheme';
+import { useReducedMotion } from '@/Hooks/ui/useReducedMotion';
 
 export const ThemeToggle: React.FC = () => {
   const { theme, setTheme, actualTheme } = useTheme();

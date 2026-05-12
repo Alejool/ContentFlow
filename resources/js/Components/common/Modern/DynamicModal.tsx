@@ -1,4 +1,4 @@
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { X } from 'lucide-react';
 import React, { ReactNode, useEffect, useRef } from 'react';

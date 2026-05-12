@@ -10,7 +10,7 @@ import {
   isStandalone,
   registerServiceWorker,
   skipWaiting,
-} from '../Utils/registerServiceWorker';
+} from '@/Utils/registerServiceWorker';
 
 interface UseServiceWorkerReturn {
   isSupported: boolean;

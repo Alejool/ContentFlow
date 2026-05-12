@@ -1,4 +1,4 @@
-import { useSocialAccounts } from '@/Hooks/useSocialAccounts';
+import { useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
 import { useCampaignStore } from '@/stores/campaignStore';
 import { usePublicationStore } from '@/stores/publicationStore';
 import type { Publication } from '@/types/Publication';

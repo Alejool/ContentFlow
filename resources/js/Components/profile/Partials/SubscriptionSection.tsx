@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
-import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
+import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
 import { formatDateString } from '@/Utils/formatters';
 import { formatCurrency } from '@/Utils/formatters/number';
 import { formatBytes } from '@/Utils/formatters/storage';

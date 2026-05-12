@@ -1,4 +1,4 @@
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Brain, Loader2, Maximize2, Minimize2, Send, Sparkles, X, Zap } from 'lucide-react';

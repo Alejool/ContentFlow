@@ -1,6 +1,6 @@
 import { Sparkles, TrendingUp, AlertCircle } from 'lucide-react';
 import { Link } from '@inertiajs/react';
-import { useAddons } from '@/Hooks/useAddons';
+import { useAddons } from '@/Hooks/Addons/useAddons';
 
 export function AICreditCounter() {
   const { summary, loading } = useAddons();

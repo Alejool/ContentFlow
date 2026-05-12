@@ -1,4 +1,4 @@
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

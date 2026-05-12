@@ -1,4 +1,4 @@
-import { useLocalization } from '@/Hooks/useLocalization';
+import { useLocalization } from '@/Hooks/common/useLocalization';
 import { Globe } from 'lucide-react';
 import { useState } from 'react';
 

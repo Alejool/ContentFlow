@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { router } from '@inertiajs/react';
-import { useReducedMotion } from '@/Hooks/useReducedMotion';
+import { useReducedMotion } from '@/Hooks/ui/useReducedMotion';
 
 /**
  * Enhanced Inertia progress indicator with smooth transitions

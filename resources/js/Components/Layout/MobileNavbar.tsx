@@ -1,8 +1,8 @@
 import Logo from '@/../assets/logo.svg';
 import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import ResponsiveNavLink from '@/Components/common/ui/ResponsiveNavLink';
-import { useStickyOnScroll } from '@/Hooks/useStickyOnScroll';
-import { useTheme } from '@/Hooks/useTheme';
+import { useStickyOnScroll } from '@/Hooks/ui/useStickyOnScroll';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {

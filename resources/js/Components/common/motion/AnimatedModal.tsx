@@ -7,8 +7,8 @@
 import React, { useEffect, useRef } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { useFocusTrap, useKeyboardNavigation } from '@/Hooks/useKeyboardNavigation';
-import { useReducedMotion } from '@/Hooks/useReducedMotion';
+import { useFocusTrap, useKeyboardNavigation } from '@/Hooks/ui/useKeyboardNavigation';
+import { useReducedMotion } from '@/Hooks/ui/useReducedMotion';
 import { VisuallyHidden } from '../Accessibility/VisuallyHidden';
 
 interface AnimatedModalProps {

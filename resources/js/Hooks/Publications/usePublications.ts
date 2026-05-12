@@ -2,16 +2,16 @@ import {
   useCampaignsList,
   useDeleteCampaign,
   useDuplicateCampaign,
-} from '@/Hooks/campaign/useCampaigns';
+} from '@/Hooks/Campaign/useCampaigns';
 import {
   useDeletePublication,
   useDuplicatePublication,
   usePublicationsList,
-} from '@/Hooks/publication/usePublicationsList';
-import { useRealtime } from '@/Hooks/publication/useRealtime';
-import { useConfirm } from '@/Hooks/useConfirm';
-import { useLogs } from '@/Hooks/useLogs';
-import { useSocialMediaAuth } from '@/Hooks/useSocialMediaAuth';
+} from '@/Hooks/Publications/usePublicationsList';
+import { useRealtime } from '@/Hooks/Publications/useRealtime';
+import { useConfirm } from '@/Hooks/common/useConfirm';
+import { useLogs } from '@/Hooks/Admin/useLogs';
+import { useSocialMediaAuth } from '@/Hooks/ConfigSocialMedia/useSocialMediaAuth';
 import { queryKeys } from '@/lib/queryKeys';
 import { ToastService } from '@/Services/ToastService';
 import { useContentPaginationStore } from '@/stores/contentPaginationStore';

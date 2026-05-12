@@ -1,9 +1,9 @@
 import StatCard from '@/Components/Statistics/StatCard';
 import EmptyState from '@/Components/common/EmptyState';
 import Skeleton from '@/Components/common/ui/Skeleton';
-import { useAnalyticsData } from '@/Hooks/useAnalyticsData';
-import { useAnalyticsSync } from '@/Hooks/useAnalyticsSync';
-import { useTheme } from '@/Hooks/useTheme';
+import { useAnalyticsData } from '@/Hooks/Analytics/useAnalyticsData';
+import { useAnalyticsSync } from '@/Hooks/Analytics/useAnalyticsSync';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
 import { Head, router, usePage } from '@inertiajs/react';

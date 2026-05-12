@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useOffline } from '@/Hooks/useOffline';
+import { useOffline } from '@/Hooks/Offline/useOffline';
 import type { QueuedOperation } from '@/types/optimistic';
 import {
   RefreshCw,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { OfflineIndicator } from './OfflineIndicator';
 import { PendingOperationsList } from './PendingOperationsList';
 import { OfflineDisabledWrapper } from './OfflineDisabledWrapper';
-import { useOfflineDisable } from '@/Hooks/useOfflineDisable';
+import { useOfflineDisable } from '@/Hooks/Offline/useOfflineDisable';
 import { X } from 'lucide-react';
 
 /**

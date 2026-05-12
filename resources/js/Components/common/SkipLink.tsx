@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 
 /**
  * SkipLink component - Provides a skip to main content link for keyboard users

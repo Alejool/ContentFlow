@@ -1,4 +1,4 @@
-import { usePublicationApprovalHistory } from '@/Hooks/approval/useApprovalHistory';
+import { usePublicationApprovalHistory } from '@/Hooks/Approval/useApprovalHistory';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
 import type { ApprovalRequest } from '@/types/ApprovalTypes';
 import { format } from 'date-fns';

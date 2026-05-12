@@ -1,4 +1,4 @@
-import type { CommandItem } from '@/Hooks/useCommandPalette';
+import type { CommandItem } from '@/Hooks/CommandPalette/useCommandPalette';
 import { router } from '@inertiajs/react';
 import {
   Calendar,

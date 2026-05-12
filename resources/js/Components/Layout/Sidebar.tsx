@@ -1,7 +1,7 @@
 import Logo from '@/../assets/logo.png';
 import NavLink from '@/Components/common/ui/NavLink';
 import WorkspaceSwitcher from '@/Components/Workspace/WorkspaceSwitcher';
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Link, usePage } from '@inertiajs/react';
 import { BarChart3, ChevronLeft, ChevronRight, FileText, Home, Layers } from 'lucide-react';
 import { useState } from 'react';

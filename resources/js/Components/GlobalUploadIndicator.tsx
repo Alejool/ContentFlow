@@ -1,7 +1,7 @@
-import { useConfirm } from '@/Hooks/useConfirm';
-import { usePublicationStatus } from '@/Hooks/usePublicationStatus';
-import { useS3Upload } from '@/Hooks/useS3Upload';
-import { useUploadWarning } from '@/Hooks/useUploadWarning';
+import { useConfirm } from '@/Hooks/common/useConfirm';
+import { usePublicationStatus } from '@/Hooks/Publications/usePublicationStatus';
+import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
+import { useUploadWarning } from '@/Hooks/Upload/useUploadWarning';
 import { useProcessingProgress } from '@/stores/processingProgressStore';
 import { useUploadQueue } from '@/stores/uploadQueueStore';
 import { router } from '@inertiajs/react';

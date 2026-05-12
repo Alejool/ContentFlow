@@ -2,7 +2,7 @@ import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import PhoneInput from '@/Components/common/Modern/PhoneInput';
 import AvatarSettings from '@/Pages/Profile/AvatarSettings';
-import { useUser } from '@/Hooks/useUser';
+import { useUser } from '@/Hooks/Auth/useUser';
 import { Link } from '@inertiajs/react';
 import { CheckCircle, Mail, MailWarning, Send, User as UserIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';

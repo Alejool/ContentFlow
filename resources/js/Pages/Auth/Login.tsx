@@ -1,4 +1,4 @@
-import { useAuth } from '@/Hooks/useAuth';
+import { useAuth } from '@/Hooks/Auth/useAuth';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link } from '@inertiajs/react';

@@ -3,7 +3,7 @@ import PublicationTable from '@/Components/Content/Publication/PublicationTable'
 import FilterSection from '@/Components/Content/common/FilterSection';
 import HeaderSection from '@/Components/Content/common/HeaderSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import type { CampaignListProps } from '@/types/CampaignListProps';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

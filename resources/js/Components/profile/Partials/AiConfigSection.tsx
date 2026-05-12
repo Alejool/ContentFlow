@@ -1,5 +1,5 @@
 import Input from '@/Components/common/Modern/Input';
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { BrainCircuit, ExternalLink, Info, Key, ShieldCheck, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

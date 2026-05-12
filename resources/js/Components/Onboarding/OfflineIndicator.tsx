@@ -1,5 +1,5 @@
 import React from 'react';
-import { useOnlineStatus } from '@/Hooks/useOnlineStatus';
+import { useOnlineStatus } from '@/Hooks/Offline/useOnlineStatus';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 
 /**

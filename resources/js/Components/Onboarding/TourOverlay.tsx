@@ -3,7 +3,7 @@ import { X, ChevronRight, SkipForward } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '@/Components/common/Modern/Button';
 import type { TourStep } from '@/types/onboarding';
-import { useOnboardingNavigation } from '@/Hooks/onboarding/useOnboardingNavigation';
+import { useOnboardingNavigation } from '@/Hooks/Onboarding/useOnboardingNavigation';
 
 interface TourOverlayProps {
   currentStep: TourStep;

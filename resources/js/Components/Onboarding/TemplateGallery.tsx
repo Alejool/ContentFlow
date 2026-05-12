@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { PublicationTemplate } from '@/types/onboarding';
 import { Search, X } from 'lucide-react';
 import TemplateCard from './TemplateCard';
-import { useTemplateIntegration } from '@/Hooks/onboarding/useTemplateIntegration';
+import { useTemplateIntegration } from '@/Hooks/Onboarding/useTemplateIntegration';
 import EmptyState from '@/Components/common/EmptyState';
 import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
 import { useEffect } from 'react';

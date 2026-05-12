@@ -5,8 +5,8 @@ import {
   formatFileSizeLimit,
   getUpgradeMessage,
   useValidateVideo,
-} from '@/Hooks/usePlatformCapabilities';
-import type { VideoValidationResult } from '@/Hooks/usePlatformCapabilities';
+} from '@/Hooks/common/usePlatformCapabilities';
+import type { VideoValidationResult } from '@/Hooks/common/usePlatformCapabilities';
 import { AlertTriangle, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

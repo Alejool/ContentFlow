@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useValidateVideo } from './usePlatformCapabilities';
-import type { VideoValidationResult } from './usePlatformCapabilities';
+import { useValidateVideo } from '../common/usePlatformCapabilities';
+import type { VideoValidationResult } from '../common/usePlatformCapabilities';
 
 export interface PlatformCapability {
   account_id: number;
@@ -161,7 +161,7 @@ export function usePublicationCapabilities(publicationId: number | null) {
       const caps = videoValidation.capabilities;
 
       // Use the upgrade message from usePlatformCapabilities
-      const { getUpgradeMessage: getVideoUpgradeMessage } = require('./usePlatformCapabilities');
+      const { getUpgradeMessage: getVideoUpgradeMessage } = require('../common/usePlatformCapabilities');
       const videoUpgrade = getVideoUpgradeMessage(platform, caps);
 
       if (videoUpgrade) {

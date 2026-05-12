@@ -8,7 +8,7 @@ import {
   useRemoveWorkspaceMember,
   useUpdateMemberRole,
   useWorkspaceMembers,
-} from '@/Hooks/useWorkspaceMembers';
+} from '@/Hooks/Workspace/useWorkspaceMembers';
 import { queryKeys } from '@/lib/queryKeys';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';

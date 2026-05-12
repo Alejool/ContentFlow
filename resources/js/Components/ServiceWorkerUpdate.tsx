@@ -4,7 +4,7 @@
  * Shows a notification when a new service worker version is available
  */
 
-import { useServiceWorker } from '../Hooks/useServiceWorker';
+import { useServiceWorker } from '../Hooks/Offline/useServiceWorker';
 
 export function ServiceWorkerUpdate() {
   const { hasUpdate, updateServiceWorker } = useServiceWorker();

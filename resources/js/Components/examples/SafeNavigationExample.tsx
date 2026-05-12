@@ -6,7 +6,7 @@
  */
 
 import { Button } from '@/Components/ui/Button';
-import { useSafeNavigation } from '@/Hooks/useSafeNavigation';
+import { useSafeNavigation } from '@/Hooks/common/useSafeNavigation';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 

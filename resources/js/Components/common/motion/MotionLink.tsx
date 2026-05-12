@@ -1,5 +1,5 @@
 import { getTransition, getVariant, hoverVariants } from '@/config/animationVariants';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useReducedMotion } from '@/Hooks/ui/useReducedMotion';
 import type { HTMLMotionProps } from 'framer-motion';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { AnchorHTMLAttributes } from 'react';

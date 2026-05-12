@@ -5,7 +5,7 @@ import TableContainer from '@/Components/common/ui/TableContainer';
 import {
   useApprovalHistory,
   usePublicationApprovalHistory,
-} from '@/Hooks/approval/useApprovalHistory';
+} from '@/Hooks/Approval/useApprovalHistory';
 import { getDateFnsLocale } from '@/Utils/dateLocales';
 import type { ApprovalRequest } from '@/types/ApprovalTypes';
 import { format } from 'date-fns';

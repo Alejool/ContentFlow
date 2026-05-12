@@ -5,9 +5,9 @@ import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValid
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import { CONTENT_TYPE_CONFIG } from '@/Constants/contentTypes';
 import { getPlatformConfig } from '@/Constants/socialPlatforms';
-import { usePublishPublication } from '@/Hooks/publication/usePublishPublication';
-import { useConfirm } from '@/Hooks/useConfirm';
-import { usePublicationCapabilities } from '@/Hooks/usePublicationCapabilities';
+import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
+import { useConfirm } from '@/Hooks/common/useConfirm';
+import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
 import { usePublicationStore } from '@/stores/publicationStore';
 import type { Publication } from '@/types/Publication';
 import { formatDateTimeStyled } from '@/Utils/formatters';
@@ -753,7 +753,7 @@ export default function PublishPublicationModal({
                     fileSizeMb={fileSizeMb}
                     onValidationComplete={(
                       valid: boolean,
-                      results: import('@/Hooks/usePlatformCapabilities').VideoValidationResult[],
+                      results: import('@/Hooks/common/usePlatformCapabilities').VideoValidationResult[],
                     ) => {
                       // Results show which accounts can't publish due to limits
                       console.log('Video validation:', valid, results);

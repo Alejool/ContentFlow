@@ -1,7 +1,7 @@
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { useActiveAddons } from '@/Hooks/useActiveAddons';
+import { useActiveAddons } from '@/Hooks/Addons/useActiveAddons';
 import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
 import { AddonCard } from './AddonCard';
 import { formatCurrency } from '@/Utils/formatters/number';

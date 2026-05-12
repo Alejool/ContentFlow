@@ -1,4 +1,4 @@
-import { useOffline } from '@/Hooks/useOffline';
+import { useOffline } from '@/Hooks/Offline/useOffline';
 import { ComponentType } from 'react';
 
 /**

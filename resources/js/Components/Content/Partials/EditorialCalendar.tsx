@@ -1,5 +1,5 @@
-import { useCalendar } from '@/Hooks/calendar/useCalendar';
-import { useTheme } from '@/Hooks/useTheme';
+import { useCalendar } from '@/Hooks/Calendar/useCalendar';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { formatTimeString } from '@/Utils/formatters';
 import {
   eachDayOfInterval,

@@ -3,7 +3,7 @@ import {
   useCalendarEvents,
   useDeleteEvent,
   useUpdateEvent,
-} from '@/Hooks/useCalendarEvents';
+} from '@/Hooks/Calendar/useCalendarEvents';
 import { useCalendarStore } from '@/stores/calendarStore';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import axios from 'axios';

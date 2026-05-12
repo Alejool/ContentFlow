@@ -33,10 +33,10 @@ import ModernCalendar from '@/Components/Content/Partials/ModernCalendar';
 import Button from '@/Components/common/Modern/Button';
 import TabNavigation from '@/Components/common/TabNavigation';
 
-import { useCanApprove } from '@/Hooks/approval/useCanApprove';
-import { usePendingApprovals } from '@/Hooks/approval/usePendingApprovals';
-import type { ContentTab } from '@/Hooks/publication/usePublications';
-import { usePublications } from '@/Hooks/publication/usePublications';
+import { useCanApprove } from '@/Hooks/Approval/useCanApprove';
+import { usePendingApprovals } from '@/Hooks/Approval/usePendingApprovals';
+import type { ContentTab } from '@/Hooks/Publications/usePublications';
+import { usePublications } from '@/Hooks/Publications/usePublications';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import { useShallow } from 'zustand/react/shallow';
 

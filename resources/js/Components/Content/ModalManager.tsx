@@ -1,4 +1,4 @@
-import { usePublishPublication } from '@/Hooks/publication/usePublishPublication';
+import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
 import { useManageContentUIStore } from '@/stores/manageContentUIStore';
 import type { Campaign } from '@/types/Campaign';
 import type { Publication } from '@/types/Publication';

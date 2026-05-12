@@ -1,4 +1,4 @@
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import { useState } from 'react';
 
 interface AvatarProps {

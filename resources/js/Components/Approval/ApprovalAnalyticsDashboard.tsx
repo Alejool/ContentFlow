@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import BarChart from '@/Components/Statistics/BarChart';
 import PieChart from '@/Components/Statistics/PieChart';
-import { useTheme } from '@/Hooks/useTheme';
+import { useTheme } from '@/Hooks/Layout/useTheme';
 import axios from 'axios';
 import { AlertCircle, BarChart3, Clock, Download, FileText, TrendingUp, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';

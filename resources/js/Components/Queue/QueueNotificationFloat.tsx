@@ -1,4 +1,4 @@
-import { useQueueStatus } from '@/Hooks/useQueueStatus';
+import { useQueueStatus } from '@/Hooks/Queue/useQueueStatus';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Clock, Loader2, X, XCircle } from 'lucide-react';
 

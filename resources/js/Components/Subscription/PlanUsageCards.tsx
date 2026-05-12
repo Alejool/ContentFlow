@@ -1,6 +1,6 @@
 import { CarouselPagination } from '@/Components/common/CarouselPagination';
 import AnimatedPagination from '@/Components/common/ui/AnimatedPagination';
-import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
+import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
 import type { SystemAddons, UsageCardProps, VisibleUsageMetrics } from './planUsage.types';
 import { UsageCard } from './UsageCard';
 import type { PageProps as InertiaPageProps } from '@inertiajs/core';
