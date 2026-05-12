@@ -22,7 +22,7 @@ class HashtagLibraryController extends Controller
         }
 
         $hashtags = $query->orderBy('usage_count', 'desc')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         return response()->json($hashtags);

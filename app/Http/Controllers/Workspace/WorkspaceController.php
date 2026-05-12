@@ -30,7 +30,8 @@ class WorkspaceController extends Controller
   {
     $user = Auth::user()->load([
       'workspaces' => function ($q) {
-        $q->withCount('users')
+        $q->orderBy('updated_at', 'desc')
+          ->withCount('users')
           ->with([
             'users' => function ($qu) {
               $qu->select('users.id', 'users.name', 'users.photo_url')

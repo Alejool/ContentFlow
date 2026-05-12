@@ -38,6 +38,7 @@ class SocialAccountController extends Controller
         ->where('is_active', true)
         ->whereIn('platform', $allowedPlatforms)
         ->with('user:id,name')
+        ->orderBy('updated_at', 'desc')
         ->get();
 
       // Si es una petición API, devolver JSON

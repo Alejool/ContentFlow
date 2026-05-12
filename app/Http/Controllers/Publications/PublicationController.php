@@ -178,14 +178,14 @@ class PublicationController extends Controller
           $query->orderBy('created_at', 'asc');
           break;
         case 'title_asc':
-          $query->orderBy('title', 'asc')->orderBy('created_at', 'desc');
+          $query->orderBy('title', 'asc')->orderBy('updated_at', 'desc');
           break;
         case 'title_desc':
-          $query->orderBy('title', 'desc')->orderBy('created_at', 'desc');
+          $query->orderBy('title', 'desc')->orderBy('updated_at', 'desc');
           break;
         case 'newest':
         default:
-          $query->orderBy('created_at', 'desc');
+          $query->orderBy('updated_at', 'desc');
           break;
       }
 

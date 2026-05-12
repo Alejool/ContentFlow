@@ -546,7 +546,7 @@ class ApprovalWorkflowEngine
             }
         }
 
-        return $query->orderBy('submitted_at', 'desc')->get();
+        return $query->orderBy('updated_at', 'desc')->get();
     }
 
     /**
@@ -565,7 +565,7 @@ class ApprovalWorkflowEngine
             'logs.approvalStep',
         ])
         ->where('publication_id', $publication->id)
-        ->orderBy('submitted_at', 'desc')
+        ->orderBy('updated_at', 'desc')
         ->get();
     }
 
