@@ -27,7 +27,7 @@ export const ContentTypeSuggestion: React.FC<ContentTypeSuggestionProps> = ({
   return (
     <div className={`rounded-lg border border-blue-200 bg-blue-50 p-4 ${className}`}>
       <div className="flex items-start gap-3">
-        <InformationCircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
+        <InformationCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
 
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center gap-2">
@@ -56,7 +56,7 @@ export const ContentTypeSuggestion: React.FC<ContentTypeSuggestionProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onApply}
-              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
             >
               <CheckIcon className="h-4 w-4" />
               {t('publications.modal.contentType.suggestion.apply', {
@@ -67,7 +67,7 @@ export const ContentTypeSuggestion: React.FC<ContentTypeSuggestionProps> = ({
 
             <button
               onClick={onDismiss}
-              className="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none"
             >
               <XMarkIcon className="h-4 w-4" />
               {t('publications.modal.contentType.suggestion.keep', {

@@ -21,13 +21,13 @@ export default function RecommendationResponse({ data, theme }: RecommendationRe
               key={index}
               className={`rounded-lg p-3 ${
                 theme === 'dark'
-                  ? 'bg-gradient-to-r from-yellow-900/10 to-primary-900/10'
-                  : 'bg-gradient-to-r from-yellow-50 to-primary-50'
+                  ? 'to-primary-900/10 bg-gradient-to-r from-yellow-900/10'
+                  : 'to-primary-50 bg-gradient-to-r from-yellow-50'
               }`}
             >
               <div className="flex items-start gap-3">
                 <div
-                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                     theme === 'dark' ? 'bg-yellow-900/30' : 'bg-yellow-100'
                   }`}
                 >

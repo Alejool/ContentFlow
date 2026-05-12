@@ -80,13 +80,13 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
   return (
     <motion.div
       layout
-      className={`group relative cursor-pointer border-b border-gray-200 p-3 transition-colors duration-200 hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50 sm:p-4 ${
+      className={`group relative cursor-pointer border-b border-gray-200 p-3 transition-colors duration-200 hover:bg-gray-50 sm:p-4 dark:border-neutral-800 dark:hover:bg-neutral-800/50 ${
         !isRead ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''
       }`}
       onClick={() => onMarkAsRead(notification.id)}
     >
       <div className="flex items-start gap-2 sm:gap-3">
-        <div className="mt-0.5 flex-shrink-0">{getIcon()}</div>
+        <div className="mt-0.5 shrink-0">{getIcon()}</div>
 
         <div className="min-w-0 flex-1">
           <div
@@ -108,7 +108,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.15 }}
-                  className={`mb-1 break-words text-sm text-gray-700 dark:text-gray-200 ${
+                  className={`mb-1 text-sm break-words text-gray-700 dark:text-gray-200 ${
                     isExpanded ? '' : 'line-clamp-2'
                   }`}
                 >
@@ -118,7 +118,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
             )}
 
             {data.message && data.message.length > 100 && (
-              <span className="cursor-pointer text-xs text-primary-600 hover:underline dark:text-primary-400">
+              <span className="text-primary-600 dark:text-primary-400 cursor-pointer text-xs hover:underline">
                 {isExpanded ? t('common.show_less') : t('common.read_more')}
               </span>
             )}
@@ -130,7 +130,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
             )}
 
             {data.account_name && (
-              <p className="mb-1 text-xs font-medium text-primary-600 dark:text-primary-400">
+              <p className="text-primary-600 dark:text-primary-400 mb-1 text-xs font-medium">
                 {data.account_name}
               </p>
             )}
@@ -146,7 +146,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
 
             {data.campaign_name && (
               <>
-                <span className="text-xs italic text-gray-500">{data.campaign_name}</span>
+                <span className="text-xs text-gray-500 italic">{data.campaign_name}</span>
                 <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
               </>
             )}
@@ -187,7 +187,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
         </div>
 
         {data.thumbnail_url && !imageError && (
-          <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-neutral-800 sm:h-16 sm:w-16">
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 sm:h-16 sm:w-16 dark:bg-neutral-800">
             <img
               src={data.thumbnail_url}
               alt={data.publication_title || 'Thumbnail'}
@@ -199,13 +199,13 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
         )}
 
         {data.thumbnail_url && imageError && (
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md bg-gray-100 dark:bg-neutral-800 sm:h-16 sm:w-16">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-gray-100 sm:h-16 sm:w-16 dark:bg-neutral-800">
             <ImageOff className="h-6 w-6 text-gray-400 dark:text-neutral-600" />
           </div>
         )}
 
         {!isRead && (
-          <div className="absolute right-3 top-3 h-2 w-2 flex-shrink-0 rounded-full bg-primary-500" />
+          <div className="bg-primary-500 absolute top-3 right-3 h-2 w-2 shrink-0 rounded-full" />
         )}
       </div>
     </motion.div>

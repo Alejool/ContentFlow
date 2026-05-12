@@ -11,7 +11,7 @@ export default function InstructionsResponse({ data, theme }: InstructionsRespon
   return (
     <div className="space-y-4">
       <div className="mb-3 flex items-center gap-2">
-        <FileText className="h-5 w-5 text-primary-500" />
+        <FileText className="text-primary-500 h-5 w-5" />
         <h3 className="text-lg font-semibold">{data.title}</h3>
       </div>
 
@@ -33,7 +33,7 @@ export default function InstructionsResponse({ data, theme }: InstructionsRespon
                 }`}
               >
                 <div
-                  className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                     theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'
                   }`}
                 >

@@ -1,9 +1,9 @@
 import { DateTimePicker } from '@/Components/common/DateTimePicker';
 import Modal from '@/Components/common/ui/Modal';
-import SocialMediaLimitsService from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
 import type { ValidationResponse } from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
-import type { Publication } from '@/types/Publications/Publication';
+import SocialMediaLimitsService from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
 import { formatDateString } from '@/Utils/formatters';
+import type { Publication } from '@/types/Publications/Publication';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -333,7 +333,7 @@ export default function PublishPreviewModal({
               <div className="flex-1 overflow-y-auto p-6">
                 {/* Media Info Section */}
                 <div className="mb-6 flex gap-5 rounded-lg bg-gray-50 p-5 dark:bg-neutral-800">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {previewData.main_thumbnail ? (
                       <img
                         src={previewData.main_thumbnail}
@@ -502,7 +502,7 @@ export default function PublishPreviewModal({
                             <h4 className="mb-2 font-semibold text-red-900 dark:text-red-300">
                               No se puede publicar en todas las plataformas
                             </h4>
-                            <p className="whitespace-pre-line text-sm text-red-800 dark:text-red-400">
+                            <p className="text-sm whitespace-pre-line text-red-800 dark:text-red-400">
                               {validationData.message}
                             </p>
                           </div>

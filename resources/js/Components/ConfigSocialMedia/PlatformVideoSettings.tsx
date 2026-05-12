@@ -51,7 +51,7 @@ export default function PlatformVideoSettings({
       {requirements && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
-            <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
             <div className="flex-1">
               <p className="mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
                 {t('videoValidation.requirements')}
@@ -60,7 +60,7 @@ export default function PlatformVideoSettings({
                 {currentType === 'short' && requirements.short && (
                   <div>
                     <p className="font-medium">YouTube Shorts:</p>
-                    <ul className="ml-4 mt-1 space-y-1">
+                    <ul className="mt-1 ml-4 space-y-1">
                       <li>
                         • {t('videoValidation.maxDuration')}: {requirements.short.maxDuration}s
                       </li>
@@ -72,7 +72,7 @@ export default function PlatformVideoSettings({
                 {currentType === 'reel' && requirements.reel && (
                   <div>
                     <p className="font-medium">{requirements.name} Reels:</p>
-                    <ul className="ml-4 mt-1 space-y-1">
+                    <ul className="mt-1 ml-4 space-y-1">
                       <li>
                         • {t('videoValidation.maxDuration')}: {requirements.reel.maxDuration}s
                       </li>
@@ -88,7 +88,7 @@ export default function PlatformVideoSettings({
                 {currentType === 'video' && requirements.video && (
                   <div>
                     <p className="font-medium">{requirements.name} Video:</p>
-                    <ul className="ml-4 mt-1 space-y-1">
+                    <ul className="mt-1 ml-4 space-y-1">
                       <li>
                         • {t('videoValidation.maxDuration')}:{' '}
                         {Math.floor(requirements.video.maxDuration / 3600)}h

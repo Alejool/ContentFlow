@@ -10,16 +10,16 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import {
-    BarChart3,
-    Calendar,
-    Eye,
-    FileText,
-    Heart,
-    Mail,
-    MousePointer2,
-    TrendingUp,
-    Users,
-    X,
+  BarChart3,
+  Calendar,
+  Eye,
+  FileText,
+  Heart,
+  Mail,
+  MousePointer2,
+  TrendingUp,
+  Users,
+  X,
 } from 'lucide-react';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -151,7 +151,7 @@ export default function Dashboard({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           data-theme-color={auth.user?.theme_color || 'orange'}
-          className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 dark:border-neutral-700 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 md:flex-row"
+          className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 md:flex-row dark:border-neutral-700 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900"
         >
           <div>
             <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
@@ -187,7 +187,7 @@ export default function Dashboard({
             {' '}
             <div className="flex items-start justify-between">
               <div className="flex flex-1 items-start gap-4">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-700">
                     <Mail className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                   </div>
@@ -219,7 +219,7 @@ export default function Dashboard({
               </div>
               <button
                 onClick={() => setShowBanner(false)}
-                className="flex-shrink-0 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
+                className="shrink-0 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -323,7 +323,7 @@ export default function Dashboard({
           {stats.engagementTrends.length > 0 && (
             <div className="rounded-lg border border-gray-100 bg-white/60 p-6 shadow-sm backdrop-blur-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/70 dark:backdrop-blur-sm">
               <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
-                <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
+                <div className="bg-primary-100 dark:bg-primary-900/20 rounded-lg p-2">
                   <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 {t('dashboard.engagementTrends')}

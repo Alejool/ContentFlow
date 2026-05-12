@@ -73,9 +73,9 @@ export default function PerformanceTable({
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-gray-400 opacity-50" />;
     return sortDirection === 'asc' ? (
-      <ChevronUp className="h-3 w-3 text-primary-600" />
+      <ChevronUp className="text-primary-600 h-3 w-3" />
     ) : (
-      <ChevronDown className="h-3 w-3 text-primary-600" />
+      <ChevronDown className="text-primary-600 h-3 w-3" />
     );
   };
 
@@ -161,7 +161,7 @@ export default function PerformanceTable({
             <tr>
               <th
                 onClick={() => handleSort('title')}
-                className="group cursor-pointer px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                className="group cursor-pointer px-6 py-3 text-left text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center gap-2">
                   {t('common.item') || 'Elemento'}
@@ -170,7 +170,7 @@ export default function PerformanceTable({
               </th>
               <th
                 onClick={() => handleSort('total_views')}
-                className="cursor-pointer px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <Eye className="h-3 w-3" />
@@ -180,7 +180,7 @@ export default function PerformanceTable({
               </th>
               <th
                 onClick={() => handleSort('total_clicks')}
-                className="cursor-pointer px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <MousePointer2 className="h-3 w-3" />
@@ -190,7 +190,7 @@ export default function PerformanceTable({
               </th>
               <th
                 onClick={() => handleSort('total_engagement')}
-                className="cursor-pointer px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-purple-600 transition-colors hover:bg-gray-100 dark:text-purple-400 dark:hover:bg-neutral-800"
+                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-purple-600 uppercase transition-colors hover:bg-gray-100 dark:text-purple-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <TrendingUp className="h-3 w-3" />
@@ -209,10 +209,10 @@ export default function PerformanceTable({
                 <React.Fragment key={`${item.campaign.id}-${item.publication.id}`}>
                   {showCampaignHeader && (
                     <tr className={theme === 'dark' ? 'bg-neutral-800/30' : 'bg-primary-50/10'}>
-                      <td className="whitespace-nowrap px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-primary-100 dark:bg-primary-900/30">
-                            <Layers className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                          <div className="bg-primary-100 dark:bg-primary-900/30 flex h-8 w-8 shrink-0 items-center justify-center rounded">
+                            <Layers className="text-primary-600 dark:text-primary-400 h-4 w-4" />
                           </div>
                           <div>
                             <div className="text-sm font-bold text-gray-900 dark:text-white">
@@ -236,17 +236,17 @@ export default function PerformanceTable({
                           </div>
                         </div>
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         <span className="text-sm font-bold text-gray-900 dark:text-white">
                           {item.campaign.total_views.toLocaleString()}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         <span className="text-sm font-bold text-gray-900 dark:text-white">
                           {item.campaign.total_clicks.toLocaleString()}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
                           {item.campaign.total_engagement.toLocaleString()}
                         </span>
@@ -255,7 +255,7 @@ export default function PerformanceTable({
                   )}
 
                   <tr className="transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800/50">
-                    <td className="whitespace-nowrap px-6 py-3">
+                    <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2 pl-8">
                         <FileText className="h-3.5 w-3.5 text-gray-400" />
                         <span className="max-w-[250px] truncate text-sm text-gray-600 dark:text-gray-300">
@@ -263,17 +263,17 @@ export default function PerformanceTable({
                         </span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3 text-center">
+                    <td className="px-6 py-3 text-center whitespace-nowrap">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {item.publication.views.toLocaleString()}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3 text-center">
+                    <td className="px-6 py-3 text-center whitespace-nowrap">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {item.publication.clicks.toLocaleString()}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3 text-center">
+                    <td className="px-6 py-3 text-center whitespace-nowrap">
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                         {item.publication.engagement.toLocaleString()}
                       </span>

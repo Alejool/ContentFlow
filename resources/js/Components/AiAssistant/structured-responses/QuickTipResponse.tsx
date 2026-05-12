@@ -10,7 +10,7 @@ export default function QuickTipResponse({ data, theme }: QuickTipResponseProps)
   return (
     <div className="space-y-4">
       <div className="mb-3 flex items-center gap-2">
-        <Zap className="h-5 w-5 text-primary-500" />
+        <Zap className="text-primary-500 h-5 w-5" />
         <h3 className="text-lg font-semibold">{data.title || 'Consejo rápido'}</h3>
       </div>
 
@@ -18,8 +18,8 @@ export default function QuickTipResponse({ data, theme }: QuickTipResponseProps)
         <div
           className={`rounded-lg p-4 ${
             theme === 'dark'
-              ? 'bg-gradient-to-r from-primary-900/20 to-yellow-900/20'
-              : 'bg-gradient-to-r from-primary-50 to-yellow-50'
+              ? 'from-primary-900/20 bg-gradient-to-r to-yellow-900/20'
+              : 'from-primary-50 bg-gradient-to-r to-yellow-50'
           }`}
         >
           <p className="text-sm leading-relaxed">{data.tip}</p>
@@ -185,7 +185,7 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
                 : 'bg-gradient-to-r from-blue-50 to-purple-50'
             }`}
           >
-            <div className={`flex-shrink-0 ${getIconColor(action.type)}`}>
+            <div className={`shrink-0 ${getIconColor(action.type)}`}>
               {getActionIcon(action.type)}
             </div>
             <div>
@@ -219,7 +219,7 @@ function StepsList({ steps, theme }: StepsListProps) {
             }`}
           >
             <div
-              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                 theme === 'dark' ? 'bg-primary-900/30' : 'bg-primary-100'
               }`}
             >

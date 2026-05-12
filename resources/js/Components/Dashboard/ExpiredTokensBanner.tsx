@@ -43,7 +43,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
       {/* ─── Expired / Failed Accounts ─── */}
       {expiredAccounts.length > 0 && (
         <div className="relative flex items-start gap-4 rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm dark:border-red-800/40 dark:bg-red-900/20">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
               <WifiOff className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
@@ -85,7 +85,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
           </div>
           <button
             onClick={() => setDismissed(true)}
-            className="absolute right-3 top-3 text-red-400 transition-colors hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
+            className="absolute top-3 right-3 text-red-400 transition-colors hover:text-red-600 dark:text-red-500 dark:hover:text-red-300"
             aria-label="Cerrar"
           >
             <X className="h-4 w-4" />
@@ -96,7 +96,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
       {/* ─── Expiring Soon Accounts ─── */}
       {expiringSoonAccounts.length > 0 && (
         <div className="relative flex items-start gap-4 rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm dark:border-amber-700/40 dark:bg-amber-900/20">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
               <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
@@ -144,7 +144,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
           </div>
           <button
             onClick={() => setDismissed(true)}
-            className="absolute right-3 top-3 text-amber-400 transition-colors hover:text-amber-600 dark:text-amber-500 dark:hover:text-amber-300"
+            className="absolute top-3 right-3 text-amber-400 transition-colors hover:text-amber-600 dark:text-amber-500 dark:hover:text-amber-300"
             aria-label="Cerrar"
           >
             <X className="h-4 w-4" />

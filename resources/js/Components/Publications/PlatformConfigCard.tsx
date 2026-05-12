@@ -169,7 +169,7 @@ export default function PlatformConfigCard({
               <select
                 value={selectedType}
                 onChange={handleTypeChange}
-                className="flex-1 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100"
+                className="flex-1 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100"
               >
                 {config.available_types.map((type) => (
                   <option key={type} value={type}>
@@ -226,9 +226,7 @@ export default function PlatformConfigCard({
                 key={index}
                 className="mb-1.5 flex items-start gap-1.5 rounded-md bg-yellow-50 p-2 dark:bg-yellow-900/20"
               >
-                <span className="flex-shrink-0 text-xs text-yellow-600 dark:text-yellow-400">
-                  ⚠
-                </span>
+                <span className="shrink-0 text-xs text-yellow-600 dark:text-yellow-400">⚠</span>
                 <span className="text-xs leading-relaxed text-yellow-900 dark:text-yellow-200">
                   {warning}
                 </span>
@@ -241,14 +239,14 @@ export default function PlatformConfigCard({
         {!config.is_compatible && (
           <div className="mt-2 border-t border-red-300 pt-2 dark:border-red-800">
             <div className="mb-1.5 flex items-start gap-1.5 rounded-md bg-red-100 p-2 dark:bg-red-900/30">
-              <span className="flex-shrink-0 text-sm text-red-600 dark:text-red-400">✗</span>
-              <span className="text-xs font-medium leading-relaxed text-red-900 dark:text-red-200">
+              <span className="shrink-0 text-sm text-red-600 dark:text-red-400">✗</span>
+              <span className="text-xs leading-relaxed font-medium text-red-900 dark:text-red-200">
                 {config.incompatibility_reason}
               </span>
             </div>
             {config.suggestion && (
               <div className="flex items-start gap-1.5 rounded-md bg-blue-50 p-2 dark:bg-blue-900/20">
-                <span className="flex-shrink-0 text-sm"></span>
+                <span className="shrink-0 text-sm"></span>
                 <span className="text-xs leading-relaxed text-blue-900 dark:text-blue-200">
                   {config.suggestion}
                 </span>

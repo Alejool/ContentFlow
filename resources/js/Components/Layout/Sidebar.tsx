@@ -128,15 +128,15 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               }`}
             >
               <div
-                className={`relative h-14 w-12 ${!auth?.current_workspace?.white_label_logo_url ? 'bg-linear-to-r' : ''} flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg`}
+                className={`relative h-14 w-12 ${!auth?.current_workspace?.white_label_logo_url ? 'bg-linear-to-r' : ''} flex shrink-0 items-center justify-center overflow-hidden rounded-lg`}
               >
                 {!logoLoaded && !logoError && (
                   <div className="absolute inset-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-neutral-700">
-                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-linear-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
+                    <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
                   </div>
                 )}
                 {logoError ? (
-                  <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                  <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
                     {(auth?.current_workspace?.name || 'C').charAt(0).toUpperCase()}
                   </span>
                 ) : (
@@ -169,7 +169,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                       : auth?.current_workspace?.name || 'Social Media Manager'}
                   </p>
                   {auth?.current_workspace?.role && (
-                    <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-500">
+                    <p className="text-primary-500 mt-0.5 text-[10px] font-bold tracking-widest uppercase">
                       {auth.current_workspace.role.name}
                     </p>
                   )}
@@ -187,16 +187,16 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                 <ChevronLeft
                   className={`h-5 w-5 transition-colors ${
                     isDark
-                      ? 'text-gray-400 hover:text-primary-400'
-                      : 'text-gray-600 hover:text-primary-600'
+                      ? 'hover:text-primary-400 text-gray-400'
+                      : 'hover:text-primary-600 text-gray-600'
                   }`}
                 />
               ) : (
                 <ChevronRight
                   className={`h-5 w-5 transition-colors ${
                     isDark
-                      ? 'text-gray-400 hover:text-primary-400'
-                      : 'text-gray-600 hover:text-primary-600'
+                      ? 'hover:text-primary-400 text-gray-400'
+                      : 'hover:text-primary-600 text-gray-600'
                   }`}
                 />
               )}
@@ -229,7 +229,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
                   {!isSidebarOpen && (
                     <div
-                      className={`pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'}`}
+                      className={`pointer-events-none absolute left-full z-50 ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'}`}
                     >
                       {t(item.nameKey)}
                     </div>
