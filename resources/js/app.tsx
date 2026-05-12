@@ -11,11 +11,14 @@ import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 
+// ─── Importación síncrona de i18n ─────────────────────────────────────────────
+// i18n debe cargarse ANTES del render para que las traducciones estén disponibles
+import i18n from './i18n';
+
 // ─── Carga diferida de módulos pesados ────────────────────────────────────────
-// bootstrap (Echo + Pusher) y i18n se cargan después del primer render,
-// no bloquean la carga inicial de la UI.
+// bootstrap (Echo + Pusher) se carga después del primer render,
+// no bloquea la carga inicial de la UI.
 const initBootstrap = () => import('./bootstrap');
-const initI18n = () => import('./i18n');
 
 // ServiceWorkerUpdate no es crítico para el render inicial
 const ServiceWorkerUpdate = React.lazy(() =>
@@ -79,14 +82,14 @@ createInertiaApp<PageProps>({
 
     const user = props.initialPage.props.auth?.user;
 
-    // Inicializar i18n, bootstrap y accesibilidad en paralelo, sin bloquear el render
-    Promise.all([initBootstrap(), initI18n(), initAccessibility()]).then(([, i18nModule]) => {
-      const i18n = i18nModule.default;
-      const userLocale = user?.locale;
-      if (userLocale && i18n.language !== userLocale) {
-        i18n.changeLanguage(userLocale);
-      }
-    });
+    // Configurar idioma del usuario si está disponible
+    const userLocale = user?.locale;
+    if (userLocale && i18n.language !== userLocale) {
+      i18n.changeLanguage(userLocale);
+    }
+
+    // Inicializar bootstrap y accesibilidad en paralelo, sin bloquear el render
+    Promise.all([initBootstrap(), initAccessibility()]);
 
     root.render(
       <ErrorBoundary>
