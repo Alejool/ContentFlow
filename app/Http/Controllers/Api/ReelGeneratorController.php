@@ -186,7 +186,7 @@ class ReelGeneratorController extends Controller
         ->where('workspace_id', $workspaceId)
         ->whereJsonContains('metadata->ai_generated', true) // Only AI-generated reels
         ->with(['publication', 'user'])
-        ->orderBy('created_at', 'desc');
+        ->orderBy('updated_at', 'desc');
 
       // Filter by platform if specified
       if ($request->has('platform')) {

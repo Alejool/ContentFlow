@@ -362,23 +362,44 @@ class StatisticsService
   public function getRecentActivity(int $workspaceId, int $limit = 10)
   {
     $publications = Publication::where('workspace_id', $workspaceId)
-      ->latest()
+      ->orderBy('updated_at', 'desc')
       ->take($limit)
       ->get()
-      ->map(function ($campaign) {
+      ->map(function ($pub) {
         return [
-          'type' => 'campaign',
-          'title' => $campaign->title,
-          'status' => $campaign->status,
-          'date' => $campaign->created_at,
+          'id' => $pub->id,
+          'type' => 'publication',
+          'title' => $pub->title,
+          'status' => $pub->status,
+          'date' => $pub->updated_at,
           'data' => [
-            'views' => $campaign->getTotalViews(),
-            'clicks' => $campaign->getTotalClicks(),
+            'views' => $pub->getTotalViews(),
+            'clicks' => $pub->getTotalClicks(),
           ],
         ];
       });
 
-    return $publications;
+    $campaigns = Campaign::where('workspace_id', $workspaceId)
+      ->orderBy('updated_at', 'desc')
+      ->take($limit)
+      ->get()
+      ->map(function ($campaign) {
+        return [
+          'id' => $campaign->id,
+          'type' => 'campaign',
+          'title' => $campaign->name,
+          'status' => $campaign->status,
+          'date' => $campaign->updated_at,
+          'data' => [
+            'publication_count' => $campaign->publications()->count(),
+          ],
+        ];
+      });
+
+    return $publications->concat($campaigns)
+      ->sortByDesc('date')
+      ->take($limit)
+      ->values();
   }
 
   /**

@@ -74,6 +74,7 @@ class AIChatController extends Controller
                 if (empty($campaigns)) {
                     $campaigns = Campaign::where('workspace_id', $user->current_workspace_id)
                         ->select('id', 'name as title', 'description', 'status', 'start_date', 'end_date')
+                        ->orderBy('updated_at', 'desc')
                         ->get()
                         ->toArray();
                 }

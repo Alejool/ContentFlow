@@ -14,7 +14,7 @@ class ScheduledReportController extends Controller
     public function index()
     {
         $reports = ScheduledReport::where('workspace_id', Auth::user()->current_workspace_id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         return response()->json($reports);

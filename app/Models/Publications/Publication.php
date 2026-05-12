@@ -57,6 +57,13 @@ class Publication extends Model
         $builder->where('workspace_id', Auth::user()->current_workspace_id);
       }
     });
+
+    // Touch related campaigns when publication is updated
+    static::saved(function ($publication) {
+      if ($publication->wasChanged()) {
+        $publication->campaigns->each->touch();
+      }
+    });
   }
 
   protected $table = 'publications';
