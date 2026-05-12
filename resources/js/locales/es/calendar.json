@@ -55,6 +55,8 @@
       "moveDescription": "Selecciona la nueva fecha y hora para mover los {count} eventos seleccionados.",
       "moveSuccess": "Eventos movidos exitosamente",
       "moveError": "Error al mover los eventos",
+      "undoSuccess": "Operación deshecha exitosamente",
+      "undoError": "Error al deshacer la operación",
       "cancel": "Cancelar",
       "move": "Mover"
     },
@@ -63,6 +65,11 @@
     "of": "de",
     "total": "total",
     "selectAll": "Seleccionar todos",
+    "selectOptions": "Opciones de selección",
+    "selectDay": "Seleccionar del día",
+    "selectDayDescription": "Solo eventos del día seleccionado",
+    "selectAllEvents": "Seleccionar todos",
+    "selectAllDescription": "Todos los eventos visibles en el calendario",
     "clearSelection": "Limpiar selección",
     "moveEvents": "Mover eventos",
     "delete": "Eliminar",
@@ -119,7 +126,8 @@
           "successDelete": "Evento eliminado",
           "confirmDelete": "¿Estás seguro de que deseas eliminar este evento?",
           "errorSave": "Error al guardar el evento",
-          "errorDelete": "Error al eliminar el evento"
+          "errorDelete": "Error al eliminar el evento",
+          "validationError": "Por favor, corrige los errores en el formulario"
         },
         "validation": {
           "titleRequired": "El título es obligatorio",
@@ -195,6 +203,13 @@
       "past_date_message": "No puedes programar eventos para fechas pasadas. Selecciona una fecha y hora futura.",
       "date_required": "La fecha es obligatoria",
       "invalid_format": "Formato de fecha inválido. Usa una fecha válida."
+    },
+    "warnings": {
+      "pastDate": "¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?"
+    },
+    "messages": {
+      "eventUpdated": "Evento actualizado exitosamente",
+      "updateFailed": "Error al actualizar el evento"
     },
     "selected_date": "Fecha seleccionada:",
     "sync": {

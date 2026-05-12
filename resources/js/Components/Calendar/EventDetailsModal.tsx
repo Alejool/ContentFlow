@@ -81,7 +81,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         {/* Event Header */}
         <div className="flex items-start gap-4">
           <div
-            className="h-20 w-1 flex-shrink-0 rounded-full"
+            className="h-20 w-1 shrink-0 rounded-full"
             style={{ backgroundColor: event.color }}
           />
           <div className="min-w-0 flex-1">
@@ -97,11 +97,11 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">{event.title}</h3>
             </div>
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium capitalize text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 capitalize dark:bg-gray-700 dark:text-gray-300">
                 {t(`status.${event.status}`, event.status)}
               </span>
               {event.type && (
-                <span className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium capitalize text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 rounded-full px-3 py-1 text-sm font-medium capitalize">
                   {event.type.replace('_', ' ')}
                 </span>
               )}
@@ -150,7 +150,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   {canEdit && onUpdateDate && (
                     <button
                       onClick={() => setIsEditingDate(true)}
-                      className="rounded-md p-1 text-gray-400 transition-all hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20"
+                      className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 rounded-md p-1 text-gray-400 transition-all"
                       title={t('common.edit') || 'Editar'}
                     >
                       <Edit2 className="h-4 w-4" />
@@ -173,7 +173,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 <div className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                   {t('calendar.eventDetails.platform') || 'Plataforma'}
                 </div>
-                <div className="text-base capitalize text-gray-900 dark:text-white">
+                <div className="text-base text-gray-900 capitalize dark:text-white">
                   {event.platform}
                 </div>
               </div>
@@ -218,7 +218,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 </div>
                 <a
                   href={`${event.extendedProps.slug}?id=${event.publicationId || event.extendedProps.publication_id}`}
-                  className="text-base text-primary-600 hover:underline dark:text-primary-400"
+                  className="text-primary-600 dark:text-primary-400 text-base hover:underline"
                 >
                   {t('calendar.eventDetails.openInEditor') || 'Abrir en el editor'}
                 </a>
@@ -228,15 +228,15 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
           {/* External platform link */}
           {event.extendedProps?.post_url && (
-            <div className="flex items-start gap-3 rounded-lg border border-primary-100 bg-primary-50 p-3 dark:border-primary-800/30 dark:bg-primary-900/10">
-              <ExternalLink className="mt-0.5 h-5 w-5 text-primary-600 dark:text-primary-400" />
+            <div className="border-primary-100 bg-primary-50 dark:border-primary-800/30 dark:bg-primary-900/10 flex items-start gap-3 rounded-lg border p-3">
+              <ExternalLink className="text-primary-600 dark:text-primary-400 mt-0.5 h-5 w-5" />
               <div className="flex-1">
-                <div className="mb-1 text-sm font-medium text-primary-700 dark:text-primary-300">
+                <div className="text-primary-700 dark:text-primary-300 mb-1 text-sm font-medium">
                   {t('calendar.eventDetails.publishedLink') || 'Publicado en la red social'}
                 </div>
                 <a
                   href={event.extendedProps.post_url}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:underline dark:text-primary-400"
+                  className="text-primary-600 dark:text-primary-400 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -255,7 +255,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 <div className="mb-1 text-sm font-medium text-red-700 dark:text-red-300">
                   {t('calendar.eventDetails.errorTitle') || 'Error en el envío'}
                 </div>
-                <div className="text-sm font-medium italic text-red-600 dark:text-red-400">
+                <div className="text-sm font-medium text-red-600 italic dark:text-red-400">
                   {event.extendedProps.error_message}
                 </div>
               </div>

@@ -18,19 +18,20 @@ interface WeekViewProps {
   currentDate: Date;
   events: CalendarEvent[];
   onEventDrop: (event: CalendarEvent, newDate: Date) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  onDeleteEvent?: (event: CalendarEvent) => void;
+  onEventClick?: ((event: CalendarEvent) => void) | undefined;
+  onDeleteEvent?: ((event: CalendarEvent) => void) | undefined;
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
+  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
+  currentUser?: { name: string } | undefined;
 }
 
 interface DraggableWeekEventProps {
   event: CalendarEvent;
   isSelected: boolean;
   onToggleSelection: (eventId: string) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
+  onEventClick?: ((event: CalendarEvent) => void) | undefined;
+  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
 }
 
 const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
@@ -94,8 +95,8 @@ interface DroppableTimeSlotProps {
   events: CalendarEvent[];
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
+  onEventClick?: ((event: CalendarEvent) => void) | undefined;
+  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
 }
 
 const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
@@ -174,7 +175,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    const draggedEvent = event.active.data.current?.event as CalendarEvent;
+    const draggedEvent = event.active.data.current?.['event'] as CalendarEvent;
     setActiveEvent(draggedEvent);
   };
 
@@ -182,8 +183,9 @@ export const WeekView: React.FC<WeekViewProps> = ({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const draggedEvent = active.data.current?.event as CalendarEvent;
-      const { day, hour } = over.data.current as { day: Date; hour: number };
+      const draggedEvent = active.data.current?.['event'] as CalendarEvent;
+      const day = over.data.current?.['day'] as Date;
+      const hour = over.data.current?.['hour'] as number;
 
       if (draggedEvent && day !== undefined && hour !== undefined) {
         const newDate = new Date(day);

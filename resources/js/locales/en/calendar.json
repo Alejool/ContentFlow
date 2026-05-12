@@ -9,8 +9,40 @@
       "fri": "Fri",
       "sat": "Sat"
     },
+    "views": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    },
     "actions": {
-      "today": "Today"
+      "today": "Today",
+      "export": "Export",
+      "selectAll": "Select all",
+      "clearSelection": "Clear selection",
+      "moveEvents": "Move events",
+      "bulkMove": "Move selected"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "today": "Today",
+      "selectDate": "Select date"
+    },
+    "filters": {
+      "all": "All",
+      "events": "Events Only",
+      "platform": "Platform",
+      "status": "Status",
+      "campaign": "Campaign"
+    },
+    "export": {
+      "title": "Export calendar",
+      "google": "Google Calendar",
+      "outlook": "Outlook Calendar",
+      "description": "The .ics file can be imported into any compatible calendar application",
+      "success": "Calendar exported successfully",
+      "error": "Error exporting calendar",
+      "eventsCount": "events"
     },
     "bulkActions": {
       "selected": "selected",
@@ -28,19 +60,38 @@
       "cancel": "Cancel",
       "move": "Move"
     },
-    "navigation": {
-      "previous": "Previous",
-      "next": "Next",
-      "today": "Today",
-      "selectDate": "Select date"
-    },
-    "filters": {
-      "all": "All",
-      "events": "Events Only"
-    },
+    "event": "event",
+    "selected": "selected",
+    "of": "of",
+    "total": "total",
+    "selectAll": "Select all",
+    "selectOptions": "Selection options",
+    "selectDay": "Select from day",
+    "selectDayDescription": "Only events from the selected day",
+    "selectAllEvents": "Select all",
+    "selectAllDescription": "All visible events in the calendar",
+    "clearSelection": "Clear selection",
+    "moveEvents": "Move events",
+    "delete": "Delete",
+    "undo": "Undo",
+    "undoLastOperation": "Undo last operation",
+    "moveSelectedEvents": "Move selected events",
+    "movingEvents": "Moving {{count}} events",
+    "movingEvents_one": "Moving 1 event",
+    "selectNewDateTime": "Select the new date and time for the selected events.",
+    "newDateAndTime": "New date and time",
+    "preserveOriginalTime": "Events will keep their original time",
+    "moveCount": "Move {{count}} events",
+    "moveCount_one": "Move 1 event",
+    "deleteSelectedEvents": "Delete selected events",
+    "confirmDelete": "Confirm deletion",
+    "deleteWarning": "Are you sure you want to delete {{count}} events? This action cannot be undone.",
+    "deleteCount": "Delete {{count}} events",
+    "deleteCount_one": "Delete 1 event",
     "events": {
       "count": "events",
-      "empty": "No events for this day"
+      "empty": "No events for this day",
+      "noScheduled": "No scheduled events"
     },
     "userEvents": {
       "modal": {
@@ -75,7 +126,8 @@
           "successDelete": "Event deleted",
           "confirmDelete": "Are you sure you want to delete this event?",
           "errorSave": "Error saving event",
-          "errorDelete": "Error deleting event"
+          "errorDelete": "Error deleting event",
+          "validationError": "Please correct the errors in the form"
         },
         "validation": {
           "titleRequired": "Title is required",
@@ -93,23 +145,17 @@
         }
       }
     },
-    "validation": {
-      "invalid_date": "Invalid Date",
-      "past_date_error": "Cannot Schedule in the Past",
-      "past_date_message": "You cannot schedule events for past dates. Select a future date and time.",
-      "date_required": "Date is required",
-      "invalid_format": "Invalid date format. Use a valid date."
-    },
-    "selected_date": "Selected date:",
     "external": {
       "title": "External Calendars",
       "description": "Sync your scheduled publications with Google Calendar and Outlook",
+      "settings": "External Calendars Settings",
       "connected": "Connected",
       "disconnected": "Disconnected",
       "error": "Error",
       "connect": "Connect",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
+      "syncNow": "Sync Now",
       "configure": "Configure",
       "lastSync": "Last sync",
       "disconnectConfirm": {
@@ -121,7 +167,10 @@
       "connectError": "Error connecting calendar",
       "disconnectSuccess": "Calendar disconnected successfully",
       "disconnectError": "Error disconnecting calendar",
+      "syncSuccess": "Synchronization completed successfully",
+      "syncError": "Error synchronizing calendar",
       "fetchError": "Error fetching connection status",
+      "connectionSuccess": "{{provider}} calendar connected successfully",
       "syncSettings": "Sync Settings",
       "enableSync": "Enable automatic sync",
       "syncCampaigns": "Sync only these campaigns (leave empty for all)",
@@ -131,7 +180,15 @@
       "save": "Save",
       "cancel": "Cancel",
       "retrySuccess": "Sync retried successfully",
-      "retryError": "Error retrying sync"
+      "retryError": "Error retrying sync",
+      "errors": {
+        "invalidState": "Invalid authentication state",
+        "expiredState": "Authentication session has expired",
+        "providerMismatch": "Provider mismatch",
+        "noCode": "No authorization code received",
+        "connectionFailed": "Error connecting to calendar",
+        "unknown": "Unknown error while connecting"
+      }
     },
     "error": {
       "title": "Something went wrong",
@@ -140,6 +197,21 @@
       "retry_button": "Retry",
       "persist": "If the problem persists contact support."
     },
+    "validation": {
+      "invalid_date": "Invalid Date",
+      "past_date_error": "Cannot Schedule in the Past",
+      "past_date_message": "You cannot schedule events for past dates. Select a future date and time.",
+      "date_required": "Date is required",
+      "invalid_format": "Invalid date format. Use a valid date."
+    },
+    "warnings": {
+      "pastDate": "Are you sure you want to move this event to a past date/time?"
+    },
+    "messages": {
+      "eventUpdated": "Event updated successfully",
+      "updateFailed": "Error updating event"
+    },
+    "selected_date": "Selected date:",
     "sync": {
       "error": {
         "title": "Sync Error",

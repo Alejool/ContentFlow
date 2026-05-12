@@ -16,7 +16,7 @@ import { getEmptyStateByKey } from '@/Utils/Content/emptyStateMapper';
 import { Head } from '@inertiajs/react';
 import { eachDayOfInterval, endOfMonth, startOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon, Filter } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -146,6 +146,12 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
   // Filter Events - use the store's filtering logic
   const filteredEvents = getFilteredEvents();
+
+  // Selecciona todos los eventos visibles usando filteredEvents directamente
+  const selectAllVisible = useCallback(() => {
+    clearSelection();
+    filteredEvents.forEach((e) => toggleEventSelection(e.id));
+  }, [filteredEvents, clearSelection, toggleEventSelection]);
 
   // Delete Event Handler
   const handleDeleteEvent = (event: any) => {
@@ -476,7 +482,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         totalEvents={filteredEvents.length}
         selectedEventIds={Array.from(selectedEvents)}
         onClearSelection={clearSelection}
-        onSelectAll={selectAll}
+        onSelectAll={selectAllVisible}
         onBulkMove={async (newDate) => {
           const success = await bulkUpdateEvents(Array.from(selectedEvents), newDate.toISOString());
           if (success) {

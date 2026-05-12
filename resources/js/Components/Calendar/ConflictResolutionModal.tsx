@@ -60,20 +60,20 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
       role="dialog"
       aria-modal="true"
     >
-      <div className="flex min-h-screen items-center justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
+      <div className="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="bg-opacity-75 fixed inset-0 bg-gray-500 transition-opacity"
           aria-hidden="true"
           onClick={onCancel}
         ></div>
 
         {/* Modal panel */}
-        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle">
+        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle dark:bg-gray-800">
           {/* Header */}
           <div className="border-b border-amber-200 bg-amber-50 px-6 py-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="flex-1">
@@ -154,7 +154,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                     </div>
                   )}
                   <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
-                    <pre className="whitespace-pre-wrap break-all text-xs text-gray-900 dark:text-gray-100">
+                    <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.localValue)}
                     </pre>
                   </div>
@@ -207,7 +207,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                     </div>
                   )}
                   <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
-                    <pre className="whitespace-pre-wrap break-all text-xs text-gray-900 dark:text-gray-100">
+                    <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.serverValue)}
                     </pre>
                   </div>
@@ -230,7 +230,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-gray-500 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
             >
               {t('calendar.conflict.cancel', 'Cancel')}
             </button>
@@ -238,7 +238,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
               type="button"
               onClick={handleResolve}
               disabled={!selectedResolution}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('calendar.conflict.resolve', 'Apply Selected Version')}
             </button>

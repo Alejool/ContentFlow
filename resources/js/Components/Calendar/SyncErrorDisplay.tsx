@@ -50,7 +50,7 @@ export const SyncErrorDisplay: React.FC<SyncErrorDisplayProps> = ({
       role="alert"
       aria-live="polite"
     >
-      <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
@@ -68,7 +68,7 @@ export const SyncErrorDisplay: React.FC<SyncErrorDisplayProps> = ({
           {onDismiss && (
             <button
               onClick={onDismiss}
-              className="flex-shrink-0 rounded p-1 transition-colors hover:bg-red-100 dark:hover:bg-red-900/40"
+              className="shrink-0 rounded p-1 transition-colors hover:bg-red-100 dark:hover:bg-red-900/40"
               aria-label={t('calendar.sync.error.dismiss', 'Dismiss error')}
             >
               <X className="h-4 w-4 text-red-600 dark:text-red-400" />

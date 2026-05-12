@@ -154,7 +154,7 @@ export default function ExternalCalendarSettings({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+        <Loader2 className="text-primary-600 h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -227,14 +227,14 @@ const CalendarConnectionCard = ({
   const { t } = useTranslation();
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500">
+    <div className="hover:border-primary-500 dark:hover:border-primary-500 rounded-lg border border-gray-200 bg-white p-4 transition-all dark:border-gray-700 dark:bg-gray-800">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-gray-700">
             {icon}
           </div>
           <div>
-            <h4 className="text-sm font-semibold capitalize text-gray-900 dark:text-gray-100">
+            <h4 className="text-sm font-semibold text-gray-900 capitalize dark:text-gray-100">
               {connection.provider} Calendar
             </h4>
             {connection.connected && connection.email && (
@@ -252,7 +252,7 @@ const CalendarConnectionCard = ({
 
       {connection.errorMessage && (
         <div className="mt-3 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
-          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
           <p className="text-sm text-red-700 dark:text-red-300">{connection.errorMessage}</p>
         </div>
       )}

@@ -71,7 +71,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
               <CalendarGrid>
                 <CalendarGridHeader>
                   {(day: string) => (
-                    <CalendarHeaderCell className="w-9 pb-2 text-center text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    <CalendarHeaderCell className="w-9 pb-2 text-center text-xs font-bold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                       {day}
                     </CalendarHeaderCell>
                   )}
@@ -139,7 +139,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
 
         {!validation.isValid && validation.error && (
           <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
-            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
             <div className="flex-1">
               <p className="text-sm font-medium text-red-800 dark:text-red-200">
                 {validation.isPastDate

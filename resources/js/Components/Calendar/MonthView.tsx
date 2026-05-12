@@ -1,51 +1,54 @@
-import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
-import { formatTimeString } from '@/Utils/formatters';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
+    DndContext,
+    DragOverlay,
+    PointerSensor,
+    useDraggable,
+    useDroppable,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
 import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  parseISO,
-  startOfMonth,
+    eachDayOfInterval,
+    endOfMonth,
+    format,
+    isSameDay,
+    isSameMonth,
+    isToday,
+    parseISO,
+    startOfMonth,
 } from 'date-fns';
-import { Clock, Trash2 } from 'lucide-react';
+import type { TFunction } from 'i18next';
 import React, { useState } from 'react';
+import { EventCard } from './EventCard';
 
 interface MonthViewProps {
   currentDate: Date;
+  selectedDate?: Date;
   events: CalendarEvent[];
   onEventDrop: (eventId: string, newDate: Date) => Promise<void>;
   onEventDelete?: (event: CalendarEvent) => void;
   onEventClick?: (event: CalendarEvent) => void;
+  onDaySelect?: (day: Date) => void;
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
-  currentUser?: { name: string };
-  t?: TFunction;
+  onSelectAll?: () => void;
+  onSelectDay?: (day: Date) => void;
+  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
+  currentUser?: { name: string } | undefined;
+  t?: TFunction | undefined;
 }
 
 interface DraggableEventProps {
   event: CalendarEvent;
   isSelected: boolean;
   onToggleSelection: (eventId: string) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  onEventDelete?: (event: CalendarEvent) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
-  currentUser?: { name: string };
-  t?: TFunction;
+  onEventClick?: ((event: CalendarEvent) => void) | undefined;
+  onEventDelete?: ((event: CalendarEvent) => void) | undefined;
+  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
+  currentUser?: { name: string } | undefined;
+  t?: TFunction | undefined;
 }
 
 const DraggableEvent: React.FC<DraggableEventProps> = ({
@@ -56,156 +59,27 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
   onEventDelete,
   PlatformIcon,
   currentUser,
-  t = (key, fallback) => fallback || key,
+  t = (key: string, fallback?: string) => fallback ?? key,
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: event.id,
     data: { event },
   });
 
-  // Check if publication has no platforms assigned
-  const hasNoPlatforms =
-    event.hasNoPlatforms ||
-    (event.type === 'post' &&
-      (!event.extendedProps?.platforms || event.extendedProps.platforms.length === 0));
-
-  // Get platforms array - for posts, use the single platform, for publications use all platforms
-  const platforms =
-    event.type === 'post'
-      ? [event.platform?.toLowerCase()].filter(Boolean)
-      : (event.extendedProps?.platforms || []).map((p: string) => p.toLowerCase());
-
-  // Get primary platform for color scheme (first platform or the single platform)
-  const primaryPlatform = platforms[0];
-  const platformConfig =
-    primaryPlatform && SOCIAL_PLATFORMS[primaryPlatform as keyof typeof SOCIAL_PLATFORMS];
-
-  // Determine if delete button should be shown
-  const canDelete =
-    onEventDelete &&
-    (['user_event', 'event'].includes(String(event.type))
-      ? !event.extendedProps?.is_public || event.extendedProps?.user_name === currentUser?.name
-      : false); // Don't allow delete for posts from calendar
-
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      role="button"
-      tabIndex={0}
-      onClick={() => onEventClick?.(event)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event);
-      }}
-      className={`group/card relative cursor-grab overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500 ring-offset-2' : ''} ${isDragging ? 'scale-95 opacity-50' : ''} ${hasNoPlatforms ? 'border-orange-300 bg-orange-50 dark:border-orange-600 dark:bg-orange-900/10' : ''} ${platformConfig && !hasNoPlatforms ? `${platformConfig.borderColor} ${platformConfig.darkBorderColor} ${platformConfig.bgClass} ${platformConfig.darkColor}` : !hasNoPlatforms ? 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800' : ''} `}
-    >
-      {/* Status Indicator Bar with platform color */}
-      <div
-        className={`absolute bottom-0 left-0 top-0 w-1.5 ${platformConfig ? platformConfig.color : hasNoPlatforms ? 'bg-orange-500' : 'bg-gray-400'}`}
+    <div ref={setNodeRef}>
+      <EventCard
+        event={event}
+        isSelected={isSelected}
+        isDragging={isDragging}
+        onToggleSelection={onToggleSelection}
+        onEventClick={onEventClick}
+        onEventDelete={onEventDelete}
+        PlatformIcon={PlatformIcon}
+        currentUser={currentUser}
+        t={t}
+        dragHandleProps={{ ...listeners, ...attributes }}
       />
-
-      {/* Warning indicator for publications without platforms */}
-      {hasNoPlatforms && (
-        <div
-          className="absolute right-2 top-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white shadow-md"
-          title="Sin redes sociales asignadas"
-        >
-          !
-        </div>
-      )}
-
-      <div className="flex items-start gap-2.5 p-3 pl-4">
-        {/* Checkbox for selection */}
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={(e) => {
-            e.stopPropagation();
-            onToggleSelection(event.id);
-          }}
-          onClick={(e) => e.stopPropagation()}
-          className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-        />
-
-        {/* Platform Icons - Show all platforms for publications */}
-        <div className="mt-0.5 flex flex-shrink-0 items-center gap-1">
-          {platforms.length > 0 ? (
-            platforms.map((platform) => {
-              const config = SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
-              const IconComponent = config?.icon;
-              if (!IconComponent) return null;
-
-              return (
-                <div
-                  key={platform}
-                  className={`${config.textColor} ${config.darkTextColor}`}
-                  title={config.name}
-                >
-                  <IconComponent className="h-4 w-4" />
-                </div>
-              );
-            })
-          ) : (
-            // Fallback for user events
-            <PlatformIcon
-              platform={
-                ['user_event', 'event'].includes(String(event.type)) ? 'user_event' : event.platform
-              }
-              className="h-4 w-4 text-gray-400 dark:text-gray-500"
-            />
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="min-w-0 flex-1">
-          <div className="mb-1 truncate text-sm font-semibold leading-tight text-gray-800 dark:text-gray-100">
-            {event.title}
-          </div>
-
-          {/* Creator info */}
-          {event.extendedProps?.user_name && (
-            <div className="mb-1 text-[10px] text-gray-500 dark:text-gray-400">
-              Creador: {event.extendedProps.user_name}
-            </div>
-          )}
-
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span
-              className={`flex items-center gap-1 text-[11px] font-medium ${platformConfig ? platformConfig.textColor + ' ' + platformConfig.darkTextColor : 'text-gray-500 dark:text-gray-400'}`}
-            >
-              <Clock className="h-3 w-3" />
-              {formatTimeString(event.start)}
-            </span>
-            {event.status && (
-              <span
-                className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${event.status === 'published' || event.status === 'posted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''} ${event.status === 'scheduled' || event.status === 'pending' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : ''} ${event.status === 'draft' ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' : ''} ${event.status === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : ''} ${event.status === 'event' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : ''} `}
-              >
-                {t(`status.${event.status}`, event.status)}
-              </span>
-            )}
-            {hasNoPlatforms && (
-              <span className="rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                Sin redes
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Delete button */}
-        {canDelete && (
-          <button
-            onClick={(ev) => {
-              ev.stopPropagation();
-              onEventDelete(event);
-            }}
-            className="flex-shrink-0 self-start rounded-md p-1.5 text-gray-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover/card:opacity-100 dark:hover:bg-red-900/20"
-            title="Eliminar"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        )}
-      </div>
     </div>
   );
 };
@@ -215,13 +89,15 @@ interface DroppableDayProps {
   events: CalendarEvent[];
   isCurrentMonth: boolean;
   isTodayDay: boolean;
+  isSelected?: boolean;
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  onEventDelete?: (event: CalendarEvent) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
-  currentUser?: { name: string };
-  t?: TFunction;
+  onEventClick?: ((event: CalendarEvent) => void) | undefined;
+  onEventDelete?: ((event: CalendarEvent) => void) | undefined;
+  onDaySelect?: ((day: Date) => void) | undefined;
+  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
+  currentUser?: { name: string } | undefined;
+  t?: TFunction | undefined;
 }
 
 const DroppableDay: React.FC<DroppableDayProps> = ({
@@ -229,10 +105,12 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
   events,
   isCurrentMonth,
   isTodayDay,
+  isSelected,
   selectedEvents,
   onToggleSelection,
   onEventClick,
   onEventDelete,
+  onDaySelect,
   PlatformIcon,
   currentUser,
   t,
@@ -245,7 +123,8 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`group relative min-h-[140px] border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900' : 'border-gray-100 bg-gray-50 dark:border-gray-800/50 dark:bg-gray-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-gray-800/50`}
+      onClick={() => onDaySelect?.(day)}
+      className={`group relative min-h-[140px] cursor-pointer border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900' : 'border-gray-100 bg-gray-50 dark:border-gray-800/50 dark:bg-gray-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isSelected ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-300 dark:bg-primary-900/10' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-gray-800/50`}
     >
       {/* Date Header */}
       <div className="mb-2.5 flex items-start justify-between">
@@ -307,12 +186,16 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
 
 export const MonthView: React.FC<MonthViewProps> = ({
   currentDate,
+  selectedDate,
   events,
   onEventDrop,
   onEventDelete,
   onEventClick,
+  onDaySelect,
   selectedEvents,
   onToggleSelection,
+  onSelectAll,
+  onSelectDay,
   PlatformIcon,
   currentUser,
   t,
@@ -403,10 +286,12 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 events={dayEvents}
                 isCurrentMonth={isCurrentMonth}
                 isTodayDay={isTodayDay}
+                isSelected={selectedDate ? isSameDay(day, selectedDate) : false}
                 selectedEvents={selectedEvents}
                 onToggleSelection={onToggleSelection}
                 onEventClick={onEventClick}
                 onEventDelete={onEventDelete}
+                onDaySelect={onDaySelect}
                 PlatformIcon={PlatformIcon}
                 currentUser={currentUser}
                 t={t}
@@ -418,59 +303,19 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
       {/* Drag Overlay - shows the dragged item */}
       <DragOverlay>
-        {activeEvent
-          ? (() => {
-              const platforms =
-                activeEvent.type === 'post'
-                  ? [activeEvent.platform?.toLowerCase()].filter(Boolean)
-                  : (activeEvent.extendedProps?.platforms || []).map((p: string) =>
-                      p.toLowerCase(),
-                    );
-
-              const primaryPlatform = platforms[0];
-              const platformConfig =
-                primaryPlatform &&
-                SOCIAL_PLATFORMS[primaryPlatform as keyof typeof SOCIAL_PLATFORMS];
-
-              return (
-                <div
-                  className={`cursor-grabbing rounded-lg border-2 p-3 opacity-95 shadow-2xl ${platformConfig ? `${platformConfig.borderColor} ${platformConfig.bgClass}` : 'border-primary-500 bg-white dark:bg-gray-800'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    {/* Show all platform icons */}
-                    <div className="flex items-center gap-1">
-                      {platforms.length > 0 ? (
-                        platforms.map((platform) => {
-                          const config =
-                            SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
-                          const IconComponent = config?.icon;
-                          if (!IconComponent) return null;
-
-                          return (
-                            <div key={platform} className={`${config.textColor}`}>
-                              <IconComponent className="h-5 w-5" />
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <PlatformIcon
-                          platform={
-                            ['user_event', 'event'].includes(String(activeEvent.type))
-                              ? 'user_event'
-                              : activeEvent.platform
-                          }
-                          className="h-5 w-5"
-                        />
-                      )}
-                    </div>
-                    <div className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                      {activeEvent.title}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()
-          : null}
+        {activeEvent && (
+          <div className="cursor-grabbing opacity-95">
+            <EventCard
+              event={activeEvent}
+              isSelected={false}
+              isDragging={true}
+              onToggleSelection={() => {}}
+              PlatformIcon={PlatformIcon}
+              currentUser={currentUser}
+              t={t}
+            />
+          </div>
+        )}
       </DragOverlay>
     </DndContext>
   );
