@@ -1,4 +1,5 @@
 import i18n from 'i18next';
+import { getUserTimezone } from './date';
 
 export function formatSpeed(bytesPerSecond: number): string {
   if (bytesPerSecond === 0) return '0 B/s';
@@ -39,16 +40,32 @@ export const formatNumber = (
   return new Intl.NumberFormat(currentLocale, options).format(value);
 };
 
+export const getCurrencyFromTimezone = (timezone?: string): string => {
+  const tz = timezone || getUserTimezone();
+  
+  if (tz.startsWith('Europe/London')) return 'GBP';
+  if (tz.startsWith('Europe/')) return 'EUR';
+  if (tz.startsWith('America/Mexico')) return 'MXN';
+  if (tz.startsWith('America/Bogota')) return 'COP';
+  if (tz.startsWith('America/Argentina')) return 'ARS';
+  if (tz.startsWith('America/Santiago')) return 'CLP';
+  if (tz.startsWith('America/Lima')) return 'PEN';
+  if (tz.startsWith('America/Sao_Paulo')) return 'BRL';
+  
+  return 'USD';
+};
+
 export const formatCurrency = (
   amount: number,
-  currency: string = 'USD',
+  currency?: string,
   locale?: string,
 ): string => {
   const currentLocale = locale || i18n.language || 'es';
+  const currentCurrency = currency || getCurrencyFromTimezone();
 
   return new Intl.NumberFormat(currentLocale, {
     style: 'currency',
-    currency,
+    currency: currentCurrency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
