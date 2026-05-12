@@ -74,7 +74,7 @@ export default function AddonSuccess() {
               {/* Success Message */}
               <div className="space-y-4 rounded-lg bg-white p-6 dark:bg-gray-800">
                 <div className="flex items-start gap-4">
-                  <Sparkles className="mt-1 h-6 w-6 flex-shrink-0 text-blue-600" />
+                  <Sparkles className="mt-1 h-6 w-6 shrink-0 text-blue-600" />
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold">¿Qué sigue?</h3>
                     <ul className="text-muted-foreground space-y-2 text-sm">

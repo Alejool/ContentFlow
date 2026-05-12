@@ -18,33 +18,43 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
       </h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="flex items-start gap-3">
-          <RefreshCw className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+          <RefreshCw className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
-              {t('subscription.addons.newTrackingSystem.independentUsage', 'Uso independiente por plan')}
+              {t(
+                'subscription.addons.newTrackingSystem.independentUsage',
+                'Uso independiente por plan',
+              )}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              {t('subscription.addons.newTrackingSystem.independentUsageDesc', 'Cada plan empieza desde 0')}
+              {t(
+                'subscription.addons.newTrackingSystem.independentUsageDesc',
+                'Cada plan empieza desde 0',
+              )}
             </p>
           </div>
         </div>
 
         <div className="flex items-start gap-3">
-          <Calendar className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+          <Calendar className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.newTrackingSystem.startDate', 'Fecha de inicio')}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              {t('subscription.addons.newTrackingSystem.startDateDesc', 'El uso se cuenta desde {date}', {
-                date: formattedDate,
-              })}
+              {t(
+                'subscription.addons.newTrackingSystem.startDateDesc',
+                'El uso se cuenta desde {date}',
+                {
+                  date: formattedDate,
+                },
+              )}
             </p>
           </div>
         </div>
 
         <div className="flex items-start gap-3">
-          <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+          <Shield className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.newTrackingSystem.addonsIntact', 'Addons intactos')}
@@ -59,7 +69,7 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
         </div>
 
         <div className="flex items-start gap-3">
-          <Zap className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+          <Zap className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.newTrackingSystem.smartConsumption', 'Consumo inteligente')}

@@ -2,11 +2,11 @@ import AddonsSummary from '@/Components/Addons/AddonsSummary';
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatDate } from '@/Utils/formatters/date';
+import { formatCurrency } from '@/Utils/formatters/number';
 import { Head, Link } from '@inertiajs/react';
 import { CheckCircle, FileText, HardDrive, Home, Package, Sparkles, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatCurrency } from '@/Utils/formatters/number';
-import { formatDate } from '@/Utils/formatters/date';
 
 interface AddonPurchaseData {
   addon_sku: string;
@@ -91,7 +91,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                 {/* Addon Info (takes 2 columns on md) */}
                 <div className="flex flex-col justify-center md:col-span-2">
                   <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-100 bg-gradient-to-b from-gray-50 to-white p-6 text-center shadow-sm dark:border-gray-700 dark:from-gray-800/50 dark:to-gray-800">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-600 shadow-inner dark:bg-primary-900/40 dark:text-primary-400">
+                    <div className="bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400 flex h-16 w-16 items-center justify-center rounded-2xl shadow-inner">
                       {(() => {
                         const IconComponent = getAddonIcon(purchase.addon_type);
                         return <IconComponent className="h-8 w-8" strokeWidth={1.5} />;
@@ -101,7 +101,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                       <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
                         {getAddonTypeName(purchase.addon_type)}
                       </h3>
-                      <span className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                      <span className="bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 inline-flex items-center rounded-full px-3 py-1 text-sm font-medium">
                         {formatAmount(purchase.addon_type, purchase.amount)}
                       </span>
                     </div>
@@ -111,7 +111,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                 {/* Purchase Info (takes 3 columns on md) */}
                 <div className="md:col-span-3">
                   <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/50">
-                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       {t('payment.addonPurchaseSuccess.details')}
                     </h4>
                     <div className="space-y-2">
@@ -168,8 +168,8 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary-200 bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30">
-                    <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
+                  <div className="border-primary-200 bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2">
+                    <span className="text-primary-600 dark:text-primary-400 text-sm font-bold">
                       1
                     </span>
                   </div>
@@ -178,8 +178,8 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary-200 bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30">
-                    <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
+                  <div className="border-primary-200 bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2">
+                    <span className="text-primary-600 dark:text-primary-400 text-sm font-bold">
                       2
                     </span>
                   </div>
@@ -188,8 +188,8 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary-200 bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30">
-                    <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
+                  <div className="border-primary-200 bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2">
+                    <span className="text-primary-600 dark:text-primary-400 text-sm font-bold">
                       3
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                 buttonStyle="outline"
                 size="lg"
                 icon={Home}
-                className="w-full border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 sm:w-auto"
+                className="w-full border-gray-300 hover:bg-gray-50 sm:w-auto dark:border-gray-600 dark:hover:bg-gray-700"
               >
                 {t('payment.addonPurchaseSuccess.backToDashboard')}
               </Button>
@@ -234,7 +234,7 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                 {t('payment.addonPurchaseSuccess.support')}{' '}
                 <a
                   href="mailto:support@Intellipost.com"
-                  className="font-medium text-primary-600 hover:underline dark:text-primary-400"
+                  className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
                 >
                   support@Intellipost.com
                 </a>

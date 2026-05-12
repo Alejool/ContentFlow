@@ -1,8 +1,8 @@
-import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import CheckoutButton from '@/Components/Stripe/CheckoutButton';
-import { FiCheck, FiZap, FiTrendingUp, FiUsers, FiStar, FiGift } from 'react-icons/fi';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import { FiCheck, FiGift, FiStar, FiTrendingUp, FiUsers, FiZap } from 'react-icons/fi';
 
 interface PlanFeature {
   text: string;
@@ -138,14 +138,14 @@ export default function Pricing() {
                   key={plan.id}
                   className={`relative flex flex-col rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                     isHighlighted
-                      ? 'border-2 border-primary-500 ring-4 ring-primary-100'
+                      ? 'border-primary-500 ring-primary-100 border-2 ring-4'
                       : 'border-2 border-gray-200'
                   } `}
                 >
                   {/* Badge */}
                   {plan.badge && (
                     <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2 transform">
-                      <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-1.5 text-sm font-semibold text-white shadow-lg">
+                      <div className="from-primary-500 to-primary-600 flex items-center gap-1 rounded-full bg-gradient-to-r px-4 py-1.5 text-sm font-semibold text-white shadow-lg">
                         <FiStar className="h-4 w-4" />
                         {plan.badge}
                       </div>
@@ -159,7 +159,7 @@ export default function Pricing() {
                       <div
                         className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl ${
                           isHighlighted
-                            ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white'
+                            ? 'from-primary-500 to-primary-600 bg-gradient-to-br text-white'
                             : 'bg-gray-100 text-gray-700'
                         } `}
                       >
@@ -185,7 +185,7 @@ export default function Pricing() {
                       {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-3">
                           <div
-                            className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full ${
+                            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
                               feature.included
                                 ? isHighlighted
                                   ? 'bg-primary-100 text-primary-600'
@@ -208,7 +208,7 @@ export default function Pricing() {
                     <div className="mt-auto">
                       {plan.buttonVariant === 'primary' ? (
                         <CheckoutButton
-                          className={`w-full transform rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl`}
+                          className={`from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 w-full transform rounded-xl bg-gradient-to-r px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl`}
                         />
                       ) : plan.buttonVariant === 'secondary' ? (
                         <button
@@ -237,7 +237,7 @@ export default function Pricing() {
               {t('pricing.faq')}{' '}
               <a
                 href="mailto:support@example.com"
-                className="font-semibold text-primary-600 hover:text-primary-700"
+                className="text-primary-600 hover:text-primary-700 font-semibold"
               >
                 {t('pricing.contactUs')}
               </a>

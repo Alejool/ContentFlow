@@ -1,7 +1,7 @@
-import { AlertTriangle, Sparkles, X } from 'lucide-react';
-import { Link } from '@inertiajs/react';
-import { useState } from 'react';
 import { formatPercent } from '@/Utils/formatters/number';
+import { Link } from '@inertiajs/react';
+import { AlertTriangle, Sparkles, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface UsageWarningBannerProps {
   usage: number;
@@ -63,7 +63,7 @@ export function UsageWarningBanner({ usage, limit, type, typeName }: UsageWarnin
     <div className={`${style.bg} border-l-4 ${style.border} mb-4 rounded-r-lg p-4 shadow-sm`}>
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center">
-          <AlertTriangle className={`h-5 w-5 ${style.icon} mr-3 flex-shrink-0`} />
+          <AlertTriangle className={`h-5 w-5 ${style.icon} mr-3 shrink-0`} />
           <div className="flex-1">
             <p className={`text-sm font-medium ${style.text}`}>
               {severity === 'critical' && '🚨 '}
@@ -86,7 +86,7 @@ export function UsageWarningBanner({ usage, limit, type, typeName }: UsageWarnin
         <div className="ml-4 flex items-center gap-2">
           <Link
             href="/subscription/addons"
-            className={`inline-flex items-center px-4 py-2 ${style.button} whitespace-nowrap rounded-lg text-sm font-medium text-white transition-colors`}
+            className={`inline-flex items-center px-4 py-2 ${style.button} rounded-lg text-sm font-medium whitespace-nowrap text-white transition-colors`}
           >
             <Sparkles className="mr-2 h-4 w-4" />
             Comprar Más

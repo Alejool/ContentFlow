@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/Components/ui/card';
-import { PLAN_FEATURES } from '@/Constants/Pricing/plans';
 import type { PlanId } from '@/Constants/Pricing/plans';
+import { PLAN_FEATURES } from '@/Constants/Pricing/plans';
 import { cn } from '@/lib/common/utils';
 import {
   ArrowRight,
@@ -312,15 +312,15 @@ export default function PlanCard({
         className={cn(
           'relative flex h-full flex-col transition-all duration-300 hover:shadow-lg',
           isPopular
-            ? 'border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900'
-            : 'border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800',
-          isCurrentPlan && 'ring-2 ring-primary-200 dark:ring-primary-900/50',
+            ? 'border-primary-600 border-2 bg-white shadow-xl dark:bg-neutral-900'
+            : 'hover:border-primary-400 dark:hover:border-primary-800 border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900',
+          isCurrentPlan && 'ring-primary-200 dark:ring-primary-900/50 ring-2',
         )}
       >
         {/* Badge superior */}
         {isPopular && (
           <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
-            <div className="flex items-center gap-1 rounded-full bg-primary-600 px-3 py-1 text-xs font-bold text-white shadow-md">
+            <div className="bg-primary-600 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold text-white shadow-md">
               <Star className="h-3 w-3 fill-current" />
               {t('pricing.mostPopular')}
             </div>
@@ -374,7 +374,7 @@ export default function PlanCard({
                 {plan.name}
               </CardTitle>
               {/* Tagline compacto */}
-              <p className="mt-0.5 text-xs font-medium text-primary-600 dark:text-primary-400">
+              <p className="text-primary-600 dark:text-primary-400 mt-0.5 text-xs font-medium">
                 {getPlanTagline(plan.id)}
               </p>
             </div>
@@ -434,7 +434,7 @@ export default function PlanCard({
               <li key={index} className="flex items-start gap-2.5">
                 <div
                   className={cn(
-                    'mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full',
+                    'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full',
                     isPopular
                       ? 'bg-primary-100 dark:bg-primary-900/30'
                       : 'bg-green-100 dark:bg-green-900/30',
@@ -459,15 +459,15 @@ export default function PlanCard({
           {/* Missing features compacto */}
           {missingFeatures.length > 0 && (
             <div className="mt-4 border-t border-gray-100 pt-4 dark:border-neutral-800/50">
-              <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+              <p className="mb-2.5 text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-neutral-500">
                 {t('pricing.missingFeatures', 'Te estás perdiendo')}
               </p>
               <ul className="space-y-2">
                 {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 3)).map(
                   (feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Lock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-neutral-600" />
-                      <span className="text-xs italic leading-tight text-gray-400 dark:text-neutral-500">
+                      <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-300 dark:text-neutral-600" />
+                      <span className="text-xs leading-tight text-gray-400 italic dark:text-neutral-500">
                         {feature}
                       </span>
                     </li>
@@ -477,7 +477,7 @@ export default function PlanCard({
               {missingFeatures.length > 3 && (
                 <button
                   onClick={() => setShowAllMissing(!showAllMissing)}
-                  className="mt-2 flex w-full items-center justify-center gap-1 rounded-md py-1.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                  className="text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 mt-2 flex w-full items-center justify-center gap-1 rounded-md py-1.5 text-xs font-medium transition-colors"
                 >
                   {showAllMissing ? (
                     <>
@@ -550,15 +550,15 @@ export default function PlanCard({
         className={cn(
           'relative flex h-full flex-col transition-all duration-300',
           isPopular
-            ? 'border-2 border-primary-600 bg-white shadow-xl dark:bg-neutral-900'
-            : 'border border-neutral-200 bg-white hover:border-primary-400 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-800',
+            ? 'border-primary-600 border-2 bg-white shadow-xl dark:bg-neutral-900'
+            : 'hover:border-primary-400 dark:hover:border-primary-800 border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900',
           isCurrentPlan && 'border-green-500',
         )}
       >
         {/* Badge superior */}
         {isPopular && (
           <div className="absolute -top-4 left-1/2 z-20 -translate-x-1/2 transform">
-            <div className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-1 text-xs font-bold text-white shadow-md">
+            <div className="bg-primary-600 flex items-center gap-1.5 rounded-full px-4 py-1 text-xs font-bold text-white shadow-md">
               <Star className="h-3.5 w-3.5 fill-current" />
               {t('pricing.mostPopular')}
             </div>
@@ -610,7 +610,7 @@ export default function PlanCard({
               </CardTitle>
 
               {/* Tagline */}
-              <p className="mb-1 text-sm font-medium text-primary-600 dark:text-primary-400">
+              <p className="text-primary-600 dark:text-primary-400 mb-1 text-sm font-medium">
                 {getPlanTagline(plan.id)}
               </p>
 
@@ -671,7 +671,7 @@ export default function PlanCard({
               <li key={index} className="flex items-start gap-3">
                 <div
                   className={cn(
-                    'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full',
+                    'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
                     isPopular
                       ? 'bg-primary-100 dark:bg-primary-900/30'
                       : 'bg-green-100 dark:bg-green-900/30',
@@ -693,17 +693,17 @@ export default function PlanCard({
 
           {missingFeatures.length > 0 && (
             <div className="mt-8 border-t border-gray-100 pt-6 dark:border-neutral-800/50">
-              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+              <p className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-neutral-500">
                 {t('pricing.missingFeatures', 'Lo que te estás perdiendo')}
               </p>
               <ul className="space-y-3">
                 {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 4)).map(
                   (feature, index) => (
                     <li key={index} className="group/item flex items-start gap-3">
-                      <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
+                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
                         <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
                       </div>
-                      <span className="text-sm italic text-gray-400 dark:text-neutral-500">
+                      <span className="text-sm text-gray-400 italic dark:text-neutral-500">
                         {feature}
                       </span>
                     </li>
@@ -713,7 +713,7 @@ export default function PlanCard({
               {missingFeatures.length > 4 && (
                 <button
                   onClick={() => setShowAllMissing(!showAllMissing)}
-                  className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-primary-600 transition-all hover:border-primary-300 hover:bg-primary-50 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-primary-400 dark:hover:border-primary-700 dark:hover:bg-primary-900/20"
+                  className="text-primary-600 hover:border-primary-300 hover:bg-primary-50 dark:text-primary-400 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium transition-all dark:border-neutral-700 dark:bg-neutral-800/50"
                 >
                   {showAllMissing ? (
                     <>

@@ -1,11 +1,11 @@
 import Button from '@/Components/common/Modern/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatCurrency } from '@/Utils/formatters/number';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatCurrency } from '@/Utils/formatters/number';
 
 interface Props {
   auth: any;
@@ -37,7 +37,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
     <AuthenticatedLayout user={auth.user}>
       <Head title={t('subscription.success.title')} />
 
-      <div className="min-h-screen to-primary-50/30 py-16 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:text-white">
+      <div className="to-primary-50/30 min-h-screen py-16 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:text-white">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           {/* Success Icon */}
           <div className="mb-8 text-center">
@@ -45,7 +45,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
               <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
             </div>
 
-            <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
+            <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl dark:text-white">
               {t('subscription.success.heading')}
             </h1>
 
@@ -56,9 +56,9 @@ export default function Success({ auth, plan, amount, currency }: Props) {
 
           {/* Payment Details Card */}
           <Card className="mb-8 border-2 border-green-200 dark:border-green-800">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-primary-50 dark:from-green-900/20 dark:to-primary-900/20">
+            <CardHeader className="to-primary-50 dark:to-primary-900/20 bg-gradient-to-r from-green-50 dark:from-green-900/20">
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                <Sparkles className="text-primary-600 dark:text-primary-400 h-5 w-5" />
                 {t('subscription.success.detailsTitle')}
               </CardTitle>
               <CardDescription>{t('subscription.success.detailsDescription')}</CardDescription>
@@ -107,25 +107,25 @@ export default function Success({ auth, plan, amount, currency }: Props) {
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t('subscription.success.step1')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t('subscription.success.step2')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t('subscription.success.step3')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
                   <span className="text-gray-700 dark:text-gray-300">
                     {t('subscription.success.step4')}
                   </span>
@@ -139,7 +139,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
             <Link href="/dashboard">
               <Button
                 size="lg"
-                className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 sm:w-auto"
+                className="from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 w-full bg-gradient-to-r text-white shadow-lg sm:w-auto"
               >
                 <span className="flex items-center gap-2">
                   {t('subscription.success.goToDashboard')}
@@ -166,7 +166,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
               {t('subscription.success.needHelp')}{' '}
               <a
                 href="mailto:support@Intellipost.com"
-                className="font-medium text-primary-600 hover:underline dark:text-primary-400"
+                className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
               >
                 support@Intellipost.com
               </a>

@@ -1,15 +1,13 @@
-import { Sparkles, HardDrive, FileText, Users, Info } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { GatewaySelector } from '@/Components/Payment/GatewaySelector';
+import { CarouselDots, CarouselPagination } from '@/Components/common/CarouselPagination';
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
-import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
-import { GatewaySelector } from '@/Components/Payment/GatewaySelector';
-import { ActiveAddonsCards } from './ActiveAddonsCards';
 import { TabNavigation } from '@/Components/common/TabNavigation';
-import type { Tab } from '@/Components/common/TabNavigation';
-import { AddonPriceDisplay } from './AddonPriceDisplay';
 import { formatCurrency } from '@/Utils/formatters/number';
+import { FileText, HardDrive, Info, Sparkles, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { AddonPriceDisplay } from './AddonPriceDisplay';
 
 interface AddonPackage {
   sku: string;
@@ -198,13 +196,13 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
       <div
         className={`relative rounded-xl border-2 bg-white p-6 transition-all dark:bg-gray-800 ${
           pkg.popular
-            ? 'scale-105 border-primary-500 shadow-lg'
-            : 'border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600'
+            ? 'border-primary-500 scale-105 shadow-lg'
+            : 'hover:border-primary-300 dark:hover:border-primary-600 border-gray-200 dark:border-gray-700'
         }`}
       >
         {pkg.popular && (
           <div className="absolute -top-2 left-3">
-            <span className="backdrop-2xl rounded-full bg-primary-500/90 px-3 py-2 text-xs font-bold text-white">
+            <span className="backdrop-2xl bg-primary-500/90 rounded-full px-3 py-2 text-xs font-bold text-white">
               {t('subscription.addons.mostPopular', 'Más Popular')}
             </span>
           </div>
@@ -219,10 +217,10 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         )}
 
         <div className="mb-4 flex justify-center">
-          {activeTab === 'ai_credits' && <Sparkles className="h-12 w-12 text-primary-500" />}
-          {activeTab === 'storage' && <HardDrive className="h-12 w-12 text-primary-500" />}
-          {activeTab === 'publications' && <FileText className="h-12 w-12 text-primary-500" />}
-          {activeTab === 'team_members' && <Users className="h-12 w-12 text-primary-500" />}
+          {activeTab === 'ai_credits' && <Sparkles className="text-primary-500 h-12 w-12" />}
+          {activeTab === 'storage' && <HardDrive className="text-primary-500 h-12 w-12" />}
+          {activeTab === 'publications' && <FileText className="text-primary-500 h-12 w-12" />}
+          {activeTab === 'team_members' && <Users className="text-primary-500 h-12 w-12" />}
         </div>
 
         <h3 className="mb-2 text-center text-xl font-bold text-gray-900 dark:text-white">
@@ -234,7 +232,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         </p>
 
         <div className="mb-4 text-center">
-          <div className="text-4xl font-bold text-primary-600 dark:text-primary-400">
+          <div className="text-primary-600 dark:text-primary-400 text-4xl font-bold">
             {pkg.amount.toLocaleString()}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -297,7 +295,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         </div>
 
         {quantity > 1 && (
-          <div className="mb-4 rounded-lg border border-primary-200 bg-primary-50 p-3 text-center dark:border-primary-800 dark:bg-primary-900/20">
+          <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 mb-4 rounded-lg border p-3 text-center">
             <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
               {t('subscription.addons.total', 'Total')} ({quantity}x):
             </div>
@@ -327,8 +325,6 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
       </div>
     );
   };
-
-
 
   // Detectar si hay precios convertidos
   const firstPackage = currentPackages[0];
@@ -365,7 +361,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
           {hasCurrencyConversion && (
             <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
               <div className="flex items-start gap-3">
-                <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
                 <div className="flex-1">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     {t(

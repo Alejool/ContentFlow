@@ -12,7 +12,7 @@ export function ExtensionAddonsInfoBanner() {
       </h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div className="flex items-start gap-3">
-          <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <Shield className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.extensionAddons.planIndependent', 'Independientes del plan')}
@@ -27,10 +27,13 @@ export function ExtensionAddonsInfoBanner() {
         </div>
 
         <div className="flex items-start gap-3">
-          <TrendingUp className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
-              {t('subscription.addons.extensionAddons.onlyWhenNeeded', 'Solo se usan cuando es necesario')}
+              {t(
+                'subscription.addons.extensionAddons.onlyWhenNeeded',
+                'Solo se usan cuando es necesario',
+              )}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300">
               {t(
@@ -42,10 +45,13 @@ export function ExtensionAddonsInfoBanner() {
         </div>
 
         <div className="flex items-start gap-3">
-          <ArrowRightLeft className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <ArrowRightLeft className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
-              {t('subscription.addons.extensionAddons.fifo', 'FIFO (Primero en entrar, primero en salir)')}
+              {t(
+                'subscription.addons.extensionAddons.fifo',
+                'FIFO (Primero en entrar, primero en salir)',
+              )}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300">
               {t('subscription.addons.extensionAddons.fifoDesc', 'Se consumen en orden de compra')}
@@ -54,19 +60,22 @@ export function ExtensionAddonsInfoBanner() {
         </div>
 
         <div className="flex items-start gap-3">
-          <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <Clock className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.extensionAddons.noExpiration', 'Sin expiración')}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              {t('subscription.addons.extensionAddons.noExpirationDesc', 'Los addons de extensión no caducan')}
+              {t(
+                'subscription.addons.extensionAddons.noExpirationDesc',
+                'Los addons de extensión no caducan',
+              )}
             </p>
           </div>
         </div>
 
         <div className="flex items-start gap-3 md:col-span-2 lg:col-span-1">
-          <Layers className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <Layers className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.extensionAddons.trackingPerPlan', 'Trazabilidad por plan')}

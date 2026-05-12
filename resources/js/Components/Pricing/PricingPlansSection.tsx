@@ -172,12 +172,12 @@ export default function PricingPlansSection({
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       {showHeader && (
         <div className="text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
+          <div className="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
             {t('pricing.flexiblePlans', 'Planes flexibles para cada necesidad')}
           </div>
 
-          <h1 className="mb-6 font-heading text-5xl font-bold text-gray-900 dark:text-white md:text-6xl">
+          <h1 className="font-heading mb-6 text-5xl font-bold text-gray-900 md:text-6xl dark:text-white">
             {t('pricing.title')}
           </h1>
 
@@ -190,7 +190,7 @@ export default function PricingPlansSection({
             <div className="mx-auto mb-8 max-w-3xl">
               <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-800 dark:bg-blue-900/20">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 shadow-inner">
                       <Info className="h-5 w-5 text-white" />
                     </div>
@@ -232,7 +232,7 @@ export default function PricingPlansSection({
                       ) : (
                         <p className="text-sm text-blue-800 dark:text-blue-200">
                           <span className="font-bold">{t('pricing.currentPlanLabel')}: </span>
-                          <span className="font-bold capitalize text-blue-600 dark:text-blue-400">
+                          <span className="font-bold text-blue-600 capitalize dark:text-blue-400">
                             {currentPlan}
                           </span>
                         </p>
@@ -282,26 +282,26 @@ export default function PricingPlansSection({
             <div className="mx-auto mt-6 max-w-2xl text-left">
               <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-md dark:border-neutral-800 dark:bg-neutral-900">
                 {/* Header row */}
-                <div className="flex items-center gap-3 bg-primary-600 px-5 py-4">
-                  <Zap className="h-5 w-5 flex-shrink-0 text-white" />
+                <div className="bg-primary-600 flex items-center gap-3 px-5 py-4">
+                  <Zap className="h-5 w-5 shrink-0 text-white" />
                   <div className="flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-primary-200">
+                    <p className="text-primary-200 text-xs font-semibold tracking-wider uppercase">
                       {t('pricing.activePlanNow')}
                     </p>
-                    <p className="text-lg font-bold capitalize leading-tight text-white">
+                    <p className="text-lg leading-tight font-bold text-white capitalize">
                       {getPlanName(currentPlan, plans)}
-                      <span className="ml-2 text-sm font-normal text-primary-200">
+                      <span className="text-primary-200 ml-2 text-sm font-normal">
                         ${getPlanPrice(currentPlan, plans)}/{t('pricing.billing.month')}
                       </span>
                     </p>
                   </div>
-                  <CheckCircle className="h-6 w-6 text-primary-200" />
+                  <CheckCircle className="text-primary-200 h-6 w-6" />
                 </div>
 
                 {/* Switchable plans (purchased + time available, use for free) */}
                 {switchablePlans.length > 0 && (
                   <div className="border-t border-neutral-100 px-5 py-4 dark:border-neutral-800">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    <p className="mb-3 text-xs font-bold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
                       {t('pricing.purchasedPlansAvailable', 'Planes comprados — cambiar sin pago')}
                     </p>
                     <div className="flex flex-col gap-2">
@@ -311,9 +311,9 @@ export default function PricingPlansSection({
                           className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20"
                         >
                           <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
                             <div>
-                              <p className="text-sm font-semibold capitalize text-green-800 dark:text-green-300">
+                              <p className="text-sm font-semibold text-green-800 capitalize dark:text-green-300">
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-green-600 dark:text-green-500">
@@ -325,7 +325,7 @@ export default function PricingPlansSection({
                           <button
                             onClick={() => handlePlanSelect(id)}
                             disabled={!!isLoading}
-                            className="flex-shrink-0 rounded-lg bg-green-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                            className="shrink-0 rounded-lg bg-green-600 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-green-700 disabled:opacity-50"
                           >
                             {isLoading === id ? t('pricing.changing') : t('pricing.use')}
                           </button>
@@ -338,7 +338,7 @@ export default function PricingPlansSection({
                 {/* Renewable plans (expired, need Stripe) */}
                 {renewablePlans.length > 0 && (
                   <div className="border-t border-neutral-100 px-5 py-4 dark:border-neutral-800">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    <p className="mb-3 text-xs font-bold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
                       {t('pricing.expiredPlans')}
                     </p>
                     <div className="flex flex-col gap-2">
@@ -348,9 +348,9 @@ export default function PricingPlansSection({
                           className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20"
                         >
                           <div className="flex items-center gap-2">
-                            <RefreshCw className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                            <RefreshCw className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                             <div>
-                              <p className="text-sm font-semibold capitalize text-amber-800 dark:text-amber-300">
+                              <p className="text-sm font-semibold text-amber-800 capitalize dark:text-amber-300">
                                 {getPlanName(id, plans)}
                               </p>
                               <p className="text-xs text-amber-600 dark:text-amber-500">
@@ -362,7 +362,7 @@ export default function PricingPlansSection({
                           <button
                             onClick={() => handlePlanSelect(id)}
                             disabled={!!isLoading}
-                            className="flex-shrink-0 rounded-lg bg-amber-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-600 disabled:opacity-50"
+                            className="shrink-0 rounded-lg bg-amber-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-600 disabled:opacity-50"
                           >
                             {isLoading === id ? '...' : t('pricing.renew')}
                           </button>

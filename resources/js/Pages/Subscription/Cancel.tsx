@@ -24,7 +24,7 @@ export default function Cancel({ auth }: Props) {
               <XCircle className="h-12 w-12 text-gray-600 dark:text-gray-400" />
             </div>
 
-            <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
+            <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl dark:text-white">
               {t('subscription.cancel.heading')}
             </h1>
 
@@ -47,7 +47,7 @@ export default function Cancel({ auth }: Props) {
 
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                 <div className="flex gap-3">
-                  <HelpCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                  <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
                   <div>
                     <h3 className="mb-1 font-semibold text-blue-900 dark:text-blue-300">
                       {t('subscription.cancel.hadProblem')}
@@ -70,8 +70,8 @@ export default function Cancel({ auth }: Props) {
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                  <div className="bg-primary-100 dark:bg-primary-900/30 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                    <span className="text-primary-600 dark:text-primary-400 text-sm font-semibold">
                       1
                     </span>
                   </div>
@@ -80,8 +80,8 @@ export default function Cancel({ auth }: Props) {
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                  <div className="bg-primary-100 dark:bg-primary-900/30 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                    <span className="text-primary-600 dark:text-primary-400 text-sm font-semibold">
                       2
                     </span>
                   </div>
@@ -90,8 +90,8 @@ export default function Cancel({ auth }: Props) {
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                  <div className="bg-primary-100 dark:bg-primary-900/30 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                    <span className="text-primary-600 dark:text-primary-400 text-sm font-semibold">
                       3
                     </span>
                   </div>
@@ -108,7 +108,7 @@ export default function Cancel({ auth }: Props) {
             <Link href="/pricing">
               <Button
                 size="lg"
-                className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg hover:from-primary-600 hover:to-primary-700 sm:w-auto"
+                className="from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 w-full bg-gradient-to-r text-white shadow-lg sm:w-auto"
               >
                 <span className="flex items-center gap-2">
                   <ArrowLeft className="h-4 w-4" />
@@ -131,7 +131,7 @@ export default function Cancel({ auth }: Props) {
             </p>
             <a
               href="mailto:support@Intellipost.com"
-              className="font-medium text-primary-600 hover:underline dark:text-primary-400"
+              className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
             >
               {t('subscription.cancel.contactSupport')}
             </a>

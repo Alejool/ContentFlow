@@ -176,7 +176,7 @@ export default function Addons({ addons }: Props) {
               }`}
             >
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {notification.type === 'success' && (
                     <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                   )}
@@ -202,7 +202,7 @@ export default function Addons({ addons }: Props) {
                 </div>
                 <button
                   onClick={() => setNotification(null)}
-                  className={`flex-shrink-0 ${
+                  className={`shrink-0 ${
                     notification.type === 'success'
                       ? 'text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200'
                       : notification.type === 'error'

@@ -18,7 +18,7 @@ import {
   Download,
   FileSpreadsheet,
   FileText,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -243,11 +243,13 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <Button onClick={handleBack} 
-            variant="ghost" 
-            buttonStyle='ghost'
-            icon={ArrowLeft} 
-            className="mb-4">
+            <Button
+              onClick={handleBack}
+              variant="ghost"
+              buttonStyle="ghost"
+              icon={ArrowLeft}
+              className="mb-4"
+            >
               {t('common.back', 'Volver')}
             </Button>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -281,7 +283,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                       'You have an active subscription. You can change to any paid plan from the Pricing page. To change to Free, first cancel your subscription.',
                     )}{' '}
                     <Button
-                      className=" mt-4 h-auto p-0 text-green-800 dark:text-green-300"
+                      className="mt-4 h-auto p-0 text-green-800 dark:text-green-300"
                       onClick={() => router.visit('/pricing')}
                     >
                       {t('subscription.billing.changePlan', 'Change Plan')}
@@ -350,7 +352,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {t('subscription.billing.plan', 'Plan')}
                     </p>
-                    <p className="text-lg font-semibold capitalize text-gray-900 dark:text-white">
+                    <p className="text-lg font-semibold text-gray-900 capitalize dark:text-white">
                       {subscription.plan}
                     </p>
                   </div>
@@ -571,7 +573,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
       >
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
-            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
             <div>
               <p className="mb-1 text-sm font-medium text-yellow-800 dark:text-yellow-200">
                 {t('subscription.billing.cancelWarningTitle', 'Importante')}
