@@ -744,7 +744,7 @@ class Publication extends Model
    */
   public static function getSupportedContentTypes(string $platform): array
   {
-    return \App\Constants\ContentTypes::getSupportedContentTypes($platform);
+    return \App\Constants\Content\ContentTypes::getSupportedContentTypes($platform);
   }
 
   /**
@@ -758,31 +758,31 @@ class Publication extends Model
         'label' => 'Post',
         'description' => 'Standard social media post',
         'icon' => 'FileText',
-        'platforms' => \App\Constants\ContentTypes::POST_COMPATIBLE_PLATFORMS,
+        'platforms' => \App\Constants\Content\ContentTypes::POST_COMPATIBLE_PLATFORMS,
       ],
       'reel' => [
         'label' => 'Reel/Short',
         'description' => 'Short vertical video',
         'icon' => 'Video',
-        'platforms' => \App\Constants\ContentTypes::REEL_COMPATIBLE_PLATFORMS,
+        'platforms' => \App\Constants\Content\ContentTypes::REEL_COMPATIBLE_PLATFORMS,
       ],
       'story' => [
         'label' => 'Story',
         'description' => 'Temporary 24h content',
         'icon' => 'Clock',
-        'platforms' => \App\Constants\ContentTypes::STORY_COMPATIBLE_PLATFORMS,
+        'platforms' => \App\Constants\Content\ContentTypes::STORY_COMPATIBLE_PLATFORMS,
       ],
       'poll' => [
         'label' => 'Poll',
         'description' => 'Interactive poll/survey',
         'icon' => 'BarChart3',
-        'platforms' => \App\Constants\ContentTypes::POLL_COMPATIBLE_PLATFORMS,
+        'platforms' => \App\Constants\Content\ContentTypes::POLL_COMPATIBLE_PLATFORMS,
       ],
       'carousel' => [
         'label' => 'Carousel',
         'description' => 'Multiple images/slides',
         'icon' => 'Images',
-        'platforms' => \App\Constants\ContentTypes::CAROUSEL_COMPATIBLE_PLATFORMS,
+        'platforms' => \App\Constants\Content\ContentTypes::CAROUSEL_COMPATIBLE_PLATFORMS,
       ],
     ];
   }
