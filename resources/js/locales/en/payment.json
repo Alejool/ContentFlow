@@ -22,6 +22,7 @@
       "price": "Price",
       "date": "Date",
       "sessionId": "Session ID",
+      "addonUsage": "Addons Status",
       "nextSteps": "What's Next?",
       "step1": "Your addon package is now active and ready to use",
       "step2": "You can view your current usage in the Addon Packages section",
