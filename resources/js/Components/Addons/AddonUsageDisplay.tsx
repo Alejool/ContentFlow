@@ -1,3 +1,5 @@
+import { formatBytesAsGB, gbToBytes } from '@/Utils/storageHelpers';
+import { useTranslation } from 'react-i18next';
 
 interface AddonUsageProps {
   type: string;
@@ -20,14 +22,23 @@ export default function AddonUsageDisplay({
   addonRemaining,
   unit,
 }: AddonUsageProps) {
+  const { t } = useTranslation();
+
+  const isStorage = type === 'storage';
+
+  // El backend envía planLimit y currentUsage en bytes, pero los addons en GB. Normalizamos a bytes.
+  const normalizedAddonTotal = isStorage ? gbToBytes(addonTotal) : addonTotal;
+  const normalizedAddonUsed = isStorage ? gbToBytes(addonUsed) : addonUsed;
+  const normalizedAddonRemaining = isStorage ? gbToBytes(addonRemaining) : addonRemaining;
+
   const isUnlimited = planLimit === -1;
   const isExceedingPlan = !isUnlimited && currentUsage > planLimit;
   const planUsage = isUnlimited ? currentUsage : Math.min(currentUsage, planLimit);
   const excessUsage = isExceedingPlan ? currentUsage - planLimit : 0;
 
   const formatValue = (value: number) => {
-    if (type === 'storage' && unit === 'GB') {
-      return `${value.toFixed(1)} GB`;
+    if (isStorage) {
+      return formatBytesAsGB(value);
     }
     return `${value.toLocaleString()} ${unit}`;
   };
@@ -37,16 +48,18 @@ export default function AddonUsageDisplay({
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatValue(currentUsage)} usado
+          {formatValue(currentUsage)} {t('subscription.addons.used', 'usado')}
         </span>
       </div>
 
       {/* Plan Base Usage */}
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Plan Base</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('subscription.addons.basePlan', 'Plan Base')}
+          </span>
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {isUnlimited ? 'Ilimitado' : formatValue(planLimit)}
+            {isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado') : formatValue(planLimit)}
           </span>
         </div>
 
@@ -62,37 +75,43 @@ export default function AddonUsageDisplay({
         )}
 
         <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-          <span>{formatValue(planUsage)} usado del plan</span>
+          <span>
+            {formatValue(planUsage)} {t('subscription.addons.usedFromPlan', 'usado del plan')}
+          </span>
           {!isUnlimited && <span>{((planUsage / planLimit) * 100).toFixed(1)}%</span>}
         </div>
       </div>
 
       {/* Addon Usage (only if exceeding plan or has addons) */}
-      {(addonTotal > 0 || isExceedingPlan) && (
+      {(normalizedAddonTotal > 0 || isExceedingPlan) && (
         <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-orange-700 dark:text-orange-400">
-              Addons de Extensión
+              {t('subscription.addons.extensionAddonsTitle', 'Addons de Extensión')}
             </span>
             <span className="text-sm text-orange-600 dark:text-orange-400">
-              {formatValue(addonTotal)} disponible
+              {formatValue(normalizedAddonTotal)} {t('subscription.addons.available', 'disponible')}
             </span>
           </div>
 
-          {addonTotal > 0 && (
+          {normalizedAddonTotal > 0 && (
             <div className="h-2 w-full rounded-full bg-orange-100 dark:bg-orange-900/30">
               <div
                 className="h-2 rounded-full bg-orange-500 transition-all duration-300 dark:bg-orange-400"
                 style={{
-                  width: `${addonTotal > 0 ? (addonUsed / addonTotal) * 100 : 0}%`,
+                  width: `${normalizedAddonTotal > 0 ? (normalizedAddonUsed / normalizedAddonTotal) * 100 : 0}%`,
                 }}
               />
             </div>
           )}
 
           <div className="mt-1 flex justify-between text-xs text-orange-600 dark:text-orange-400">
-            <span>{formatValue(addonUsed)} usado de addons</span>
-            <span>{formatValue(addonRemaining)} restante</span>
+            <span>
+              {formatValue(normalizedAddonUsed)} {t('subscription.addons.usedFromAddons', 'usado de addons')}
+            </span>
+            <span>
+              {formatValue(normalizedAddonRemaining)} {t('subscription.addons.remaining', 'restante')}
+            </span>
           </div>
 
           {/* Explanation */}
@@ -100,14 +119,22 @@ export default function AddonUsageDisplay({
             <p className="text-xs text-orange-800 dark:text-orange-300">
               {isExceedingPlan ? (
                 <>
-                  <strong>Usando addons:</strong> Has excedido tu plan base por{' '}
-                  {formatValue(excessUsage)}. Los addons se están consumiendo automáticamente.
+                  <strong>{t('subscription.addons.usingAddons', 'Usando addons:')}</strong>{' '}
+                  {t('subscription.addons.exceededPlanBy', 'Has excedido tu plan base por')}{' '}
+                  {formatValue(excessUsage)}.{' '}
+                  {t(
+                    'subscription.addons.addonsConsumingAutomatically',
+                    'Los addons se están consumiendo automáticamente.',
+                  )}
                 </>
               ) : (
                 <>
-                  <strong>Addons disponibles:</strong> Tus addons se activarán automáticamente
-                  cuando excedas el límite de tu plan base (
-                  {isUnlimited ? 'ilimitado' : formatValue(planLimit)}).
+                  <strong>{t('subscription.addons.addonsAvailable', 'Addons disponibles:')}</strong>{' '}
+                  {t(
+                    'subscription.addons.addonsWillActivateWhenExceeding',
+                    'Tus addons se activarán automáticamente cuando excedas el límite de tu plan base',
+                  )}{' '}
+                  ({isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado').toLowerCase() : formatValue(planLimit)}).
                 </>
               )}
             </p>
@@ -119,15 +146,16 @@ export default function AddonUsageDisplay({
       <div className="-mx-6 -mb-6 mt-4 rounded-b-lg border-t border-gray-200 bg-gray-50 px-6 pb-6 pt-4 dark:border-gray-700 dark:bg-gray-900/50">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Uso Total Disponible
+            {t('subscription.addons.totalAvailableUsage', 'Uso Total Disponible')}
           </span>
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            {isUnlimited ? 'Ilimitado' : formatValue(planLimit + addonTotal)}
+            {isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado') : formatValue(planLimit + normalizedAddonTotal)}
           </span>
         </div>
         <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          Plan: {isUnlimited ? 'Ilimitado' : formatValue(planLimit)} + Addons:{' '}
-          {formatValue(addonTotal)}
+          {t('subscription.addons.planLabel', 'Plan:')}{' '}
+          {isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado') : formatValue(planLimit)} +{' '}
+          {t('subscription.addons.addonsLabel', 'Addons:')} {formatValue(normalizedAddonTotal)}
         </div>
       </div>
     </div>

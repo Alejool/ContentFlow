@@ -1,3 +1,4 @@
+import { formatBytes, formatStorageUsage } from '@/Utils/storageHelpers';
 import { Link } from '@inertiajs/react';
 import { ChevronDown, FileText, HardDrive, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -53,15 +54,6 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
       enterprise: t('pricing.plans.enterprise.name') || 'Enterprise',
     };
     return planNames[planName] || planName;
-  };
-
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   if (!usage || usageLoading) {
@@ -137,7 +129,7 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
               <span className="text-[10px] font-semibold text-gray-900 dark:text-white">
                 {usage.storage.limit_gb === -1
                   ? `${formatBytes(usage.storage.used_bytes)} / ∞`
-                  : `${formatBytes(usage.storage.used_bytes)} / ${usage.storage.total_available_gb} GB`}
+                  : formatStorageUsage(usage.storage.used_bytes, usage.storage.total_available_bytes)}
               </span>
             </div>
             <div className='text-[10px]'>

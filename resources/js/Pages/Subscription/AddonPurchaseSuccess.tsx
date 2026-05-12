@@ -84,66 +84,67 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
                 {t('payment.addonPurchaseSuccess.details')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Addon Info */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
+                {/* Addon Info (takes 2 columns on md) */}
+                <div className="flex flex-col justify-center md:col-span-2">
+                  <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-100 bg-gradient-to-b from-gray-50 to-white p-6 text-center shadow-sm dark:border-gray-700 dark:from-gray-800/50 dark:to-gray-800">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-600 shadow-inner dark:bg-primary-900/40 dark:text-primary-400">
                       {(() => {
                         const IconComponent = getAddonIcon(purchase.addon_type);
-                        return (
-                          <IconComponent className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                        );
+                        return <IconComponent className="h-8 w-8" strokeWidth={1.5} />;
                       })()}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
                         {getAddonTypeName(purchase.addon_type)}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
                         {formatAmount(purchase.addon_type, purchase.amount)}
-                      </p>
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Purchase Info */}
-                <div className="space-y-3">
-                  <div className="flex justify-between py-2">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {t('payment.addonPurchaseSuccess.amount')}:
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {formatAmount(purchase.addon_type, purchase.amount)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {t('payment.addonPurchaseSuccess.price')}:
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      $
-                      {typeof purchase.price === 'number'
-                        ? purchase.price.toFixed(2)
-                        : parseFloat(purchase.price || '0').toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {t('payment.addonPurchaseSuccess.date')}:
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {new Date(purchase.purchase_date).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-t border-gray-200 pt-3 dark:border-gray-600">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {t('payment.addonPurchaseSuccess.sessionId')}:
-                    </span>
-                    <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-                      {purchase.session_id.substring(0, 20)}...
-                    </span>
+                {/* Purchase Info (takes 3 columns on md) */}
+                <div className="md:col-span-3">
+                  <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/50">
+                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {t('payment.addonPurchaseSuccess.details')}
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-700/50">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {t('payment.addonPurchaseSuccess.amount')}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {formatAmount(purchase.addon_type, purchase.amount)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2 dark:border-gray-700/50">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {t('payment.addonPurchaseSuccess.price')}
+                        </span>
+                        <span className="text-base font-bold text-green-600 dark:text-green-400">
+                          $
+                          {typeof purchase.price === 'number'
+                            ? purchase.price.toFixed(2)
+                            : parseFloat(purchase.price || '0').toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {t('payment.addonPurchaseSuccess.date')}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(purchase.purchase_date).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

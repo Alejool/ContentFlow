@@ -1,27 +1,27 @@
 import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
+import { formatDateString } from '@/Utils/dateHelpers';
 import { router, usePage } from '@inertiajs/react';
 import {
-  AlertCircle,
-  ArrowUpCircle,
-  Calendar,
-  CheckCircle,
-  CreditCard,
-  Crown,
-  FileText,
-  HardDrive,
-  Key,
-  Palette,
-  Share2,
-  Sparkles,
-  TrendingUp,
-  Users,
-  Zap,
+    AlertCircle,
+    ArrowUpCircle,
+    Calendar,
+    CheckCircle,
+    CreditCard,
+    Crown,
+    FileText,
+    HardDrive,
+    Key,
+    Palette,
+    Share2,
+    Sparkles,
+    TrendingUp,
+    Users,
+    Zap,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatDateString } from '@/Utils/dateHelpers';
-import { useSubscriptionUsage } from '@/Hooks/useSubscriptionUsage';
 
 interface Invoice {
   id: string;
@@ -76,15 +76,6 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
     );
   }
 
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  };
-
   const getProgressBarColor = (percentage: number) => {
     if (percentage >= 90) return 'bg-red-500';
     if (percentage >= 70) return 'bg-yellow-500';
@@ -108,8 +99,8 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
       label: t('subscription.usage.storage', 'Almacenamiento'),
       icon: HardDrive,
       used: formatBytes(usage.storage.used_bytes),
-      limit: `${usage.storage.limit_gb} GB`,
-      total_available: `${usage.storage.total_available_gb} GB`,
+      limit: formatBytes(usage.storage.limit_bytes),
+      total_available: formatBytes(usage.storage.total_available_bytes),
       percentage: usage.storage.percentage,
       addon_info: usage.storage.addon_info,
       show: true,
