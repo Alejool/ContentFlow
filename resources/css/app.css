@@ -877,12 +877,21 @@
 }
 
 /* Transiciones suaves globales para todos los elementos al cambiar de tema */
-*,
-*::before,
-*::after {
+/* Solo se aplican cuando NO se está ejecutando una View Transition */
+html:not(.disable-transitions) *,
+html:not(.disable-transitions) *::before,
+html:not(.disable-transitions) *::after {
   transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
   transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Deshabilitar TODAS las transiciones durante el cambio de tema con View Transition API */
+html.disable-transitions *,
+html.disable-transitions *::before,
+html.disable-transitions *::after {
+  transition: none !important;
+  animation: none !important;
 }
 
 /* Excepciones para elementos que no deben tener transición */

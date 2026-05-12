@@ -59,10 +59,15 @@ i18n
     detection: languageDetectorOptions,
     // Reaccionar a cambios de idioma del navegador
     react: {
-      useSuspense: false,
+      useSuspense: false, // Desactivar suspense para evitar problemas de carga
       bindI18n: 'languageChanged loaded',
       bindI18nStore: 'added removed',
+      transEmptyNodeValue: '', // Evitar mostrar claves cuando no hay traducción
+      transSupportBasicHtmlNodes: true,
+      transKeepBasicHtmlNodesFor: ['br', 'strong', 'i', 'p'],
     },
+    // Asegurar que las traducciones estén disponibles inmediatamente
+    initImmediate: false,
   });
 
 // Set global Zod error map using a dynamic call to i18n.t

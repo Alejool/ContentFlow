@@ -56,6 +56,13 @@ export const dateTimeFormats: Record<string, Intl.DateTimeFormatOptions> = {
     hour: '2-digit',
     minute: '2-digit',
   },
+  datetimeLong: {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  },
   full: {
     year: 'numeric',
     month: 'long',
@@ -223,4 +230,26 @@ export const pluralize = (
   }
 
   return plural || `${singular}s`;
+};
+
+/**
+ * Formatea una fecha opcional con un fallback
+ * Útil para campos que pueden ser undefined/null
+ */
+export const formatOptionalDate = (
+  date: Date | string | number | undefined | null,
+  format: keyof typeof dateTimeFormats = 'medium',
+  fallback: string = i18n.t('common.notAvailable', 'No disponible'),
+  locale?: string,
+): string => {
+  if (!date) {
+    return fallback;
+  }
+
+  try {
+    return formatDate(date, format, locale);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return fallback;
+  }
 };

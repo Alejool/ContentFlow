@@ -89,6 +89,10 @@ export function transitionTheme(
     document.documentElement.style.setProperty('--y', '50%');
   }
 
+  // Deshabilitar transiciones CSS globales durante el cambio de tema
+  // Esto previene que miles de elementos intenten animar simultáneamente
+  document.documentElement.classList.add('disable-transitions');
+
   // Iniciar la transición
   const transition = (
     document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
@@ -96,6 +100,14 @@ export function transitionTheme(
     flushSync(() => {
       callback();
     });
+  });
+
+  // Rehabilitar transiciones después de que termine la View Transition
+  transition.finished.finally(() => {
+    // Pequeño delay para asegurar que la transición visual haya terminado
+    setTimeout(() => {
+      document.documentElement.classList.remove('disable-transitions');
+    }, 50);
   });
 
   return transition.finished;
