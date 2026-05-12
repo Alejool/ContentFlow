@@ -42,7 +42,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
             {status === 'verification-link-sent' && (
               <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <Check className="h-5 w-5 text-green-600" />
                   </div>
                   <p className="text-sm font-medium text-green-800">

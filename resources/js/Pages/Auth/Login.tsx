@@ -71,9 +71,9 @@ export default function Login() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {authError && (
-              <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
-                <div className="flex items-center gap-3 text-primary-700 dark:text-primary-400">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 rounded-lg border p-4">
+                <div className="text-primary-700 dark:text-primary-400 flex items-center gap-3">
+                  <AlertCircle className="h-5 w-5 shrink-0" />
                   <p className="text-sm font-medium">{authError}</p>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function Login() {
             {successMessage && (
               <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 shrink-0" />
                   <p className="text-sm font-medium">{successMessage}</p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export default function Login() {
               <label className="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-offset-0"
+                  className="text-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-offset-0"
                   {...register('remember')}
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -131,7 +131,7 @@ export default function Login() {
 
               <Link
                 href={route('password.request')}
-                className="text-sm font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium transition-colors"
               >
                 {t('auth.login.buttons.forgotPassword')}
               </Link>
@@ -189,7 +189,7 @@ export default function Login() {
                 {t('auth.login.noAccount')}{' '}
                 <Link
                   href={route('register')}
-                  className="inline-flex items-center gap-1 font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                  className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 inline-flex items-center gap-1 font-semibold transition-colors"
                 >
                   <UserPlus className="h-5 w-5" />
                   {t('auth.login.buttons.registerLink')}

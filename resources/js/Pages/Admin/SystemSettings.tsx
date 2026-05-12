@@ -1,23 +1,23 @@
-import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import AdminNavigation from '@/Components/Admin/AdminNavigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
-import Button from '@/Components/common/Modern/Button';
-import { Badge } from '@/Components/ui/badge';
-import Switch from '@/Components/common/Modern/Switch';
 import SettingsTabs from '@/Components/Workspace/SettingsTabs';
 import AlertCard from '@/Components/common/Modern/AlertCard';
+import Button from '@/Components/common/Modern/Button';
+import Switch from '@/Components/common/Modern/Switch';
+import { Badge } from '@/Components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, router } from '@inertiajs/react';
 import {
-  Settings,
-  Package,
-  Zap,
-  Puzzle,
-  Globe,
-  Save,
   CheckCircle2,
   CreditCard,
+  Globe,
+  Package,
+  Puzzle,
+  Save,
+  Settings,
+  Zap,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Setting {
@@ -173,7 +173,7 @@ export default function SystemSettings({ settings, categories }: Props) {
               </p>
             )}
           </div>
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Switch
               id={`setting-${setting.id}`}
               label=""

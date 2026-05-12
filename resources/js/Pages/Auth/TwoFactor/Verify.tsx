@@ -46,11 +46,11 @@ export default function Verify() {
   return (
     <AuthenticatedLayout>
       <Head title="Two-Factor Authentication" />
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8 dark:bg-neutral-900 sm:px-6 lg:px-8">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-neutral-900">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-              <Shield className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            <div className="bg-primary-100 dark:bg-primary-900/30 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full">
+              <Shield className="text-primary-600 dark:text-primary-400 h-8 w-8" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               Two-Factor Authentication
@@ -61,14 +61,14 @@ export default function Verify() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
+            <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 rounded-lg border p-4">
               <div className="flex items-start gap-3">
-                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-700 dark:text-primary-400" />
+                <AlertCircle className="text-primary-700 dark:text-primary-400 mt-0.5 h-5 w-5 shrink-0" />
                 <div>
-                  <p className="text-sm font-medium text-primary-700 dark:text-primary-400">
+                  <p className="text-primary-700 dark:text-primary-400 text-sm font-medium">
                     Security Check Required
                   </p>
-                  <p className="mt-1 text-xs text-primary-600 dark:text-primary-500">
+                  <p className="text-primary-600 dark:text-primary-500 mt-1 text-xs">
                     Open your authenticator app and enter the 6-digit code. You can also use a
                     backup code if you don't have access to your device.
                   </p>
@@ -103,7 +103,7 @@ export default function Verify() {
             <div className="text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Lost your device?{' '}
-                <span className="font-medium text-primary-600 dark:text-primary-400">
+                <span className="text-primary-600 dark:text-primary-400 font-medium">
                   Use a backup code
                 </span>
               </p>

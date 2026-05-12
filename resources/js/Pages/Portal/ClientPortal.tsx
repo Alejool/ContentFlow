@@ -9,14 +9,7 @@ import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms
 import type { MediaFile, Publication } from '@/types';
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import {
-  Building2,
-  Check,
-  Info,
-  Loader2,
-  MessageSquare,
-  X,
-} from 'lucide-react';
+import { Building2, Check, Info, Loader2, MessageSquare, X } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -154,10 +147,10 @@ export default function ClientPortal({ publication, token }: Props) {
               C
             </div>
             <div>
-              <span className="block text-lg font-extrabold leading-none tracking-tight">
+              <span className="block text-lg leading-none font-extrabold tracking-tight">
                 Intellipost
               </span>
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">
+              <span className="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-zinc-500">
                 {t('portal.clientPortal')}
               </span>
             </div>
@@ -181,7 +174,7 @@ export default function ClientPortal({ publication, token }: Props) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100/50 p-4 shadow-sm dark:border-blue-800/30 dark:from-blue-900/20 dark:to-blue-900/10"
         >
-          <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div className="text-sm leading-relaxed text-blue-900 dark:text-blue-200">
             <p className="mb-1 font-bold">{t('portal.info.title')}</p>
             <p>
@@ -221,10 +214,10 @@ export default function ClientPortal({ publication, token }: Props) {
             <ReelsSection reels={reels} />
 
             {/* Publication Header with Status */}
-            <PublicationHeader 
-              title={title} 
-              description={publication.description || ''} 
-              status={(publication as any).status} 
+            <PublicationHeader
+              title={title}
+              description={publication.description || ''}
+              status={(publication as any).status}
             />
 
             {/* Creator Info */}
@@ -240,7 +233,7 @@ export default function ClientPortal({ publication, token }: Props) {
             {/* Target Platforms */}
             {targetPlatforms.length > 0 && (
               <div className="mb-6">
-                <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-500">
+                <h3 className="mb-3 text-sm font-bold tracking-wider text-gray-500 uppercase dark:text-zinc-500">
                   {t('portal.details.targetPlatforms')}
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -268,10 +261,9 @@ export default function ClientPortal({ publication, token }: Props) {
                   {t('portal.status.' + publication.status, publication.status)}
                 </p>
                 <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                  {['approved', 'rejected'].includes(publication.status || '') 
+                  {['approved', 'rejected'].includes(publication.status || '')
                     ? t('portal.status.alreadyReviewed')
-                    : t('portal.status.notPendingReview')
-                  }
+                    : t('portal.status.notPendingReview')}
                 </p>
               </div>
             ) : !showRejectReason ? (
@@ -280,7 +272,13 @@ export default function ClientPortal({ publication, token }: Props) {
                   onClick={handleApprove}
                   disabled={processing}
                   className="h-12 flex-[2] rounded-lg bg-gradient-to-r from-green-600 to-green-700 text-base font-bold text-white shadow-lg shadow-green-500/20 transition-all hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/40 active:scale-95"
-                  icon={processing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
+                  icon={
+                    processing ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Check className="h-5 w-5" />
+                    )
+                  }
                 >
                   {processing ? t('portal.actions.approving') : t('portal.actions.approve')}
                 </Button>
@@ -344,7 +342,10 @@ export default function ClientPortal({ publication, token }: Props) {
 
         <footer className="mt-8 text-center">
           <p className="text-sm text-gray-500 dark:text-zinc-600">
-            {t('portal.footer.secureLink', { app: 'Intellipost', workspace: publication.workspace?.name })}
+            {t('portal.footer.secureLink', {
+              app: 'Intellipost',
+              workspace: publication.workspace?.name,
+            })}
           </p>
           <p className="mt-2 text-xs text-gray-400 dark:text-zinc-700">
             {t('portal.footer.reference', { id: publication.id, token: token.substring(0, 8) })}

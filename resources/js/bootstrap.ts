@@ -13,6 +13,11 @@ if (token) {
   console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
 
+// Configurar el idioma del navegador para todas las peticiones
+// Esto permite que Laravel devuelva mensajes de validación en el idioma correcto
+const browserLanguage = navigator.language || 'es';
+axios.defaults.headers.common['Accept-Language'] = browserLanguage;
+
 // Attach the client's detected timezone to all requests so the backend
 // can use it when needed to parse or normalize datetime values.
 try {

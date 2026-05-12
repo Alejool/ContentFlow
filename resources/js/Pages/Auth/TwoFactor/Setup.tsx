@@ -7,9 +7,9 @@ import { z } from 'zod';
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import { AlertCircle, CheckCircle2, Copy, Key, Shield } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { QRCodeSVG } from 'qrcode.react';
 
 interface SetupProps {
   qrCodeUrl: string;
@@ -71,11 +71,11 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
   return (
     <AuthenticatedLayout>
       <Head title={t('twoFactor.setup.title')} />
-      <div className="min-h-screen bg-gray-50 px-4 py-8 dark:bg-neutral-900 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-neutral-900">
         <div className="mx-auto max-w-3xl">
           <div className="mb-8 text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
-              <Shield className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            <div className="bg-primary-100 dark:bg-primary-900/30 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full">
+              <Shield className="text-primary-600 dark:text-primary-400 h-8 w-8" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('twoFactor.setup.title')}
@@ -87,7 +87,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
             {/* Security Warning */}
             <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
               <div className="flex items-start gap-3">
-                <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-700 dark:text-blue-400" />
+                <Shield className="mt-0.5 h-5 w-5 shrink-0 text-blue-700 dark:text-blue-400" />
                 <div>
                   <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
                     {t('twoFactor.setup.securityWarning.title')}
@@ -140,7 +140,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
               </h3>
               <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-700 dark:text-yellow-400" />
+                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-700 dark:text-yellow-400" />
                   <div>
                     <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">
                       {t('twoFactor.setup.step2.warning.title')}

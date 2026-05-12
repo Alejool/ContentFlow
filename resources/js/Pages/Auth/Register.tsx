@@ -76,9 +76,9 @@ export default function Register() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {authError && (
-              <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
-                <div className="flex items-center gap-3 text-primary-700 dark:text-primary-400">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 rounded-lg border p-4">
+                <div className="text-primary-700 dark:text-primary-400 flex items-center gap-3">
+                  <AlertCircle className="h-5 w-5 shrink-0" />
                   <p className="text-sm font-medium">{authError}</p>
                 </div>
               </div>
@@ -87,7 +87,7 @@ export default function Register() {
             {successMessage && (
               <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 shrink-0" />
                   <p className="text-sm font-medium">{successMessage}</p>
                 </div>
               </div>
@@ -163,7 +163,7 @@ export default function Register() {
               <input
                 type="checkbox"
                 id="terms"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-offset-0"
+                className="text-primary-600 focus:ring-primary-500 mt-1 h-4 w-4 rounded border-gray-300 focus:ring-offset-0"
                 required
               />
               <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
@@ -199,7 +199,7 @@ export default function Register() {
                 {t('auth.register.alreadyRegistered')}{' '}
                 <Link
                   href={route('login')}
-                  className="inline-flex items-center gap-1 font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+                  className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 inline-flex items-center gap-1 font-semibold transition-colors"
                 >
                   <LogIn className="h-5 w-5" />
                   {t('auth.register.buttons.login')}

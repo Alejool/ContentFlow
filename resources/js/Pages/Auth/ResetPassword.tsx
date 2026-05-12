@@ -73,7 +73,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             {!errors.email && (
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                 <div className="flex items-center gap-3 text-blue-700 dark:text-blue-400">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 shrink-0" />
                   <div>
                     <p className="text-sm font-medium">
                       {t('auth.reset-password.status.verified')}
@@ -142,7 +142,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                 className={`rounded-lg p-3 ${
                   data.password === data.password_confirmation
                     ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                    : 'border border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20'
+                    : 'border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 border'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -155,8 +155,8 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     </>
                   ) : (
                     <>
-                      <AlertCircle className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                      <span className="text-sm text-primary-600 dark:text-primary-400">
+                      <AlertCircle className="text-primary-600 dark:text-primary-400 h-4 w-4" />
+                      <span className="text-primary-600 dark:text-primary-400 text-sm">
                         {t('auth.reset-password.match.error')}
                       </span>
                     </>
