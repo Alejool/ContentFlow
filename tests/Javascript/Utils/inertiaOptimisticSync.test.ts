@@ -63,11 +63,11 @@ describe('inertiaOptimisticSync', () => {
     it('should return component name from data-page attribute', () => {
       const appElement = document.getElementById('app');
       appElement?.setAttribute('data-page', JSON.stringify({
-        component: 'Content/Partials/ContentPage',
+        component: 'Content/Index',
         props: {},
       }));
       
-      expect(getInertiaPageComponent()).toBe('Content/Partials/ContentPage');
+      expect(getInertiaPageComponent()).toBe('Content/Index');
     });
     
     it('should handle malformed data-page gracefully', () => {

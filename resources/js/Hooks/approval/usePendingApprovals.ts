@@ -2,6 +2,7 @@ import { queryKeys } from '@/lib/common/queryKeys';
 import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 async function fetchPendingApprovalsFn(type = 'to_approve'): Promise<ApprovalRequest[]> {
   const response = await axios.get(route('api.v1.approvals.pending'), { params: { type } });
@@ -21,11 +22,10 @@ export function usePendingApprovals(refreshTrigger?: number) {
     staleTime: 60 * 1000, // 1 min
   });
 
-  // When refreshTrigger changes, invalidate so the query refetches
-  // (replaces the old useEffect pattern)
-  if (refreshTrigger !== undefined) {
-    queryClient.invalidateQueries({ queryKey: queryKeys.approvals.all });
-  }
+  useEffect(() => {
+    if (refreshTrigger === undefined || refreshTrigger < 1) return;
+    void queryClient.invalidateQueries({ queryKey: queryKeys.approvals.all });
+  }, [refreshTrigger, queryClient]);
 
   return {
     requests: query.data ?? [],
