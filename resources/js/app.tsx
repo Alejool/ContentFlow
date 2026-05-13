@@ -40,6 +40,22 @@ const initAccessibility = async () => {
   ariaAnnouncer.initialize();
 };
 
+const pageModules = import.meta.glob('./Pages/**/*.tsx');
+
+function logChunkLoadFailure(err: unknown): void {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (
+    !msg.includes('Failed to fetch dynamically imported module') &&
+    !msg.includes('error loading dynamically imported module')
+  ) {
+    return;
+  }
+  console.error(
+    '[Vite/Inertia] No se pudo cargar el módulo de la página. Prueba Ctrl+Shift+R o reinicia el servidor de Vite.',
+    err,
+  );
+}
+
 // ─── Global error handler for navigation errors ────────────────────────────────
 // Suppress "AbortError: Transition was skipped" warnings in production
 // These are expected when navigations are cancelled (e.g., rapid clicks)
@@ -57,6 +73,7 @@ if (typeof window !== 'undefined') {
       if (import.meta.env.DEV) {
         console.debug('[Inertia] Navigation cancelled (expected behavior):', event.reason.message);
       }
+      return;
     }
   });
 
@@ -72,9 +89,15 @@ const appName = import.meta.env['VITE_APP_NAME'] || 'Intellipost';
 
 createInertiaApp<PageProps>({
   title: (title: any) => `${title} - ${appName}`,
-  resolve: (name: string) => {
+  resolve: async (name: string) => {
     const cleanName = name.startsWith('/') ? name.slice(1) : name;
-    return resolvePageComponent(`./Pages/${cleanName}.tsx`, import.meta.glob('./Pages/**/*.tsx'));
+    const path = `./Pages/${cleanName}.tsx`;
+    try {
+      return await resolvePageComponent(path, pageModules);
+    } catch (err) {
+      logChunkLoadFailure(err);
+      throw err;
+    }
   },
 
   setup({ el, App, props }: { el: HTMLElement; App: React.ComponentType<any>; props: any }) {
