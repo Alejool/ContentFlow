@@ -1,4 +1,4 @@
-import Checkbox from '@/Components/common/Modern/Checkbox';
+import Switch from '@/Components/common/Modern/Switch';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { formatTimeString } from '@/Utils/formatters';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
@@ -14,9 +14,9 @@ interface EventCardProps {
   onToggleSelection: (eventId: string) => void;
   onEventClick?: (event: CalendarEvent) => void;
   onEventDelete?: (event: CalendarEvent) => void;
-  PlatformIcon: React.ComponentType<{ 
-    platform?: string | undefined; 
-    className?: string | undefined 
+  PlatformIcon: React.ComponentType<{
+    platform?: string | undefined;
+    className?: string | undefined;
   }>;
   currentUser?: { name: string } | undefined;
   t?: TFunction | undefined;
@@ -98,16 +98,12 @@ export const EventCard: React.FC<EventCardProps> = ({
       transition={{ duration: 0.15 }}
       {...dragHandleProps}
       onClick={() => onEventClick?.(event)}
-      className={`
-        group/card relative cursor-grab overflow-hidden rounded-md border
-        transition-all duration-150 hover:shadow-md active:cursor-grabbing
-        ${isSelected ? 'ring-2 ring-primary-500 ring-offset-1' : 'border-transparent'}
-        ${isDragging ? 'scale-95 opacity-50' : ''}
-      `}
+      className={`group/card relative cursor-grab overflow-hidden rounded-md border transition-all duration-150 hover:shadow-md active:cursor-grabbing ${isSelected ? 'ring-primary-500 ring-2 ring-offset-1' : 'border-transparent'} ${isDragging ? 'scale-95 opacity-50' : ''} `}
       style={{
         backgroundColor: eventColor || '#ffffff',
         borderLeftWidth: '3px',
-        borderLeftColor: eventColor || (platformConfig ? platformConfig.color.replace('bg-', '#') : '#9ca3af'),
+        borderLeftColor:
+          eventColor || (platformConfig ? platformConfig.color.replace('bg-', '#') : '#9ca3af'),
       }}
     >
       {/* Fondo con color de plataforma si no hay color de evento */}
@@ -117,20 +113,25 @@ export const EventCard: React.FC<EventCardProps> = ({
 
       {/* Indicador de advertencia */}
       {hasNoPlatforms && (
-        <div className="absolute right-1 top-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500">
+        <div className="absolute top-1 right-1 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500">
           <AlertCircle className="h-3 w-3 text-white" />
         </div>
       )}
 
       {/* Contenido principal */}
       <div className="relative z-10 flex items-center gap-1.5 p-1.5">
-        {/* Checkbox */}
-        <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
-          <Checkbox
-            checked={isSelected}
+        {/* Switch */}
+        <div 
+          onClick={(e) => e.stopPropagation()} 
+          onKeyDown={(e) => e.stopPropagation()}
+          role="presentation"
+          className="flex-shrink-0"
+        >
+          <Switch
+            isSelected={isSelected}
             onChange={() => onToggleSelection(event.id)}
-            size="sm"
-            variant="primary"
+            size="xs"
+            variant="animated"
           />
         </div>
 
@@ -146,7 +147,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
         {/* Título */}
         <h4
-          className="min-w-0 flex-1 truncate text-xs font-semibold leading-tight"
+          className="min-w-0 flex-1 truncate text-xs leading-tight font-semibold"
           style={{
             color: eventColor ? (isDarkColor(eventColor) ? '#ffffff' : '#111827') : '#111827',
           }}
@@ -195,7 +196,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               e.stopPropagation();
               onEventDelete(event);
             }}
-            className="flex-shrink-0 rounded p-0.5 opacity-0 transition-all hover:bg-red-500 hover:text-white group-hover/card:opacity-100"
+            className="flex-shrink-0 rounded p-0.5 opacity-0 transition-all group-hover/card:opacity-100 hover:bg-red-500 hover:text-white"
             style={{
               color: eventColor ? (isDarkColor(eventColor) ? '#ffffff' : '#ef4444') : '#ef4444',
             }}

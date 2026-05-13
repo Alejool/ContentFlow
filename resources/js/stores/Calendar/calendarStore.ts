@@ -1,16 +1,16 @@
 import type { CalendarEvent, CalendarFilters, CalendarView, DataConflict } from '@/types/Calendar/calendar';
 import axios from 'axios';
 import {
-  addDays,
-  addMonths,
-  addWeeks,
-  endOfMonth,
-  endOfWeek,
-  startOfMonth,
-  startOfWeek,
-  subDays,
-  subMonths,
-  subWeeks,
+    addDays,
+    addMonths,
+    addWeeks,
+    endOfMonth,
+    endOfWeek,
+    startOfMonth,
+    startOfWeek,
+    subDays,
+    subMonths,
+    subWeeks,
 } from 'date-fns';
 import { create } from 'zustand';
 
@@ -94,6 +94,8 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     // Persist view preference to localStorage
     localStorage.setItem('calendar_preferred_view', view);
     set({ view });
+    // Re-fetch with the correct range for the new view
+    setTimeout(() => get().fetchEvents(), 0);
   },
 
   setFilters: (filters) => {
@@ -166,12 +168,26 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   },
 
   fetchEvents: async () => {
-    const { currentMonth, filters } = get();
+    const { currentMonth, filters, view } = get();
     set({ isLoading: true, error: null });
 
     try {
-      const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
-      const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
+      let start: string;
+      let end: string;
+
+      if (view === 'week') {
+        // For week view, fetch exactly the current week range
+        start = startOfWeek(currentMonth, { weekStartsOn: 0 }).toISOString();
+        end = endOfWeek(currentMonth, { weekStartsOn: 0 }).toISOString();
+      } else if (view === 'day') {
+        // For day view, fetch the full week containing the current day to have buffer
+        start = startOfWeek(currentMonth, { weekStartsOn: 0 }).toISOString();
+        end = endOfWeek(currentMonth, { weekStartsOn: 0 }).toISOString();
+      } else {
+        // For month view, fetch the full month including partial weeks at edges
+        start = startOfWeek(startOfMonth(currentMonth)).toISOString();
+        end = endOfWeek(endOfMonth(currentMonth)).toISOString();
+      }
 
       // Build query params with filters
       const params: Record<string, string> = { start, end };

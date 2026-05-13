@@ -1,12 +1,13 @@
+import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { formatDate } from '@/Utils/common/i18nHelpers'; // Uses locale-specific named format presets (monthYear, dayWeekMonthYear)
 import type { CalendarView } from '@/types/Calendar/calendar';
-import { format, setMonth, setYear } from 'date-fns';
+import { setMonth, setYear } from 'date-fns';
 import {
-  Calendar as CalendarIcon,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
+    Calendar as CalendarIcon,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    Loader2,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,27 +43,16 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
       if (showMonthPicker && !target.closest('.month-picker-container')) {
         setShowMonthPicker(false);
       }
-      if (showDatePicker && !target.closest('.date-picker-container')) {
-        setShowDatePicker(false);
-      }
+      // DatePicker maneja su propio cierre con backdrop
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showMonthPicker, showDatePicker]);
+  }, [showMonthPicker]);
 
   const goToMonth = (month: number, year: number) => {
     const newDate = setYear(setMonth(new Date(currentDate), month), year);
     onNavigateToDate(newDate);
     setShowMonthPicker(false);
-  };
-
-  const handleDatePickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = new Date(e.target.value);
-    if (!isNaN(selectedDate.getTime())) {
-      onNavigateToDate(selectedDate);
-      setShowDatePicker(false);
-    }
   };
 
   // Format the current date display based on view
@@ -177,31 +167,34 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
         </button>
 
         {/* Date Picker Button */}
-        <div className="date-picker-container relative ml-1">
-          <button
-            onClick={() => setShowDatePicker(!showDatePicker)}
-            className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
-            title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
-          >
-            <CalendarIcon className="h-5 w-5" />
-          </button>
-
-          {/* Date Picker Dropdown */}
-          {showDatePicker && (
-            <div className="absolute right-0 top-full z-50 mt-2 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-black">
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
-              </label>
-              <input
-                type="date"
-                value={format(currentDate, 'yyyy-MM-dd')}
-                onChange={handleDatePickerChange}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-              />
-            </div>
-          )}
-        </div>
+        <button
+          onClick={() => setShowDatePicker(!showDatePicker)}
+          className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
+          title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
+        >
+          <CalendarIcon className="h-5 w-5" />
+        </button>
       </div>
+
+      {/* Date Picker - renderizado fuera del contenedor de navegación */}
+      {showDatePicker && (
+        <div className="date-picker-wrapper">
+          <DatePickerModern
+            selected={currentDate}
+            onChange={(date) => {
+              if (date) {
+                onNavigateToDate(date);
+              }
+              setShowDatePicker(false);
+            }}
+            showTimeSelect={false}
+            placeholder={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
+            isClearable={false}
+            allowPastDates={true}
+            yearRange={{ past: 5, future: 5 }}
+          />
+        </div>
+      )}
     </div>
   );
 };

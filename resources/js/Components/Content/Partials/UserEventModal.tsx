@@ -61,10 +61,10 @@ export default function UserEventModal({
     <Modal show={show} onClose={onClose} maxWidth="2xl">
       <div className="flex max-h-[90vh] flex-col">
         <motion.div
-          key={selectedColor}
           initial={{ opacity: 0.8 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, ease: 'easeInOut' }}
+          transition={{ duration: 0.15, ease: 'easeInOut' }}
+          className="transition-colors duration-150"
         >
           <ModalHeader
             t={t}
@@ -79,7 +79,10 @@ export default function UserEventModal({
           />
         </motion.div>
 
-        <div className="custom-scrollbar flex-1 overflow-y-auto bg-gray-50 dark:bg-neutral-800/50">
+        <div 
+          className="custom-scrollbar flex-1 overflow-y-auto transition-colors duration-150"
+          style={{ backgroundColor: `${selectedColor}06` }}
+        >
           <form
             id="user-event-form"
             onSubmit={onSubmit}
@@ -97,7 +100,7 @@ export default function UserEventModal({
               variant="default"
               sizeType="lg"
               autoFocus
-              className="transition-colors duration-500"
+              className="transition-colors duration-150"
               activeColor={selectedColor}
               disabled={isReadOnly}
             />
@@ -112,7 +115,7 @@ export default function UserEventModal({
               register={register}
               rows={3}
               variant="default"
-              className="transition-colors duration-500"
+              className="transition-colors duration-150"
               activeColor={selectedColor}
               disabled={isReadOnly}
             />
@@ -198,7 +201,7 @@ export default function UserEventModal({
                   <button
                     type="button"
                     onClick={() => field.onChange(true)}
-                    className={`flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border-2 px-4 py-4 text-xs font-bold transition-all duration-300 ${
+                    className={`flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border-2 px-4 py-4 text-xs font-bold transition-all duration-150 ${
                       field.value
                         ? 'translate-y-[-2px] shadow-sm'
                         : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-100 dark:border-neutral-800 dark:bg-gray-800/30 dark:text-gray-500 dark:hover:bg-gray-700'
@@ -220,7 +223,7 @@ export default function UserEventModal({
                   <button
                     type="button"
                     onClick={() => field.onChange(false)}
-                    className={`flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border-2 px-4 py-4 text-xs font-bold transition-all duration-300 ${
+                    className={`flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border-2 px-4 py-4 text-xs font-bold transition-all duration-150 ${
                       !field.value
                         ? 'translate-y-[-2px] shadow-sm'
                         : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-100 dark:border-neutral-800 dark:bg-gray-800/30 dark:text-gray-500 dark:hover:bg-gray-700'
@@ -243,7 +246,7 @@ export default function UserEventModal({
               )}
             />
             <p
-              className="text-xs font-medium transition-colors duration-300"
+              className="text-xs font-medium transition-colors duration-150"
               style={{ color: `${selectedColor}` }}
             >
               {watch('is_public')
@@ -253,11 +256,10 @@ export default function UserEventModal({
           </div>
 
           <motion.div
-            key={`color-section-${selectedColor}`}
             initial={{ opacity: 0.8, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="rounded-lg border p-5 backdrop-blur-sm transition-all duration-500"
+            transition={{ duration: 0.15, ease: 'easeInOut' }}
+            className="rounded-lg border p-5 backdrop-blur-sm transition-all duration-150"
             style={getGradientStyle(selectedColor)}
           >
             <div className="mb-4 flex items-center justify-between">
@@ -265,11 +267,10 @@ export default function UserEventModal({
                 {t('calendar.userEvents.modal.fields.color')}
               </label>
               <motion.span
-                key={`color-badge-${selectedColor}`}
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className="rounded-full px-3 py-1.5 text-xs font-medium"
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-150"
                 style={{
                   backgroundColor: `${selectedColor}20`,
                   color: selectedColor,
@@ -299,7 +300,7 @@ export default function UserEventModal({
                     setValue('color', color.value);
                     setSelectedColor(color.value);
                   }}
-                  className={`h-9 w-9 rounded-full shadow-md transition-all duration-200 ${
+                  className={`h-9 w-9 rounded-full shadow-md transition-all duration-150 ${
                     selectedColor === color.value
                       ? 'ring-3 scale-110 border-2 border-white ring-white ring-offset-2 dark:border-neutral-800 dark:ring-neutral-800'
                       : 'border-2 border-transparent'
@@ -314,22 +315,20 @@ export default function UserEventModal({
           </motion.div>
           
           <motion.div
-            key={`info-section-${selectedColor}`}
             initial={{ opacity: 0.8, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className={`rounded-lg border border-dashed px-6 pb-2 pt-2 text-center transition-all duration-500 ${isReadOnly ? 'opacity-70' : ''}`}
+            transition={{ duration: 0.15, ease: 'easeInOut' }}
+            className={`rounded-lg border border-dashed px-6 pb-2 pt-2 text-center transition-all duration-150 ${isReadOnly ? 'opacity-70' : ''}`}
             style={{
               borderColor: `${selectedColor}40`,
               backgroundColor: `${selectedColor}08`,
             }}
           >
             <motion.p
-              key={`info-text-${selectedColor}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="text-xs font-bold"
+              transition={{ duration: 0.15, delay: 0.1 }}
+              className="text-xs font-bold transition-colors duration-150"
               style={{ color: selectedColor }}
             >
               {watch('is_public')

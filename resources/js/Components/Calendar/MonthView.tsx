@@ -20,6 +20,7 @@ import {
     startOfMonth,
 } from 'date-fns';
 import type { TFunction } from 'i18next';
+import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 import { EventCard } from './EventCard';
 
@@ -31,6 +32,7 @@ interface MonthViewProps {
   onEventDelete?: (event: CalendarEvent) => void;
   onEventClick?: (event: CalendarEvent) => void;
   onDaySelect?: (day: Date) => void;
+  onAddEvent?: (date: Date) => void;
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
   onSelectAll?: () => void;
@@ -95,6 +97,7 @@ interface DroppableDayProps {
   onEventClick?: ((event: CalendarEvent) => void) | undefined;
   onEventDelete?: ((event: CalendarEvent) => void) | undefined;
   onDaySelect?: ((day: Date) => void) | undefined;
+  onAddEvent?: ((date: Date) => void) | undefined;
   PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
   currentUser?: { name: string } | undefined;
   t?: TFunction | undefined;
@@ -111,6 +114,7 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
   onEventClick,
   onEventDelete,
   onDaySelect,
+  onAddEvent,
   PlatformIcon,
   currentUser,
   t,
@@ -123,7 +127,15 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
   return (
     <div
       ref={setNodeRef}
+      role="button"
+      tabIndex={0}
       onClick={() => onDaySelect?.(day)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onDaySelect?.(day);
+        }
+      }}
       className={`group relative min-h-[140px] cursor-pointer border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900' : 'border-gray-100 bg-gray-50 dark:border-gray-800/50 dark:bg-gray-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isSelected ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-300 dark:bg-primary-900/10' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-gray-800/50`}
     >
       {/* Date Header */}
@@ -148,11 +160,29 @@ const DroppableDay: React.FC<DroppableDayProps> = ({
           </span>
         </div>
 
-        {isTodayDay && (
-          <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
-            HOY
-          </span>
-        )}
+        <div className="flex items-center gap-1">
+          {isTodayDay && (
+            <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+              HOY
+            </span>
+          )}
+          {/* Add event button */}
+          {onAddEvent && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const dateWithTime = new Date(day);
+                dateWithTime.setHours(9, 0, 0, 0);
+                onAddEvent(dateWithTime);
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded-md bg-primary-50 text-primary-600 transition-all hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 shadow-sm"
+              title="Agregar evento"
+              aria-label="Agregar evento"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Events Stack with Scroll */}
@@ -192,6 +222,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onEventDelete,
   onEventClick,
   onDaySelect,
+  onAddEvent,
   selectedEvents,
   onToggleSelection,
   onSelectAll,
@@ -292,6 +323,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 onEventClick={onEventClick}
                 onEventDelete={onEventDelete}
                 onDaySelect={onDaySelect}
+                onAddEvent={onAddEvent}
                 PlatformIcon={PlatformIcon}
                 currentUser={currentUser}
                 t={t}

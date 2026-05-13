@@ -183,6 +183,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               void handleDrop(event, newDate);
             }}
             onEventClick={onViewEventClick}
+            onAddEvent={(date) => {
+              setSelectedDate(date);
+              setSelectedEventForModal(undefined);
+              setShowEventModal(true);
+            }}
           />
         );
 
@@ -197,6 +202,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             }}
             onEventClick={onViewEventClick}
             onDeleteEvent={requestDeleteEvent}
+            onAddEvent={(date) => {
+              setSelectedDate(date);
+              setSelectedEventForModal(undefined);
+              setShowEventModal(true);
+            }}
           />
         );
 
@@ -215,6 +225,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             onEventClick={onViewEventClick}
             onEventDelete={requestDeleteEvent}
             onDaySelect={handleDaySelect}
+            onAddEvent={(date) => {
+              setSelectedDate(date);
+              setSelectedEventForModal(undefined);
+              setShowEventModal(true);
+            }}
             t={t as any}
           />
         );

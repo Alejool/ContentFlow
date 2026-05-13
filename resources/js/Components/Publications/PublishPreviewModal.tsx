@@ -205,6 +205,15 @@ export default function PublishPreviewModal({
         scheduled_at: isScheduled ? scheduledAt : null,
       });
 
+      // Notify the calendar to refresh if this was a scheduled publication
+      if (isScheduled && scheduledAt) {
+        window.dispatchEvent(
+          new CustomEvent('publication:scheduled', {
+            detail: { scheduledAt, publicationId: publication.id },
+          }),
+        );
+      }
+
       onPublished(response.data);
       handleClose();
     } catch (error: any) {

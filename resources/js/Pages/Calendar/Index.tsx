@@ -42,6 +42,7 @@ const PlatformIcon = ({ platform, className }: { platform?: string; className?: 
 };
 
 import { BulkActionsBar } from '@/Components/Calendar/BulkActionsBar';
+import UserEventModal from '@/Components/Content/Partials/UserEventModal';
 import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -119,6 +120,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [showEventDetailsModal, setShowEventDetailsModal] = useState(false);
+  const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [addEventDate, setAddEventDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     fetchEvents();
@@ -134,6 +137,18 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       clearSelection(); // Clear any selected events from previous workspace
     }
   }, [auth?.user?.current_workspace_id]);
+
+  // Refresh calendar when a publication is scheduled from anywhere in the app
+  useEffect(() => {
+    const handlePublicationScheduled = () => {
+      fetchEvents();
+    };
+
+    window.addEventListener('publication:scheduled', handlePublicationScheduled);
+    return () => {
+      window.removeEventListener('publication:scheduled', handlePublicationScheduled);
+    };
+  }, [fetchEvents]);
 
   // Grid Generation
   const days = eachDayOfInterval({
@@ -244,6 +259,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                   {/* View Selector */}
                   <CalendarViewSelector currentView={view} onViewChange={setView} />
 
+                  {/* Platform filters */}
                   <div className="mr-2 flex flex-wrap items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
                     {platforms.map((p) => (
                       <button
@@ -274,56 +290,51 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               </div>
 
               {/* Calendar Grid */}
-              {!loading && filteredEvents.length === 0 ? (
-                <EmptyState config={getEmptyStateByKey('calendarView', t)!} />
-              ) : (
-                <>
-                  {/* Filter Panel */}
-                  <div className="mb-6">
-                    <FilterPanel
-                      filters={filters}
-                      onFiltersChange={setFilters}
-                      campaigns={campaigns}
-                      totalEvents={events.length}
-                      filteredCount={filteredEvents.length}
-                    />
-                  </div>
+              <>
+                {/* Filter Panel — always visible */}
+                <div className="mb-6">
+                  <FilterPanel
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    campaigns={campaigns}
+                    totalEvents={events.length}
+                    filteredCount={filteredEvents.length}
+                  />
+                </div>
 
+                {/* Empty state — shown inside the view area, not replacing it */}
+                {!loading && filteredEvents.length === 0 && (
+                  <EmptyState config={getEmptyStateByKey('calendarView', t)!} />
+                )}
+
+                {/* Views — always rendered so add-event buttons are always accessible */}
+                <div className={!loading && filteredEvents.length === 0 ? 'hidden' : ''}>
                   {view === 'month' && (
                     <MonthView
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (eventId, newDate) => {
-                        // Check if dropping to a past date
                         const now = new Date();
                         now.setHours(0, 0, 0, 0);
                         const targetDate = new Date(newDate);
                         targetDate.setHours(0, 0, 0, 0);
-
                         if (targetDate < now) {
-                          // Show warning for past date
                           const confirmed = window.confirm(
                             t('calendar.warnings.pastDate') ||
                               '¿Estás seguro de que quieres mover este evento a una fecha pasada?',
                           );
-                          if (!confirmed) {
-                            return; // Cancel the drop
-                          }
+                          if (!confirmed) return;
                         }
-
                         const success = await updateEvent(eventId, newDate.toISOString(), '');
                         if (success) {
-                          toast.success(
-                            t('calendar.messages.eventUpdated') || 'Evento actualizado',
-                          );
+                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
                         } else {
-                          toast.error(
-                            t('calendar.messages.updateFailed') || 'Error al actualizar evento',
-                          );
+                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
                         }
                       }}
                       onEventDelete={handleDeleteEvent}
                       onEventClick={handleEventClick}
+                      onAddEvent={(date) => { setAddEventDate(date); setShowAddEventModal(true); }}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
@@ -337,35 +348,23 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (event, newDate) => {
-                        // Check if dropping to a past date/time
                         const now = new Date();
-
                         if (newDate < now) {
                           const confirmed = window.confirm(
                             t('calendar.warnings.pastDate') ||
                               '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?',
                           );
-                          if (!confirmed) {
-                            return;
-                          }
+                          if (!confirmed) return;
                         }
-
-                        const success = await updateEvent(
-                          event.id,
-                          newDate.toISOString(),
-                          event.type,
-                        );
+                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
                         if (success) {
-                          toast.success(
-                            t('calendar.messages.eventUpdated') || 'Evento actualizado',
-                          );
+                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
                         } else {
-                          toast.error(
-                            t('calendar.messages.updateFailed') || 'Error al actualizar evento',
-                          );
+                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
                         }
                       }}
                       onEventClick={handleEventClick}
+                      onAddEvent={(date) => { setAddEventDate(date); setShowAddEventModal(true); }}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
@@ -377,43 +376,31 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (event, newDate) => {
-                        // Check if dropping to a past date/time
                         const now = new Date();
-
                         if (newDate < now) {
                           const confirmed = window.confirm(
                             t('calendar.warnings.pastDate') ||
                               '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?',
                           );
-                          if (!confirmed) {
-                            return;
-                          }
+                          if (!confirmed) return;
                         }
-
-                        const success = await updateEvent(
-                          event.id,
-                          newDate.toISOString(),
-                          event.type,
-                        );
+                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
                         if (success) {
-                          toast.success(
-                            t('calendar.messages.eventUpdated') || 'Evento actualizado',
-                          );
+                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
                         } else {
-                          toast.error(
-                            t('calendar.messages.updateFailed') || 'Error al actualizar evento',
-                          );
+                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
                         }
                       }}
                       onEventClick={handleEventClick}
                       onDeleteEvent={handleDeleteEvent}
+                      onAddEvent={(date) => { setAddEventDate(date); setShowAddEventModal(true); }}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
                     />
                   )}
-                </>
-              )}
+                </div>
+              </>
             </div>
           </div>
         </div>
@@ -509,6 +496,21 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         }}
         canUndo={canUndo && isUndoAvailable()}
       />
+      {/* Add Event Modal (Day View) */}
+      <UserEventModal
+        show={showAddEventModal}
+        onClose={() => {
+          setShowAddEventModal(false);
+          setAddEventDate(undefined);
+        }}
+        selectedDate={addEventDate}
+        onSuccess={() => {
+          setShowAddEventModal(false);
+          setAddEventDate(undefined);
+          fetchEvents();
+        }}
+      />
+
     </AuthenticatedLayout>
   );
 }

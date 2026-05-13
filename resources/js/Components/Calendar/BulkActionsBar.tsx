@@ -77,14 +77,23 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
             style={{ overflow: 'visible' }}
           >
             {/* Top accent gradient */}
-            <div className="from-primary-400 via-primary-700 to-primary-900 absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r" />
+            <div className="from-primary-400 via-primary-700 to-primary-900 absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-linear-to-r" />
 
-            <div className="px-6 py-4">
-              <div className="flex items-center gap-6">
+            <div className="flex flex-col items-center gap-4 px-6 py-5 min-w-[320px]">
+              {/* Top: Selection Info & Clear Button */}
+              <div className="flex w-full items-center justify-between">
                 <SelectionInfo selectedCount={selectedCount} />
+                <button 
+                  onClick={onClearSelection} 
+                  className="rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                  title="Cerrar"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+              </div>
 
-                <div className="h-12 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600" />
-
+              {/* Bottom: Action Buttons */}
+              <div className="w-full">
                 <ActionButtons
                   selectedCount={selectedCount}
                   totalEvents={totalEvents}
@@ -94,13 +103,13 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                   onSelectDay={onSelectDay}
                   onUndo={onUndo ?? (() => {})}
                   onMove={() => setShowMoveModal(true)}
-                  onClearSelection={onClearSelection}
+                  onDelete={onBulkDelete ? () => setShowDeleteModal(true) : undefined}
                 />
               </div>
             </div>
 
             {/* Bottom accent */}
-            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700" />
+            <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700" />
           </motion.div>
         </motion.div>
       </AnimatePresence>

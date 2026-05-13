@@ -3,13 +3,13 @@ import { CalendarDate } from '@internationalized/date';
 import { AlertTriangle } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import {
-  Calendar as AriaCalendar,
-  CalendarCell,
-  CalendarGrid,
-  CalendarGridBody,
-  CalendarGridHeader,
-  CalendarHeaderCell,
-  I18nProvider,
+    Calendar as AriaCalendar,
+    CalendarCell,
+    CalendarGrid,
+    CalendarGridBody,
+    CalendarGridHeader,
+    CalendarHeaderCell,
+    I18nProvider,
 } from 'react-aria-components';
 import { useTranslation } from 'react-i18next';
 

@@ -1,18 +1,33 @@
+import Switch from '@/Components/common/Modern/Switch';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { formatTimeString } from '@/Utils/formatters';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
+    DndContext,
+    DragOverlay,
+    PointerSensor,
+    useDraggable,
+    useDroppable,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
 import { format, parseISO } from 'date-fns';
-import { Clock } from 'lucide-react';
+import { es } from 'date-fns/locale';
+import { Clock, Plus } from 'lucide-react';
 import React, { useState } from 'react';
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+function isDarkColor(color: string): boolean {
+  const hex = color.replace('#', '');
+  if (hex.length < 6) return false;
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
+}
+
+// ─── interfaces ──────────────────────────────────────────────────────────────
 
 interface DayViewProps {
   currentDate: Date;
@@ -20,17 +35,19 @@ interface DayViewProps {
   onEventDrop: (event: CalendarEvent, newDate: Date) => void;
   onEventClick?: (event: CalendarEvent) => void;
   onDeleteEvent?: (event: CalendarEvent) => void;
+  onAddEvent?: (date: Date) => void;
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
   PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
 }
+
+// ─── DraggableDayEvent ────────────────────────────────────────────────────────
 
 interface DraggableDayEventProps {
   event: CalendarEvent;
   isSelected: boolean;
   onToggleSelection: (eventId: string) => void;
   onEventClick?: (event: CalendarEvent) => void;
-  onDeleteEvent?: (event: CalendarEvent) => void;
   PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
 }
 
@@ -39,13 +56,15 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
   isSelected,
   onToggleSelection,
   onEventClick,
-  onDeleteEvent: _onDeleteEvent,
   PlatformIcon,
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: event.id,
     data: { event },
   });
+
+  const eventColor = event.color;
+  const dark = eventColor ? isDarkColor(eventColor) : false;
 
   return (
     <div
@@ -55,47 +74,69 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
       role="button"
       tabIndex={0}
       onClick={() => onEventClick?.(event)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event);
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event); }}
+      className={`relative cursor-grab rounded-xl p-3 active:cursor-grabbing transition-all hover:shadow-lg ${
+        isSelected ? 'ring-2 ring-primary-500 ring-offset-1' : ''
+      } ${isDragging ? 'opacity-50 scale-95' : ''}`}
+      style={{
+        backgroundColor: eventColor || '#f9fafb',
+        borderLeft: `4px solid ${eventColor || '#9ca3af'}`,
       }}
-      className={`relative cursor-grab rounded-lg p-4 active:cursor-grabbing ${isSelected ? 'ring-2 ring-primary-500' : ''} ${isDragging ? 'opacity-50' : ''} border-l-4 bg-white transition-all hover:shadow-lg dark:bg-gray-800`}
-      style={{ borderLeftColor: event.color }}
     >
       <div className="flex items-start gap-3">
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={(e) => {
-            e.stopPropagation();
-            onToggleSelection(event.id);
-          }}
+        {/* System Checkbox — stop propagation so click doesn't open modal */}
+        <div
+          className="mt-0.5 flex-shrink-0"
           onClick={(e) => e.stopPropagation()}
-          className="mt-1"
-        />
+        >
+          <Switch
+            isSelected={isSelected}
+            onChange={() => onToggleSelection(event.id)}
+            size="sm"
+            variant="animated"
+          />
+        </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <PlatformIcon platform={event.extendedProps.platform} className="h-5 w-5" />
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                {event.title}
-              </h3>
-            </div>
+          {/* Platform icon + title */}
+          <div className="flex items-center gap-2">
+            <PlatformIcon platform={event.extendedProps?.platform} className="h-4 w-4 flex-shrink-0" />
+            <h3
+              className="truncate text-sm font-semibold"
+              style={{ color: dark ? '#ffffff' : '#111827' }}
+              title={event.title}
+            >
+              {event.title}
+            </h3>
           </div>
 
-          <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span>{formatTimeString(event.start)}</span>
-            </div>
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-gray-700">
+          {/* Time + status */}
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <span
+              className="flex items-center gap-1 text-xs"
+              style={{ color: dark ? 'rgba(255,255,255,0.75)' : '#6b7280' }}
+            >
+              <Clock className="h-3 w-3" />
+              {formatTimeString(event.start)}
+            </span>
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize"
+              style={{
+                backgroundColor: dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
+                color: dark ? '#ffffff' : '#374151',
+              }}
+            >
               {event.status}
             </span>
           </div>
 
-          {event.extendedProps.description && (
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              {event.extendedProps.description}
+          {/* Description */}
+          {event.extendedProps?.description && (
+            <p
+              className="mt-1.5 line-clamp-2 text-xs"
+              style={{ color: dark ? 'rgba(255,255,255,0.7)' : '#4b5563' }}
+            >
+              {event.extendedProps.description as string}
             </p>
           )}
         </div>
@@ -104,13 +145,16 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
   );
 };
 
+// ─── DroppableHourSlot ────────────────────────────────────────────────────────
+
 interface DroppableHourSlotProps {
   hour: number;
   events: CalendarEvent[];
   selectedEvents: Set<string>;
   onToggleSelection: (eventId: string) => void;
   onEventClick?: (event: CalendarEvent) => void;
-  onDeleteEvent?: (event: CalendarEvent) => void;
+  onAddEvent?: (date: Date) => void;
+  currentDate: Date;
   PlatformIcon: React.ComponentType<{ platform?: string; className?: string }>;
 }
 
@@ -120,49 +164,80 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
   selectedEvents,
   onToggleSelection,
   onEventClick,
-  onDeleteEvent,
+  onAddEvent,
+  currentDate,
   PlatformIcon,
 }) => {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `hour-${hour}`,
-    data: { hour },
-  });
+  const { setNodeRef, isOver } = useDroppable({ id: `hour-${hour}`, data: { hour } });
+
+  const handleSlotClick = () => {
+    if (!onAddEvent) return;
+    const date = new Date(currentDate);
+    date.setHours(hour, 0, 0, 0);
+    onAddEvent(date);
+  };
 
   return (
     <div
       ref={setNodeRef}
-      className={`flex min-h-[100px] border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${isOver ? 'bg-primary-100/50 dark:bg-primary-900/20' : ''} `}
+      className={`group flex min-h-[90px] border-b border-gray-100 transition-colors dark:border-gray-800 ${
+        isOver ? 'bg-primary-50 dark:bg-primary-900/20' : ''
+      }`}
     >
-      {/* Time label */}
-      <div className="w-24 border-r border-gray-100 bg-gray-50 p-4 text-right dark:border-gray-800 dark:bg-gray-900/50">
-        <div className="text-sm font-semibold text-gray-900 dark:text-white">
+      {/* Time label — clicking it also opens the add modal */}
+      <div className="relative w-20 flex-shrink-0 border-r border-gray-100 bg-gray-50 px-3 py-3 text-right transition-colors hover:bg-primary-50 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:bg-primary-900/20">
+        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
           {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
-        </div>
+        </span>
+        {onAddEvent && (
+          <button
+            type="button"
+            onClick={handleSlotClick}
+            className="absolute left-1 top-2.5 flex h-5 w-5 items-center justify-center rounded bg-primary-50 text-primary-600 transition-all hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 shadow-sm"
+            title={`Agregar evento a las ${hour.toString().padStart(2, '0')}:00`}
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
-      {/* Events */}
-      <div className="flex-1 space-y-2 p-3">
-        {events.map((event) => (
-          <DraggableDayEvent
-            key={event.id}
-            event={event}
-            isSelected={selectedEvents.has(event.id)}
-            onToggleSelection={onToggleSelection}
-            onEventClick={onEventClick}
-            onDeleteEvent={onDeleteEvent}
-            PlatformIcon={PlatformIcon}
-          />
-        ))}
+      {/* Events area */}
+      <div className="relative flex-1 p-2">
+        {/* Botón + grande removido */}
 
-        {events.length === 0 && !isOver && (
-          <div className="py-4 text-center text-sm text-gray-400 dark:text-gray-600">
-            Sin eventos programados
+        {events.length > 0 ? (
+          <div className="space-y-2">
+            {events.map((event) => (
+              <DraggableDayEvent
+                key={event.id}
+                event={event}
+                isSelected={selectedEvents.has(event.id)}
+                onToggleSelection={onToggleSelection}
+                onEventClick={onEventClick}
+                PlatformIcon={PlatformIcon}
+              />
+            ))}
           </div>
+        ) : (
+          /* Empty slot — click anywhere to add */
+          <button
+            type="button"
+            onClick={handleSlotClick}
+            className="flex h-full min-h-[66px] w-full items-center justify-center rounded-lg border-2 border-dashed border-transparent text-xs text-gray-400 transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-500 dark:text-gray-600 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
+          >
+            <span className="flex items-center gap-1">
+              <Plus className="h-4 w-4" />
+              Agregar evento
+            </span>
+          </button>
         )}
 
-        {isOver && events.length === 0 && (
-          <div className="py-4 text-center text-sm font-medium text-primary-600 dark:text-primary-400">
-            Soltar aquí
+        {/* Drop indicator */}
+        {isOver && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg border-2 border-dashed border-primary-400 bg-primary-50/30 dark:bg-primary-900/20">
+            <span className="rounded-lg bg-white/90 px-3 py-1 text-xs font-semibold text-primary-600 shadow dark:bg-black/90 dark:text-primary-400">
+              Soltar aquí
+            </span>
           </div>
         )}
       </div>
@@ -170,103 +245,99 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
   );
 };
 
+// ─── DayView ──────────────────────────────────────────────────────────────────
+
 export const DayView: React.FC<DayViewProps> = ({
   currentDate,
   events,
   onEventDrop,
   onEventClick,
   onDeleteEvent: _onDeleteEvent,
+  onAddEvent,
   selectedEvents,
   onToggleSelection,
   PlatformIcon,
 }) => {
   const [activeEvent, setActiveEvent] = useState<CalendarEvent | null>(null);
 
-  // Configure sensors for drag detection
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
-  const getEventsForHour = (hour: number) => {
-    return events.filter((event) => {
-      const eventDate = parseISO(event.start);
+  const getEventsForHour = (hour: number) =>
+    events.filter((event) => {
+      const d = parseISO(event.start);
       return (
-        format(eventDate, 'yyyy-MM-dd') === format(currentDate, 'yyyy-MM-dd') &&
-        eventDate.getHours() === hour
+        format(d, 'yyyy-MM-dd') === format(currentDate, 'yyyy-MM-dd') &&
+        d.getHours() === hour
       );
     });
+
+  const handleDragStart = (e: DragStartEvent) => {
+    setActiveEvent(e.active.data.current?.event as CalendarEvent);
   };
 
-  const handleDragStart = (event: DragStartEvent) => {
-    const draggedEvent = event.active.data.current?.event as CalendarEvent;
-    setActiveEvent(draggedEvent);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
     if (over && active.id !== over.id) {
       const draggedEvent = active.data.current?.event as CalendarEvent;
       const { hour } = over.data.current as { hour: number };
-
       if (draggedEvent && hour !== undefined) {
         const newDate = new Date(currentDate);
         newDate.setHours(hour, 0, 0, 0);
         onEventDrop(draggedEvent, newDate);
       }
     }
-
     setActiveEvent(null);
   };
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex h-full flex-col overflow-hidden bg-white dark:bg-black">
-        {/* Header */}
-        <div className="border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100 p-6 dark:border-gray-700 dark:from-primary-900/20 dark:to-primary-800/20">
-          <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {format(currentDate, 'EEEE')}
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
+
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100 px-6 py-4 dark:border-gray-700 dark:from-primary-900/20 dark:to-primary-800/20">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-primary-400">
+              {format(currentDate, 'EEEE', { locale: es })}
+            </p>
+            <h2 className="mt-0.5 text-2xl font-bold text-gray-900 dark:text-white">
+              {format(currentDate, "d 'de' MMMM, yyyy", { locale: es })}
+            </h2>
           </div>
-          <div className="mt-1 text-4xl font-bold text-gray-900 dark:text-white">
-            {format(currentDate, "d 'de' MMMM, yyyy")}
-          </div>
+
+
         </div>
 
-        {/* Time slots */}
-        <div className="flex-1 overflow-y-auto">
-          {hours.map((hour) => {
-            const hourEvents = getEventsForHour(hour);
-            return (
-              <DroppableHourSlot
-                key={hour}
-                hour={hour}
-                events={hourEvents}
-                selectedEvents={selectedEvents}
-                onToggleSelection={onToggleSelection}
-                onEventClick={onEventClick}
-                onDeleteEvent={_onDeleteEvent}
-                PlatformIcon={PlatformIcon}
-              />
-            );
-          })}
+        {/* ── Time slots ── */}
+        <div className="max-h-[70vh] overflow-y-auto">
+          {hours.map((hour) => (
+            <DroppableHourSlot
+              key={hour}
+              hour={hour}
+              events={getEventsForHour(hour)}
+              selectedEvents={selectedEvents}
+              onToggleSelection={onToggleSelection}
+              onEventClick={onEventClick}
+              onAddEvent={onAddEvent}
+              currentDate={currentDate}
+              PlatformIcon={PlatformIcon}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Drag Overlay */}
+      {/* Drag overlay */}
       <DragOverlay>
         {activeEvent ? (
-          <div className="cursor-grabbing rounded-lg border border-primary-500 bg-white p-3 opacity-90 shadow-2xl dark:bg-gray-800">
+          <div className="w-64 cursor-grabbing rounded-xl border border-primary-400 bg-white p-3 opacity-90 shadow-2xl dark:bg-gray-800">
             <div className="flex items-center gap-2">
-              <PlatformIcon platform={activeEvent.extendedProps.platform} className="h-5 w-5" />
-              <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              <PlatformIcon platform={activeEvent.extendedProps?.platform} className="h-4 w-4" />
+              <span className="truncate text-sm font-semibold text-gray-800 dark:text-gray-200">
                 {activeEvent.title}
-              </div>
+              </span>
             </div>
           </div>
         ) : null}
