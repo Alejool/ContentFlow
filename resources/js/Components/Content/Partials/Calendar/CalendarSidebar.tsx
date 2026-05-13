@@ -1,3 +1,3 @@
 // Re-export from the canonical Calendar component location.
 // This file is kept for backwards compatibility only.
-export { WeekView as default } from '@/Components/Calendar/WeekView';
+export { CalendarSidebar as default } from '@/Components/Calendar/CalendarSidebar';

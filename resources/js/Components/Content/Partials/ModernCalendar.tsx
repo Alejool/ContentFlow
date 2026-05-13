@@ -45,6 +45,7 @@ interface ModernCalendarProps {
     type: 'publication' | 'post' | 'user_event',
     event?: CalendarEvent,
   ) => void;
+  onEventDrop?: (event: CalendarEvent, newDate: Date) => void | Promise<void>;
 }
 
 export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
@@ -103,13 +104,13 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   /** Selecciona solo los eventos del día activo en el sidebar */
   const selectDay = useCallback(() => {
     clearSelection();
-    dayEvents.forEach((e) => toggleEventSelection(e.id));
+    dayEvents.forEach((e: CalendarEvent) => toggleEventSelection(e.id));
   }, [dayEvents, clearSelection, toggleEventSelection]);
 
   /** Selecciona todos los eventos visibles (usa filteredEvents, no el store) */
   const selectAllVisible = useCallback(() => {
     clearSelection();
-    filteredEvents.forEach((e) => toggleEventSelection(e.id));
+    filteredEvents.forEach((e: CalendarEvent) => toggleEventSelection(e.id));
   }, [filteredEvents, clearSelection, toggleEventSelection]);
 
   // ── Click en evento (vistas) ──────────────────────────────────────────────
@@ -152,12 +153,13 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const handleDaySelect = useCallback(
     (day: Date) => {
       setSelectedDate(day);
+      setView('day');
       // En vista mes sincronizamos el mes visible solo si cambia
       if (view === 'month') {
         navigateToDate(day);
       }
     },
-    [setSelectedDate, navigateToDate, view],
+    [setSelectedDate, setView, navigateToDate, view],
   );
 
   // ── Plataformas ───────────────────────────────────────────────────────────
@@ -168,7 +170,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     const commonProps = {
       selectedEvents: selectedEvents as Set<string>,
       onToggleSelection: (id: string) => toggleEventSelection(id),
-      PlatformIcon,
+      onDaySelect: handleDaySelect,
       currentUser: currentUser ? { name: currentUser.name as string } : undefined,
     };
 
@@ -179,8 +181,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             {...commonProps}
             currentDate={selectedDate}
             events={filteredEvents}
-            onEventDrop={(event, newDate) => {
-              void handleDrop(event, newDate);
+            onEventDrop={async (event, newDate) => {
+              await handleDrop(event, newDate);
             }}
             onEventClick={onViewEventClick}
             onAddEvent={(date) => {
@@ -197,8 +199,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             {...commonProps}
             currentDate={selectedDate}
             events={filteredEvents}
-            onEventDrop={(event, newDate) => {
-              void handleDrop(event, newDate);
+            onEventDrop={async (event, newDate) => {
+              await handleDrop(event, newDate);
             }}
             onEventClick={onViewEventClick}
             onDeleteEvent={requestDeleteEvent}
@@ -218,9 +220,9 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             currentDate={currentMonth}
             selectedDate={selectedDate}
             events={filteredEvents}
-            onEventDrop={(eventId, newDate) => {
-              const ev = filteredEvents.find((e) => e.id === eventId);
-              if (ev) void handleDrop(ev, newDate);
+            onEventDrop={async (eventId: string, newDate: Date) => {
+              const ev = filteredEvents.find((e: CalendarEvent) => e.id === eventId);
+              if (ev) await handleDrop(ev, newDate);
             }}
             onEventClick={onViewEventClick}
             onEventDelete={requestDeleteEvent}

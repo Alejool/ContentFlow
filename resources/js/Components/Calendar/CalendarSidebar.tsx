@@ -1,7 +1,9 @@
+import Button from '@/Components/common/Modern/Button';
 import Checkbox from '@/Components/common/Modern/Checkbox';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
-import type { CalendarEvent } from '@/types/Calendar/calendar';
+import { isDarkColor } from '@/Utils/Calendar/colorHelpers';
 import { formatTimeString } from '@/Utils/formatters';
+import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { isSameDay, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { AlertCircle, Calendar as CalendarIcon, Lock, Trash2 } from 'lucide-react';
@@ -20,21 +22,6 @@ interface CalendarSidebarProps {
   actionSlot?: React.ReactNode;
 }
 
-/**
- * Determina si un color es oscuro
- */
-function isDarkColor(color: string): boolean {
-  const hex = color.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance < 0.5;
-}
-
-/**
- * Sidebar con diseño consistente con EventCard
- */
 export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
   selectedDate,
   events,
@@ -104,32 +91,27 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => onEventClick(event)}
-                className={`
-                  group relative cursor-pointer overflow-hidden rounded-lg border
-                  transition-all duration-150 hover:shadow-md
-                  ${isSelected ? 'ring-2 ring-primary-500 ring-offset-1' : 'border-transparent'}
-                `}
+                className={`group relative cursor-pointer overflow-hidden rounded-lg border-l-4 transition-all duration-150 hover:shadow-md ${isSelected ? 'ring-primary-500 ring-2 ring-offset-1' : 'border-transparent'} `}
                 style={{
                   backgroundColor: eventColor,
-                  borderLeftWidth: '4px',
                   borderLeftColor: eventColor,
                 }}
               >
                 {hasNoPlatforms && (
-                  <div className="absolute right-2 top-2 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500">
+                  <div className="absolute top-2 right-2 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500">
                     <AlertCircle className="h-3 w-3 text-white" />
                   </div>
                 )}
 
                 {isLocked && (
-                  <div className="absolute left-2 top-2 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500">
+                  <div className="absolute top-2 left-2 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500">
                     <Lock className="h-3 w-3 text-white" />
                   </div>
                 )}
 
                 <div className="relative z-10 flex items-center gap-2 p-3">
                   {onToggleSelection && (
-                    <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+                    <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                       <Checkbox
                         checked={isSelected}
                         onChange={() => onToggleSelection(event.id)}
@@ -140,20 +122,14 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                   )}
 
                   <span
-                    className="flex-shrink-0 text-xs font-bold tabular-nums"
-                    style={{
-                      color: isDarkColor(eventColor) ? '#ffffff' : '#374151',
-                    }}
+                    className={`shrink-0 text-xs font-bold tabular-nums ${isDarkColor(eventColor) ? 'text-white' : 'text-gray-700'}`}
                   >
                     {formatTimeString(event.start).split(' ')[0]}
                   </span>
 
                   <div className="min-w-0 flex-1">
                     <h5
-                      className="truncate text-sm font-semibold leading-tight"
-                      style={{
-                        color: isDarkColor(eventColor) ? '#ffffff' : '#111827',
-                      }}
+                      className={`truncate text-sm leading-tight font-semibold ${isDarkColor(eventColor) ? 'text-white' : 'text-gray-900'}`}
                       title={event.title}
                     >
                       {event.title}
@@ -161,12 +137,7 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
 
                     {(event.user?.name || event.extendedProps?.user_name) && (
                       <p
-                        className="text-[10px]"
-                        style={{
-                          color: isDarkColor(eventColor)
-                            ? 'rgba(255,255,255,0.7)'
-                            : 'rgba(0,0,0,0.5)',
-                        }}
+                        className={`text-[10px] ${isDarkColor(eventColor) ? 'text-white/70' : 'text-black/50'}`}
                       >
                         {Number(event.user?.id) === Number(currentUser?.id)
                           ? t('common.me') || 'Yo'
@@ -176,7 +147,7 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                   </div>
 
                   {platforms.length > 0 && (
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       {(() => {
                         const platform = platforms[0];
                         const config = SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
@@ -185,17 +156,14 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
 
                         return (
                           <div
-                            className="flex h-5 w-5 items-center justify-center rounded"
-                            style={{
-                              backgroundColor: 'rgba(0,0,0,0.1)',
-                            }}
-                            title={config.name + (platforms.length > 1 ? ` +${platforms.length - 1}` : '')}
+                            className="flex h-5 w-5 items-center justify-center rounded bg-black/10"
+                            title={
+                              config.name +
+                              (platforms.length > 1 ? ` +${platforms.length - 1}` : '')
+                            }
                           >
                             <IconComponent
-                              className="h-3.5 w-3.5"
-                              style={{
-                                color: isDarkColor(eventColor) ? '#ffffff' : undefined,
-                              }}
+                              className={`h-3.5 w-3.5 ${isDarkColor(eventColor) ? 'text-white' : ''}`}
                             />
                           </div>
                         );
@@ -204,19 +172,21 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                   )}
 
                   {canDelete && (
-                    <button
+                    <Button
+                      type="button"
+                      buttonStyle="icon"
+                      variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDeleteEvent(event);
                       }}
-                      className="flex-shrink-0 rounded p-1 opacity-0 transition-all hover:bg-red-500 hover:text-white group-hover:opacity-100"
-                      style={{
-                        color: isDarkColor(eventColor) ? '#ffffff' : '#ef4444',
-                      }}
-                      title={t('common.delete') || 'Eliminar'}
+                      className="bg-neutral-100/20! hover:bg-neutral-100/40! backdrop-blur-2xl "
+                      title="Agregar evento"
+                      aria-label="Agregar evento"
+                      icon={<Trash2 className="text-primary-500 h-3.5 w-3.5" />}
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                      {''}
+                    </Button>
                   )}
                 </div>
               </motion.div>

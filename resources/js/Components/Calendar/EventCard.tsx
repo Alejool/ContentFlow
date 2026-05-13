@@ -1,5 +1,6 @@
 import Switch from '@/Components/common/Modern/Switch';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
+import { isDarkColor } from '@/Utils/Calendar/colorHelpers';
 import { formatTimeString } from '@/Utils/formatters';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { motion } from 'framer-motion';
@@ -12,15 +13,12 @@ interface EventCardProps {
   isSelected: boolean;
   isDragging?: boolean;
   onToggleSelection: (eventId: string) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  onEventDelete?: (event: CalendarEvent) => void;
-  PlatformIcon: React.ComponentType<{
-    platform?: string | undefined;
-    className?: string | undefined;
-  }>;
+  onEventClick?: ((event: CalendarEvent) => void) | undefined;
+  onEventDelete?: ((event: CalendarEvent) => void) | undefined;
   currentUser?: { name: string } | undefined;
   t?: TFunction | undefined;
   dragHandleProps?: any;
+  showDay?: boolean;
 }
 
 /**
@@ -34,10 +32,10 @@ export const EventCard: React.FC<EventCardProps> = ({
   onToggleSelection,
   onEventClick,
   onEventDelete,
-  PlatformIcon,
   currentUser,
   t = (key: string, fallback?: string) => fallback ?? key,
   dragHandleProps,
+  showDay,
 }) => {
   // Check if publication has no platforms assigned
   const hasNoPlatforms =
@@ -97,11 +95,13 @@ export const EventCard: React.FC<EventCardProps> = ({
       whileHover={{ scale: 1.01 }}
       transition={{ duration: 0.15 }}
       {...dragHandleProps}
-      onClick={() => onEventClick?.(event)}
-      className={`group/card relative cursor-grab overflow-hidden rounded-md border transition-all duration-150 hover:shadow-md active:cursor-grabbing ${isSelected ? 'ring-primary-500 ring-2 ring-offset-1' : 'border-transparent'} ${isDragging ? 'scale-95 opacity-50' : ''} `}
+      onClick={(e) => {
+        e.stopPropagation();
+        onEventClick?.(event);
+      }}
+      className={`group/card relative cursor-grab overflow-hidden rounded-md border-l-[3px] transition-all duration-150 hover:shadow-md active:cursor-grabbing ${isSelected ? 'ring-primary-500 ring-2 ring-offset-1' : 'border-transparent'} ${isDragging ? 'scale-95 opacity-50' : ''} `}
       style={{
         backgroundColor: eventColor || '#ffffff',
-        borderLeftWidth: '3px',
         borderLeftColor:
           eventColor || (platformConfig ? platformConfig.color.replace('bg-', '#') : '#9ca3af'),
       }}
@@ -121,11 +121,11 @@ export const EventCard: React.FC<EventCardProps> = ({
       {/* Contenido principal */}
       <div className="relative z-10 flex items-center gap-1.5 p-1.5">
         {/* Switch */}
-        <div 
-          onClick={(e) => e.stopPropagation()} 
+        <div
+          onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
           role="presentation"
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           <Switch
             isSelected={isSelected}
@@ -135,30 +135,26 @@ export const EventCard: React.FC<EventCardProps> = ({
           />
         </div>
 
-        {/* Hora */}
-        <span
-          className="flex-shrink-0 text-[10px] font-bold tabular-nums"
-          style={{
-            color: eventColor ? (isDarkColor(eventColor) ? '#ffffff' : '#374151') : '#374151',
-          }}
-        >
-          {formatTimeString(event.start).split(' ')[0]}
-        </span>
+        {/* Hora y Día */}
+        <div className="flex shrink-0 flex-col items-start leading-none">
+          {showDay && (
+            <span className={`text-[8px] font-black uppercase tracking-tighter opacity-70 ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : 'text-gray-500') : 'text-gray-500'}`}>
+              {new Intl.DateTimeFormat('es-ES', { weekday: 'short' }).format(new Date(event.start))}
+            </span>
+          )}
+          <span className={`text-[10px] font-bold tabular-nums ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : 'text-gray-700') : 'text-gray-700'}`}>
+            {formatTimeString(event.start).split(' ')[0]}
+          </span>
+        </div>
 
         {/* Título */}
-        <h4
-          className="min-w-0 flex-1 truncate text-xs leading-tight font-semibold"
-          style={{
-            color: eventColor ? (isDarkColor(eventColor) ? '#ffffff' : '#111827') : '#111827',
-          }}
-          title={event.title}
-        >
+        <h4 className={`min-w-0 flex-1 truncate text-xs leading-tight font-semibold ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : 'text-gray-900') : 'text-gray-900'}`} title={event.title}>
           {event.title}
         </h4>
 
         {/* Iconos de plataformas (solo primero) */}
         {platforms.length > 0 && (
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             {(() => {
               const platform = platforms[0];
               const config = SOCIAL_PLATFORMS[platform as keyof typeof SOCIAL_PLATFORMS];
@@ -167,22 +163,10 @@ export const EventCard: React.FC<EventCardProps> = ({
 
               return (
                 <div
-                  className="flex h-4 w-4 items-center justify-center rounded"
-                  style={{
-                    backgroundColor: eventColor ? 'rgba(0,0,0,0.1)' : undefined,
-                  }}
+                  className={`flex h-4 w-4 items-center justify-center rounded ${eventColor ? 'bg-black/10' : ''}`}
                   title={config.name + (platforms.length > 1 ? ` +${platforms.length - 1}` : '')}
                 >
-                  <IconComponent
-                    className="h-3 w-3"
-                    style={{
-                      color: eventColor
-                        ? isDarkColor(eventColor)
-                          ? '#ffffff'
-                          : undefined
-                        : undefined,
-                    }}
-                  />
+                  <IconComponent className={`h-3 w-3 ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : '') : ''}`} />
                 </div>
               );
             })()}
@@ -196,10 +180,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               e.stopPropagation();
               onEventDelete(event);
             }}
-            className="flex-shrink-0 rounded p-0.5 opacity-0 transition-all group-hover/card:opacity-100 hover:bg-red-500 hover:text-white"
-            style={{
-              color: eventColor ? (isDarkColor(eventColor) ? '#ffffff' : '#ef4444') : '#ef4444',
-            }}
+            className={`shrink-0 rounded p-0.5 opacity-0 transition-all group-hover/card:opacity-100 hover:bg-red-500 hover:text-white ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : 'text-red-500') : 'text-red-500'}`}
             title="Eliminar"
           >
             <Trash2 className="h-3 w-3" />
@@ -209,21 +190,5 @@ export const EventCard: React.FC<EventCardProps> = ({
     </motion.div>
   );
 };
-
-/**
- * Determina si un color es oscuro
- */
-function isDarkColor(color: string): boolean {
-  // Convertir hex a RGB
-  const hex = color.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-
-  // Calcular luminosidad
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  return luminance < 0.5;
-}
 
 export default EventCard;

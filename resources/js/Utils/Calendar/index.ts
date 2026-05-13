@@ -4,3 +4,4 @@
  */
 
 export * from './calendarPerformance';
+export * from './dayAddEventDate';

@@ -52,9 +52,19 @@ export function findColorOption(colorValue: string): ColorOption {
  */
 export function getGradientStyle(color: string) {
   return {
-    background: `linear-gradient(135deg, ${color}25, ${color}10)`,
-    borderColor: `${color}50`,
+    background: `linear-gradient(135deg, ${color}34 0%, ${color}16 48%, transparent 100%)`,
+    borderColor: `${color}55`,
   };
+}
+
+/** Sombra exterior viva para la muestra grande del color en modales. */
+export function getColorPreviewGlow(color: string): string {
+  return `0 10px 36px -6px ${getColorWithOpacity(color, 0.45)}, inset 0 1px 0 rgba(255,255,255,0.35)`;
+}
+
+/** Anillo de selección alrededor de un swatch (sin depender de ring dinámico en Tailwind). */
+export function getSwatchSelectionShadow(color: string): string {
+  return `0 0 0 2px #fff, 0 0 0 4px ${color}, 0 6px 20px ${getColorWithOpacity(color, 0.35)}`;
 }
 
 /**
@@ -67,4 +77,17 @@ export function getColorShadow(color: string, opacity: number = 0.2): string {
   return `0 4px 12px ${color}${Math.round(opacity * 255)
     .toString(16)
     .padStart(2, '0')}`;
+}
+/**
+ * Determina si un color es oscuro (calculando luminancia)
+ */
+export function isDarkColor(color: string): boolean {
+  if (!color) return false;
+  const hex = color.replace('#', '');
+  if (hex.length < 6) return false;
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  // Fórmula de luminancia estándar
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
 }

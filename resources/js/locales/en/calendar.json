@@ -64,6 +64,8 @@
     "selected": "selected",
     "of": "of",
     "total": "total",
+    "allSelected": "All selected",
+    "select": "Select",
     "selectAll": "Select all",
     "selectOptions": "Selection options",
     "selectDay": "Select from day",

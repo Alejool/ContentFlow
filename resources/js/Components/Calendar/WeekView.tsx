@@ -10,40 +10,19 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import { eachDayOfInterval, endOfWeek, format, isToday, parseISO, startOfWeek } from 'date-fns';
+import { eachDayOfInterval, endOfWeek, format, isSameDay, isToday, parseISO, startOfWeek } from 'date-fns';
 import { Plus } from 'lucide-react';
+import Button from '@/Components/common/Modern/Button';
+import { toAddEventDateTime } from '@/Utils/Calendar/dayAddEventDate';
 import React, { useState } from 'react';
 
-interface WeekViewProps {
-  currentDate: Date;
-  events: CalendarEvent[];
-  onEventDrop: (event: CalendarEvent, newDate: Date) => void;
-  onEventClick?: ((event: CalendarEvent) => void) | undefined;
-  onDeleteEvent?: ((event: CalendarEvent) => void) | undefined;
-  onAddEvent?: ((date: Date) => void) | undefined;
-  selectedEvents: Set<string>;
-  onToggleSelection: (eventId: string) => void;
-  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
-  currentUser?: { name: string } | undefined;
-}
-
-// ─── Draggable event wrapper using EventCard ────────────────────────────────
-
-interface DraggableWeekEventProps {
-  event: CalendarEvent;
-  isSelected: boolean;
-  onToggleSelection: (eventId: string) => void;
-  onEventClick?: ((event: CalendarEvent) => void) | undefined;
-  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
-  currentUser?: { name: string } | undefined;
-}
+import type { DraggableWeekEventProps, WeekViewProps } from './viewTypes';
 
 const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
   event,
   isSelected,
   onToggleSelection,
   onEventClick,
-  PlatformIcon,
   currentUser,
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -59,9 +38,9 @@ const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
         isDragging={isDragging}
         onToggleSelection={onToggleSelection}
         onEventClick={onEventClick}
-        PlatformIcon={PlatformIcon}
         currentUser={currentUser}
         dragHandleProps={{ ...listeners, ...attributes }}
+        showDay={true}
       />
     </div>
   );
@@ -77,8 +56,8 @@ interface DroppableTimeSlotProps {
   onToggleSelection: (eventId: string) => void;
   onEventClick?: ((event: CalendarEvent) => void) | undefined;
   onAddEvent?: ((date: Date) => void) | undefined;
-  PlatformIcon: React.ComponentType<{ platform?: string | undefined; className?: string | undefined }>;
   currentUser?: { name: string } | undefined;
+  isSelectedDay?: boolean;
 }
 
 const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
@@ -89,17 +68,15 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
   onToggleSelection,
   onEventClick,
   onAddEvent,
-  PlatformIcon,
   currentUser,
+  isSelectedDay,
 }) => {
   const slotId = `${format(day, 'yyyy-MM-dd')}-${hour}`;
   const { setNodeRef, isOver } = useDroppable({ id: slotId, data: { day, hour } });
 
   const handleAddClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const date = new Date(day);
-    date.setHours(hour, 0, 0, 0);
-    onAddEvent?.(date);
+    onAddEvent?.(toAddEventDateTime(day, hour));
   };
 
   return (
@@ -109,23 +86,21 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
       tabIndex={0}
       onClick={() => {
         if (!onAddEvent) return;
-        const date = new Date(day);
-        date.setHours(hour, 0, 0, 0);
-        onAddEvent(date);
+        onAddEvent(toAddEventDateTime(day, hour));
       }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           if (!onAddEvent) return;
-          const date = new Date(day);
-          date.setHours(hour, 0, 0, 0);
-          onAddEvent(date);
+          onAddEvent(toAddEventDateTime(day, hour));
         }
       }}
-      className={`group relative min-h-[60px] cursor-pointer border-r border-gray-100 p-1 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/30 ${
+      className={`group relative min-h-[80px] cursor-pointer border-r border-gray-100 transition-colors hover:bg-primary-50/20 dark:border-gray-800 dark:hover:bg-primary-900/10 ${
         isOver ? 'bg-primary-100/50 ring-1 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''
-      }`}
+      } ${isToday(day) ? 'bg-primary-50/20 dark:bg-primary-900/5' : ''} ${isSelectedDay ? 'bg-gray-50/40 dark:bg-white/5' : ''}`}
     >
+      {/* Línea de media hora decorativa */}
+      <div className="absolute top-1/2 left-0 h-[1px] w-full border-t border-dashed border-gray-100 dark:border-gray-800/50" />
       {events.map((event) => (
         <DraggableWeekEvent
           key={event.id}
@@ -133,7 +108,6 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
           isSelected={selectedEvents.has(event.id)}
           onToggleSelection={onToggleSelection}
           onEventClick={onEventClick}
-          PlatformIcon={PlatformIcon}
           currentUser={currentUser}
         />
       ))}
@@ -158,7 +132,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
   onAddEvent,
   selectedEvents,
   onToggleSelection,
-  PlatformIcon,
+  onDaySelect,
   currentUser,
 }) => {
   const [activeEvent, setActiveEvent] = useState<CalendarEvent | null>(null);
@@ -167,18 +141,15 @@ export const WeekView: React.FC<WeekViewProps> = ({
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
-  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
-  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   const getEventsForDayAndHour = (day: Date, hour: number) =>
     events.filter((event) => {
       const eventDate = parseISO(event.start);
-      return (
-        format(eventDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') &&
-        eventDate.getHours() === hour
-      );
+      return isSameDay(eventDate, day) && eventDate.getHours() === hour;
     });
 
   const handleDragStart = (e: DragStartEvent) => {
@@ -192,9 +163,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
       const day = over.data.current?.['day'] as Date;
       const hour = over.data.current?.['hour'] as number;
       if (draggedEvent && day !== undefined && hour !== undefined) {
-        const newDate = new Date(day);
-        newDate.setHours(hour, 0, 0, 0);
-        onEventDrop(draggedEvent, newDate);
+        onEventDrop(draggedEvent, toAddEventDateTime(day, hour));
       }
     }
     setActiveEvent(null);
@@ -218,12 +187,24 @@ export const WeekView: React.FC<WeekViewProps> = ({
             {days.map((day) => (
               <div
                 key={day.toISOString()}
-                className={`group relative border-r border-gray-200 px-2 py-3 text-center last:border-r-0 dark:border-gray-700 ${
+                role="button"
+                tabIndex={0}
+                onClick={() => onDaySelect?.(day)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onDaySelect?.(day);
+                  }
+                }}
+                className={`group relative flex flex-col items-center justify-center border-r border-gray-200 px-2 py-4 last:border-r-0 transition-all hover:bg-gray-50/80 dark:border-gray-700 dark:hover:bg-gray-900/30 ${
                   isToday(day)
-                    ? 'bg-primary-50 dark:bg-primary-900/20'
+                    ? 'bg-primary-50/50 dark:bg-primary-900/10'
                     : 'bg-white dark:bg-black'
                 }`}
               >
+                {isToday(day) && (
+                  <div className="absolute top-0 left-0 h-1 w-full bg-primary-500 shadow-[0_0_8px_rgba(var(--primary-500),0.5)]" />
+                )}
                 <div className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                   {format(day, 'EEE')}
                 </div>
@@ -239,30 +220,34 @@ export const WeekView: React.FC<WeekViewProps> = ({
 
                 {/* Add event button */}
                 {onAddEvent && (
-                  <button
+                  <Button
+                    type="button"
+                    buttonStyle="icon"
+                    variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
                       const date = new Date(day);
                       date.setHours(9, 0, 0, 0);
                       onAddEvent(date);
                     }}
-                    className="absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-md bg-primary-50 text-primary-600 transition-all hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 shadow-sm"
+                    className=""
                     title="Agregar evento"
                     aria-label="Agregar evento"
+                    icon={<Plus className="h-4 w-4" />}
                   >
-                    <Plus className="h-4 w-4" />
-                  </button>
+                    {''}
+                  </Button>
                 )}
               </div>
             ))}
           </div>
 
           {/* ── Time grid ── */}
-          <div className="overflow-y-auto" style={{ maxHeight: '70vh' }}>
+          <div className="overflow-y-auto max-h-[70vh]" >
             {hours.map((hour) => (
               <div
                 key={hour}
-                className="grid border-b border-gray-100 dark:border-gray-800"
+                className={`grid border-b border-gray-100 dark:border-gray-800 ${hour % 2 === 0 ? 'bg-white dark:bg-black' : 'bg-gray-50/30 dark:bg-gray-900/10'}`}
                 style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
               >
                 {/* Hour label */}
@@ -281,8 +266,8 @@ export const WeekView: React.FC<WeekViewProps> = ({
                     onToggleSelection={onToggleSelection}
                     onEventClick={onEventClick}
                     onAddEvent={onAddEvent}
-                    PlatformIcon={PlatformIcon}
                     currentUser={currentUser}
+                    isSelectedDay={isSameDay(day, currentDate)}
                   />
                 ))}
               </div>
@@ -301,8 +286,8 @@ export const WeekView: React.FC<WeekViewProps> = ({
               isSelected={false}
               isDragging={true}
               onToggleSelection={() => {}}
-              PlatformIcon={PlatformIcon}
               currentUser={currentUser}
+              showDay={true}
             />
           </div>
         ) : null}

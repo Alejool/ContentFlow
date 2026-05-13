@@ -11,3 +11,5 @@ export const PlatformIcon = ({ platform, className = "h-4 w-4" }: PlatformIconPr
   const Icon = config.icon;
   return <Icon className={className} style={{ color: config.color }} />;
 };
+
+export default PlatformIcon;

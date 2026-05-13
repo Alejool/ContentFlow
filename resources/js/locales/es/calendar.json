@@ -64,6 +64,8 @@
     "selected": "seleccionados",
     "of": "de",
     "total": "total",
+    "allSelected": "Todos seleccionados",
+    "select": "Seleccionar",
     "selectAll": "Seleccionar todos",
     "selectOptions": "Opciones de selección",
     "selectDay": "Seleccionar del día",

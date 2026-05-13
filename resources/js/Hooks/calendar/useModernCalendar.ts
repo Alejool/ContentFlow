@@ -56,7 +56,8 @@ export const useModernCalendar = () => {
         return;
       }
 
-      if (isSameDay(parseISO(event.start), newDate)) return;
+      const oldDate = parseISO(event.start);
+      if (oldDate.getTime() === newDate.getTime()) return;
 
       try {
         await calendar.handleEventDrop(event.id, newDate.toISOString(), event.type);
