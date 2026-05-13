@@ -210,19 +210,34 @@ export const usePublications = () => {
   }, [activeTab, setPage]);
 
   const handleRefresh = useCallback(() => {
+    /** Invalidaciones en paralelo: la query activa refetch sola; el resto calienta otras pestañas. */
+    const warmRelatedCaches = () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.logs.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.approvals.all }),
+      ]);
+
     if (activeTab === 'publications' || activeTab === 'approvals') {
       usePublicationStore.getState().clearPageData();
-      // Invalidate list caches completely so the refetch
-      // shows fresh server-ordered data without losing local filters immediately
-      queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
-      pubQuery.refetch();
+      void warmRelatedCaches();
     } else if (activeTab === 'campaigns') {
-      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() });
-      campQuery.refetch();
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.approvals.all }),
+      ]);
     } else {
-      logsQuery.refetch();
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.logs.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.lists() }),
+      ]);
     }
-  }, [activeTab, pubQuery, campQuery, logsQuery, queryClient]);
+  }, [activeTab, queryClient]);
 
   const handleDeleteItem = useCallback(
     async (id: number) => {

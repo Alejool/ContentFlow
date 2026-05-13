@@ -1,5 +1,7 @@
+import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { create } from 'zustand';
 
 interface LoadingStates {
@@ -63,8 +65,6 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
 
       // Actualizar el store de publicaciones con el nuevo estado
       if (publication) {
-        const { usePublicationStore } = await import('@/stores/Publications/publicationStore');
-        const { useManageContentUIStore } = await import('@/stores/Content/manageContentUIStore');
 
         const updateData = {
           ...publication,

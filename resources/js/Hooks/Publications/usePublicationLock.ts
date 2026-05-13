@@ -22,11 +22,14 @@ interface User {
   avatar?: string;
 }
 
+import { useContentUIStore } from '@/stores/Content/contentUIStore';
+import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
+import { useCalendarStore } from '@/stores/Calendar/calendarStore';
+
 // Helper for multi-store synchronization
-const syncAllUIStores = async (pubId: number, freshData: Publication) => {
+const syncAllUIStores = (pubId: number, freshData: Publication) => {
   // 1. Sync useContentUIStore
   try {
-    const { useContentUIStore } = await import('@/stores/Content/contentUIStore');
     const store = useContentUIStore.getState();
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
@@ -35,7 +38,6 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
 
   // 2. Sync useManageContentUIStore
   try {
-    const { useManageContentUIStore } = await import('@/stores/Content/manageContentUIStore');
     const store = useManageContentUIStore.getState();
     if (store.selectedItem?.id === pubId) {
       store.setSelectedItem(freshData);
@@ -58,11 +60,10 @@ const refreshPublicationInAllStores = async (pubId: number, providedData?: Publi
       usePublicationStore.getState().updatePublication(pubId, freshData);
 
       // 2. Update Modal/UI Stores
-      await syncAllUIStores(pubId, freshData);
+      syncAllUIStores(pubId, freshData);
 
       // 3. Update Calendar Store if it exists in the grid
       try {
-        const { useCalendarStore } = await import('@/stores/Calendar/calendarStore');
         const calStore = useCalendarStore.getState();
         const mainMedia = (freshData as any).media_files?.[0];
         const thumb = mainMedia?.thumbnail?.file_path || (freshData as any).image;
