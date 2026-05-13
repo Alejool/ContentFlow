@@ -175,15 +175,14 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                     <Button
                       type="button"
                       buttonStyle="icon"
-                      variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDeleteEvent(event);
                       }}
-                      className="bg-neutral-100/20! hover:bg-neutral-100/40! backdrop-blur-2xl "
-                      title="Agregar evento"
-                      aria-label="Agregar evento"
-                      icon={<Trash2 className="text-primary-500 h-3.5 w-3.5" />}
+                      className="bg-neutral-100/10! backdrop-blur-2xl hover:bg-neutral-100/40!"
+                      title="Eliminar evento"
+                      aria-label="Eliminar evento"
+                      icon={<Trash2 className="h-3.5 w-3.5 text-neutral-900!" />}
                     >
                       {''}
                     </Button>

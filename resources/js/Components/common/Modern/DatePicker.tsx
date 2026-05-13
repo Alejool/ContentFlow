@@ -86,6 +86,7 @@ interface DatePickerProps<T extends FieldValues> {
   useUTC?: boolean;
   showTimezone?: boolean;
   yearRange?: { past: number; future: number };
+  inline?: boolean;
 }
 
 const dateToCalendarDate = (d: Date): CalendarDate =>
@@ -284,6 +285,7 @@ const DatePickerModern = <T extends FieldValues>({
   useUTC = false,
   showTimezone = false,
   yearRange = { past: 1, future: 50 },
+  inline = false,
 }: DatePickerProps<T>) => {
   const { i18n } = useTranslation();
   const { timezoneLabel } = useTimezoneStore();
@@ -426,6 +428,210 @@ const DatePickerModern = <T extends FieldValues>({
     return formatted.length > 30 ? `${formatted.substring(0, 27)}...` : formatted;
   };
 
+  const pickerContent = (
+    <div className="flex max-w-full flex-col justify-center overflow-auto md:flex-row">
+      <div className="">
+        <div
+          className="flex h-16 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-900"
+          style={{
+            borderTopLeftRadius: '0.75rem',
+            borderTopRightRadius: showTimeSelect ? 0 : '0.75rem',
+          }}
+        >
+          <Button
+            type="button"
+            buttonStyle="icon"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setUserNavigating(true);
+              setNavDate((d) => {
+                const n = new Date(d);
+                n.setMonth(n.getMonth() - 1);
+                return n;
+              });
+            }}
+            icon={ChevronLeft}
+          >
+            <span className="sr-only">Previous month</span>
+          </Button>
+          <div className="flex flex-1 items-center justify-center gap-2">
+            <div className="w-[140px]">
+              <Select
+                id="dp-month"
+                options={monthOptions}
+                value={navDate.getMonth()}
+                onChange={(v: string | number | string[]) => {
+                  const month = Number(v);
+                  setUserNavigating(true);
+                  setNavDate((d) => {
+                    const n = new Date(d);
+                    n.setMonth(month);
+                    return n;
+                  });
+                }}
+                size="sm"
+                usePortal={false}
+              />
+            </div>
+            <div className="w-[100px]">
+              <Select
+                id="dp-year"
+                options={yearOptions}
+                value={navDate.getFullYear()}
+                onChange={(v: string | number | string[]) => {
+                  const year = Number(v);
+                  setUserNavigating(true);
+                  setNavDate((d) => {
+                    const n = new Date(d);
+                    n.setFullYear(year);
+                    return n;
+                  });
+                }}
+                size="sm"
+                usePortal={false}
+                searchable
+              />
+            </div>
+          </div>
+          <Button
+            type="button"
+            buttonStyle="icon"
+            variant="ghost"
+            size="sm"
+            rounded="lg"
+            shadow="none"
+            onClick={() => {
+              setUserNavigating(true);
+              setNavDate((d) => {
+                const n = new Date(d);
+                n.setMonth(n.getMonth() + 1);
+                return n;
+              });
+            }}
+            icon={ChevronRight}
+          >
+            <span className="sr-only">Next month</span>
+          </Button>
+        </div>
+
+        <AriaCalendar
+          key={`${navDate.getFullYear()}-${navDate.getMonth()}`}
+          value={calendarValue}
+          onChange={handleCalendarChange}
+          minValue={minCalendarDate}
+          focusedValue={focusedValue}
+          onFocusChange={(fv: CalendarDate) => {
+            setNavDate(new Date(fv.year, fv.month - 1, fv.day));
+            setFocusedValue(fv);
+          }}
+          className="p-3"
+        >
+          <CalendarGrid className="w-full">
+            <CalendarGridHeader>
+              {(day: string) => (
+                <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+                  {day}
+                </CalendarHeaderCell>
+              )}
+            </CalendarGridHeader>
+            <CalendarGridBody>
+              {(date: CalendarDate) => (
+                <CalendarCell
+                  date={date}
+                  className={({
+                    isSelected,
+                    isDisabled,
+                    isToday,
+                    isFocused: isFoc,
+                  }: {
+                    isSelected: boolean;
+                    isDisabled: boolean;
+                    isToday: boolean;
+                    isFocused: boolean;
+                  }) =>
+                    [
+                      'flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all duration-200',
+                      isSelected
+                        ? 'bg-primary-500 shadow-primary-500/30 scale-105 font-semibold text-white shadow-lg'
+                        : isToday
+                          ? 'border-primary-500 bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400 border-2 font-semibold'
+                          : isDisabled
+                            ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
+                            : 'text-gray-700 hover:scale-105 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800',
+                      isFoc && !isSelected
+                        ? 'ring-primary-400/40 ring-2 ring-offset-2 dark:ring-offset-neutral-900'
+                        : '',
+                    ].join(' ')
+                  }
+                >
+                  {({ formattedDate }: { formattedDate: string }) => formattedDate}
+                </CalendarCell>
+              )}
+            </CalendarGridBody>
+          </CalendarGrid>
+        </AriaCalendar>
+
+        {/* Footer */}
+        <div
+          className="absolute right-0 bottom-0 left-0 flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900"
+          style={{
+            borderBottomLeftRadius: '0.75rem',
+            borderBottomRightRadius: showTimeSelect ? 0 : '0.75rem',
+          }}
+        >
+          <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Calendar className="h-4 w-4 shrink-0 text-gray-400" />
+            <span className="truncate">{formatDisplayDate(displayDate)}</span>
+            {showTimezone && useUTC && (
+              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
+                ({timezoneLabel()})
+              </span>
+            )}
+          </div>
+          {isClearable && displayDate && (
+            <Button
+              type="button"
+              buttonStyle="ghost"
+              variant="ghost"
+              size="sm"
+              rounded="lg"
+              shadow="none"
+              className="!gap-1.5"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDateChange(null);
+                setIsOpen(false);
+              }}
+              icon={X}
+            >
+              {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {showTimeSelect && (
+        <CustomTimeSelector
+          date={displayDate}
+          onChange={(d) => handleDateChange(d)}
+          currentLocale={currentLocale}
+          activeColor={activeColor}
+        />
+      )}
+    </div>
+  );
+
+  if (inline) {
+    return (
+      <I18nProvider locale={currentLocale === 'es' ? 'es-ES' : 'en-US'}>
+        <div className={`border-primary-100 relative z-10 w-full overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-neutral-900 ${containerClassName}`}>
+          {pickerContent}
+        </div>
+      </I18nProvider>
+    );
+  }
+
   return (
     <I18nProvider locale={currentLocale === 'es' ? 'es-ES' : 'en-US'}>
       <div className={`relative ${containerClassName}`} ref={triggerRef}>
@@ -468,197 +674,7 @@ const DatePickerModern = <T extends FieldValues>({
               onClick={() => setIsOpen(false)}
             />
             <div className="border-primary-100 fixed top-1/2 left-1/2 z-[9999] max-h-[90vh] w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-neutral-900">
-              <div className="flex max-w-full flex-col justify-center overflow-auto md:flex-row">
-                <div className="">
-                  <div
-                    className="flex h-16 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-900"
-                    style={{
-                      borderTopLeftRadius: '0.75rem',
-                      borderTopRightRadius: showTimeSelect ? 0 : '0.75rem',
-                    }}
-                  >
-                    <Button
-                      type="button"
-                      buttonStyle="icon"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setUserNavigating(true);
-                        setNavDate((d) => {
-                          const n = new Date(d);
-                          n.setMonth(n.getMonth() - 1);
-                          return n;
-                        });
-                      }}
-                      icon={ChevronLeft}
-                    >
-                      <span className="sr-only">Previous month</span>
-                    </Button>
-                    <div className="flex flex-1 items-center justify-center gap-2">
-                      <div className="w-[140px]">
-                        <Select
-                          id="dp-month"
-                          options={monthOptions}
-                          value={navDate.getMonth()}
-                          onChange={(v: string | number | string[]) => {
-                            const month = Number(v);
-                            setUserNavigating(true);
-                            setNavDate((d) => {
-                              const n = new Date(d);
-                              n.setMonth(month);
-                              return n;
-                            });
-                          }}
-                          size="sm"
-                          usePortal={false}
-                        />
-                      </div>
-                      <div className="w-[100px]">
-                        <Select
-                          id="dp-year"
-                          options={yearOptions}
-                          value={navDate.getFullYear()}
-                          onChange={(v: string | number | string[]) => {
-                            const year = Number(v);
-                            setUserNavigating(true);
-                            setNavDate((d) => {
-                              const n = new Date(d);
-                              n.setFullYear(year);
-                              return n;
-                            });
-                          }}
-                          size="sm"
-                          usePortal={false}
-                          searchable
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      buttonStyle="icon"
-                      variant="ghost"
-                      size="sm"
-                      rounded="lg"
-                      shadow="none"
-                      onClick={() => {
-                        setUserNavigating(true);
-                        setNavDate((d) => {
-                          const n = new Date(d);
-                          n.setMonth(n.getMonth() + 1);
-                          return n;
-                        });
-                      }}
-                      icon={ChevronRight}
-                    >
-                      <span className="sr-only">Next month</span>
-                    </Button>
-                  </div>
-
-                  <AriaCalendar
-                    key={`${navDate.getFullYear()}-${navDate.getMonth()}`}
-                    value={calendarValue}
-                    onChange={handleCalendarChange}
-                    minValue={minCalendarDate}
-                    focusedValue={focusedValue}
-                    onFocusChange={(fv: CalendarDate) => {
-                      setNavDate(new Date(fv.year, fv.month - 1, fv.day));
-                      setFocusedValue(fv);
-                    }}
-                    className="p-3"
-                  >
-                    <CalendarGrid className="w-full">
-                      <CalendarGridHeader>
-                        {(day: string) => (
-                          <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
-                            {day}
-                          </CalendarHeaderCell>
-                        )}
-                      </CalendarGridHeader>
-                      <CalendarGridBody>
-                        {(date: CalendarDate) => (
-                          <CalendarCell
-                            date={date}
-                            className={({
-                              isSelected,
-                              isDisabled,
-                              isToday,
-                              isFocused: isFoc,
-                            }: {
-                              isSelected: boolean;
-                              isDisabled: boolean;
-                              isToday: boolean;
-                              isFocused: boolean;
-                            }) =>
-                              [
-                                'flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all duration-200',
-                                isSelected
-                                  ? 'bg-primary-500 shadow-primary-500/30 scale-105 font-semibold text-white shadow-lg'
-                                  : isToday
-                                    ? 'border-primary-500 bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400 border-2 font-semibold'
-                                    : isDisabled
-                                      ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
-                                      : 'text-gray-700 hover:scale-105 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800',
-                                isFoc && !isSelected
-                                  ? 'ring-primary-400/40 ring-2 ring-offset-2 dark:ring-offset-neutral-900'
-                                  : '',
-                              ].join(' ')
-                            }
-                          >
-                            {({ formattedDate }: { formattedDate: string }) => formattedDate}
-                          </CalendarCell>
-                        )}
-                      </CalendarGridBody>
-                    </CalendarGrid>
-                  </AriaCalendar>
-
-                  {/* Footer */}
-                  <div
-                    className="absolute right-0 bottom-0 left-0 flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900"
-                    style={{
-                      borderBottomLeftRadius: '0.75rem',
-                      borderBottomRightRadius: showTimeSelect ? 0 : '0.75rem',
-                    }}
-                  >
-                    <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      <Calendar className="h-4 w-4 shrink-0 text-gray-400" />
-                      <span className="truncate">{formatDisplayDate(displayDate)}</span>
-                      {showTimezone && useUTC && (
-                        <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
-                          ({timezoneLabel()})
-                        </span>
-                      )}
-                    </div>
-                    {isClearable && displayDate && (
-                      <Button
-                        type="button"
-                        buttonStyle="ghost"
-                        variant="ghost"
-                        size="sm"
-                        rounded="lg"
-                        shadow="none"
-                        className="!gap-1.5"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDateChange(null);
-                          setIsOpen(false);
-                        }}
-                        icon={X}
-                      >
-                        {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {showTimeSelect && (
-                  <CustomTimeSelector
-                    date={displayDate}
-                    onChange={(d) => handleDateChange(d)}
-                    currentLocale={currentLocale}
-                    activeColor={activeColor}
-                  />
-                )}
-              </div>
+              {pickerContent}
             </div>
           </>
         )}

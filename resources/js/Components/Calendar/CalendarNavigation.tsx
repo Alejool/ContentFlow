@@ -1,14 +1,9 @@
+import Button from '@/Components/common/Modern/Button';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
-import { formatDate } from '@/Utils/common/i18nHelpers'; // Uses locale-specific named format presets (monthYear, dayWeekMonthYear)
+import { formatDate } from '@/Utils/common/i18nHelpers';
 import type { CalendarView } from '@/types/Calendar/calendar';
 import { setMonth, setYear } from 'date-fns';
-import {
-    Calendar as CalendarIcon,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    Loader2,
-} from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -36,18 +31,19 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const today = new Date();
 
-  // Close pickers when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
       if (showMonthPicker && !target.closest('.month-picker-container')) {
         setShowMonthPicker(false);
       }
-      // DatePicker maneja su propio cierre con backdrop
+      if (showDatePicker && !target.closest('.date-picker-container')) {
+        setShowDatePicker(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showMonthPicker]);
+  }, [showMonthPicker, showDatePicker]);
 
   const goToMonth = (month: number, year: number) => {
     const newDate = setYear(setMonth(new Date(currentDate), month), year);
@@ -55,7 +51,6 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
     setShowMonthPicker(false);
   };
 
-  // Format the current date display based on view
   const getDateDisplay = () => {
     switch (view) {
       case 'day':
@@ -80,51 +75,61 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
     <div className="flex items-center gap-4">
       {/* Date Display with Dropdown */}
       <div className="month-picker-container relative">
-        <button
+        <Button
           onClick={() => setShowMonthPicker(!showMonthPicker)}
-          className="flex items-center gap-3 text-3xl font-bold capitalize text-gray-900 transition-colors hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
+          variant="ghost"
+          buttonStyle="ghost"
+          className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-3 border-none p-0! text-3xl! font-bold text-gray-900 capitalize shadow-none transition-colors hover:bg-transparent! dark:text-white"
+          icon={
+            isLoading ? <Loader2 className="text-primary-500 h-5 w-5 animate-spin" /> : undefined
+          }
         >
           {getDateDisplay()}
-          <ChevronDown
-            className={`h-5 w-5 transition-transform ${showMonthPicker ? 'rotate-180' : ''}`}
-          />
-          {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary-500" />}
-        </button>
+        </Button>
 
         {/* Month/Year Picker Dropdown */}
         {showMonthPicker && (
-          <div className="absolute left-0 top-full z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-black">
+          <div className="absolute top-full left-0 z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-black">
             <div className="mb-4 grid grid-cols-3 gap-2">
               {Array.from({ length: 12 }, (_, i) => (
-                <button
+                <Button
                   key={i}
                   onClick={() => goToMonth(i, currentDate.getFullYear())}
-                  className={`rounded-lg p-2 text-sm transition-colors ${
+                  variant={currentDate.getMonth() === i ? 'primary' : 'ghost'}
+                  buttonStyle={currentDate.getMonth() === i ? 'solid' : 'ghost'}
+                  size="md"
+                  className={`text-sm ${
                     currentDate.getMonth() === i
-                      ? 'bg-primary-500 text-white'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                      ? ''
+                      : 'border-none! text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                   }`}
                 >
                   {formatDate(new Date(2024, i, 1), 'monthShort')}
-                </button>
+                </Button>
               ))}
             </div>
             <div className="flex items-center justify-between gap-2">
-              <button
+              <Button
                 onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() - 1)}
-                className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                variant="secondary"
+                buttonStyle="icon"
+                size="sm"
+                className="p-2! transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <ChevronLeft className="h-4 w-4" />
-              </button>
+              </Button>
               <span className="font-semibold text-gray-900 dark:text-white">
                 {currentDate.getFullYear()}
               </span>
-              <button
+              <Button
                 onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() + 1)}
-                className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                variant="secondary"
+                buttonStyle="icon"
+                size="sm"
+                className="p-2! transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <ChevronRight className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -132,69 +137,89 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
 
       {/* Navigation Controls */}
       <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-800">
-        {/* Previous Button */}
-        <button
+        <Button
           onClick={onNavigatePrevious}
-          className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
+          buttonStyle="icon"
+          variant="ghost"
+          size="sm"
+          rounded="lg"
+          shadow="sm"
+          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-gray-700!"
           title={t('calendar.navigation.previous') || 'Anterior'}
         >
           <ChevronLeft className="h-5 w-5" />
-        </button>
+        </Button>
 
-        {/* Today Button with visual indicator */}
-        <button
+        <Button
           onClick={onNavigateToToday}
-          className={`relative rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-all hover:bg-white hover:shadow dark:hover:bg-gray-700 ${
+          variant={isCurrentDay(currentDate) ? 'primary' : 'secondary'}
+          buttonStyle={'ghost'}
+          size="sm"
+          rounded="lg"
+          shadow="sm"
+          className={`relative font-semibold transition-all hover:shadow ${
             isCurrentDay(currentDate)
-              ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
-              : 'text-gray-700 dark:text-gray-200'
+              ? 'bg-primary-100! text-primary-700! dark:bg-primary-900! dark:text-primary-300!'
+              : 'text-gray-700! hover:bg-white! dark:text-gray-200! dark:hover:bg-gray-700!'
           }`}
           title={t('calendar.navigation.today') || 'Hoy'}
         >
           {isCurrentDay(currentDate) && (
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary-500"></span>
+            <span className="bg-primary-500 absolute top-1 right-1 h-2 w-2 rounded-full"></span>
           )}
           {t('calendar.navigation.today') || 'Hoy'}
-        </button>
+        </Button>
 
-        {/* Next Button */}
-        <button
+        <Button
           onClick={onNavigateNext}
-          className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
+          buttonStyle="icon"
+          variant="ghost"
+          size="sm"
+          rounded="lg"
+          shadow="sm"
+          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-gray-700!"
           title={t('calendar.navigation.next') || 'Siguiente'}
+          icon={<ChevronRight className="h-5 w-5" />}
         >
-          <ChevronRight className="h-5 w-5" />
-        </button>
+          {''}
+        </Button>
 
-        {/* Date Picker Button */}
-        <button
-          onClick={() => setShowDatePicker(!showDatePicker)}
-          className="rounded-lg p-2 text-gray-600 shadow-sm transition-all hover:bg-white hover:shadow dark:text-gray-300 dark:hover:bg-gray-700"
-          title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
-        >
-          <CalendarIcon className="h-5 w-5" />
-        </button>
-      </div>
+        <div className="relative">
+          <Button
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            buttonStyle="icon"
+            variant="ghost"
+            size="sm"
+            rounded="lg"
+            shadow="sm"
+            className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-gray-700!"
+            title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
+            icon={<CalendarIcon className="h-5 w-5" />}
+          >
+            {''}
+          </Button>
 
-      {/* Date Picker - renderizado fuera del contenedor de navegación */}
-      {showDatePicker && (
-        <div className="date-picker-wrapper">
-          <DatePickerModern
-            selected={currentDate}
-            onChange={(date) => {
-              if (date) {
-                onNavigateToDate(date);
-              }
-              setShowDatePicker(false);
-            }}
-            showTimeSelect={false}
-            placeholder={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
-            isClearable={false}
-            allowPastDates={true}
-            yearRange={{ past: 5, future: 5 }}
-          />
+          {showDatePicker && (
+            <div className="date-picker-container absolute top-full right-0 z-50 mt-2">
+              <DatePickerModern
+                inline
+                selected={currentDate}
+                onChange={(date) => {
+                  if (date) {
+                    onNavigateToDate(date);
+                  }
+                  setShowDatePicker(false);
+                }}
+                showTimeSelect={false}
+                placeholder={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
+                isClearable={false}
+                allowPastDates={true}
+                yearRange={{ past: 5, future: 5 }}
+              />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
