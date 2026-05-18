@@ -31,6 +31,8 @@ use App\Http\Controllers\Subscription\PricingController;
 use App\Http\Controllers\Subscription\UsageMetricsController;
 use App\Http\Controllers\Subscription\AddonsController;
 
+use App\Services\common\SystemConfigService;
+
 Route::get('/portal/{token}', [ClientPortalController::class, 'renderPortal'])->name('portal.view');
 
 // Stripe Checkout Routes
@@ -46,7 +48,7 @@ Route::middleware('guest')->group(function () {
   Route::get(
     '/',
     function () {
-      $systemConfig = app(\App\Services\SystemConfigService::class);
+      $systemConfig = app(SystemConfigService::class);
       $availablePlans = $systemConfig->getAvailablePlans();
       
       // Formatear planes para el frontend

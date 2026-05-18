@@ -10,13 +10,14 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Services\common\SystemConfigService;
 use App\Services\Pricing\PlanFilterService;
+use App\Services\Pricing\PlanManagementService;
 
 class PricingController extends Controller
 {
     public function __construct(
-        private \App\Services\PlanManagementService $planManagement,
+        private PlanManagementService $planManagement,
         private SystemConfigService $systemConfig,
-        private \App\Services\PlanFilterService $planFilter
+        private PlanFilterService $planFilter
     ) {}
 
     /**
