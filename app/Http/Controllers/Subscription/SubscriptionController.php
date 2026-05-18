@@ -17,7 +17,7 @@ class SubscriptionController extends Controller
 {
     public function __construct(
         private UsageTrackingService $usageTracking,
-        private \App\Services\PlanManagementService $planManagement,
+        private \App\Services\Pricing\PlanManagementService $planManagement,
         private SubscriptionTrackingService $subscriptionTracking
     ) {}
 

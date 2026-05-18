@@ -355,7 +355,7 @@ class HandleStripeSubscriptionCreated
         }
 
         // Cambiar a plan free
-        $planManagement = app(\App\Services\PlanManagementService::class);
+        $planManagement = app(\App\Services\Pricing\PlanManagementService::class);
         $planManagement->changePlan(
             user: $user,
             newPlan: 'free',

@@ -283,9 +283,9 @@ class HandleStripeSubscriptionCreatedTest extends TestCase
         Event::fake([SubscriptionUpdated::class]);
 
         // Mock PlanManagementService
-        $planManagement = Mockery::mock(\App\Services\PlanManagementService::class);
+        $planManagement = Mockery::mock(\App\Services\Pricing\PlanManagementService::class);
         $planManagement->shouldReceive('changePlan')->once();
-        $this->app->instance(\App\Services\PlanManagementService::class, $planManagement);
+        $this->app->instance(\App\Services\Pricing\PlanManagementService::class, $planManagement);
 
         // Create workspace subscription
         WorkspaceSubscription::create([
@@ -330,9 +330,9 @@ class HandleStripeSubscriptionCreatedTest extends TestCase
         $this->assertTrue(Cache::has("user_subscription_{$this->user->id}"));
 
         // Mock PlanManagementService
-        $planManagement = Mockery::mock(\App\Services\PlanManagementService::class);
+        $planManagement = Mockery::mock(\App\Services\Pricing\PlanManagementService::class);
         $planManagement->shouldReceive('changePlan')->once();
-        $this->app->instance(\App\Services\PlanManagementService::class, $planManagement);
+        $this->app->instance(\App\Services\Pricing\PlanManagementService::class, $planManagement);
 
         // Create workspace subscription
         WorkspaceSubscription::create([

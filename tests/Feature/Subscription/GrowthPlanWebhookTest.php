@@ -272,7 +272,7 @@ class GrowthPlanWebhookTest extends TestCase
 
         // Simulate the subscription controller's handleSubscriptionCreated method
         $usageTrackingService = app(\App\Services\Usage\UsageTrackingService::class);
-        $planManagementService = app(\App\Services\PlanManagementService::class);
+        $planManagementService = app(\App\Services\Pricing\PlanManagementService::class);
         $controller = new \App\Http\Controllers\Subscription\SubscriptionController(
             $usageTrackingService,
             $planManagementService,

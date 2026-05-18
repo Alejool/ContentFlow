@@ -10,14 +10,16 @@ use App\Services\Addons\AddonUsageService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Services\Subscription\PlanLimitValidator;
+use App\Services\Subscription\PlanFeatureTransitionService;
 
 class PlanManagementService
 {
     public function __construct(
         private SubscriptionTrackingService $trackingService,
         private AddonUsageService $addonUsageService,
-        private \App\Services\Subscription\PlanLimitValidator $planLimitValidator,
-        private \App\Services\Subscription\PlanFeatureTransitionService $featureTransitionService
+        private PlanLimitValidator $planLimitValidator,
+        private PlanFeatureTransitionService $featureTransitionService
     ) {}
 
     /**
