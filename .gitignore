@@ -19,12 +19,13 @@ yarn-error.log
 # ============================================
 # ARCHIVOS DE ENTORNO Y CONFIGURACIÓN SENSIBLE
 # ============================================
-.env
-.env.backup
-.env.production
-.env.local
-.env.docker
-.env.demo
+
+.env*
+!.env.example
+
+.dev*
+
+
 database.sqlite
 backups/*.sql
 dump.sql
