@@ -3,7 +3,7 @@
 namespace App\Listeners\Approval;
 
 use App\Events\Approval\ApprovalRequestSubmitted;
-use App\Notifications\PublicationAwaitingApprovalNotification;
+use App\Notifications\Approval\PublicationAwaitingApprovalNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
 

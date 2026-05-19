@@ -330,7 +330,7 @@ class AnalyticsController extends Controller
             return response()->json(['message' => 'No active social accounts to sync.', 'dispatched' => 0]);
         }
 
-        $jobs = $accounts->map(fn ($account) => new \App\Jobs\SyncSocialAnalyticsJob($account, 7));
+        $jobs = $accounts->map(fn ($account) => new \App\Jobs\Social\SyncSocialAnalyticsJob($account, 7));
 
         \Illuminate\Support\Facades\Bus::batch($jobs->toArray())
             ->name("Manual Sync — Workspace {$workspaceId}")

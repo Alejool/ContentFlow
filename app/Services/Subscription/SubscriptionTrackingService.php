@@ -3,8 +3,8 @@
 namespace App\Services\Subscription;
 
 use App\Models\User;
-use App\Models\SubscriptionHistory;
-use App\Models\SubscriptionUsageTracking;
+use App\Models\Subscription\SubscriptionHistory;
+use App\Models\Subscription\SubscriptionUsageTracking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 

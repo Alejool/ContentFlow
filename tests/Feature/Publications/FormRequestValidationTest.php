@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 
 class FormRequestValidationTest extends TestCase
 {

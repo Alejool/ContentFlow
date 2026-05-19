@@ -3,7 +3,7 @@
 namespace App\Services\SocialPlatforms;
 
 use GuzzleHttp\Exception\ClientException;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Log;
 
 use App\DTOs\Publications\SocialPostDTO;

@@ -5,7 +5,7 @@ namespace App\Services\Workspace;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\UsageMetric;
 use Carbon\Carbon;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Cache;
 
 class WorkspaceUsageService

@@ -4,7 +4,7 @@ namespace App\Integrations\RSS;
 
 use App\Integrations\Core\BaseIntegration;
 use App\Integrations\Contracts\SyncableInterface;
-use App\Models\Integration;
+use App\Models\Integrations\Integration;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Workspace;
 
 use App\Http\Controllers\Controller;
 use App\Models\Workspace\Workspace;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Approval;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use App\Models\Publications\Publication;
 use App\Models\Approval\ApprovalRequest;
 use App\Services\Approval\ApprovalWorkflowEngine;

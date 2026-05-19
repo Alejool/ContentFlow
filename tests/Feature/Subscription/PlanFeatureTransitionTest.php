@@ -5,8 +5,8 @@ namespace Tests\Feature\Subscription;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\ApprovalWorkflow;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalWorkflow;
+use App\Models\Approval\ApprovalLevel;
 use App\Services\Subscription\PlanFeatureTransitionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

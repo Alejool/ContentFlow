@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Workspace\Workspace;
 use App\Services\Approval\ApprovalAnalyticsService;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

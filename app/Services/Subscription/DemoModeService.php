@@ -2,8 +2,8 @@
 
 namespace App\Services\Subscription;
 
-use App\Events\ConfigurationChanged;
-use App\Models\SystemSetting;
+use App\Events\System\ConfigurationChanged;
+use App\Models\System\SystemSetting;
 use Illuminate\Support\Facades\Event;
 
 class DemoModeService

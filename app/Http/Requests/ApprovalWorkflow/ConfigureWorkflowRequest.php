@@ -32,7 +32,7 @@ class ConfigureWorkflowRequest extends FormRequest
                 'exists:roles,name',
                 function ($attribute, $value, $fail) {
                     // Check if role can participate in approvals
-                    $role = \App\Models\Role\Role::where('name', $value)->first();
+                    $role = \App\Models\Auth\Role::where('name', $value)->first();
                     if ($role && !$role->approval_participant) {
                         $fail("The role '{$value}' cannot participate in approval workflows.");
                     }

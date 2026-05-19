@@ -21,7 +21,7 @@ class AIChatController extends Controller
 
     public function __construct(
         AIService $aiService,
-        protected \App\Services\ContentSanitizerService $sanitizer,
+        protected \App\Services\Content\ContentSanitizerService $sanitizer,
         protected PlanLimitValidator $planLimits,
         protected UsageTrackingService $usageTracking
     ) {

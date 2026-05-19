@@ -4,7 +4,7 @@ namespace App\Services\Subscription;
 
 use App\Events\Subscription\GracePeriodStarted;
 use App\Models\Subscription\Subscription;
-use App\Models\SystemSetting;
+use App\Models\System\SystemSetting;
 use App\Models\Workspace\Workspace;
 use App\Notifications\Subscription\GracePeriodExpiringNotification;
 use Illuminate\Support\Facades\Log;

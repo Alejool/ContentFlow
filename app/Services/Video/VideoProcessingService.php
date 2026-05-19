@@ -3,7 +3,7 @@
 namespace App\Services\Video;
 
 use App\Services\Storage\S3PathService;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Storage;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;

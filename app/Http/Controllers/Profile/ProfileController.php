@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\PasswordUpdateRequest;
 use App\Services\Storage\S3PathService;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

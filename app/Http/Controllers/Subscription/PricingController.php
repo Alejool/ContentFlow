@@ -90,13 +90,13 @@ class PricingController extends Controller
             'plans' => $this->getEnabledPlans(),
             'currentPlan' => $currentPlan,
             'systemFeatures' => [
-                'ai' => \App\Models\SystemSetting::isFeatureEnabled('ai'),
-                'analytics' => \App\Models\SystemSetting::isFeatureEnabled('analytics'),
-                'reels' => \App\Models\SystemSetting::isFeatureEnabled('reels'),
-                'approval_workflows' => \App\Models\SystemSetting::isFeatureEnabled('approval_workflows'),
-                'calendar_sync' => \App\Models\SystemSetting::isFeatureEnabled('calendar_sync'),
-                'bulk_operations' => \App\Models\SystemSetting::isFeatureEnabled('bulk_operations'),
-                'white_label' => \App\Models\SystemSetting::isFeatureEnabled('white_label'),
+                'ai' => \App\Models\System\SystemSetting::isFeatureEnabled('ai'),
+                'analytics' => \App\Models\System\SystemSetting::isFeatureEnabled('analytics'),
+                'reels' => \App\Models\System\SystemSetting::isFeatureEnabled('reels'),
+                'approval_workflows' => \App\Models\System\SystemSetting::isFeatureEnabled('approval_workflows'),
+                'calendar_sync' => \App\Models\System\SystemSetting::isFeatureEnabled('calendar_sync'),
+                'bulk_operations' => \App\Models\System\SystemSetting::isFeatureEnabled('bulk_operations'),
+                'white_label' => \App\Models\System\SystemSetting::isFeatureEnabled('white_label'),
             ],
         ]);
     }

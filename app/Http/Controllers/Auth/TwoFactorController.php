@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
+use App\Models\Logs\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use Inertia\Inertia;
-use App\Notifications\TwoFactorEnabledNotification;
+use App\Notifications\Auth\TwoFactorEnabledNotification;
 
 class TwoFactorController extends Controller
 {

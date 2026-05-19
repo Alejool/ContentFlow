@@ -16,12 +16,12 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_middleware_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Http\Middleware\CustomRateLimiter::class),
+            class_exists(\App\Http\Middleware\System\CustomRateLimiter::class),
             'CustomRateLimiter middleware should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Http\Middleware\Require2FA::class),
+            class_exists(\App\Http\Middleware\Auth\Require2FA::class),
             'Require2FA middleware should exist'
         );
     }
@@ -30,12 +30,12 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_service_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Services\FileValidatorService::class),
+            class_exists(\App\Services\Content\FileValidatorService::class),
             'FileValidatorService should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Services\ContentSanitizerService::class),
+            class_exists(\App\Services\Content\ContentSanitizerService::class),
             'ContentSanitizerService should exist'
         );
     }
@@ -44,7 +44,7 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_model_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Models\AuditLog::class),
+            class_exists(\App\Models\Logs\AuditLog::class),
             'AuditLog model should exist'
         );
 
@@ -67,32 +67,32 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_event_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Events\AuditableEvent::class),
+            class_exists(\App\Events\System\AuditableEvent::class),
             'AuditableEvent base class should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Events\ConfigurationChanged::class),
+            class_exists(\App\Events\System\ConfigurationChanged::class),
             'ConfigurationChanged event should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Events\RoleChanged::class),
+            class_exists(\App\Events\System\RoleChanged::class),
             'RoleChanged event should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Events\SocialTokenAccessed::class),
+            class_exists(\App\Events\System\SocialTokenAccessed::class),
             'SocialTokenAccessed event should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Events\AuthenticationFailed::class),
+            class_exists(\App\Events\System\AuthenticationFailed::class),
             'AuthenticationFailed event should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Events\CriticalDataDeleted::class),
+            class_exists(\App\Events\System\CriticalDataDeleted::class),
             'CriticalDataDeleted event should exist'
         );
     }
@@ -101,7 +101,7 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_listener_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Listeners\AuditLogger::class),
+            class_exists(\App\Listeners\System\AuditLogger::class),
             'AuditLogger listener should exist'
         );
     }
@@ -110,7 +110,7 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_observer_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Observers\UserObserver::class),
+            class_exists(\App\Observers\Auth\UserObserver::class),
             'UserObserver should exist'
         );
     }
@@ -128,12 +128,12 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_dto_classes_exist()
     {
         $this->assertTrue(
-            class_exists(\App\DTOs\ContentValidationResultDTO::class),
+            class_exists(\App\DTOs\Content\ContentValidationResultDTO::class),
             'ContentValidationResultDTO should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\DTOs\SanitizationResult::class),
+            class_exists(\App\DTOs\Content\SanitizationResult::class),
             'SanitizationResult should exist'
         );
     }
@@ -142,12 +142,12 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function all_security_commands_exist()
     {
         $this->assertTrue(
-            class_exists(\App\Console\Commands\CleanOldAuditLogs::class),
+            class_exists(\App\Console\Commands\System\CleanOldAuditLogs::class),
             'CleanOldAuditLogs command should exist'
         );
 
         $this->assertTrue(
-            class_exists(\App\Console\Commands\RotateEncryptionKey::class),
+            class_exists(\App\Console\Commands\System\RotateEncryptionKey::class),
             'RotateEncryptionKey command should exist'
         );
     }
@@ -156,11 +156,11 @@ class SecurityIntegrationCheckpointTest extends TestCase
     public function rate_limits_configuration_file_exists()
     {
         $this->assertFileExists(
-            config_path('rate-limits.php'),
-            'rate-limits.php configuration file should exist'
+            config_path('api_rate_limits.php'),
+            'api_rate_limits.php configuration file should exist'
         );
 
-        $config = config('rate-limits');
+        $config = config('api_rate_limits');
         $this->assertIsArray($config, 'Rate limits configuration should be an array');
         $this->assertArrayHasKey('endpoints', $config, 'Configuration should have endpoints key');
         $this->assertArrayHasKey('window', $config, 'Configuration should have window key');
@@ -169,7 +169,7 @@ class SecurityIntegrationCheckpointTest extends TestCase
     /** @test */
     public function rate_limits_configuration_has_required_endpoints()
     {
-        $config = config('rate-limits.endpoints');
+        $config = config('api_rate_limits.endpoints');
 
         $requiredEndpoints = [
             'api.ai.generate',
@@ -190,7 +190,7 @@ class SecurityIntegrationCheckpointTest extends TestCase
     /** @test */
     public function rate_limits_configuration_has_role_based_limits()
     {
-        $endpoints = config('rate-limits.endpoints');
+        $endpoints = config('api_rate_limits.endpoints');
         $aiConfig = $endpoints['api.ai.generate'] ?? null;
 
         $this->assertNotNull($aiConfig, 'API AI generate endpoint should be configured');
@@ -227,9 +227,9 @@ class SecurityIntegrationCheckpointTest extends TestCase
     /** @test */
     public function content_sanitizer_service_can_be_instantiated()
     {
-        $service = app(\App\Services\ContentSanitizerService::class);
+        $service = app(\App\Services\Content\ContentSanitizerService::class);
         $this->assertInstanceOf(
-            \App\Services\ContentSanitizerService::class,
+            \App\Services\Content\ContentSanitizerService::class,
             $service,
             'ContentSanitizerService should be instantiable'
         );
@@ -238,9 +238,9 @@ class SecurityIntegrationCheckpointTest extends TestCase
     /** @test */
     public function file_validator_service_can_be_instantiated()
     {
-        $service = app(\App\Services\FileValidatorService::class);
+        $service = app(\App\Services\Content\FileValidatorService::class);
         $this->assertInstanceOf(
-            \App\Services\FileValidatorService::class,
+            \App\Services\Content\FileValidatorService::class,
             $service,
             'FileValidatorService should be instantiable'
         );

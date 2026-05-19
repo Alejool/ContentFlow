@@ -2,8 +2,8 @@
 
 namespace App\Services\Subscription;
 
-use App\Events\ConfigurationChanged;
-use App\Models\SystemSetting;
+use App\Events\System\ConfigurationChanged;
+use App\Models\System\SystemSetting;
 use App\Models\Workspace\Workspace;
 use App\Services\Subscription\DTOs\PurchaseEligibility;
 use App\Services\Common\SystemConfigService;

@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
-use App\Notifications\SocialAccountConnectedNotification;
-use App\Notifications\SocialAccountDisconnectedNotification;
+use App\Notifications\Social\SocialAccountConnectedNotification;
+use App\Notifications\Social\SocialAccountDisconnectedNotification;
 use App\Models\Social\SocialPostLog;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
 use App\Services\Subscription\PlanLimitValidator;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Inertia\Inertia;
 
 
@@ -79,7 +79,7 @@ class SocialAccountController extends Controller
       ], 403);
     }
 
-    $userRole = \App\Models\Role\Role::find($role->pivot->role_id);
+    $userRole = \App\Models\Auth\Role::find($role->pivot->role_id);
     $hasPermission = $userRole && $userRole->permissions()->where('slug', 'manage-accounts')->exists();
     
     if (!$hasPermission) {
@@ -1141,7 +1141,7 @@ class SocialAccountController extends Controller
         ], 403);
       }
 
-      $userRole = \App\Models\Role\Role::find($role->pivot->role_id);
+      $userRole = \App\Models\Auth\Role::find($role->pivot->role_id);
       $hasPermission = $userRole && $userRole->permissions()->where('slug', 'manage-accounts')->exists();
       
       if (!$hasPermission) {

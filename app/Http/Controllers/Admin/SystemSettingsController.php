@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SystemSetting;
+use App\Models\System\SystemSetting;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Models\Publications\Publication;

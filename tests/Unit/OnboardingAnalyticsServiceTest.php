@@ -5,8 +5,8 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use App\Services\Onboarding\OnboardingAnalyticsService;
 use App\Models\User;
-use App\Models\OnboardingAnalytics;
-use App\Models\OnboardingState;
+use App\Models\System\OnboardingAnalytics;
+use App\Models\Workspace\OnboardingState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class OnboardingAnalyticsServiceTest extends TestCase

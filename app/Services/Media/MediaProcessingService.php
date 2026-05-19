@@ -2,7 +2,7 @@
 
 namespace App\Services\Media;
 
-use App\Jobs\ProcessBackgroundUpload;
+use App\Jobs\Media\ProcessBackgroundUpload;
 use App\Services\Storage\S3PathService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;

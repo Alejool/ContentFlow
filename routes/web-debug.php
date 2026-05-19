@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Models\WorkspaceAddon;
+use App\Models\Subscription\WorkspaceAddon;
 
 // Ruta temporal de diagnóstico - ELIMINAR EN PRODUCCIÓN
 Route::get('/debug/current-user-addons', function () {

@@ -2,7 +2,7 @@
 
 namespace App\Services\Video;
 
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Storage;
 
 /**

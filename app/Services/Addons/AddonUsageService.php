@@ -3,7 +3,7 @@
 namespace App\Services\Addons;
 
 use App\Models\Workspace\Workspace;
-use App\Models\WorkspaceAddon;
+use App\Models\Subscription\WorkspaceAddon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

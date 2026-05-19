@@ -12,7 +12,7 @@ Artisan::command('test:reverb', function () {
     $this->info('Config Broadcasting Default: ' . config('broadcasting.default'));
     $this->info('Env BROADCAST_CONNECTION: ' . env('BROADCAST_CONNECTION'));
     $this->info('Dispatching TestReverbEvent...');
-    \App\Events\TestReverbEvent::dispatch('Testing Reverb Connection at ' . now());
+    \App\Events\System\TestReverbEvent::dispatch('Testing Reverb Connection at ' . now());
     $this->info('Event dispatched! Check your Reverb console and Browser console.');
 })->purpose('Test Reverb Broadcasting');
 

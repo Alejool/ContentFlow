@@ -3,7 +3,7 @@
 namespace App\Events\Approval;
 
 use App\Models\Approval\ApprovalRequest;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalLevel;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;

@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\AssignRoleRequest;
 use App\Http\Requests\Role\RevokeRoleRequest;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Services\Roles\RoleService;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -60,9 +60,9 @@ class RoleController extends Controller
                 'Role assigned successfully',
                 200
             );
-        } catch (\App\Exceptions\RoleNotFoundException $e) {
+        } catch (\App\Exceptions\Auth\RoleNotFoundException $e) {
             return $this->errorResponse($e->getMessage(), 404);
-        } catch (\App\Exceptions\InsufficientPermissionsException $e) {
+        } catch (\App\Exceptions\Auth\InsufficientPermissionsException $e) {
             return $this->errorResponse($e->getMessage(), 403);
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to assign role: ' . $e->getMessage(), 500);

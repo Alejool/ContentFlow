@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\OnboardingState;
+use App\Models\Workspace\OnboardingState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

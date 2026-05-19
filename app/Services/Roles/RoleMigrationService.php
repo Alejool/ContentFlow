@@ -2,13 +2,13 @@
 
 namespace App\Services\Roles;
 
-use App\Models\Role\Role;
-use App\Models\Permission\Permission;
+use App\Models\Auth\Role;
+use App\Models\Auth\Permission;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\DTOs\Workspace\WorkspaceMigrationResult;
 use App\DTOs\Workspace\MigrationReport;
-use App\Notifications\RoleMigrationNotification;
+use App\Notifications\Auth\RoleMigrationNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

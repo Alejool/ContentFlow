@@ -57,9 +57,14 @@ if docker network ls | grep -q "$NET"; then
 fi
 
 # =====================================================
-# 4. RESET VOLUMES (CLEAN STATE)
+# 4. RESET VOLUMES (CLEAN STATE IF REQUESTED)
 # =====================================================
-echo "📦 recreando volúmenes..."
+CLEAN_START=false
+for arg in "$@"; do
+  if [ "$arg" = "--clean" ] || [ "$arg" = "-c" ]; then
+    CLEAN_START=true
+  fi
+done
 
 VOLUMES=(
   contentflow_pgsql_data_shared
@@ -69,10 +74,23 @@ VOLUMES=(
   contentflow_vite_cache_dev
 )
 
-for v in "${VOLUMES[@]}"; do
-  docker volume rm -f "$v" >/dev/null 2>&1 || true
-  docker volume create "$v" >/dev/null
-done
+if [ "$CLEAN_START" = true ]; then
+  echo "📦 recreando todos los volúmenes (CLEAN START)..."
+  for v in "${VOLUMES[@]}"; do
+    docker volume rm -f "$v" >/dev/null 2>&1 || true
+    docker volume create "$v" >/dev/null
+  done
+else
+  echo "📦 verificando volúmenes existentes..."
+  for v in "${VOLUMES[@]}"; do
+    if ! docker volume ls -q --filter "name=^${v}$" | grep -q "$v"; then
+      echo "➕ creando volumen faltante: $v"
+      docker volume create "$v" >/dev/null
+    else
+      echo "✔ volumen conservado: $v"
+    fi
+  done
+fi
 
 # =====================================================
 # 5. CLEAN DOCKER SYSTEM
@@ -129,7 +147,7 @@ $COMPOSE up -d app
 echo "🔑 configurando Laravel..."
 
 $COMPOSE exec -T app php artisan key:generate --force || true
-$COMPOSE exec -T app php artisan migrate --force || true
+# $COMPOSE exec -T app php artisan migrate --force || true
 
 # =====================================================
 # 11. SECONDARY SERVICES

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Webhooks;
 
-use App\Helpers\AddonHelper;
+use App\Helpers\Subscription\AddonHelper;
 use App\Http\Controllers\Controller;
-use App\Models\WebhookEvent;
+use App\Models\Integrations\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use App\Services\Subscription\SubscriptionTrackingService;

@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Publications\Publication;
-use App\Models\ApprovalWorkflow;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalWorkflow;
+use App\Models\Approval\ApprovalLevel;
 use App\Models\Logs\ApprovalLog;
 use App\Models\User;
 

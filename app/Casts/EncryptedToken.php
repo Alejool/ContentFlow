@@ -2,7 +2,7 @@
 
 namespace App\Casts;
 
-use App\Events\SocialTokenAccessed;
+use App\Events\System\SocialTokenAccessed;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;

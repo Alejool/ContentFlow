@@ -4,9 +4,9 @@ namespace App\Services\Approval;
 
 use App\Models\Publications\Publication;
 use App\Models\Approval\ApprovalRequest;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalLevel;
 use App\Models\Logs\ApprovalLog;
-use App\Models\ApprovalWorkflow;
+use App\Models\Approval\ApprovalWorkflow;
 use App\Models\User;
 use App\Events\Approval\ApprovalRequestSubmitted;
 use App\Events\Approval\ApprovalStepCompleted;

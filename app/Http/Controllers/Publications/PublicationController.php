@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Publications;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
-use App\Traits\HasTimezone;
+use App\Traits\System\ApiResponse;
+use App\Traits\System\HasTimezone;
 use Illuminate\Http\Request;
 use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +18,7 @@ use App\Actions\Publications\PublishPublicationAction;
 use App\Actions\Publications\UnpublishPublicationAction;
 use App\Actions\Publications\DeletePublicationAction;
 use App\Events\Publications\PublicationUpdated;
-use App\Events\PublicationStatusUpdated;
+use App\Events\Publication\PublicationStatusUpdated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -28,13 +28,13 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialPostLog;
 use App\Models\Logs\ApprovalLog;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use App\Models\User;
-use App\Jobs\ProcessBackgroundUpload;
+use App\Jobs\Media\ProcessBackgroundUpload;
 use App\Models\Workspace\Workspace;
 use App\Models\Social\SocialAccount;
-use App\Models\ApprovalLevel;
-use App\Models\ApprovalWorkflow;
+use App\Models\Approval\ApprovalLevel;
+use App\Models\Approval\ApprovalWorkflow;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Publications\PublicationLock;
 use App\Services\Validation\ContentValidationService;
@@ -399,7 +399,7 @@ class PublicationController extends Controller
       } 
       // If there's a pending approval request with current step
       elseif ($approvalRequest && $approvalRequest->status === 'pending' && $approvalRequest->current_step_id) {
-        $currentStep = \App\Models\ApprovalLevel::find($approvalRequest->current_step_id);
+        $currentStep = \App\Models\Approval\ApprovalLevel::find($approvalRequest->current_step_id);
         $currentLevel = $currentStep ? $currentStep->level_number : 0;
         \Log::info('Using approval_request current_step_id', [
           'current_step_id' => $approvalRequest->current_step_id,
@@ -630,8 +630,8 @@ class PublicationController extends Controller
       ->first();
     
     if ($userRole && $userRole->pivot->role_id) {
-      $role = \App\Models\Role\Role::find($userRole->pivot->role_id);
-      $isOwner = $role && $role->slug === \App\Models\Role\Role::OWNER;
+      $role = \App\Models\Auth\Role::find($userRole->pivot->role_id);
+      $isOwner = $role && $role->slug === \App\Models\Auth\Role::OWNER;
     }
 
     \Log::info('PublicationController::publish - Checking canBePublished', [
@@ -1058,7 +1058,7 @@ class PublicationController extends Controller
       ->get();
 
     foreach ($approvers as $approver) {
-      $approver->notify(new \App\Notifications\PublicationAwaitingApprovalNotification($publication, Auth::user()));
+      $approver->notify(new \App\Notifications\Approval\PublicationAwaitingApprovalNotification($publication, Auth::user()));
     }
 
     // Broadcast lock change to notify all users in real-time
@@ -1294,7 +1294,7 @@ class PublicationController extends Controller
 
         // CRITICAL: Broadcast specific event for approval level advancement
         // This is different from PublicationUpdated to avoid confusion
-        broadcast(new \App\Events\Approval\ApprovalLevelAdvanced(
+        broadcast(new \App\Events\Approval\ApprovalLevelAdvancedBroadcast(
           $publication,
           $currentStep,
           $nextStep
@@ -1394,7 +1394,7 @@ class PublicationController extends Controller
     // Notify the redactor (publication owner)
     $publication->load('user');
     if ($publication->user) {
-      $publication->user->notify(new \App\Notifications\PublicationApprovedNotification($publication, Auth::user()));
+      $publication->user->notify(new \App\Notifications\Approval\PublicationApprovedNotification($publication, Auth::user()));
     }
 
     // Broadcast lock removal to notify all users in real-time (publication is now editable)
@@ -1514,7 +1514,7 @@ class PublicationController extends Controller
     // Notify the publication owner
     $publication->load('user');
     if ($publication->user) {
-      $publication->user->notify(new \App\Notifications\PublicationRejectedNotification($publication, Auth::user()));
+      $publication->user->notify(new \App\Notifications\Approval\PublicationRejectedNotification($publication, Auth::user()));
     }
 
     // Broadcast lock removal to notify all users in real-time
@@ -1685,10 +1685,10 @@ class PublicationController extends Controller
 
     $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
 
-    $publication->user->notify(new \App\Notifications\PublicationCancelledNotification($publication));
+    $publication->user->notify(new \App\Notifications\Publication\PublicationCancelledNotification($publication));
 
     if ($publication->workspace && ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url)) {
-      $publication->workspace->notify(new \App\Notifications\PublicationCancelledNotification($publication));
+      $publication->workspace->notify(new \App\Notifications\Publication\PublicationCancelledNotification($publication));
     }
 
     broadcast(new PublicationStatusUpdated(Auth::id(), $publication->id, 'failed'))->toOthers();
@@ -2165,7 +2165,7 @@ class PublicationController extends Controller
       $startDate = $validator->getExportStartDate($workspace);
       $endDate = now();
       
-      $export = new \App\Exports\PublicationsExport($filters);
+      $export = new \App\Exports\Publication\PublicationsExport($filters);
       
       // Generate descriptive filename with date range and plan limit
       $startDateStr = $startDate->format('Y-m-d');

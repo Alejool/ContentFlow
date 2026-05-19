@@ -9,8 +9,8 @@ use App\Models\Publications\Publication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
-use App\Models\Role\Role;
-use App\Models\Permission\Permission;
+use App\Models\Auth\Role;
+use App\Models\Auth\Permission;
 
 class PublicationValidationTest extends TestCase
 {

@@ -2,7 +2,7 @@
 
 namespace App\Services\SocialPlatforms;
 
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use GuzzleHttp\Exception\ClientException;
 use League\OAuth1\Client\Server\Twitter;
 use League\OAuth1\Client\Credentials\TokenCredentials;

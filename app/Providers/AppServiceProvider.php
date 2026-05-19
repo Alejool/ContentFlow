@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Notifications\DatabaseNotification;
-use App\Observers\NotificationObserver;
-use App\Observers\UserObserver;
-use App\Observers\PublicationObserver;
-use App\Observers\MediaFileObserver;
+use App\Observers\System\NotificationObserver;
+use App\Observers\Auth\UserObserver;
+use App\Observers\Publication\PublicationObserver;
+use App\Observers\Media\MediaFileObserver;
 
 use App\Models\User;
 use App\Models\Publications\Publication;
@@ -78,52 +78,52 @@ class AppServiceProvider extends ServiceProvider
 
     // Register audit event listeners
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\ConfigurationChanged::class,
-      \App\Listeners\AuditLogger::class
+      \App\Events\System\ConfigurationChanged::class,
+      \App\Listeners\System\AuditLogger::class
     );
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\RoleChanged::class,
-      \App\Listeners\AuditLogger::class
+      \App\Events\System\RoleChanged::class,
+      \App\Listeners\System\AuditLogger::class
     );
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\SocialTokenAccessed::class,
-      \App\Listeners\AuditLogger::class
+      \App\Events\System\SocialTokenAccessed::class,
+      \App\Listeners\System\AuditLogger::class
     );
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\AuthenticationFailed::class,
-      \App\Listeners\AuditLogger::class
+      \App\Events\System\AuthenticationFailed::class,
+      \App\Listeners\System\AuditLogger::class
     );
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\CriticalDataDeleted::class,
-      \App\Listeners\AuditLogger::class
+      \App\Events\System\CriticalDataDeleted::class,
+      \App\Listeners\System\AuditLogger::class
     );
 
     // Register external calendar sync listeners for publications
     \Illuminate\Support\Facades\Event::listen(
       \App\Events\Publications\PublicationCreated::class,
-      [\App\Listeners\SyncPublicationToExternalCalendars::class, 'handleCreated']
+      [\App\Listeners\Calendar\SyncPublicationToExternalCalendars::class, 'handleCreated']
     );
     \Illuminate\Support\Facades\Event::listen(
       \App\Events\Publications\PublicationUpdated::class,
-      [\App\Listeners\SyncPublicationToExternalCalendars::class, 'handleUpdated']
+      [\App\Listeners\Calendar\SyncPublicationToExternalCalendars::class, 'handleUpdated']
     );
     \Illuminate\Support\Facades\Event::listen(
       \App\Events\Publications\PublicationDeleted::class,
-      [\App\Listeners\SyncPublicationToExternalCalendars::class, 'handleDeleted']
+      [\App\Listeners\Calendar\SyncPublicationToExternalCalendars::class, 'handleDeleted']
     );
 
     // Register external calendar sync listeners for user calendar events
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\UserCalendarEventCreated::class,
-      [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleCreated']
+      \App\Events\Calendar\UserCalendarEventCreated::class,
+      [\App\Listeners\Calendar\SyncUserCalendarEventToExternalCalendars::class, 'handleCreated']
     );
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\UserCalendarEventUpdated::class,
-      [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleUpdated']
+      \App\Events\Calendar\UserCalendarEventUpdated::class,
+      [\App\Listeners\Calendar\SyncUserCalendarEventToExternalCalendars::class, 'handleUpdated']
     );
     \Illuminate\Support\Facades\Event::listen(
-      \App\Events\UserCalendarEventDeleted::class,
-      [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleDeleted']
+      \App\Events\Calendar\UserCalendarEventDeleted::class,
+      [\App\Listeners\Calendar\SyncUserCalendarEventToExternalCalendars::class, 'handleDeleted']
     );
 
     // Register Stripe webhook listeners

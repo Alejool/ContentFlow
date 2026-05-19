@@ -7,7 +7,7 @@ use App\Events\Subscription\UsageLimitsUpdated;
 use App\Services\Subscription\PlanLimitValidator;
 use App\Services\Workspace\WorkspaceAddonService;
 use Illuminate\Support\Facades\Cache;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class UsageLimitsNotificationService
 {

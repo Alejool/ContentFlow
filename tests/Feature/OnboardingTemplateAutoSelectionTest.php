@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\OnboardingState;
+use App\Models\Workspace\OnboardingState;
 use App\Services\Onboarding\OnboardingService;
 use App\Services\Onboarding\OnboardingAnalyticsService;
 use App\Repositories\Onboarding\OnboardingStateRepository;

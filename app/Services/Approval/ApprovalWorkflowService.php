@@ -5,20 +5,21 @@ namespace App\Services\Approval;
 use App\Models\Publications\Publication;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\ApprovalWorkflow;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalWorkflow;
+use App\Models\Approval\ApprovalLevel;
 use App\Models\ApprovalAction;
-use App\Models\Role\Role;
-use App\Models\Permission\Permission;
+use App\Models\Auth\Role;
+use App\Models\Auth\Permission;
 use App\DTOs\Approval\ApprovalStatus;
-use App\Exceptions\ApprovalWorkflowNotEnabledException;
-use App\Exceptions\InvalidContentStatusException;
-use App\Exceptions\InsufficientPermissionsException;
-use App\Exceptions\InvalidApprovalStateException;
-use App\Exceptions\InvalidWorkflowConfigurationException;
-use App\Events\ContentSubmittedForApproval;
-use App\Events\ContentApproved;
-use App\Events\ContentRejected;
+use App\Exceptions\Approval\ApprovalWorkflowNotEnabledException;
+use App\Exceptions\Publication\InvalidContentStatusException;
+use App\Exceptions\Auth\InsufficientPermissionsException;
+use App\Exceptions\Approval\InvalidApprovalStateException;
+use App\Exceptions\Approval\InvalidWorkflowConfigurationException;
+use App\Events\Approval\ContentSubmittedForApproval;
+use App\Events\Approval\ContentApproved;
+use App\Events\Approval\ContentRejected;
+use App\Services\Roles\RoleService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -273,7 +274,7 @@ class ApprovalWorkflowService
 
             // Dispatch event
             if ($content->status === Publication::STATUS_APPROVED) {
-                event(new \App\Events\ContentApproved($content, $submitter));
+                event(new \App\Events\Approval\ContentApproved($content, $submitter));
             } else {
                 event(new ContentSubmittedForApproval($content, $submitter));
             }

@@ -5,9 +5,9 @@ namespace App\Services\Subscription;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\Subscription;
 use App\Models\Subscription\UsageMetric;
-use App\Models\SubscriptionHistory;
+use App\Models\Subscription\SubscriptionHistory;
 use Illuminate\Support\Facades\DB;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class PlanMigrationService
 {

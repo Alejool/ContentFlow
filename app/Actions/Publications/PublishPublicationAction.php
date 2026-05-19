@@ -2,16 +2,16 @@
 
 namespace App\Actions\Publications;
 
-use App\Jobs\PublishToSocialMedia;
+use App\Jobs\Social\PublishToSocialMedia;
 use App\Models\Publications\Publication;
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialAccount;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Validation\PublishValidationService;
-use App\Events\PublicationStatusUpdated;
+use App\Events\Publication\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;
 use App\Services\Publish\PlatformPublishService;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class PublishPublicationAction
 {
@@ -38,8 +38,8 @@ class PublishPublicationAction
         ->first();
       
       if ($userRole && $userRole->pivot->role_id) {
-        $role = \App\Models\Role\Role::find($userRole->pivot->role_id);
-        $isOwner = $role && $role->slug === \App\Models\Role\Role::OWNER;
+        $role = \App\Models\Auth\Role::find($userRole->pivot->role_id);
+        $isOwner = $role && $role->slug === \App\Models\Auth\Role::OWNER;
       }
     }
 
@@ -194,7 +194,7 @@ class PublishPublicationAction
         'account_name' => $acc->account_name
       ])->toArray();
 
-      $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication, $accountsData);
+      $notification = new \App\Notifications\Publication\PublicationProcessingStartedNotification($publication, $accountsData);
 
       // Notify ALL workspace members (including the one who published)
       if ($publication->workspace) {
@@ -298,7 +298,7 @@ class PublishPublicationAction
       try {
         $user = auth()->user();
         if ($user) {
-          $user->notify(new \App\Notifications\PublicationQueuedNotification(
+          $user->notify(new \App\Notifications\Publication\PublicationQueuedNotification(
             $publication,
             $queueInfo['estimated_position'],
             $estimatedWaitMinutes,

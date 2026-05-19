@@ -4,7 +4,7 @@ namespace App\Services\Onboarding;
 
 use App\Interfaces\OnboardingServiceInterface;
 use App\Models\User;
-use App\Models\OnboardingState;
+use App\Models\Workspace\OnboardingState;
 use App\Repositories\Onboarding\OnboardingStateRepository;
 use Illuminate\Support\Facades\Log;
 

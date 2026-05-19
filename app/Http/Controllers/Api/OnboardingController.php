@@ -475,7 +475,7 @@ class OnboardingController extends Controller
     /**
      * Format onboarding state for API response
      * 
-     * @param \App\Models\OnboardingState $state
+     * @param \App\Models\Workspace\OnboardingState $state
      * @return array
      */
     protected function formatOnboardingState($state): array

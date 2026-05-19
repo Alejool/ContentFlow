@@ -6,7 +6,7 @@ use App\Models\Social\SocialAccount;
 use App\Interfaces\SocialPlatformInterface;
 use App\Services\ConfigSocialMedia\SocialTokenManager;
 use GuzzleHttp\Client;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Log;
 
 abstract class BaseSocialService implements SocialPlatformInterface

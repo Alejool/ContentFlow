@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Webhooks;
 use App\Http\Controllers\Controller;
 use App\Models\Subscription\WorkspaceSubscription;
 use App\Models\Subscription\WorkspaceAddon;
-use App\Models\WebhookEvent;
+use App\Models\Integrations\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Services\Addons\AddonUsageService;
 use Illuminate\Http\Request;

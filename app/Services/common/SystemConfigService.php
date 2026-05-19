@@ -2,8 +2,8 @@
 
 namespace App\Services\Common;
 
-use App\Models\SystemSetting;
-use App\Helpers\LogHelper;
+use App\Models\System\SystemSetting;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Cache;
 
 class SystemConfigService

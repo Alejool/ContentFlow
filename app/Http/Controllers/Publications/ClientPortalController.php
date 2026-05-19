@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Publications;
 use App\Http\Controllers\Controller;
 use App\Models\Publications\Publication;
 use App\Models\Logs\ApprovalLog;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

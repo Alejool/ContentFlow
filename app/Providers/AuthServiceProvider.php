@@ -6,13 +6,13 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use App\Models\Publications\HashtagLibrary;
 use App\Models\Reports\ScheduledReport;
 use App\Models\Publications\Publication;
-use App\Models\Role\Role;
-use App\Models\ApprovalWorkflow;
-use App\Policies\HashtagLibraryPolicy;
-use App\Policies\ScheduledReportPolicy;
-use App\Policies\PublicationPolicy;
-use App\Policies\RolePolicy;
-use App\Policies\ApprovalWorkflowPolicy;
+use App\Models\Auth\Role;
+use App\Models\Approval\ApprovalWorkflow;
+use App\Policies\Publication\HashtagLibraryPolicy;
+use App\Policies\System\ScheduledReportPolicy;
+use App\Policies\Publication\PublicationPolicy;
+use App\Policies\Auth\RolePolicy;
+use App\Policies\Approval\ApprovalWorkflowPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {

@@ -3,7 +3,7 @@
 namespace App\Services\Video;
 
 use App\Services\AI\AIService;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Str;
 
 class VideoAnalysisService

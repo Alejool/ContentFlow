@@ -7,7 +7,7 @@ use App\Http\Requests\ContentApproval\ApproveContentRequest;
 use App\Http\Requests\ContentApproval\RejectContentRequest;
 use App\Models\Publications\Publication;
 use App\Services\Approval\ApprovalWorkflowService;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -48,9 +48,9 @@ class ContentApprovalController extends Controller
                 'Content submitted for approval successfully',
                 200
             );
-        } catch (\App\Exceptions\ApprovalWorkflowNotEnabledException $e) {
+        } catch (\App\Exceptions\Approval\ApprovalWorkflowNotEnabledException $e) {
             return $this->errorResponse($e->getMessage(), 422);
-        } catch (\App\Exceptions\InvalidContentStatusException $e) {
+        } catch (\App\Exceptions\Publication\InvalidContentStatusException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to submit content: ' . $e->getMessage(), 500);
@@ -87,9 +87,9 @@ class ContentApprovalController extends Controller
                 'Content approved successfully',
                 200
             );
-        } catch (\App\Exceptions\InsufficientPermissionsException $e) {
+        } catch (\App\Exceptions\Auth\InsufficientPermissionsException $e) {
             return $this->errorResponse($e->getMessage(), 403);
-        } catch (\App\Exceptions\InvalidApprovalStateException $e) {
+        } catch (\App\Exceptions\Approval\InvalidApprovalStateException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to approve content: ' . $e->getMessage(), 500);
@@ -126,9 +126,9 @@ class ContentApprovalController extends Controller
                 'Content rejected successfully',
                 200
             );
-        } catch (\App\Exceptions\InsufficientPermissionsException $e) {
+        } catch (\App\Exceptions\Auth\InsufficientPermissionsException $e) {
             return $this->errorResponse($e->getMessage(), 403);
-        } catch (\App\Exceptions\InvalidApprovalStateException $e) {
+        } catch (\App\Exceptions\Approval\InvalidApprovalStateException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to reject content: ' . $e->getMessage(), 500);
@@ -331,7 +331,7 @@ class ContentApprovalController extends Controller
                     }
                     
                     // Check if we've reached the end
-                    $workflow = \App\Models\ApprovalWorkflow::where('workspace_id', $content->workspace_id)->first();
+                    $workflow = \App\Models\Approval\ApprovalWorkflow::where('workspace_id', $content->workspace_id)->first();
                     if ($workflow && $workflow->is_multi_level) {
                         $maxLevel = $workflow->getMaxLevel();
                         if ($content->current_approval_level > $maxLevel) {

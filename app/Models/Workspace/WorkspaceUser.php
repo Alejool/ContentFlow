@@ -3,7 +3,7 @@
 namespace App\Models\Workspace;
 
 use App\Models\User;
-use App\Models\Role\Role;;
+use App\Models\Auth\Role;;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 

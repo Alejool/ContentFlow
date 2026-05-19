@@ -59,7 +59,7 @@ class SocialPostLogController extends Controller
       $startDate = $validator->getExportStartDate($workspace);
       $endDate = now();
       
-      $export = new \App\Exports\SocialPostLogsExport($filters);
+      $export = new \App\Exports\Social\SocialPostLogsExport($filters);
       
       // Generate descriptive filename with date range and plan limit
       $startDateStr = $startDate->format('Y-m-d');

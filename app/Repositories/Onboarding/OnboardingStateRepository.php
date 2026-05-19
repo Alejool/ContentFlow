@@ -3,7 +3,7 @@
 namespace App\Repositories\Onboarding;
 
 use App\Interfaces\OnboardingStateRepositoryInterface;
-use App\Models\OnboardingState;
+use App\Models\Workspace\OnboardingState;
 
 class OnboardingStateRepository implements OnboardingStateRepositoryInterface
 {

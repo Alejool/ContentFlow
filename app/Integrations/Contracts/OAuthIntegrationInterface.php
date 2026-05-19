@@ -2,7 +2,7 @@
 
 namespace App\Integrations\Contracts;
 
-use App\Models\IntegrationConnection;
+use App\Models\Integrations\IntegrationConnection;
 use Illuminate\Http\RedirectResponse;
 
 interface OAuthIntegrationInterface extends IntegrationInterface

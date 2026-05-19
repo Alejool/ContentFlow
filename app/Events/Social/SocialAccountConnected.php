@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Events\Social;
+
+use Illuminate\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\PrivateChannel;
+use App\Models\Social\SocialAccount;
+
+class SocialAccountConnected implements ShouldBroadcast
+{
+  public function __construct(public SocialAccount $account) {}
+
+  public function broadcastOn()
+  {
+    return new PrivateChannel('user.' . $this->account->user_id);
+  }
+}

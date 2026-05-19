@@ -157,7 +157,7 @@ class ProgressController extends Controller
 
         // Broadcast via WebSocket if available
         try {
-            broadcast(new \App\Events\UploadProgressUpdated(
+            broadcast(new \App\Events\Media\UploadProgressUpdated(
                 $request->user()->id,
                 $uploadId,
                 $progressData

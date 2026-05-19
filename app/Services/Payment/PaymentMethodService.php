@@ -2,7 +2,7 @@
 
 namespace App\Services\Payment;
 
-use App\Models\SystemSetting;
+use App\Models\System\SystemSetting;
 use Illuminate\Support\Facades\Cache;
 
 class PaymentMethodService

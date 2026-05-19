@@ -7,22 +7,22 @@ use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
 use App\Services\SocialPlatforms\TikTokService;
 use App\Services\SocialPlatforms\TwitterService;
-use App\Notifications\VideoDeletedNotification;
+use App\Notifications\Media\VideoDeletedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 
-use App\Jobs\ProcessYouTubePlaylistItem;
+use App\Jobs\Social\ProcessYouTubePlaylistItem;
 use App\Models\Youtube\YouTubePlaylistQueue;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use App\Models\Social\SocialPostLog;
 use App\Services\Log\SocialPostLogService;
 
-use App\Events\PublicationStatusUpdated;
-use App\Jobs\VerifyYouTubeVideoStatus;
+use App\Events\Publication\PublicationStatusUpdated;
+use App\Jobs\Social\VerifyYouTubeVideoStatus;
 
 use App\DTOs\Publications\SocialPostDTO;
 

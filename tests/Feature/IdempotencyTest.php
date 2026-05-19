@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Subscription\WorkspaceAddon;
-use App\Models\WebhookEvent;
+use App\Models\Integrations\WebhookEvent;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

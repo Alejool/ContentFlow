@@ -20,7 +20,7 @@ class GranularLimitValidator
     public function getGranularLimits(Workspace $workspace): array
     {
         $plan = $workspace->subscription?->plan ?? 'demo';
-        return config("rate_limits.{$plan}", config('rate_limits.demo', []));
+        return config("granular_limits.{$plan}", config('granular_limits.demo', []));
     }
 
     /**

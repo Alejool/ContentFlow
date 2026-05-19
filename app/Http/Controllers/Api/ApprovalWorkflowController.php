@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ApprovalWorkflow\AddLevelRequest;
 use App\Http\Requests\ApprovalWorkflow\ConfigureWorkflowRequest;
 use App\Http\Requests\ApprovalWorkflow\UpdateLevelRequest;
-use App\Models\ApprovalLevel;
-use App\Models\ApprovalWorkflow;
+use App\Models\Approval\ApprovalLevel;
+use App\Models\Approval\ApprovalWorkflow;
 use App\Models\Workspace\Workspace;
 use App\Services\Approval\ApprovalWorkflowService;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -166,7 +166,7 @@ class ApprovalWorkflowController extends Controller
                 'Workflow configured successfully',
                 200
             );
-        } catch (\App\Exceptions\InvalidWorkflowConfigurationException $e) {
+        } catch (\App\Exceptions\Approval\InvalidWorkflowConfigurationException $e) {
             \Log::error('ApprovalWorkflow Configuration Error', [
                 'error' => $e->getMessage(),
                 'workspace_id' => $workspace->id ?? null
@@ -266,7 +266,7 @@ class ApprovalWorkflowController extends Controller
                 'Level added successfully',
                 201
             );
-        } catch (\App\Exceptions\InvalidWorkflowConfigurationException $e) {
+        } catch (\App\Exceptions\Approval\InvalidWorkflowConfigurationException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to add level: ' . $e->getMessage(), 500);
@@ -299,7 +299,7 @@ class ApprovalWorkflowController extends Controller
             }
 
             if ($request->has('role_name')) {
-                $role = \App\Models\Role\Role::where('name', $request->role_name)->firstOrFail();
+                $role = \App\Models\Auth\Role::where('name', $request->role_name)->firstOrFail();
                 $level->role_id = $role->id;
             }
 

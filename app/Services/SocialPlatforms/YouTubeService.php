@@ -4,7 +4,7 @@ namespace App\Services\SocialPlatforms;
 
 use Exception;
 use GuzzleHttp\Exception\ClientException;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use App\Models\Publications\Publication;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;

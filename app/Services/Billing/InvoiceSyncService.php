@@ -4,7 +4,7 @@ namespace App\Services\Billing;
 
 use App\Models\Subscription\Invoice;
 use App\Models\Workspace\Workspace;
-use App\Jobs\SyncStripeInvoiceJob;
+use App\Jobs\Billing\SyncStripeInvoiceJob;
 use Illuminate\Support\Facades\Log;
 
 /**

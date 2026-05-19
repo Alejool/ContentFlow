@@ -19,8 +19,11 @@ class WorkspaceAddon extends Model
         'total_amount',
         'used_amount',
         'price_paid',
+        'currency',
         'stripe_payment_intent_id',
         'stripe_invoice_id',
+        'stripe_session_id',
+        'stripe_customer_id',
         'payment_gateway',
         'payment_id',
         'purchased_by',
@@ -76,6 +79,23 @@ class WorkspaceAddon extends Model
     }
 
     /**
+     * Check if addon is active and not expired.
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active && 
+               ($this->expires_at === null || $this->expires_at->isFuture());
+    }
+
+    /**
+     * Check if addon is expired.
+     */
+    public function isExpired(): bool
+    {
+        return $this->expires_at !== null && $this->expires_at->isPast();
+    }
+
+    /**
      * Check if addon has remaining amount.
      */
     public function hasRemaining(): bool
@@ -84,11 +104,19 @@ class WorkspaceAddon extends Model
     }
 
     /**
-     * Get remaining amount.
+     * Get available remaining amount.
+     */
+    public function getAvailable(): int
+    {
+        return max(0, $this->total_amount - $this->used_amount);
+    }
+
+    /**
+     * Get remaining amount (alias for getAvailable).
      */
     public function getRemainingAmount(): int
     {
-        return max(0, $this->total_amount - $this->used_amount);
+        return $this->getAvailable();
     }
 
     /**
@@ -114,12 +142,20 @@ class WorkspaceAddon extends Model
 
         $this->increment('used_amount', $amount);
 
-        // Desactivar si se agotó
+        // Deactivate if exhausted
         if ($this->fresh()->used_amount >= $this->total_amount) {
             $this->update(['is_active' => false]);
         }
 
         return true;
+    }
+
+    /**
+     * Increment used amount alias.
+     */
+    public function incrementUsed(int $amount = 1): void
+    {
+        $this->incrementUsage($amount);
     }
 
     /**
@@ -135,11 +171,11 @@ class WorkspaceAddon extends Model
     }
 
     /**
-     * Check if addon is expired.
+     * Decrement used amount alias.
      */
-    public function isExpired(): bool
+    public function decrementUsed(int $amount = 1): void
     {
-        return $this->expires_at && $this->expires_at->isPast();
+        $this->decrementUsage($amount);
     }
 
     /**

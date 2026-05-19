@@ -167,7 +167,7 @@ services:
       - "5173:5173"
     volumes:
       - ./:/var/www/html
-      - /var/www/html/node_modules
+      - cf_node_modules_v2:/var/www/html/node_modules
     networks:
       - laravel
 

@@ -3,9 +3,9 @@
 namespace Tests\Feature\Publications;
 
 use App\Models\MediaFiles\MediaFile;
-use App\Models\Permission\Permission;
+use App\Models\Auth\Permission;
 use App\Models\Publications\Publication;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use App\Models\Social\SocialAccount;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
@@ -330,7 +330,7 @@ class PublicationSendTest extends TestCase
 
         // Debe aceptar la solicitud (200 o 202)
         $this->assertContains($response->status(), [200, 202]);
-        Queue::assertPushed(\App\Jobs\PublishToSocialMedia::class);
+        Queue::assertPushed(\App\Jobs\Social\PublishToSocialMedia::class);
     }
 
     /** @test */
@@ -362,7 +362,7 @@ class PublicationSendTest extends TestCase
             ]);
 
         $this->assertContains($response->status(), [200, 202]);
-        Queue::assertPushed(\App\Jobs\PublishToSocialMedia::class);
+        Queue::assertPushed(\App\Jobs\Social\PublishToSocialMedia::class);
     }
 
     /** @test */
@@ -393,7 +393,7 @@ class PublicationSendTest extends TestCase
             ]);
 
         $this->assertContains($response->status(), [200, 202]);
-        Queue::assertPushed(\App\Jobs\PublishToSocialMedia::class);
+        Queue::assertPushed(\App\Jobs\Social\PublishToSocialMedia::class);
     }
 
     /** @test */
@@ -418,7 +418,7 @@ class PublicationSendTest extends TestCase
             ]);
 
         $this->assertContains($response->status(), [200, 202]);
-        Queue::assertPushed(\App\Jobs\PublishToSocialMedia::class);
+        Queue::assertPushed(\App\Jobs\Social\PublishToSocialMedia::class);
     }
 
     /** @test */
@@ -452,7 +452,7 @@ class PublicationSendTest extends TestCase
             ]);
 
         $this->assertContains($response->status(), [200, 202]);
-        Queue::assertPushed(\App\Jobs\PublishToSocialMedia::class);
+        Queue::assertPushed(\App\Jobs\Social\PublishToSocialMedia::class);
     }
 
     // -------------------------------------------------------------------------

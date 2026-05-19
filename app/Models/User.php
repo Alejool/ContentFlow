@@ -12,7 +12,7 @@ use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Notifications\VerifyEmailNotification;
+use App\Notifications\Auth\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 
@@ -23,12 +23,12 @@ use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialPostLog;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use App\Models\Calendar\ExternalCalendarConnection;
 use App\Models\Calendar\BulkOperationHistory;
-use App\Models\SubscriptionHistory;
-use App\Models\SubscriptionUsageTracking;
-use App\Traits\HasTimezone;
+use App\Models\Subscription\SubscriptionHistory;
+use App\Models\Subscription\SubscriptionUsageTracking;
+use App\Traits\System\HasTimezone;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
@@ -260,7 +260,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
    */
   public function onboardingState()
   {
-    return $this->hasOne(\App\Models\OnboardingState::class);
+    return $this->hasOne(\App\Models\Workspace\OnboardingState::class);
   }
 
   /**

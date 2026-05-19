@@ -3,8 +3,8 @@
 namespace App\Services\Workspace;
 
 use App\Models\Workspace\Workspace;
-use App\Models\WorkspaceAddon;
-use App\Helpers\LogHelper;
+use App\Models\Subscription\WorkspaceAddon;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 

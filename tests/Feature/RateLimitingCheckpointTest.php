@@ -23,7 +23,7 @@ class RateLimitingCheckpointTest extends TestCase
     {
         // Verify the middleware class exists
         $this->assertTrue(
-            class_exists(\App\Http\Middleware\CustomRateLimiter::class),
+            class_exists(\App\Http\Middleware\System\CustomRateLimiter::class),
             'CustomRateLimiter middleware class should exist'
         );
 
@@ -36,12 +36,12 @@ class RateLimitingCheckpointTest extends TestCase
     public function rate_limit_configuration_file_exists()
     {
         $this->assertFileExists(
-            config_path('rate-limits.php'),
-            'rate-limits.php configuration file should exist'
+            config_path('api_rate_limits.php'),
+            'api_rate_limits.php configuration file should exist'
         );
 
         // Verify configuration is loaded
-        $config = config('rate-limits');
+        $config = config('api_rate_limits');
         $this->assertIsArray($config, 'Rate limits configuration should be an array');
         $this->assertArrayHasKey('endpoints', $config, 'Configuration should have endpoints key');
     }
@@ -99,7 +99,7 @@ class RateLimitingCheckpointTest extends TestCase
     /** @test */
     public function rate_limit_configuration_has_different_limits_per_endpoint()
     {
-        $config = config('rate-limits.endpoints');
+        $config = config('api_rate_limits.endpoints');
 
         // Verify different endpoints have different limits
         $this->assertArrayHasKey('api.ai.generate', $config);
@@ -114,7 +114,8 @@ class RateLimitingCheckpointTest extends TestCase
     /** @test */
     public function rate_limit_configuration_has_role_based_limits()
     {
-        $config = config('rate-limits.endpoints.api.ai.generate');
+        $endpoints = config('api_rate_limits.endpoints');
+        $config = $endpoints['api.ai.generate'] ?? null;
 
         $this->assertArrayHasKey('roles', $config);
         $this->assertArrayHasKey('admin', $config['roles']);

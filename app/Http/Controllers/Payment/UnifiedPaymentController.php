@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Payment;
 
-use App\Helpers\AddonHelper;
+use App\Helpers\Subscription\AddonHelper;
 use App\Http\Controllers\Controller;
 use App\Facades\PaymentGateway;
 use App\Facades\CountryDetection;

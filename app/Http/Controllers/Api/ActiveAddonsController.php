@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Helpers\AddonHelper;
+use App\Helpers\Subscription\AddonHelper;
 use App\Http\Controllers\Controller;
-use App\Models\WorkspaceAddon;
+use App\Models\Subscription\WorkspaceAddon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

@@ -6,7 +6,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\Subscription as WorkspaceSubscription;
-use App\Models\SubscriptionHistory;
+use App\Models\Subscription\SubscriptionHistory;
 use App\Listeners\Subscription\HandleStripeSubscriptionCreated;
 use App\Events\Subscription\SubscriptionUpdated;
 use App\Services\Subscription\SubscriptionTrackingService;

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Notifications;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 
 class NotificationsController extends Controller
 {

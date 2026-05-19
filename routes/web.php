@@ -20,7 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use App\Models\Workspace\Workspace;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\SystemNotificationController;

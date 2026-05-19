@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Channels\CustomDiscordChannel;
-use App\Channels\CustomSlackChannel;
+use App\Channels\System\CustomDiscordChannel;
+use App\Channels\System\CustomSlackChannel;
 use App\Models\Workspace\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;

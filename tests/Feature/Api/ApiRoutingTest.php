@@ -4,7 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;;
+use App\Models\Auth\Role;;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

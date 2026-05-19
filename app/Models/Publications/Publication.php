@@ -23,9 +23,9 @@ use App\Models\Social\ScheduledPost;
 use App\Models\Campaigns\Campaign;
 use App\Models\Publications\PublicationComment;
 use App\Models\Calendar\ExternalCalendarEvent;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalLevel;
 
-use App\Traits\HandlesUtcDates;
+use App\Traits\System\HandlesUtcDates;
 use App\Events\Publications\PublicationCreated;
 use App\Events\Publications\PublicationDeleted;
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Content;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\Publications\Publication;

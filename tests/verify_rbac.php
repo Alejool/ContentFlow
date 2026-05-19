@@ -12,7 +12,7 @@ config(['cache.default' => 'array']);
 config(['session.driver' => 'array']);
 
 use App\Models\User;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use App\Models\Workspace\Workspace;
 use Illuminate\Support\Facades\Auth;
 

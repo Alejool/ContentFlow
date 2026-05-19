@@ -3,7 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\User;
-use App\Models\OnboardingState;
+use App\Models\Workspace\OnboardingState;
 
 interface OnboardingServiceInterface
 {

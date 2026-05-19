@@ -7,7 +7,7 @@ use App\Services\Onboarding\OnboardingService;
 use App\Services\Onboarding\OnboardingAnalyticsService;
 use App\Repositories\Onboarding\OnboardingStateRepository;
 use App\Models\User;
-use App\Models\OnboardingState;
+use App\Models\Workspace\OnboardingState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class OnboardingServiceTest extends TestCase

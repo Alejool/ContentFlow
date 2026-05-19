@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Workspace;
 
 use App\Http\Controllers\Controller;
-use App\Models\ApprovalWorkflow;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalWorkflow;
+use App\Models\Approval\ApprovalLevel;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\Logs\ApprovalLog;
 use App\Models\Workspace\Workspace;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

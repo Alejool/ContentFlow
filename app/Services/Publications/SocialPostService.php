@@ -9,7 +9,7 @@ use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\TwitterService;
 use App\Services\SocialPlatforms\TikTokService;
 use App\Services\SocialPlatforms\YouTubeService;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class SocialPostService
 {

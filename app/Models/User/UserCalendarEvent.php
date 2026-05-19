@@ -4,9 +4,9 @@ namespace App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Events\UserCalendarEventCreated;
-use App\Events\UserCalendarEventUpdated;
-use App\Events\UserCalendarEventDeleted;
+use App\Events\Calendar\UserCalendarEventCreated;
+use App\Events\Calendar\UserCalendarEventUpdated;
+use App\Events\Calendar\UserCalendarEventDeleted;
 
 class UserCalendarEvent extends Model
 {

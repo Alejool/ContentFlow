@@ -7,7 +7,7 @@ use App\Models\Subscription\UsageMetric;
 use App\Events\Subscription\LimitReached;
 use App\Events\Subscription\LimitWarning;
 use Illuminate\Support\Facades\Cache;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class UsageTrackingService
 {

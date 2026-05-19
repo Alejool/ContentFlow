@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Webhooks;
 
-use App\Helpers\AddonHelper;
+use App\Helpers\Subscription\AddonHelper;
 use App\Http\Controllers\Controller;
-use App\Models\WebhookEvent;
+use App\Models\Integrations\WebhookEvent;
 use App\Models\Workspace\Workspace;
-use App\Models\WorkspaceAddon;
+use App\Models\Subscription\WorkspaceAddon;
 use App\Services\Addons\AddonUsageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

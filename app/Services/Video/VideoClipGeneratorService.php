@@ -4,7 +4,7 @@ namespace App\Services\Video;
 
 use App\Models\MediaFiles\MediaFile;
 use App\Services\Storage\S3PathService;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 

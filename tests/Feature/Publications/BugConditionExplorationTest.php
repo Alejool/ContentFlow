@@ -7,7 +7,7 @@ use App\Models\Workspace\Workspace;
 use App\Models\Social\SocialAccount;
 use App\Models\Publications\Publication;
 use App\Models\MediaFiles\MediaFile;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

@@ -2,13 +2,13 @@
 
 namespace App\Services\Roles;
 
-use App\Models\Role\Role;
-use App\Models\Permission\Permission;
+use App\Models\Auth\Role;
+use App\Models\Auth\Permission;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Exceptions\RoleNotFoundException;
-use App\Exceptions\InsufficientPermissionsException;
-use App\Events\RoleChanged;
+use App\Exceptions\Auth\RoleNotFoundException;
+use App\Exceptions\Auth\InsufficientPermissionsException;
+use App\Events\System\RoleChanged;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;

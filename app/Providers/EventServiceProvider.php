@@ -11,21 +11,21 @@ use App\Events\Subscription\GracePeriodStarted;
 use App\Listeners\Subscription\NotifyUsageLimitsChanged;
 
 // Approval workflow events
-use App\Events\ApprovalLevelAdvanced;
-use App\Events\ApprovalTaskReassigned;
-use App\Events\ContentApproved;
-use App\Events\ContentRejected;
-use App\Events\ContentSubmittedForApproval;
-use App\Events\RoleChanged;
+use App\Events\Approval\ApprovalLevelAdvanced;
+use App\Events\Approval\ApprovalTaskReassigned;
+use App\Events\Approval\ContentApproved;
+use App\Events\Approval\ContentRejected;
+use App\Events\Approval\ContentSubmittedForApproval;
+use App\Events\System\RoleChanged;
 use App\Events\Approval\ApprovalRequestSubmitted;
 use App\Events\Approval\ApprovalStepCompleted;
 
 // Approval workflow listeners
-use App\Listeners\InvalidatePermissionCache;
-use App\Listeners\NotifyContentCreator;
-use App\Listeners\NotifyNextLevelApprovers;
-use App\Listeners\NotifyApproversOnSubmission;
-use App\Listeners\NotifyUserOfReassignment;
+use App\Listeners\Auth\InvalidatePermissionCache;
+use App\Listeners\Approval\NotifyContentCreator;
+use App\Listeners\Approval\NotifyNextLevelApprovers;
+use App\Listeners\Approval\NotifyApproversOnSubmission;
+use App\Listeners\Approval\NotifyUserOfReassignment;
 use App\Listeners\Approval\NotifyFirstStepApprovers;
 use App\Listeners\Approval\NotifyNextStepApprovers;
 

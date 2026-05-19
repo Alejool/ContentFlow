@@ -170,7 +170,7 @@ class HandleStripeSubscriptionCreated
         }
 
         // Obtener configuración del addon
-        $addonConfig = \App\Helpers\AddonHelper::findBySku($addonSku);
+        $addonConfig = \App\Helpers\Subscription\AddonHelper::findBySku($addonSku);
 
         if (!$addonConfig) {
             Log::error('Addon configuration not found', [
@@ -191,7 +191,7 @@ class HandleStripeSubscriptionCreated
         }
 
         // Registrar la compra del addon
-        $workspaceAddon = \App\Models\WorkspaceAddon::create([
+        $workspaceAddon = \App\Models\Subscription\WorkspaceAddon::create([
             'workspace_id' => $workspaceId,
             'addon_sku' => $addonSku,
             'addon_type' => $addonType ?? 'unknown',

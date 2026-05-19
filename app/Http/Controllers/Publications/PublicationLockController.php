@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Publications\Publication;
 use App\Models\Publications\PublicationLock;
 use App\Events\Publications\PublicationLockChanged;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

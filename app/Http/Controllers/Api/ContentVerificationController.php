@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialPostLog;
-use App\Jobs\VerifyPlatformContentStatus;
+use App\Jobs\Social\VerifyPlatformContentStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;

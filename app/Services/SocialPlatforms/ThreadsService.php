@@ -4,7 +4,7 @@ namespace App\Services\SocialPlatforms;
 
 use App\DTOs\Publications\SocialPostDTO;
 use App\DTOs\Publications\PostResultDTO;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
 

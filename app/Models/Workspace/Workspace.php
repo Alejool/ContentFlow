@@ -113,7 +113,7 @@ class Workspace extends Model
      */
     public function approvalWorkflow()
     {
-        return $this->hasOne(\App\Models\ApprovalWorkflow::class, 'workspace_id');
+        return $this->hasOne(\App\Models\Approval\ApprovalWorkflow::class, 'workspace_id');
     }
 
     /**
@@ -169,7 +169,7 @@ class Workspace extends Model
      */
     public function addons()
     {
-        return $this->hasMany(\App\Models\WorkspaceAddon::class);
+        return $this->hasMany(\App\Models\Subscription\WorkspaceAddon::class);
     }
 
 

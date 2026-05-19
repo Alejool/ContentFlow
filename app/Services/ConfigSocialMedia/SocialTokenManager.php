@@ -5,7 +5,7 @@ namespace App\Services\ConfigSocialMedia;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use App\Models\Social\SocialAccount;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class SocialTokenManager
 {

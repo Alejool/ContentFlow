@@ -4,7 +4,7 @@ namespace App\Services\Subscription;
 
 use App\Jobs\Subscription\ProcessRenewalRetryJob;
 use App\Models\Subscription\Subscription;
-use App\Models\SystemSetting;
+use App\Models\System\SystemSetting;
 use App\Models\Workspace\Workspace;
 use App\Notifications\Subscription\RenewalFailedNotification;
 use App\Facades\PaymentGateway;

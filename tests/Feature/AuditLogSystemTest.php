@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use App\Models\AuditLog;
+use App\Models\Logs\AuditLog;
 
 class AuditLogSystemTest extends TestCase
 {
@@ -38,24 +38,24 @@ class AuditLogSystemTest extends TestCase
     /** @test */
     public function auditable_events_exist()
     {
-        $this->assertTrue(class_exists(\App\Events\AuditableEvent::class));
-        $this->assertTrue(class_exists(\App\Events\ConfigurationChanged::class));
-        $this->assertTrue(class_exists(\App\Events\RoleChanged::class));
-        $this->assertTrue(class_exists(\App\Events\SocialTokenAccessed::class));
-        $this->assertTrue(class_exists(\App\Events\AuthenticationFailed::class));
-        $this->assertTrue(class_exists(\App\Events\CriticalDataDeleted::class));
+        $this->assertTrue(class_exists(\App\Events\System\AuditableEvent::class));
+        $this->assertTrue(class_exists(\App\Events\System\ConfigurationChanged::class));
+        $this->assertTrue(class_exists(\App\Events\System\RoleChanged::class));
+        $this->assertTrue(class_exists(\App\Events\System\SocialTokenAccessed::class));
+        $this->assertTrue(class_exists(\App\Events\System\AuthenticationFailed::class));
+        $this->assertTrue(class_exists(\App\Events\System\CriticalDataDeleted::class));
     }
 
     /** @test */
     public function audit_logger_listener_exists()
     {
-        $this->assertTrue(class_exists(\App\Listeners\AuditLogger::class));
-        $this->assertTrue(method_exists(\App\Listeners\AuditLogger::class, 'handle'));
+        $this->assertTrue(class_exists(\App\Listeners\System\AuditLogger::class));
+        $this->assertTrue(method_exists(\App\Listeners\System\AuditLogger::class, 'handle'));
     }
 
     /** @test */
     public function clean_audit_logs_command_exists()
     {
-        $this->assertTrue(class_exists(\App\Console\Commands\CleanOldAuditLogs::class));
+        $this->assertTrue(class_exists(\App\Console\Commands\System\CleanOldAuditLogs::class));
     }
 }

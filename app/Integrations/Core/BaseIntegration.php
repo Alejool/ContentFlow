@@ -3,7 +3,7 @@
 namespace App\Integrations\Core;
 
 use App\Integrations\Contracts\IntegrationInterface;
-use App\Models\Integration;
+use App\Models\Integrations\Integration;
 use Illuminate\Support\Facades\Log;
 
 abstract class BaseIntegration implements IntegrationInterface

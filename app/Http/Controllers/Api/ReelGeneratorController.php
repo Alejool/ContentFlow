@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\GenerateReelsFromVideo;
+use App\Jobs\Media\GenerateReelsFromVideo;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Publications\Publication;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

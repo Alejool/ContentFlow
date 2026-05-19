@@ -15,7 +15,7 @@ use App\Models\Campaigns\Campaign;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialPostLog;
 
-use App\Traits\HandlesUtcDates;
+use App\Traits\System\HandlesUtcDates;
 
 class ScheduledPost extends Model
 {

@@ -5,8 +5,8 @@ namespace App\Services\Publications;
 use App\Models\Publications\Publication;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;
-use App\Policies\PublicationPolicy;
+use App\Models\Auth\Role;
+use App\Policies\Publication\PublicationPolicy;
 use Illuminate\Support\Facades\Log;
 
 /**

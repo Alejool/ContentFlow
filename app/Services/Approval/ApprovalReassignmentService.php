@@ -5,11 +5,12 @@ namespace App\Services\Approval;
 use App\Models\Publications\Publication;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalLevel;
 use App\Models\ApprovalAction;
-use App\Models\ApprovalWorkflow;
-use App\Models\Role\Role;
-use App\Events\ApprovalTaskReassigned;
+use App\Models\Approval\ApprovalWorkflow;
+use App\Models\Auth\Role;
+use App\Events\Approval\ApprovalTaskReassigned;
+use App\Services\Roles\RoleService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Campaigns;
 use App\Http\Controllers\Controller;
 use App\Services\Statistics\StatisticsService;
 use App\Models\Campaigns\Campaign;
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -321,7 +321,7 @@ class CampaignController extends Controller
       $startDate = $validator->getExportStartDate($workspace);
       $endDate = now();
       
-      $export = new \App\Exports\CampaignsExport($filters);
+      $export = new \App\Exports\Social\CampaignsExport($filters);
       
       // Generate descriptive filename with date range and plan limit
       $startDateStr = $startDate->format('Y-m-d');

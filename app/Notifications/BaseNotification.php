@@ -6,9 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use App\Channels\EnhancedDatabaseChannel;
-use App\Channels\CustomSlackChannel;
-use App\Channels\CustomDiscordChannel;
+use App\Channels\System\EnhancedDatabaseChannel;
+use App\Channels\System\CustomSlackChannel;
+use App\Channels\System\CustomDiscordChannel;
 use App\Models\Workspace\Workspace;
 
 abstract class BaseNotification extends Notification implements ShouldQueue

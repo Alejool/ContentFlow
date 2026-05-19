@@ -2,7 +2,7 @@
 
 namespace App\Actions\Publications;
 
-use App\Jobs\BulkPublishPublications;
+use App\Jobs\Publication\BulkPublishPublications;
 use App\Models\Publications\Publication;
 use App\Services\Queue\QueuePriorityService;
 use Illuminate\Support\Facades\Log;

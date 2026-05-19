@@ -5,7 +5,7 @@ namespace App\Services\Subscription;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 
 class LimitNotificationService
 {

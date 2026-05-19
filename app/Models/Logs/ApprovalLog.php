@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Approval\ApprovalRequest;
-use App\Models\ApprovalLevel;
+use App\Models\Approval\ApprovalLevel;
 use App\Models\User;
 
 class ApprovalLog extends Model

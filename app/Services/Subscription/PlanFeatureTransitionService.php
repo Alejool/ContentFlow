@@ -3,7 +3,7 @@
 namespace App\Services\Subscription;
 
 use App\Models\Workspace\Workspace;
-use App\Models\ApprovalWorkflow;
+use App\Models\Approval\ApprovalWorkflow;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

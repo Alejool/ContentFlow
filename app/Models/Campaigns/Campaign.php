@@ -11,7 +11,7 @@ use App\Models\Publications\Publication;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 
-use App\Traits\HandlesUtcDates;
+use App\Traits\System\HandlesUtcDates;
 
 class Campaign extends Model
 {

@@ -2,7 +2,7 @@
 
 namespace App\Services\Onboarding;
 
-use App\Models\OnboardingAnalytics;
+use App\Models\System\OnboardingAnalytics;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User\UserCalendarEvent;
 use Illuminate\Support\Facades\Auth;
 
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 

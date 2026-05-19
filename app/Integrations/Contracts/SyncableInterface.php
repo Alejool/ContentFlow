@@ -2,7 +2,7 @@
 
 namespace App\Integrations\Contracts;
 
-use App\Models\Integration;
+use App\Models\Integrations\Integration;
 use Illuminate\Support\Collection;
 
 interface SyncableInterface extends IntegrationInterface

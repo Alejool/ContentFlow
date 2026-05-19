@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\UploadProgressUpdated;
+use App\Events\Media\UploadProgressUpdated;
 use App\Http\Controllers\Controller;
 use App\Services\Storage\S3PathService;
 use App\Services\Subscription\PlanLimitValidator;

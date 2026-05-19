@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Workspace;
 
-use App\Traits\ApiResponse;
+use App\Traits\System\ApiResponse;
 use App\Services\Storage\S3PathService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
-use App\Notifications\WorkspaceRemovedNotification;
+use App\Notifications\Workspace\WorkspaceRemovedNotification;
 
 use App\Models\User;
 use App\Models\Logs\WebhookLog;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;
+use App\Models\Auth\Role;
 
 class WorkspaceController extends Controller
 {
@@ -149,7 +149,7 @@ class WorkspaceController extends Controller
     }
 
     // Get all permissions
-    $permissions = \App\Models\Permission\Permission::all()->map(function ($permission) {
+    $permissions = \App\Models\Auth\Permission::all()->map(function ($permission) {
       $translationKey = "permissions.{$permission->slug}";
       
       return [
@@ -616,7 +616,7 @@ class WorkspaceController extends Controller
 
   public function permissions()
   {
-    $permissions = \App\Models\Permission\Permission::all()->map(function ($permission) {
+    $permissions = \App\Models\Auth\Permission::all()->map(function ($permission) {
       $translationKey = "permissions.{$permission->slug}";
       
       return [

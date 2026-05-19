@@ -3,7 +3,7 @@
 namespace App\Services\Validation;
 
 use App\Models\MediaFiles\MediaFile;
-use App\Helpers\LogHelper;
+use App\Helpers\System\LogHelper;
 use Illuminate\Support\Facades\Storage;
 
 class MediaAnalyzer
