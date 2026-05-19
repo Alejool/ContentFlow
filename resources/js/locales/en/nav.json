@@ -11,6 +11,23 @@
     "logout": "Log Out",
     "notifications": "Notifications",
     "workspaces": "Workspaces",
-    "workspace_branding": "Workspace Branding"
+    "workspace_branding": "Workspace Branding",
+    "reels": "Reels",
+    "billing": "Billing",
+    "addons": "Add-ons",
+    "adminDashboard": "Admin Dashboard",
+    "adminSettings": "System Settings",
+    "search": "Search routes...",
+    "noResults": "No routes found",
+    "section": {
+      "dashboard": "Dashboard",
+      "content": "Content",
+      "analytics": "Analytics",
+      "workspaces": "Workspaces",
+      "subscription": "Subscription",
+      "settings": "Settings",
+      "admin": "Administration",
+      "quickNavHint": "to navigate"
+    }
   }
 }

@@ -11,6 +11,23 @@
     "logout": "Cerrar Sesión",
     "notifications": "Notificaciones",
     "workspaces": "Espacios",
-    "workspace_branding": "Marca del Espacio"
+    "workspace_branding": "Marca del Espacio",
+    "reels": "Reels",
+    "billing": "Facturación",
+    "addons": "Créditos",
+    "adminDashboard": "Admin Panel",
+    "adminSettings": "Config. Sistema",
+    "search": "Buscar rutas...",
+    "noResults": "No se encontraron rutas",
+    "section": {
+      "dashboard": "Panel",
+      "content": "Contenido",
+      "analytics": "Analíticas",
+      "workspaces": "Espacios",
+      "subscription": "Suscripción",
+      "settings": "Configuración",
+      "admin": "Administración",
+      "quickNavHint": "para navegar"
+    }
   }
 }

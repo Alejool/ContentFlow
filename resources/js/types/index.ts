@@ -4,3 +4,4 @@ export * from './Publication';
 export * from './Workspace';
 export * from './Role';
 export * from './layout';
+export * from './navigation';
