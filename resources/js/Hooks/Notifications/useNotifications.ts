@@ -3,6 +3,9 @@ import { getNotificationType } from '@/stores/Notifications/notificationStore';
 import type { NotificationData, NotificationTypeFilter } from '@/stores/Notifications/notificationStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useEffect } from 'react';
+import { usePage } from '@inertiajs/react';
+import { createEchoSubscription } from '@/Utils/common/echoHelper';
 
 interface NotificationsResponse {
   notifications: NotificationData[];
@@ -31,6 +34,25 @@ export function useNotifications() {
 
   const notifications = query.data?.notifications ?? [];
   const unreadCount = query.data?.unread_count ?? 0;
+
+  const page = usePage<any>();
+  const user = page.props.auth?.user;
+
+  // Real-time notifications listener
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channelName = `App.Models.User.${user.id}`;
+    
+    return createEchoSubscription(channelName, 'private', (channel) => {
+      // Listen for Laravel's built-in Notification broadcast
+      channel.notification((notification: any) => {
+        console.log('Real-time notification received:', notification);
+        // Invalidate queries to trigger an immediate refetch
+        queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
+      });
+    });
+  }, [user?.id, queryClient]);
 
   // Derived slices (replaces store computed values)
   const applicationNotifications = notifications.filter(
