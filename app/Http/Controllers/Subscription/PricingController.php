@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Services\common\SystemConfigService;
+use App\Services\Common\SystemConfigService;
 use App\Services\Pricing\PlanFilterService;
 use App\Services\Pricing\PlanManagementService;
 
