@@ -13,7 +13,6 @@ use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Workspace\WorkspaceController;
 use App\Http\Controllers\Workspace\ApiTokenController;
 use App\Http\Controllers\Workspace\InvitationController;
-use App\Http\Controllers\Calendar\CalendarViewController;
 use App\Http\Controllers\Api\ExternalCalendarController;
 
 use Illuminate\Http\Request;
@@ -31,7 +30,7 @@ use App\Http\Controllers\Subscription\PricingController;
 use App\Http\Controllers\Subscription\UsageMetricsController;
 use App\Http\Controllers\Subscription\AddonsController;
 
-use App\Services\common\SystemConfigService;
+use App\Services\Common\SystemConfigService;
 
 Route::get('/portal/{token}', [ClientPortalController::class, 'renderPortal'])->name('portal.view');
 
@@ -165,19 +164,11 @@ Route::middleware('auth')->group(function () {
     Route::get('{workspace}/api-docs/download', [ApiTokenController::class, 'downloadDocs'])->name('api-docs.download');
   });
 
-  Route::prefix('content')->name('content.')->group(function () {
+Route::prefix('content')->name('content.')->group(function () {
     Route::get('/', [ContentController::class, 'index'])->name('index');
   });
 
-  Route::get('/reels', function () {
-    return inertia('Reels/AiReelsGallery');
-  })->name('reels.gallery');
-
-  Route::get('/calendar', [CalendarViewController::class, 'index'])->name('calendar.index');
-  Route::get('/calendar/settings', [CalendarViewController::class, 'settings'])->name('calendar.settings');
-
   Route::prefix('social-accounts')->name('social-accounts.')->group(function () {
-    Route::get('/', [SocialAccountController::class, 'index'])->name('index');
     Route::get('auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('auth-url');
   });
 

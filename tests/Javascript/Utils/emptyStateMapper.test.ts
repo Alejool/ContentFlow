@@ -12,10 +12,8 @@ describe('emptyStateMapper', () => {
     it('should define mappings for all required contexts', () => {
       const routes = emptyStateContexts.map((ctx) => ctx.route);
       
-      expect(routes).toContain('reels.gallery');
       expect(routes).toContain('content.index');
       expect(routes).toContain('analytics.index');
-      expect(routes).toContain('calendar.index');
     });
 
     it('should map to valid config keys', () => {

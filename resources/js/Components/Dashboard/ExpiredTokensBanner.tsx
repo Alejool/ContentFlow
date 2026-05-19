@@ -77,7 +77,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
               ))}
             </div>
             <Link
-              href="/social-accounts"
+              href="/content"
               className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
             >
               Reconectar cuentas →
@@ -135,7 +135,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
               })}
             </div>
             <Link
-              href="/social-accounts"
+              href="/content"
               className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-500"
             >
               <AlertTriangle className="h-3.5 w-3.5" />

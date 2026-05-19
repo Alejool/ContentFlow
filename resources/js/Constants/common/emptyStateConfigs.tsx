@@ -29,7 +29,7 @@ export const getEmptyStateConfigs = (t: TFunction): Record<string, EmptyStateCon
     description: t('common.emptyState.reels.description'),
     primaryAction: {
       label: t('common.emptyState.reels.action'),
-      onClick: () => router.visit('/reels'),
+      onClick: () => router.visit('/content?action=create&type=reel'),
       icon: <Plus className="h-4 w-4" />,
     },
   },
@@ -126,7 +126,7 @@ export const emptyStateConfigs: Record<string, EmptyStateConfig> = {
       'Create your first reel to start engaging with your audience through short-form video content.',
     primaryAction: {
       label: 'Create Reel',
-      onClick: () => router.visit('/reels'),
+      onClick: () => router.visit('/content?action=create&type=reel'),
       icon: <Plus className="h-4 w-4" />,
     },
   },

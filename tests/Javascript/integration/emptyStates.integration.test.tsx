@@ -167,21 +167,6 @@ describe('Empty States - Integration Tests', () => {
 
   describe('3. Empty State Mapper Utility', () => {
     
-    it('should return correct config for reels route with empty data', () => {
-      const props = { reels: [] };
-      const config = getEmptyStateConfig('reels.gallery', props);
-      
-      expect(config).toBeDefined();
-      expect(config?.title.toLowerCase()).toContain('reel');
-    });
-
-    it('should return null for reels route with data', () => {
-      const props = { reels: [{ id: 1, title: 'Test Reel' }] };
-      const config = getEmptyStateConfig('reels.gallery', props);
-      
-      expect(config).toBeNull();
-    });
-
     it('should return correct config for publications route with empty data', () => {
       const props = { publications: [] };
       const config = getEmptyStateConfig('content.index', props);
@@ -203,13 +188,6 @@ describe('Empty States - Integration Tests', () => {
       
       expect(config).toBeDefined();
       expect(config?.title.toLowerCase()).toContain('analytics');
-    });
-
-    it('should return correct config for calendar route with empty data', () => {
-      const props = { events: [] };
-      const config = getEmptyStateConfig('calendar.index', props);
-      
-      expect(config).toBeDefined();
     });
 
     it('should return null for unknown route', () => {

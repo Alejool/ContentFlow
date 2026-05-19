@@ -142,7 +142,7 @@ export default function TourOverlay({
           const mobileMenuDropdown = document.querySelector('nav.lg\\:hidden > div:last-child');
           if (mobileMenuDropdown && !mobileMenuDropdown.classList.contains('hidden')) {
             // Menu is open, look for Calendar link inside it
-            const calendarLink = mobileMenuDropdown.querySelector('a[href*="/calendar"]');
+            const calendarLink = mobileMenuDropdown.querySelector('a[href*="/content"]');
             if (calendarLink) {
               targetElement = calendarLink;
               break;

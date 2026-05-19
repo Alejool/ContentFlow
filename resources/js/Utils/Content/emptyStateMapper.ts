@@ -31,11 +31,6 @@ interface EmptyStateContext {
  */
 export const emptyStateContexts: EmptyStateContext[] = [
   {
-    route: 'reels.gallery',
-    dataKey: 'reels',
-    configKey: 'reels',
-  },
-  {
     route: 'content.index',
     dataKey: 'publications',
     configKey: 'scheduledPosts',
@@ -44,11 +39,6 @@ export const emptyStateContexts: EmptyStateContext[] = [
     route: 'analytics.index',
     dataKey: 'analytics',
     configKey: 'analytics',
-  },
-  {
-    route: 'calendar.index',
-    dataKey: 'events',
-    configKey: 'calendarView',
   },
 ];
 

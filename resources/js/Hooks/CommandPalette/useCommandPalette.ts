@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 export interface CommandItem {
   id: string;
   name: string;
+  nameKey?: string;
   description?: string;
   href?: string;
   action?: () => void;
   icon: React.ComponentType<any>;
-  category: 'navigation' | 'actions' | 'accounts' | 'settings' | 'billing' | 'theme';
+  category: 'navigation' | 'actions' | 'settings';
   keywords?: string[];
+  adminOnly?: boolean;
 }
 
 export function useCommandPalette(commands: CommandItem[]) {
@@ -69,22 +71,24 @@ export function useCommandPalette(commands: CommandItem[]) {
     setIsOpen(false);
     setQuery('');
 
-    if (item.href) {
-      // Prevent duplicate navigation
-      if (isNavigatingRef.current) {
-        console.warn('[CommandPalette] Navigation already in progress, skipping');
-        return;
-      }
+    // Use rAF to let React flush the state update (close dialog) before navigation
+    requestAnimationFrame(() => {
+      if (item.href) {
+        if (isNavigatingRef.current) {
+          console.warn('[CommandPalette] Navigation already in progress, skipping');
+          return;
+        }
 
-      isNavigatingRef.current = true;
-      router.visit(item.href, {
-        onFinish: () => {
-          isNavigatingRef.current = false;
-        },
-      });
-    } else if (item.action) {
-      item.action();
-    }
+        isNavigatingRef.current = true;
+        router.visit(item.href, {
+          onFinish: () => {
+            isNavigatingRef.current = false;
+          },
+        });
+      } else if (item.action) {
+        item.action();
+      }
+    });
   };
 
   const open = () => setIsOpen(true);

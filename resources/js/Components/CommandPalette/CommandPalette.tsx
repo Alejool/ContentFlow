@@ -8,14 +8,25 @@ import {
   Dialog,
   DialogPanel,
 } from '@headlessui/react';
+import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Command, Search } from 'lucide-react';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CATEGORY_LABELS, COMMAND_PALETTE_COMMANDS } from './commandPaletteCommands';
 
 export default function CommandPalette() {
+  const { t } = useTranslation();
+  const { auth } = usePage().props as any;
+  const isSuperAdmin = auth?.user?.is_super_admin === true;
+
+  const filteredCommands = useMemo(() => {
+    if (isSuperAdmin) return COMMAND_PALETTE_COMMANDS;
+    return COMMAND_PALETTE_COMMANDS.filter((cmd) => !cmd.adminOnly);
+  }, [isSuperAdmin]);
+
   const { isOpen, query, setQuery, groupedCommands, handleSelect, setIsOpen } =
-    useCommandPalette(COMMAND_PALETTE_COMMANDS);
+    useCommandPalette(filteredCommands);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -116,7 +127,7 @@ export default function CommandPalette() {
                                           : 'text-gray-700 dark:text-gray-300'
                                       }`}
                                     >
-                                      {item.name}
+                                      {item.nameKey ? t(item.nameKey) : item.name}
                                     </p>
                                     {item.description && (
                                       <p

@@ -25,7 +25,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 
-export type ContentTab = 'publications' | 'campaigns' | 'logs' | 'calendar' | 'approvals';
+export type ContentTab = 'publications' | 'campaigns' | 'logs' | 'calendar' | 'approvals' | 'social';
 
 export const usePublications = () => {
   const { t } = useTranslation();

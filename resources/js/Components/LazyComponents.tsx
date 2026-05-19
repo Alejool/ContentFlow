@@ -51,8 +51,6 @@ export const LazyPlatformSettingsModal = createLazyComponent(
 
 // Páginas pesadas
 export const LazyAnalyticsPage = lazy(() => import('@/Pages/Analytics/Index'));
-export const LazyCalendarPage = lazy(() => import('@/Pages/Calendar/Index'));
-export const LazyReelsGallery = lazy(() => import('@/Pages/Reels/AiReelsGallery'));
 export const LazyWorkspaceSettings = lazy(() => import('@/Pages/Workspace/Settings'));
 
 // AI Components - lazy load for better performance

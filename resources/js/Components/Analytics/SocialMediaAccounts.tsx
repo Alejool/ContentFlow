@@ -139,7 +139,7 @@ export default function SocialMediaAccounts({
                 )}
               </p>
               <Link
-                href={route('social-accounts.index')}
+                href="/content"
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
               >
                 <Plus className="h-4 w-4" />
@@ -287,7 +287,7 @@ export default function SocialMediaAccounts({
                     }`}
                   >
                     <Link
-                      href={route('social-accounts.index')}
+                      href="/content"
                       className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                         theme === 'dark'
                           ? 'bg-amber-900/30 text-amber-300 hover:bg-amber-900/50'

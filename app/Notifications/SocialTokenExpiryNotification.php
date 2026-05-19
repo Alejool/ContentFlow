@@ -39,7 +39,7 @@ class SocialTokenExpiryNotification extends Notification
             ->greeting("Hola {$notifiable->name},")
             ->line("Tu cuenta **{$accountName}** en **{$platformLabel}** perderá acceso {$daysLabel}.")
             ->line('Si no la reconectas, las publicaciones programadas en esa cuenta fallarán silenciosamente.')
-            ->action('Reconectar cuenta', url('/social-accounts'))
+            ->action('Reconectar cuenta', url('/content'))
             ->line('Puedes reconectar la cuenta desde la sección de Cuentas Conectadas en menos de un minuto.');
     }
 
@@ -56,7 +56,7 @@ class SocialTokenExpiryNotification extends Notification
             'account_id'    => $this->account->id,
             'days_remaining' => $this->daysRemaining,
             'message'       => "Tu cuenta {$this->account->account_name} ({$this->account->platform}) vence {$daysLabel}.",
-            'action_url'    => '/social-accounts',
+            'action_url'    => '/content',
         ];
     }
 }
