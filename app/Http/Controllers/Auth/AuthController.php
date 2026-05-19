@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Log;
+use App\Services\Onboarding\OnboardingService;
 
 use App\Models\User;
 
@@ -55,7 +56,7 @@ class AuthController extends Controller
         ]);
         
         // Initialize onboarding for new users
-        $onboardingService = app(\App\Services\OnboardingService::class);
+        $onboardingService = app(OnboardingService::class);
         $onboardingService->initializeOnboarding($user);
         Log::info('Google Callback: Onboarding initialized for new user', ['user_id' => $user->id]);
       }
@@ -64,9 +65,9 @@ class AuthController extends Controller
       $user->updateLoginStats();
       Log::info('Google Callback: User logged in', ['id' => $user->id, 'is_new' => $isNewUser]);
 
-      // request()->session()->regenerate(); // Potentially causing race conditions in Docker/mixed content
+      request()->session()->regenerate();
       request()->session()->save();
-      Log::info('Google Callback: Session saved', ['user_id' => $user->id, 'session_id' => request()->session()->getId()]);
+      Log::info('Google Callback: Session Regenerated and Saved', ['user_id' => $user->id, 'session_id' => request()->session()->getId()]);
 
       return redirect()->route('dashboard');
     } catch (\Exception $e) {

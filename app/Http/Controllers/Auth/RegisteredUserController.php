@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use App\Mail\PasswordRecoveryMail;
+use App\Services\Onboarding\OnboardingService;
 
 
 class RegisteredUserController extends Controller
@@ -71,7 +72,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         
         // Initialize onboarding for new users
-        $onboardingService = app(\App\Services\OnboardingService::class);
+        $onboardingService = app(OnboardingService::class);
         $onboardingService->initializeOnboarding($user);
         Log::info('Onboarding initialized for new user', ['user_id' => $user->id]);
         
