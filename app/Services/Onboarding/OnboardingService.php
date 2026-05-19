@@ -91,27 +91,32 @@ class OnboardingService implements OnboardingServiceInterface
             return $existingState;
         }
 
-        // Create new onboarding state with default values
+        // Create new onboarding state with default values.
+        // tour_skipped / wizard_skipped están en true temporalmente mientras
+        // se mejora el flujo — reverter a false cuando el tour esté listo.
         $data = [
             'business_info_completed' => false,
-            'business_name' => null,
-            'business_industry' => null,
-            'business_goals' => null,
-            'business_size' => null,
-            'plan_selected' => false,
-            'selected_plan' => null,
-            'tour_completed' => false,
-            'tour_skipped' => false,
-            'tour_current_step' => 0,
-            'tour_completed_steps' => [],
-            'wizard_completed' => false,
-            'wizard_skipped' => false,
-            'wizard_current_step' => 0,
-            'template_selected' => false,
-            'template_id' => null,
-            'dismissed_tooltips' => [],
-            'completed_at' => null,
-            'started_at' => now(),
+            'business_name'           => null,
+            'business_industry'       => null,
+            'business_goals'          => null,
+            'business_size'           => null,
+            'plan_selected'           => false,
+            'selected_plan'           => null,
+            // Tour omitido por defecto hasta que se corrija el flujo
+            'tour_completed'          => false,
+            'tour_skipped'            => true,
+            'tour_current_step'       => 0,
+            'tour_completed_steps'    => [],
+            // Wizard omitido por defecto
+            'wizard_completed'        => false,
+            'wizard_skipped'          => true,
+            'wizard_current_step'     => 0,
+            // Template por defecto para no bloquear el flujo
+            'template_selected'       => true,
+            'template_id'             => 'default',
+            'dismissed_tooltips'      => [],
+            'completed_at'            => null,
+            'started_at'              => now(),
         ];
 
         Log::info("Initializing onboarding for user {$user->id}");

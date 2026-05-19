@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\common;
+namespace App\Services\Common;
 
 use App\Models\SystemSetting;
 use App\Helpers\LogHelper;
