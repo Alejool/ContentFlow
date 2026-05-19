@@ -56,87 +56,132 @@ class DevSeeder extends Seeder
         $this->command->info('▶  Configuración de suscripciones...');
         $this->call(SubscriptionControlSeeder::class);
 
-        // ── 3. Usuario de prueba ───────────────────────────────────────
-        $this->command->info('▶  Usuario de prueba...');
-        $user = User::firstOrCreate(
-            ['email' => self::TEST_EMAIL],
+        // ── 3. Usuarios de prueba ──────────────────────────────────────
+        $this->command->info('▶  Usuarios de prueba...');
+        $testUsers = [
             [
-                'name'              => self::TEST_NAME,
-                'password'          => Hash::make(self::TEST_PASSWORD),
-                'email_verified_at' => now(),
-            ]
-        );
+                'name' => 'Dev User',
+                'email' => 'dev@contentflow.test',
+                'photo_url' => 'https://i.pravatar.cc/150?img=1',
+                'bio' => 'Usuario de desarrollo para testing',
+                'timezone' => 'America/Mexico_City',
+            ],
+            [
+                'name' => 'María García',
+                'email' => 'maria@contentflow.test',
+                'photo_url' => 'https://i.pravatar.cc/150?img=2',
+                'bio' => 'Social Media Manager especializada en estrategias de contenido digital',
+                'timezone' => 'America/Mexico_City',
+            ],
+            [
+                'name' => 'Carlos Rodríguez',
+                'email' => 'carlos@contentflow.test',
+                'photo_url' => 'https://i.pravatar.cc/150?img=12',
+                'bio' => 'Director de Marketing Digital con 10+ años de experiencia',
+                'timezone' => 'America/Bogota',
+            ],
+            [
+                'name' => 'Ana Martínez',
+                'email' => 'ana@contentflow.test',
+                'photo_url' => 'https://i.pravatar.cc/150?img=5',
+                'bio' => 'Content Creator y Community Manager',
+                'timezone' => 'Europe/Madrid',
+            ],
+        ];
 
-        if ($user->wasRecentlyCreated) {
-            $this->command->info("   ✅ Usuario creado: " . self::TEST_EMAIL);
-        } else {
-            $this->command->info("   ℹ️  Usuario ya existe: " . self::TEST_EMAIL);
+        $createdCount = 0;
+        $existingCount = 0;
+
+        foreach ($testUsers as $testUser) {
+            if (!User::where('email', $testUser['email'])->exists()) {
+                User::create([
+                    'name' => $testUser['name'],
+                    'email' => $testUser['email'],
+                    'password' => Hash::make(self::TEST_PASSWORD),
+                    'email_verified_at' => now(),
+                    'photo_url' => $testUser['photo_url'],
+                    'bio' => $testUser['bio'],
+                    'timezone' => $testUser['timezone'],
+                ]);
+                $createdCount++;
+            } else {
+                $existingCount++;
+            }
         }
 
-        // ── 4. Workspace personal del usuario ─────────────────────────
-        $this->command->info('▶  Workspace...');
+        $this->command->info("   ✅ {$createdCount} usuarios creados, {$existingCount} ya existían");
+
+        // ── 4. Workspaces y datos para cada usuario ────────────────────
+        $this->command->info('▶  Workspaces...');
         $ownerRole = Role::where('slug', 'owner')->first();
 
         if (!$ownerRole) {
-            $this->command->error('   ❌ Rol "owner" no encontrado. Verifica que RolesAndPermissionsSeeder corrió bien.');
+            $this->command->error('   ❌ Rol "owner" no encontrado.');
             return;
         }
 
-        $workspace = null;
+        $users = User::all();
+        $wsCreatedCount = 0;
 
-        if (!$user->workspaces()->exists()) {
-            $workspace = Workspace::create([
-                'name'       => self::TEST_NAME . "'s Workspace",
-                'slug'       => Str::slug(self::TEST_NAME . '-workspace-' . Str::random(4)),
-                'created_by' => $user->id,
-            ]);
+        foreach ($users as $user) {
+            if (!$user->workspaces()->exists()) {
+                $workspace = Workspace::create([
+                    'name'       => $user->name . "'s Workspace",
+                    'slug'       => Str::slug($user->name . '-workspace-' . Str::random(4)),
+                    'created_by' => $user->id,
+                ]);
 
-            $user->workspaces()->attach($workspace->id, ['role_id' => $ownerRole->id]);
-            $user->update(['current_workspace_id' => $workspace->id]);
-
-            $this->command->info("   ✅ Workspace creado: {$workspace->name} (ID: {$workspace->id})");
-        } else {
-            $workspace = $user->workspaces()->first();
-
-            if (!$user->current_workspace_id) {
+                $user->workspaces()->attach($workspace->id, ['role_id' => $ownerRole->id]);
                 $user->update(['current_workspace_id' => $workspace->id]);
+                $wsCreatedCount++;
+            } else {
+                $workspace = $user->workspaces()->first();
+                if (!$user->current_workspace_id) {
+                    $user->update(['current_workspace_id' => $workspace->id]);
+                }
             }
-
-            $this->command->info("   ℹ️  Workspace ya existe (ID: {$workspace->id})");
         }
 
-        // Usar el workspace activo del usuario para asociar todos los datos
-        $workspaceId = $user->fresh()->current_workspace_id ?? $workspace?->id;
+        $this->command->info("   ✅ {$wsCreatedCount} workspaces creados");
 
-        // ── 5. Redes sociales simuladas ────────────────────────────────
-        $this->command->info('▶  Cuentas de redes sociales...');
-        $this->seedSocialAccounts($user, $workspaceId);
+        // ── 5. Generar datos para cada usuario ──────────────────────────
+        foreach ($users as $user) {
+            $workspaceId = $user->fresh()->current_workspace_id;
 
-        // ── 6. Métricas de redes sociales ──────────────────────────────
-        $this->command->info('▶  Métricas de redes sociales...');
-        $this->seedSocialMetrics($user, $workspaceId);
+            $this->command->info("▶  Procesando usuario: {$user->email}");
 
-        // ── 7. Campañas de ejemplo ─────────────────────────────────────
-        $this->command->info('▶  Campañas de ejemplo...');
-        $this->seedCampaigns($user, $workspaceId);
+            // Redes sociales
+            $this->seedSocialAccounts($user, $workspaceId);
 
-        // ── 8. Publicaciones de ejemplo ────────────────────────────────
-        $this->command->info('▶  Publicaciones y analytics...');
-        $this->seedPublications($user, $workspaceId);
+            // Métricas de redes sociales
+            $this->seedSocialMetrics($user, $workspaceId);
+
+            // Campañas
+            $this->seedCampaigns($user, $workspaceId);
+
+            // Publicaciones y analytics
+            $this->seedPublications($user, $workspaceId);
+        }
 
         // ── Resumen ────────────────────────────────────────────────────
         $this->command->info('');
         $this->command->info('╔══════════════════════════════════════════════════════════╗');
         $this->command->info('║              ✅ DevSeeder completado                     ║');
         $this->command->info('╠══════════════════════════════════════════════════════════╣');
-        $this->command->info('║  Email         : ' . str_pad(self::TEST_EMAIL, 42) . '║');
+        $this->command->info('║  Usuarios      : ' . str_pad(User::count() . ' usuarios creados', 42) . '║');
         $this->command->info('║  Password      : ' . str_pad(self::TEST_PASSWORD, 42) . '║');
         $this->command->info('║  Roles         : ' . str_pad(Role::count() . ' roles, ' . Permission::count() . ' permisos', 42) . '║');
-        $this->command->info('║  Social cuentas: ' . str_pad(SocialAccount::where('user_id', $user->id)->count() . ' cuentas', 42) . '║');
-        $this->command->info('║  Campañas      : ' . str_pad(Campaign::where('user_id', $user->id)->count() . ' campañas', 42) . '║');
-        $this->command->info('║  Publicaciones : ' . str_pad(Publication::where('user_id', $user->id)->count() . ' publicaciones', 42) . '║');
-        $this->command->info('║  Analytics     : ' . str_pad(CampaignAnalytics::where('user_id', $user->id)->count() . ' registros', 42) . '║');
+        $this->command->info('║  Social cuentas: ' . str_pad(SocialAccount::count() . ' cuentas totales', 42) . '║');
+        $this->command->info('║  Campañas      : ' . str_pad(Campaign::count() . ' campañas totales', 42) . '║');
+        $this->command->info('║  Publicaciones : ' . str_pad(Publication::count() . ' publicaciones totales', 42) . '║');
+        $this->command->info('║  Analytics     : ' . str_pad(CampaignAnalytics::count() . ' registros totales', 42) . '║');
         $this->command->info('╚══════════════════════════════════════════════════════════╝');
+        $this->command->info('');
+        
+        $this->command->line('💡 Usuarios de prueba:');
+        foreach ($testUsers as $user) {
+            $this->command->line("   • {$user['email']} / password: " . self::TEST_PASSWORD);
+        }
         $this->command->info('');
     }
 
