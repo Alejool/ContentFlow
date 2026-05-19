@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -14,3 +15,6 @@ Artisan::command('test:reverb', function () {
     \App\Events\TestReverbEvent::dispatch('Testing Reverb Connection at ' . now());
     $this->info('Event dispatched! Check your Reverb console and Browser console.');
 })->purpose('Test Reverb Broadcasting');
+
+// Tarea programada diaria para verificar discordancias de facturas con Stripe y guardarlas localmente
+Schedule::command('stripe:sync-invoices')->dailyAt('02:00');

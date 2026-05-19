@@ -141,6 +141,29 @@ class PricingController extends Controller
                 throw new \Exception('Failed to update plan');
             }
 
+            // Actualizar el stripe_id del workspace si no lo tiene
+            $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
+            if ($workspace && $session->customer && $workspace->stripe_id !== $session->customer) {
+                $workspace->update(['stripe_id' => $session->customer]);
+                \Log::info('Workspace Stripe ID updated after checkout', [
+                    'workspace_id' => $workspace->id,
+                    'stripe_id' => $session->customer
+                ]);
+            }
+
+            // Sincronizar facturas desde Stripe inmediatamente para asegurar que se guarden en DB local 
+            // (crucial para entornos de desarrollo sin webhooks, y mejor UX en producción)
+            if ($workspace && $workspace->stripe_id) {
+                try {
+                    \Illuminate\Support\Facades\Artisan::call('stripe:sync-workspace-invoices', [
+                        'workspace_id' => $workspace->id
+                    ]);
+                    \Log::info('Invoices explicitly synced after checkout success', ['workspace_id' => $workspace->id]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to sync invoices after checkout success', ['error' => $e->getMessage()]);
+                }
+            }
+
             // Update onboarding state to mark plan as selected
             $onboardingState = $user->onboardingState;
             if ($onboardingState && !$onboardingState->plan_selected) {
