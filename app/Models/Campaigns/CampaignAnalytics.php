@@ -2,6 +2,7 @@
 
 namespace App\Models\Campaigns;
 
+use App\Models\Publications\Publication;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,8 @@ class CampaignAnalytics extends Model
 
     protected $fillable = [
         'campaign_id',
+        'publication_id',
+        'user_id',
         'date',
         'views',
         'unique_visitors',
@@ -48,5 +51,10 @@ class CampaignAnalytics extends Model
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
+    }
+
+    public function publication(): BelongsTo
+    {
+        return $this->belongsTo(Publication::class);
     }
 }

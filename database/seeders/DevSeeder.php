@@ -3,23 +3,30 @@
 namespace Database\Seeders;
 
 use App\Models\Campaigns\Campaign;
+use App\Models\Campaigns\CampaignAnalytics;
 use App\Models\Permission\Permission;
+use App\Models\Publications\Publication;
 use App\Models\Role\Role;
 use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialMediaMetrics;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
  * DevSeeder — Un solo comando para levantar el entorno de desarrollo con:
- *   - Roles y permisos
- *   - Configuración de suscripciones
+ *   - Roles y permisos (RolesAndPermissionsSeeder)
+ *   - Configuración de suscripciones (SubscriptionControlSeeder)
  *   - 1 usuario de prueba con workspace propio (rol Owner)
- *   - Cuentas de redes sociales simuladas (facebook, instagram, twitter, tiktok, youtube)
- *   - Campañas de ejemplo
+ *   - 5 cuentas de redes sociales simuladas (facebook, instagram, twitter, tiktok, youtube)
+ *   - 90 días de métricas de redes sociales con datos realistas
+ *   - 3 campañas de ejemplo
+ *   - 15 publicaciones de ejemplo con analytics completos
  *
  * Uso (dentro del contenedor app):
  *   php artisan db:seed --class=DevSeeder
@@ -105,9 +112,17 @@ class DevSeeder extends Seeder
         $this->command->info('▶  Cuentas de redes sociales...');
         $this->seedSocialAccounts($user, $workspaceId);
 
-        // ── 6. Campañas de ejemplo ─────────────────────────────────────
+        // ── 6. Métricas de redes sociales ──────────────────────────────
+        $this->command->info('▶  Métricas de redes sociales...');
+        $this->seedSocialMetrics($user, $workspaceId);
+
+        // ── 7. Campañas de ejemplo ─────────────────────────────────────
         $this->command->info('▶  Campañas de ejemplo...');
         $this->seedCampaigns($user, $workspaceId);
+
+        // ── 8. Publicaciones de ejemplo ────────────────────────────────
+        $this->command->info('▶  Publicaciones y analytics...');
+        $this->seedPublications($user, $workspaceId);
 
         // ── Resumen ────────────────────────────────────────────────────
         $this->command->info('');
@@ -117,8 +132,10 @@ class DevSeeder extends Seeder
         $this->command->info('║  Email         : ' . str_pad(self::TEST_EMAIL, 42) . '║');
         $this->command->info('║  Password      : ' . str_pad(self::TEST_PASSWORD, 42) . '║');
         $this->command->info('║  Roles         : ' . str_pad(Role::count() . ' roles, ' . Permission::count() . ' permisos', 42) . '║');
-        $this->command->info('║  Social cuentas: ' . str_pad(SocialAccount::where('user_id', $user->id)->count() . ' cuentas conectadas', 42) . '║');
+        $this->command->info('║  Social cuentas: ' . str_pad(SocialAccount::where('user_id', $user->id)->count() . ' cuentas', 42) . '║');
         $this->command->info('║  Campañas      : ' . str_pad(Campaign::where('user_id', $user->id)->count() . ' campañas', 42) . '║');
+        $this->command->info('║  Publicaciones : ' . str_pad(Publication::where('user_id', $user->id)->count() . ' publicaciones', 42) . '║');
+        $this->command->info('║  Analytics     : ' . str_pad(CampaignAnalytics::where('user_id', $user->id)->count() . ' registros', 42) . '║');
         $this->command->info('╚══════════════════════════════════════════════════════════╝');
         $this->command->info('');
     }
@@ -272,5 +289,302 @@ class DevSeeder extends Seeder
         }
 
         $this->command->info("   ✅ {$created} campañas creadas, {$existing} ya existían");
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Métricas de redes sociales
+    // ──────────────────────────────────────────────────────────────────
+    private function seedSocialMetrics(User $user, ?int $workspaceId): void
+    {
+        $socialAccounts = SocialAccount::where('user_id', $user->id)->get();
+        
+        $totalMetrics = 0;
+
+        foreach ($socialAccounts as $account) {
+            $startDate = Carbon::now()->subDays(90);
+            $currentDate = $startDate->copy();
+            $followers = match($account->platform) {
+                'facebook' => 4820,
+                'instagram' => 12340,
+                'twitter' => 3210,
+                'tiktok' => 8900,
+                'youtube' => 2150,
+                default => 5000,
+            };
+
+            while ($currentDate <= Carbon::now()) {
+                $exists = SocialMediaMetrics::where('social_account_id', $account->id)
+                    ->where('date', $currentDate->format('Y-m-d'))
+                    ->exists();
+
+                if (!$exists) {
+                    $isWeekend = $currentDate->isWeekend();
+                    
+                    $growthRate = match($account->platform) {
+                        'tiktok' => rand(50, 300),
+                        'youtube' => rand(10, 100),
+                        'facebook' => rand(5, 50),
+                        'twitter' => rand(-10, 80),
+                        default => rand(0, 50),
+                    };
+                    
+                    $dailyGrowth = $isWeekend ? (int)($growthRate * 0.7) : $growthRate;
+                    $followers += $dailyGrowth;
+                    if ($followers < 0) $followers = 0;
+
+                    $postsPerDay = match($account->platform) {
+                        'tiktok' => $isWeekend ? rand(2, 5) : rand(1, 3),
+                        'twitter' => $isWeekend ? rand(3, 8) : rand(5, 15),
+                        'facebook' => $isWeekend ? rand(1, 2) : rand(0, 2),
+                        'youtube' => rand(0, 1),
+                        default => rand(0, 2),
+                    };
+
+                    $engagementRate = match($account->platform) {
+                        'tiktok' => rand(8, 18),
+                        'youtube' => rand(4, 10),
+                        'facebook' => rand(1, 4),
+                        'twitter' => rand(1, 3),
+                        default => rand(1, 5),
+                    };
+
+                    $views = (int)($followers * ($postsPerDay + 1) * (rand(10, 30) / 100));
+                    $totalLikes = (int)($views * ($engagementRate / 100));
+                    $totalComments = (int)($totalLikes * (rand(5, 15) / 100));
+                    $totalShares = (int)($totalLikes * (rand(2, 8) / 100));
+
+                    SocialMediaMetrics::create([
+                        'social_account_id' => $account->id,
+                        'user_id' => $user->id,
+                        'date' => $currentDate->format('Y-m-d'),
+                        'followers' => $followers,
+                        'following' => rand(100, 1000),
+                        'posts_count' => $postsPerDay,
+                        'total_likes' => $totalLikes,
+                        'total_comments' => $totalComments,
+                        'total_shares' => $totalShares,
+                        'engagement_rate' => $engagementRate,
+                    ]);
+
+                    $totalMetrics++;
+                }
+
+                $currentDate->addDay();
+            }
+        }
+
+        $this->command->info("   ✅ {$totalMetrics} registros de métricas creados");
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Publicaciones de ejemplo con analytics
+    // ──────────────────────────────────────────────────────────────────
+    private function seedPublications(User $user, ?int $workspaceId): void
+    {
+        $publicationTemplates = [
+            [
+                'title' => 'Rebajas de Verano 2026 - Hasta 50% de Descuento',
+                'body' => "🌞 ¡El verano está aquí y nuestras ofertas también! 🔥\n\nDisfruta de descuentos increíbles en toda nuestra colección de verano. Desde ropa de playa hasta accesorios frescos, tenemos todo lo que necesitas para brillar esta temporada.\n\n✨ Ofertas destacadas:\n• Trajes de baño: 40% OFF\n• Gafas de sol: 30% OFF\n• Sandalias: 50% OFF\n• Vestidos de verano: 35% OFF",
+                'hashtags' => ['#verano2026', '#rebajas'],
+                'goal' => 'Incrementar ventas de verano en un 35%',
+                'url' => 'https://tienda.example.com/verano-2026',
+            ],
+            [
+                'title' => 'Lanzamiento Colección Invierno - Nuevos Diseños',
+                'body' => "❄️ Nueva Colección de Invierno Ya Disponible ❄️\n\nDescubre las últimas tendencias en moda invernal. Diseños exclusivos que combinan estilo y comodidad para mantenerte abrigado con clase.",
+                'hashtags' => ['#invierno', '#moda', '#nuevaColeccion'],
+                'goal' => 'Lanzamiento exitoso con 500+ ventas',
+                'url' => 'https://tienda.example.com/invierno-coleccion',
+            ],
+            [
+                'title' => 'Promo Gadgets Tech - Vida Inteligente',
+                'body' => "🚀 Tecnología que Transforma tu Vida 📱\n\n¿Listo para actualizar tu setup? Tenemos los gadgets más innovadores del mercado con precios especiales.",
+                'hashtags' => ['#tecnologia', '#gadgets', '#tech'],
+                'goal' => 'Posicionar marca en segmento tech',
+                'url' => 'https://tech.example.com/promo-gadgets',
+            ],
+            [
+                'title' => 'Campaña Alimentación Orgánica - Vida Saludable',
+                'body' => "🌱 Alimentación Consciente, Vida Saludable 🥗\n\nÚnete al movimiento de comida orgánica y descubre cómo pequeños cambios en tu dieta pueden transformar tu bienestar.",
+                'hashtags' => ['#organico', '#comidaSana', '#wellness'],
+                'goal' => 'Educar audiencia sobre alimentación orgánica',
+                'url' => 'https://organic.example.com/productos',
+            ],
+            [
+                'title' => 'Desafío Fitness 30 Días - Transformación Total',
+                'body' => "💪 Desafío Fitness de 30 Días - ¡Transforma Tu Cuerpo y Mente! 🏋️\n\n¿Estás listo para el cambio definitivo? Únete a nuestro desafío de transformación integral.",
+                'hashtags' => ['#fitness', '#workout', '#desafio', '#transformacion'],
+                'goal' => 'Conseguir 200 participantes en el desafío',
+                'url' => 'https://fitness.example.com/desafio-30-dias',
+            ],
+            [
+                'title' => 'Black Friday Mega Ofertas - Tiempo Limitado',
+                'body' => "🖤 BLACK FRIDAY ESTÁ AQUÍ 🛍️\n\n¡Las ofertas más esperadas del año han llegado! Descuentos de hasta 70% en productos seleccionados.",
+                'hashtags' => ['#blackFriday', '#ofertas', '#descuentos'],
+                'goal' => 'Maximizar ventas - objetivo $50,000 en 48 horas',
+                'url' => 'https://shop.example.com/black-friday-2026',
+            ],
+            [
+                'title' => 'Propósitos Año Nuevo 2026 - Nuevo Comienzo',
+                'body' => "🎆 Nuevo Año, Nueva Tú ✨\n\n2026 es tu año para brillar y cumplir todos tus sueños. Te ayudamos a cumplir tus propósitos.",
+                'hashtags' => ['#anoNuevo', '#propositos', '#metas'],
+                'goal' => 'Engagement alto - 10,000 interacciones en enero',
+                'url' => 'https://programas.example.com/ano-nuevo-2026',
+            ],
+            [
+                'title' => 'Moda Sostenible - Estilo con Conciencia Ecológica',
+                'body' => "🌿 Moda Sostenible: Estilo con Conciencia 👗\n\nLa moda puede ser hermosa Y responsable con el planeta. Descubre nuestra línea eco-friendly.",
+                'hashtags' => ['#modaSostenible', '#ecoFriendly'],
+                'goal' => 'Posicionar marca como líder en moda sostenible',
+                'url' => 'https://eco.example.com/moda-sostenible',
+            ],
+            [
+                'title' => 'Webinar Gratuito - Marketing Digital 2026',
+                'body' => "🎓 Webinar GRATUITO: Estrategias de Marketing Digital para 2026 📊\n\n¿Quieres llevar tu negocio al siguiente nivel? Únete a nuestro webinar exclusivo.",
+                'hashtags' => ['#webinar', '#marketingDigital'],
+                'goal' => 'Generar 500+ registros',
+                'url' => 'https://eventos.example.com/webinar-marketing-2026',
+            ],
+            [
+                'title' => 'Lanzamiento App Móvil - Productividad Máxima',
+                'body' => "📱 ¡Lanzamos nuestra APP! Tu asistente de productividad personal 🚀\n\nDespués de 2 años de desarrollo, finalmente está aquí.",
+                'hashtags' => ['#appMovil', '#productividad', '#tecnologia'],
+                'goal' => 'Alcanzar 10,000 descargas en primer mes',
+                'url' => 'https://app.example.com/descargar',
+            ],
+            [
+                'title' => 'Curso Online - Fotografía Profesional desde Cero',
+                'body' => "📸 Curso Online: Fotografía Profesional desde Cero 🎨\n\n¿Siempre quisiste ser fotógrafo profesional? Este es tu momento.",
+                'hashtags' => ['#fotografia', '#cursoOnline'],
+                'goal' => 'Vender 100 cursos en lanzamiento',
+                'url' => 'https://cursos.example.com/fotografia-profesional',
+            ],
+            [
+                'title' => 'Concurso Redes Sociales - Gana Viaje a París',
+                'body' => "🎉 ¡MEGA CONCURSO! Gana un Viaje para 2 a París ✈️🗼\n\nCelebramos 10 años y queremos premiarte con el viaje de tus sueños.",
+                'hashtags' => ['#concurso', '#sorteo', '#ganaViaje'],
+                'goal' => 'Viralizar marca alcanzando 50,000+ interacciones',
+                'url' => 'https://concurso.example.com/viaje-paris',
+            ],
+            [
+                'title' => 'Podcast Semanal - Historias de Éxito Empresarial',
+                'body' => "🎙️ NUEVO EPISODIO de nuestro Podcast 🚀\n\nEntrevistamos a María López, CEO de TechStart, quien nos cuenta cómo pasó de $0 a $10M.",
+                'hashtags' => ['#podcast', '#emprendimiento', '#negocio'],
+                'goal' => 'Alcanzar 5,000 reproducciones',
+                'url' => 'https://podcast.example.com/episodio-15',
+            ],
+            [
+                'title' => 'Masterclass Gratuita - Inversiones Inteligentes',
+                'body' => "💰 Masterclass GRATUITA: Inversiones Inteligentes para Principiantes 📈\n\n¿Quieres hacer crecer tu dinero? Esta masterclass es para ti.",
+                'hashtags' => ['#inversiones', '#finanzas', '#masterclass'],
+                'goal' => 'Generar 500 registros',
+                'url' => 'https://masterclass.example.com/inversiones',
+            ],
+            [
+                'title' => 'Lanzamiento Libro - Guía Completa de Redes Sociales',
+                'body' => "📚 ¡MI LIBRO YA ESTÁ DISPONIBLE! 🎉\n\nDespués de 2 años de trabajo, finalmente puedo compartir contigo todo lo que sé.",
+                'hashtags' => ['#libro', '#redesSociales', '#marketing'],
+                'goal' => 'Vender 1,000 copias en primer mes',
+                'url' => 'https://libro.example.com/redes-sociales',
+            ],
+        ];
+
+        $count = count($publicationTemplates);
+        $created = 0;
+
+        foreach ($publicationTemplates as $template) {
+            $title = $template['title'] . ' - ' . Str::random(4);
+            $startDate = Carbon::now()->subDays(rand(10, 90));
+            $endDate = $startDate->copy()->addDays(rand(7, 60));
+
+            $statusOptions = ['published', 'published', 'published', 'scheduled', 'draft'];
+            $status = $statusOptions[array_rand($statusOptions)];
+
+            $platformSettings = [
+                'facebook' => [
+                    'enabled' => rand(0, 1) === 1,
+                    'post_type' => ['status', 'photo', 'link'][rand(0, 2)],
+                ],
+                'twitter' => [
+                    'enabled' => rand(0, 1) === 1,
+                    'thread' => rand(0, 1) === 1,
+                ],
+            ];
+
+            $publication = Publication::create([
+                'user_id' => $user->id,
+                'workspace_id' => $workspaceId,
+                'title' => $title,
+                'slug' => Str::slug($title),
+                'status' => $status,
+                'goal' => $template['goal'],
+                'body' => $template['body'],
+                'description' => 'Publicación de prueba con contenido detallado y hashtags relevantes.',
+                'hashtags' => $template['hashtags'],
+                'url' => $template['url'],
+                'platform_settings' => $platformSettings,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'publish_date' => $startDate,
+                'published_at' => $status === 'published' ? $startDate : null,
+                'published_by' => $status === 'published' ? $user->id : null,
+                'approved_at' => in_array($status, ['published', 'scheduled']) ? $startDate->copy()->subHours(2) : null,
+                'approved_by' => in_array($status, ['published', 'scheduled']) ? $user->id : null,
+            ]);
+
+            // Generar analytics si está publicada
+            if ($status === 'published') {
+                $this->generatePublicationAnalytics($publication);
+            }
+
+            $created++;
+        }
+
+        $this->command->info("   ✅ {$created} publicaciones creadas con analytics");
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Generar analytics para cada publicación
+    // ──────────────────────────────────────────────────────────────────
+    private function generatePublicationAnalytics(Publication $publication): void
+    {
+        $currentDate = $publication->start_date->copy();
+        $endDate = $publication->end_date->copy()->min(Carbon::now());
+
+        $baseViews = rand(100, 1000);
+
+        while ($currentDate <= $endDate) {
+            $isWeekend = $currentDate->isWeekend();
+            $multiplier = $isWeekend ? 0.6 : 1.1;
+
+            $views = (int)($baseViews * $multiplier * (rand(80, 120) / 100));
+            $clicks = (int)($views * (rand(2, 10) / 100));
+            $conversions = (int)($clicks * (rand(5, 20) / 100));
+            $likes = (int)($views * (rand(5, 15) / 100));
+            $comments = (int)($likes * (rand(5, 20) / 100));
+            $shares = (int)($likes * (rand(2, 10) / 100));
+            $saves = (int)($likes * (rand(1, 5) / 100));
+
+            CampaignAnalytics::create([
+                'publication_id' => $publication->id,
+                'user_id' => $publication->user_id,
+                'date' => $currentDate->format('Y-m-d'),
+                'views' => $views,
+                'clicks' => $clicks,
+                'conversions' => $conversions,
+                'likes' => $likes,
+                'comments' => $comments,
+                'shares' => $shares,
+                'saves' => $saves,
+                'reach' => (int)($views * (rand(80, 95) / 100)),
+                'impressions' => (int)($views * (rand(110, 140) / 100)),
+                'engagement_rate' => $views > 0 ? round((($likes + $comments + $shares + $saves) / $views) * 100, 2) : 0,
+                'ctr' => $views > 0 ? round(($clicks / $views) * 100, 2) : 0,
+                'conversion_rate' => $clicks > 0 ? round(($conversions / $clicks) * 100, 2) : 0,
+            ]);
+
+            $currentDate->addDay();
+            $baseViews = $baseViews * (rand(95, 105) / 100);
+        }
     }
 }
