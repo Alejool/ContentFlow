@@ -13,7 +13,7 @@ use App\Models\PublicationTemplate;
 
 use App\Services\AI\AIService;
 use App\Services\Onboarding\OnboardingService;
-use App\Services\common\SystemConfigService;
+use App\Services\Common\SystemConfigService;
 use App\Services\Pricing\PlanFilterService;
 
 class HandleInertiaRequests extends Middleware
