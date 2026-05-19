@@ -1165,7 +1165,7 @@ class SocialAccountController extends Controller
       if (!$account) {
         return response()->json([
           'success' => false,
-          'message' => trans('notifications.account_not_found', [], $account->user->preferredLocale())
+          'message' => trans('notifications.account_not_found')
         ], 404);
       }
 
