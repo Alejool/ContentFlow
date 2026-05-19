@@ -14,6 +14,7 @@ export interface NavRoute {
   routeName: string;
   icon: LucideIcon;
   url?: string;
+  routeParams?: Record<string, any>;
 }
 
 export interface NavSection {

@@ -5,9 +5,10 @@ import type { NavRoute, NavSection } from '@/types/navigation';
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import Logo from '@assets/logo.png';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Command } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Command, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -28,6 +29,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
   const hasAnalyticsPermission = userPermissions.includes('view-analytics');
   const isSuperAdmin = auth?.user?.is_super_admin === true;
 
+  const currentWorkspaceId = auth?.current_workspace?.id;
+
   const sections = useMemo(() => {
     let idx = 0;
     return NAV_SECTIONS.filter((section) => {
@@ -44,6 +47,31 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
     })).filter((section) => section.routes.length > 0);
   }, [hasAnalyticsPermission, isSuperAdmin]);
 
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }));
+  };
+
+  // Automatically expand the section containing the active route
+  useEffect(() => {
+    const initial: Record<string, boolean> = { ...expandedSections };
+    let changed = false;
+    sections.forEach((section) => {
+      const active = section.routes.some((route) => isRouteActive(route));
+      if (active && !initial[section.id]) {
+        initial[section.id] = true;
+        changed = true;
+      }
+    });
+    if (changed) {
+      setExpandedSections(initial);
+    }
+  }, [sections]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!e.altKey || e.metaKey || e.ctrlKey) return;
@@ -55,7 +83,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
       const section = sections[keyIndex];
       if (section.routes.length > 0) {
         const firstRoute = section.routes[0];
-        window.location.href = getRouteUrl(firstRoute);
+        window.location.href = getRouteUrl(firstRoute, { currentWorkspaceId });
       }
     };
 
@@ -86,7 +114,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
     return (
       <NavLink
         key={item.routeName + (item.url || '')}
-        href={getRouteUrl(item)}
+        href={getRouteUrl(item, { currentWorkspaceId })}
         active={active}
         className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${isSidebarOpen ? '' : 'justify-center'
           } rounded-lg font-medium transition-all duration-200 ${classes.hoverBg} ${classes.textColor
@@ -202,20 +230,24 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
           <nav
             ref={navRef}
-            className="flex-1 space-y-0.5  px-3 py-2"
+            className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2 scroll-smooth select-none [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-800"
             aria-label="Main navigation"
             role="navigation"
           >
             {sections.map((section) => {
               const sectionActive = isSectionActive(section as NavSection);
               if (section.routes.length === 0) return null;
+              const isExpanded = expandedSections[section.id] ?? false;
 
               return (
-                <div key={section.id} role="group" aria-label={t(section.labelKey)}>
+                <div key={section.id} role="group" aria-label={t(section.labelKey)} className="mb-2">
                   {isSidebarOpen ? (
-                    <div className="group/section mb-1 mt-4 flex items-center gap-2 first:mt-0">
+                    <button
+                      onClick={() => toggleSection(section.id)}
+                      className="group/section mb-1.5 mt-4 flex w-full items-center justify-between px-3 py-1 first:mt-0 text-left"
+                    >
                       <span
-                        className={`flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase ${sectionActive
+                        className={`flex items-center gap-1.5 text-[10px] font-bold tracking-[0.15em] uppercase ${sectionActive
                           ? classes.sectionActiveText
                           : classes.sectionInactiveText
                           }`}
@@ -226,10 +258,12 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                           Alt+{SECTION_SHORTCUT_KEYS[section.shortcutIndex]}
                         </span>
                       </span>
-                      {sectionActive && (
-                        <div className="h-px flex-1 bg-linear-to-r from-primary-500/30 to-transparent" />
+                      {isExpanded ? (
+                        <ChevronUp className={`h-3 w-3 shrink-0 transition-colors ${sectionActive ? classes.sectionActiveText : classes.sectionInactiveText}`} />
+                      ) : (
+                        <ChevronDown className={`h-3 w-3 shrink-0 transition-colors ${sectionActive ? classes.sectionActiveText : classes.sectionInactiveText}`} />
                       )}
-                    </div>
+                    </button>
                   ) : (
                     <div className="group/section relative flex flex-col items-center py-1.5">
                       <div
@@ -247,11 +281,20 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                     </div>
                   )}
 
-                  <div
-                    className={`space-y-0.5 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}
-                  >
-                    {section.routes.map(renderNavItem)}
-                  </div>
+                  <AnimatePresence initial={false}>
+                    {(!isSidebarOpen || isExpanded) && (
+                      <motion.div
+                        key={`sidebar-routes-${section.id}`}
+                        initial={isSidebarOpen ? { height: 0, opacity: 0 } : undefined}
+                        animate={isSidebarOpen ? { height: 'auto', opacity: 1 } : undefined}
+                        exit={isSidebarOpen ? { height: 0, opacity: 0 } : undefined}
+                        transition={{ duration: 0.2, ease: 'easeInOut' }}
+                        className={`space-y-0.5 ${isSidebarOpen ? 'overflow-hidden' : 'flex flex-col items-center'}`}
+                      >
+                        {section.routes.map(renderNavItem)}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
@@ -259,7 +302,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
           {/* Footer - keyboard shortcut hint */}
           {isSidebarOpen && (
-            <div className={`border-t px-4 py-3 ${classes.borderColor}`}>
+            <div className={`shrink-0 border-t px-4 py-3 ${classes.borderColor}`}>
               <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
                 <Command className="h-3 w-3" />
                 <span>

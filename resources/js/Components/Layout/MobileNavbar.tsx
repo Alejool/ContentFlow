@@ -1,6 +1,6 @@
 import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import ResponsiveNavLink from '@/Components/common/ui/ResponsiveNavLink';
-import { NAV_SECTIONS, isRouteActive as isNavRouteActive } from '@/Constants/navigation';
+import { NAV_SECTIONS, isRouteActive as isNavRouteActive, getRouteUrl } from '@/Constants/navigation';
 import type { NavSection } from '@/types/navigation';
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import { useFocusTrap } from '@/Hooks/ui/useKeyboardNavigation';
@@ -299,7 +299,7 @@ export default function MobileNavbar({
               )}
 
               {filteredSections.sections.map((section) => {
-                const isExpanded = expandedSections[section.id] ?? false;
+                const isExpanded = searchQuery ? true : expandedSections[section.id] ?? false;
                 const hasActive = section.routes.some((r) => isNavRouteActive(r));
 
                 return (
@@ -343,7 +343,8 @@ export default function MobileNavbar({
                         >
                           <div className="ml-2 space-y-0.5 border-l-2 pl-3 dark:border-neutral-700">
                             {section.routes.map((item) => {
-                              const href = item.url || safeRoute(item.routeName);
+                              const currentWorkspaceId = auth?.current_workspace?.id;
+                              const href = getRouteUrl(item, { currentWorkspaceId });
                               const isActive = isNavRouteActive(item);
                               return (
                                 <ResponsiveNavLink

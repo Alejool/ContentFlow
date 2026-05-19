@@ -112,6 +112,14 @@ export default function ManageContentPage() {
     const saved = localStorage.getItem(`contentPage_search_${activeTab}`);
     return saved || '';
   });
+  const [selectedSection, setSelectedSection] = useState<'default' | 'social'>(() => {
+    if (typeof window === 'undefined') return 'default';
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get('section');
+    if (section === 'social') return 'social';
+    const saved = localStorage.getItem('manage_content_selected_section');
+    return saved === 'social' ? 'social' : 'default';
+  });
 
   useEffect(() => {
     localStorage.setItem(`contentPage_search_${activeTab}`, search);
@@ -127,6 +135,9 @@ export default function ManageContentPage() {
     (tab: ContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
+        setSelectedSection('default');
+        localStorage.setItem('manage_content_selected_section', 'default');
+
         const savedSearch = localStorage.getItem(`contentPage_search_${tab}`);
         setSearch(savedSearch || '');
         const savedFilters = localStorage.getItem(`contentPage_filters_${tab}`);
@@ -151,9 +162,22 @@ export default function ManageContentPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab') as ContentTab;
+    const tab = params.get('tab') as ContentTab | null;
+    const section = params.get('section');
+
     if (tab && ['publications', 'campaigns', 'calendar', 'logs', 'approvals'].includes(tab)) {
       setActiveTab(tab);
+    }
+
+    if (section === 'social') {
+      setSelectedSection('social');
+      localStorage.setItem('manage_content_selected_section', 'social');
+    } else if (tab) {
+      setSelectedSection('default');
+      localStorage.setItem('manage_content_selected_section', 'default');
+    } else {
+      const saved = localStorage.getItem('manage_content_selected_section');
+      setSelectedSection(saved === 'social' ? 'social' : 'default');
     }
 
     if (params.get('action') === 'create') {
@@ -486,7 +510,10 @@ export default function ManageContentPage() {
       <div className=" w-full min-w-0 max-w-full  bg-gray-50/30 dark:bg-neutral-900/10">
         <div className="mx-auto min-w-0 max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
           <div className="mb-8">
-            <SocialMediaAccounts />
+            <SocialMediaAccounts
+              defaultOpen={selectedSection === 'social'}
+              highlighted={selectedSection === 'social'}
+            />
           </div>
 
           <div className="mb-8">

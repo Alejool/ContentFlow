@@ -48,7 +48,12 @@ const cardVariants = {
   exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.2 } },
 };
 
-const SocialMediaAccounts = memo(() => {
+interface SocialMediaAccountsProps {
+  defaultOpen?: boolean;
+  highlighted?: boolean;
+}
+
+const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: SocialMediaAccountsProps) => {
   const { t } = useTranslation();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
   const { auth } = usePage<any>().props;
@@ -313,10 +318,10 @@ const SocialMediaAccounts = memo(() => {
   };
 
   return (
-    <Disclosure>
+    <Disclosure defaultOpen={defaultOpen} as="div" key={`social-accounts-${defaultOpen ? 'open' : 'closed'}`}>
       {({ open }) => (
         <div>
-          <DisclosureButton className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white p-4 transition-all duration-300 hover:border-gray-300 hover:shadow-sm dark:border-black/50 dark:bg-black/70 dark:hover:border-neutral-600">
+          <DisclosureButton className={`flex w-full items-center justify-between rounded-lg border p-4 transition-all duration-300 ${highlighted ? 'border-primary-400/50 bg-primary-50/80 shadow-lg shadow-primary-500/10 dark:bg-primary-900/20 dark:border-primary-500/30' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm dark:border-black/50 dark:bg-black/70 dark:hover:border-neutral-600'}`}>
             <div className="flex items-center gap-3">
               <motion.div
                 animate={{ rotate: open ? 360 : 0 }}
