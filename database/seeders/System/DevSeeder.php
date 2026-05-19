@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\System;
 
 use App\Models\Campaigns\Campaign;
 use App\Models\Campaigns\CampaignAnalytics;
@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Database\Seeders\Auth\RolesAndPermissionsSeeder;
+use Database\Seeders\Subscription\SubscriptionControlSeeder;
 
 /**
  * DevSeeder — Un solo comando para levantar el entorno de desarrollo con:
