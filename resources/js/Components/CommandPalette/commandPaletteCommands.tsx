@@ -16,7 +16,7 @@ function buildNavigationCommands(): CommandItem[] {
     for (const routeDef of section.routes) {
       try {
         commands.push({
-          id: `nav-${routeDef.routeName.replace(/\./g, '-')}${routeDef.url ? '-custom' : ''}`,
+          id: `nav-${routeDef.routeName.replace(/\./g, '-')}-${routeDef.nameKey.replace(/\./g, '-')}${routeDef.url ? '-custom' : ''}`,
           name: routeDef.nameKey,
           nameKey: routeDef.nameKey,
           href: routeDef.url || route(routeDef.routeName),

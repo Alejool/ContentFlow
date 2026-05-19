@@ -113,7 +113,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
     const active = isRouteActive(item);
     return (
       <NavLink
-        key={item.routeName + (item.url || '')}
+        key={item.routeName + '-' + item.nameKey}
         href={getRouteUrl(item, { currentWorkspaceId })}
         active={active}
         className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${isSidebarOpen ? '' : 'justify-center'

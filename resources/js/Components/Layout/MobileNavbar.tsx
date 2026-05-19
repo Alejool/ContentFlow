@@ -348,7 +348,7 @@ export default function MobileNavbar({
                               const isActive = isNavRouteActive(item);
                               return (
                                 <ResponsiveNavLink
-                                  key={item.routeName + (item.url || '')}
+                                  key={item.routeName + '-' + item.nameKey}
                                   href={href}
                                   active={isActive}
                                   role="listitem"
