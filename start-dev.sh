@@ -2,23 +2,29 @@
 set -euo pipefail
 
 COMPOSE="docker compose -f docker-compose.dev.yml"
-PROJECT="contentflow-dev"
 
 echo ""
-echo "🚀 ContentFlow DEV START (STABLE MODE)"
+echo "🚀 ContentFlow DEV START (FIXED STABLE MODE)"
 echo ""
 
 # =====================================================
-# 1. STOP + CLEAN ORPHANS
+# 0. FIX WSL / DOCKER DESKTOP MOUNTS
 # =====================================================
-echo "🧹 limpiando entorno..."
+echo "🧼 limpiando mounts WSL..."
+
+sudo rm -rf /run/desktop/mnt/host/wsl/docker-desktop-bind-mounts/* 2>/dev/null || true
+
+# =====================================================
+# 1. STOP EVERYTHING
+# =====================================================
+echo "🧹 deteniendo stack..."
 
 $COMPOSE down --remove-orphans || true
 
 # =====================================================
-# 2. FIX CONTAINERS CONFLICT (SAFE RECREATE)
+# 2. REMOVE CONTAINERS
 # =====================================================
-echo "🔍 verificando contenedores conflictivos..."
+echo "🧨 limpiando contenedores..."
 
 CONTAINERS=(
   contentflow_app_dev
@@ -33,29 +39,27 @@ CONTAINERS=(
 
 for c in "${CONTAINERS[@]}"; do
   CID=$(docker ps -aq --filter "name=$c" || true)
-
-  if [ ! -z "$CID" ]; then
-    echo "🧨 eliminando contenedor existente: $c"
-    docker rm -f "$CID" >/dev/null 2>&1 || true
+  if [ -n "$CID" ]; then
+    docker rm -f $CID >/dev/null 2>&1 || true
+    echo "✔ eliminado: $c"
   fi
 done
 
 # =====================================================
-# 3. FIX NETWORK (avoid mismatch warnings)
+# 3. RESET NETWORK
 # =====================================================
-echo "🔌 verificando red..."
+echo "🔌 reseteando red..."
 
 NET="contentflow_network_dev"
 
 if docker network ls | grep -q "$NET"; then
-  echo "⚠️ red existente detectada → recreando limpia"
   docker network rm "$NET" >/dev/null 2>&1 || true
 fi
 
 # =====================================================
-# 4. FIX VOLUMES (reuse or create clean)
+# 4. RESET VOLUMES (CLEAN STATE)
 # =====================================================
-echo "📦 verificando volúmenes..."
+echo "📦 recreando volúmenes..."
 
 VOLUMES=(
   contentflow_pgsql_data_shared
@@ -66,18 +70,21 @@ VOLUMES=(
 )
 
 for v in "${VOLUMES[@]}"; do
-  if docker volume ls | grep -q "$v"; then
-    echo "✔ volumen existente: $v"
-  else
-    echo "📦 creando volumen: $v"
-    docker volume create "$v" >/dev/null
-  fi
+  docker volume rm -f "$v" >/dev/null 2>&1 || true
+  docker volume create "$v" >/dev/null
 done
 
 # =====================================================
-# 5. ENV SAFE LOAD (NO BREAKS)
+# 5. CLEAN DOCKER SYSTEM
 # =====================================================
-echo "🔐 cargando variables .env..."
+echo "🧽 limpieza docker..."
+
+docker system prune -f >/dev/null || true
+
+# =====================================================
+# 6. ENV LOAD
+# =====================================================
+echo "🔐 cargando .env..."
 
 if [ -f .env.docker ]; then
   export $(grep -v '^#' .env.docker | xargs) || true
@@ -86,9 +93,9 @@ fi
 DB_USER="${DB_USERNAME:-postgres}"
 
 # =====================================================
-# 6. START DATABASE + REDIS FIRST
+# 7. START INFRA (ONLY DB FIRST)
 # =====================================================
-echo "🏗️ levantando infraestructura base..."
+echo "🏗️ levantando postgres + redis..."
 
 $COMPOSE up -d pgsql redis
 
@@ -101,42 +108,48 @@ done
 echo "✅ PostgreSQL listo"
 
 # =====================================================
-# 7. START APP
+# 8. 🔥 CRITICAL FIX: COMPOSER BEFORE APP
+# =====================================================
+echo "📦 instalando dependencias PHP (OBLIGATORIO)..."
+
+$COMPOSE run --rm app sh -c "
+  composer install --no-interaction --prefer-dist
+"
+
+# =====================================================
+# 9. START APP (NOW SAFE)
 # =====================================================
 echo "🚀 levantando app..."
 
 $COMPOSE up -d app
 
-echo "📦 composer install..."
+# =====================================================
+# 10. LARAVEL SETUP
+# =====================================================
+echo "🔑 configurando Laravel..."
 
-$COMPOSE exec -T app sh -c "
-  git config --global --add safe.directory /var/www/html 2>/dev/null || true
-  composer install --no-interaction --prefer-dist
-" || true
-
-echo "🔑 app key..."
 $COMPOSE exec -T app php artisan key:generate --force || true
-
-echo "🧬 migraciones..."
 $COMPOSE exec -T app php artisan migrate --force || true
 
 # =====================================================
-# 8. FRONT + QUEUE + WORKERS
+# 11. SECONDARY SERVICES
 # =====================================================
 echo "⚙️ levantando servicios secundarios..."
 
 $COMPOSE up -d nginx queue vite reverb scheduler
 
 # =====================================================
-# 9. HEALTHCHECK REAL (OCTANE)
+# 12. REAL HEALTHCHECK (NO FAKE READY)
 # =====================================================
-echo "⏳ esperando Octane (healthcheck real)..."
+echo "⏳ esperando healthcheck real..."
 
 for i in {1..60}; do
-  CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/health || true)
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 2 http://localhost/api/health || true)
+
+  echo "🔄 intento $i → HTTP $CODE"
 
   if [ "$CODE" = "200" ]; then
-    echo "✅ Octane OK"
+    echo "✅ sistema OK"
     break
   fi
 
@@ -144,19 +157,14 @@ for i in {1..60}; do
 done
 
 # =====================================================
-# 10. DONE
+# DONE
 # =====================================================
 echo ""
 echo "🎉 ==============================="
-echo "   DEV ENVIRONMENT READY"
+echo "   DEV ENV READY (STABLE)"
 echo "🎉 ==============================="
 echo ""
-echo "🌐 App:        http://localhost:8000"
-echo "⚡ Octane:     http://localhost:8080"
-echo "⚡ Vite:       http://localhost:5173"
-echo "📡 Reverb:     ws://localhost:8081"
-echo "🧠 Redis UI:   http://localhost:8082"
-echo ""
-echo "📜 logs:"
-echo "docker compose -f docker-compose.dev.yml logs -f app"
+echo "🌐 App:    http://localhost"
+echo "⚡ Octane: http://localhost:8080"
+echo "⚡ Vite:   http://localhost:5173"
 echo ""

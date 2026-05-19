@@ -319,6 +319,9 @@ export default defineConfig({
     server: isProduction ? {} : {
         host: '0.0.0.0',
         port: 5173,
+        // origin fija el URL que laravel-vite-plugin escribe en public/hot.
+        // Sin esto, hmr.clientPort contamina el hot file y rompe los asset URLs.
+        origin: `http://${host}:5173`,
         // strictPort: true causaba crash silencioso cuando el puerto quedaba ocupado
         // por un proceso zombie tras un reinicio del contenedor
         strictPort: false,
