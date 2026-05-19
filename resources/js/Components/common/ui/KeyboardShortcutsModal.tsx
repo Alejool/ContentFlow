@@ -40,6 +40,27 @@ const SHORTCUTS_CONFIG: ShortcutDefinition[] = [
     fallbackText: 'Abrir búsqueda rápida',
     category: 'navigation',
   },
+  {
+    macKeys: ['⌥', '1-7'],
+    winKeys: ['Alt', '1-7'],
+    translationKey: 'shortcuts.nav.section',
+    fallbackText: 'Navegar a sección (Panel, Contenido, etc.)',
+    category: 'navigation',
+  },
+  {
+    macKeys: ['⌥', '↑↓'],
+    winKeys: ['Alt', '↑↓'],
+    translationKey: 'shortcuts.nav.quick',
+    fallbackText: 'Navegación rápida entre secciones',
+    category: 'navigation',
+  },
+  {
+    macKeys: ['Esc'],
+    winKeys: ['Esc'],
+    translationKey: 'shortcuts.nav.close',
+    fallbackText: 'Cerrar menú móvil / sidebar',
+    category: 'navigation',
+  },
   // Ayuda
   {
     macKeys: ['⌘', '/'],

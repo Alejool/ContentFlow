@@ -65,6 +65,14 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
           </Suspense>
         )}
 
+        {/* Skip-to-content link for keyboard users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-lg focus:bg-primary-600 focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-white focus:shadow-xl"
+        >
+          Saltar al contenido principal
+        </a>
+
         <div className="flex w-full max-w-full flex-col overflow-hidden">
           <div className="relative flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden">
             <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
@@ -79,11 +87,13 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
               />
 
               <main
+                id="main-content"
                 className={`max-w-full min-w-0 flex-1 overflow-x-hidden transition-all duration-500 ease-in-out ${
                   isSidebarOpen ? 'lg:ml-80' : 'lg:ml-32'
                 }`}
                 role="main"
                 aria-label="Main content"
+                tabIndex={-1}
               >
                 <header
                   className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 lg:sticky lg:top-0 dark:border-neutral-800 dark:bg-black/80`}

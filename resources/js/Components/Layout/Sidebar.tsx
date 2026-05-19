@@ -1,10 +1,12 @@
 import NavLink from '@/Components/common/ui/NavLink';
 import WorkspaceSwitcher from '@/Components/Workspace/WorkspaceSwitcher';
+import { NAV_SECTIONS, getRouteUrl, isRouteActive, isSectionActive } from '@/Constants/navigation';
+import type { NavRoute, NavSection } from '@/types/navigation';
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import Logo from '@assets/logo.png';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ChevronLeft, ChevronRight, FileText, Home, Layers } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Command } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -12,29 +14,7 @@ interface SidebarProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
 }
 
-const navigationItems = [
-  {
-    nameKey: 'nav.dashboard',
-    href: 'dashboard',
-    icon: Home,
-  },
-  {
-    nameKey: 'nav.manageContent',
-    href: 'content.index',
-    hrefPattern: '/content',
-    icon: FileText,
-  },
-  {
-    nameKey: 'nav.analytics',
-    href: 'analytics.index',
-    icon: BarChart3,
-  },
-  {
-    nameKey: 'nav.workspaces',
-    href: 'workspaces.index',
-    icon: Layers,
-  },
-];
+const SECTION_SHORTCUT_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
   const { t } = useTranslation();
@@ -42,49 +22,46 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
   const { auth } = usePage().props as any;
   const [logoLoaded, setLogoLoaded] = useState(false);
   const [logoError, setLogoError] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
 
-  // Get user permissions from current workspace
-  const userPermissions = auth?.current_workspace?.permissions || [];
+  const userPermissions = (auth?.current_workspace?.permissions as string[]) || [];
   const hasAnalyticsPermission = userPermissions.includes('view-analytics');
+  const isSuperAdmin = auth?.user?.is_super_admin === true;
 
-  // Filter navigation items based on permissions
-  const filteredNavigationItems = navigationItems.filter((item) => {
-    // Hide Analytics if user doesn't have view-analytics permission
-    if (item.href === 'analytics.index' && !hasAnalyticsPermission) {
-      return false;
-    }
-    return true;
-  });
+  const sections = useMemo(() => {
+    let idx = 0;
+    return NAV_SECTIONS.filter((section) => {
+      if (section.id === 'analytics' && !hasAnalyticsPermission) return false;
+      if (section.id === 'admin' && !isSuperAdmin) return false;
+      return true;
+    }).map((section) => ({
+      ...section,
+      routes: section.routes.filter((route) => {
+        if (route.routeName === 'analytics.index' && !hasAnalyticsPermission) return false;
+        return true;
+      }),
+      shortcutIndex: idx++,
+    })).filter((section) => section.routes.length > 0);
+  }, [hasAnalyticsPermission, isSuperAdmin]);
 
-  const isRouteActive = (routeName: string): boolean => {
-    if (typeof window === 'undefined') return false;
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.altKey || e.metaKey || e.ctrlKey) return;
 
-    const currentPath = window.location.pathname;
+      const keyIndex = SECTION_SHORTCUT_KEYS.indexOf(e.key);
+      if (keyIndex === -1 || keyIndex >= sections.length) return;
 
-    const routePatterns: Record<string, string[]> = {
-      dashboard: ['/dashboard'],
-      'content.index': ['/content'],
-      'analytics.index': ['/analytics'],
-      'workspaces.index': ['/workspaces'],
+      e.preventDefault();
+      const section = sections[keyIndex];
+      if (section.routes.length > 0) {
+        const firstRoute = section.routes[0];
+        window.location.href = getRouteUrl(firstRoute);
+      }
     };
 
-    const patterns = routePatterns[routeName] || [`/${routeName.replace('.', '/')}`];
-
-    return patterns.some(
-      (pattern) => currentPath === pattern || currentPath.startsWith(pattern + '/'),
-    );
-  };
-
-  const getRouteUrl = (routeName: string): string => {
-    const routeUrls: Record<string, string> = {
-      dashboard: '/dashboard',
-      'content.index': '/content',
-      'analytics.index': '/analytics',
-      'workspaces.index': '/workspaces',
-    };
-
-    return routeUrls[routeName] || `/${routeName.replace('.', '/')}`;
-  };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [sections]);
 
   const isDark = actualTheme === 'dark';
 
@@ -97,14 +74,54 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
     activeGradient: isDark
       ? 'bg-linear-to-r from-primary-600 to-primary-800'
       : 'bg-linear-to-r from-primary-600 to-primary-700',
+    sectionActiveText: isDark ? 'text-primary-400' : 'text-primary-600',
+    sectionInactiveText: isDark ? 'text-gray-500' : 'text-gray-400',
     buttonHoverBg: isDark ? 'hover:bg-neutral-800' : 'hover:bg-gray-100',
-    logoGradient: isDark ? 'from-primary-500 to-primary-700' : 'from-primary-600 to-primary-800',
     titleGradient: isDark ? 'from-gray-200 to-gray-400' : 'from-gray-900 to-gray-700',
     subtitleColor: isDark ? 'text-gray-400' : 'text-gray-500',
-    logoutHoverBg: isDark
-      ? 'hover:bg-primary-900/30 hover:text-primary-300'
-      : 'hover:bg-red-50 hover:text-red-600',
   };
+
+  const renderNavItem = useCallback((item: NavRoute) => {
+    const active = isRouteActive(item);
+    return (
+      <NavLink
+        key={item.routeName + (item.url || '')}
+        href={getRouteUrl(item)}
+        active={active}
+        className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${
+          isSidebarOpen ? '' : 'justify-center'
+        } rounded-lg font-medium transition-all duration-200 ${classes.hoverBg} ${
+          classes.textColor
+        } ${
+          active
+            ? `${classes.activeGradient} text-white shadow-md`
+            : `${classes.textColor} ${classes.hoverText}`
+        }`}
+      >
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+          <item.icon className="h-[18px] w-[18px]" />
+        </div>
+
+        {isSidebarOpen && (
+          <span className="ml-3 truncate transition-all duration-200">{t(item.nameKey)}</span>
+        )}
+
+        {active && isSidebarOpen && (
+          <div className="absolute right-2 h-1.5 w-1.5 rounded-full bg-white/80" />
+        )}
+
+        {!isSidebarOpen && (
+          <div
+            className={`pointer-events-none absolute left-full z-50 ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 ${
+              isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
+            }`}
+          >
+            {t(item.nameKey)}
+          </div>
+        )}
+      </NavLink>
+    );
+  }, [isSidebarOpen, classes, t, isDark]);
 
   return (
     <>
@@ -117,9 +134,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
           className={`absolute inset-0 border-r backdrop-blur-3xl ${classes.borderColor} opacity-90 shadow-2xl ${classes.sidebarBg}`}
         />
 
-        <div className="relative mt-3 flex h-full flex-col">
+        <div className="relative flex h-full flex-col">
           <div
-            className={`flex items-center justify-center gap-4 border-b p-6 ${classes.borderColor}`}
+            className={`flex items-center justify-center gap-4 border-b px-4 py-5 ${classes.borderColor}`}
           >
             <Link
               href="/"
@@ -128,7 +145,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               }`}
             >
               <div
-                className={`relative h-14 w-12 ${!auth?.current_workspace?.white_label_logo_url ? 'bg-linear-to-r' : ''} flex shrink-0 items-center justify-center overflow-hidden rounded-lg`}
+                className={`relative flex h-12 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg ${
+                  !auth?.current_workspace?.white_label_logo_url ? 'bg-linear-to-r from-primary-600 to-primary-800' : ''
+                }`}
               >
                 {!logoLoaded && !logoError && (
                   <div className="absolute inset-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-neutral-700">
@@ -146,30 +165,27 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                     alt={`${auth?.current_workspace?.name || 'Intellipost'} logo`}
                     onLoad={() => setLogoLoaded(true)}
                     onError={() => setLogoError(true)}
-                    className={`transition-opacity duration-300 ${logoLoaded ? 'opacity-100' : 'opacity-0'} ${
+                    className={`transition-opacity duration-300 ${
+                      logoLoaded ? 'opacity-100' : 'opacity-0'
+                    } ${
                       auth?.current_workspace?.white_label_logo_url
                         ? 'h-full w-full object-contain p-1'
-                        : 'h-16 w-16 object-contain'
+                        : 'h-14 w-14 object-contain'
                     }`}
                   />
                 )}
               </div>
               {isSidebarOpen && (
-                <div className="ml-4 opacity-100 transition-opacity duration-300">
-                  <h1
-                    className={`bg-linear-to-r text-xl font-bold ${classes.titleGradient} bg-clip-text text-transparent`}
+                <div className="ml-3 min-w-0 flex-1">
+                  <h2
+                    className={`truncate bg-linear-to-r text-lg font-bold ${classes.titleGradient} bg-clip-text text-transparent`}
                   >
                     {auth?.current_workspace?.white_label_logo_url
                       ? auth.current_workspace.name
                       : 'Intellipost'}
-                  </h1>
-                  <p className={`text-xs ${classes.subtitleColor}`}>
-                    {auth?.current_workspace?.white_label_logo_url
-                      ? t('nav.workspace_branding')
-                      : auth?.current_workspace?.name || 'Social Media Manager'}
-                  </p>
+                  </h2>
                   {auth?.current_workspace?.role && (
-                    <p className="text-primary-500 mt-0.5 text-[10px] font-bold tracking-widest uppercase">
+                    <p className="text-primary-500 truncate text-[10px] font-bold tracking-widest uppercase">
                       {auth.current_workspace.role.name}
                     </p>
                   )}
@@ -184,62 +200,98 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               aria-expanded={isSidebarOpen}
             >
               {isSidebarOpen ? (
-                <ChevronLeft
-                  className={`h-5 w-5 transition-colors ${
-                    isDark
-                      ? 'hover:text-primary-400 text-gray-400'
-                      : 'hover:text-primary-600 text-gray-600'
-                  }`}
-                />
+                <ChevronLeft className="h-4 w-4" />
               ) : (
-                <ChevronRight
-                  className={`h-5 w-5 transition-colors ${
-                    isDark
-                      ? 'hover:text-primary-400 text-gray-400'
-                      : 'hover:text-primary-600 text-gray-600'
-                  }`}
-                />
+                <ChevronRight className="h-4 w-4" />
               )}
             </button>
           </div>
 
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
-          <nav className="flex-1 space-y-2 px-4" aria-label="Main navigation">
-            {filteredNavigationItems.map((item) => {
-              const isActive = !!route().current(item.href);
-              const navLink = (
-                <NavLink
-                  key={item.href}
-                  href={getRouteUrl(item.href)}
-                  active={isActive}
-                  className={`group relative flex w-full items-center px-4 py-3 text-sm ${isSidebarOpen ? '' : 'justify-center'} rounded-lg font-medium transition-all duration-300 ${classes.hoverBg} ${classes.textColor} hover:shadow-lg ${
-                    isActive
-                      ? `${classes.activeGradient} text-white shadow-lg hover:text-white`
-                      : `${classes.textColor} ${classes.hoverText}`
-                  }`}
-                >
-                  <div className="flex h-10 items-center justify-center rounded-full">
-                    <item.icon className="h-5 w-5" />
-                  </div>
+          <nav
+            ref={navRef}
+            className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2"
+            aria-label="Main navigation"
+            role="navigation"
+          >
+            {sections.map((section) => {
+              const sectionActive = isSectionActive(section as NavSection);
+              if (section.routes.length === 0) return null;
 
-                  {isSidebarOpen && (
-                    <span className="ml-4 transition-all duration-300">{t(item.nameKey)}</span>
-                  )}
-
-                  {!isSidebarOpen && (
-                    <div
-                      className={`pointer-events-none absolute left-full z-50 ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'}`}
-                    >
-                      {t(item.nameKey)}
+              return (
+                <div key={section.id} role="group" aria-label={t(section.labelKey)}>
+                  {isSidebarOpen ? (
+                    <div className="group/section mb-1 mt-4 flex items-center gap-2 first:mt-0">
+                      <span
+                        className={`flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase ${
+                          sectionActive
+                            ? classes.sectionActiveText
+                            : classes.sectionInactiveText
+                        }`}
+                      >
+                        <span className="truncate">{t(section.labelKey)}</span>
+                        <span className={`rounded px-1 py-0.5 text-[9px] font-mono ${
+                          isDark ? 'bg-neutral-800 text-neutral-500' : 'bg-gray-200 text-gray-400'
+                        }`}>
+                          Alt+{SECTION_SHORTCUT_KEYS[section.shortcutIndex]}
+                        </span>
+                      </span>
+                      {sectionActive && (
+                        <div className="h-px flex-1 bg-linear-to-r from-primary-500/30 to-transparent" />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="group/section relative flex flex-col items-center py-1.5">
+                      <div
+                        className={`h-px w-6 transition-colors duration-200 ${
+                          sectionActive
+                            ? 'bg-primary-400/50'
+                            : 'bg-gray-300 dark:bg-neutral-700'
+                        }`}
+                      />
+                      <span
+                        className={`mt-1 text-[8px] font-mono ${
+                          isDark ? 'text-neutral-600' : 'text-gray-400'
+                        } opacity-0 transition-opacity duration-200 group-hover/section:opacity-100`}
+                      >
+                        Alt+{SECTION_SHORTCUT_KEYS[section.shortcutIndex]}
+                      </span>
                     </div>
                   )}
-                </NavLink>
-              );
 
-              return navLink;
+                  <div
+                    className={`space-y-0.5 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}
+                  >
+                    {section.routes.map(renderNavItem)}
+                  </div>
+                </div>
+              );
             })}
           </nav>
+
+          {/* Footer - keyboard shortcut hint */}
+          {isSidebarOpen && (
+            <div className={`border-t px-4 py-3 ${classes.borderColor}`}>
+              <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
+                <Command className="h-3 w-3" />
+                <span>
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                    Alt
+                  </kbd>
+                  <span className="mx-1">+</span>
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                    #
+                  </kbd>
+                  <span className="ml-1">{t('nav.section.quickNavHint') || 'para navegar'}</span>
+                </span>
+                <span className="mx-1 text-gray-300 dark:text-neutral-600">·</span>
+                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                  ⌘K
+                </kbd>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
