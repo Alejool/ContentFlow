@@ -124,7 +124,7 @@ const SocialMediaAccounts = memo(() => {
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/social-accounts', {
+      const response = await axios.get('/api/v1/social-accounts', {
         headers: {
           'X-CSRF-TOKEN': document
             .querySelector('meta[name="csrf-token"]')
@@ -134,29 +134,41 @@ const SocialMediaAccounts = memo(() => {
         },
         withCredentials: true,
       });
-      if (response.data?.accounts) updateAccountsStatus(response.data.accounts);
+      // Siempre llamar updateAccountsStatus — incluso si la respuesta está vacía o
+      // el backend devuelve null. Así todas las plataformas activas aparecen con
+      // la opción de conectar cuando no hay cuentas vinculadas.
+      updateAccountsStatus(response.data?.accounts ?? []);
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error(t('manageContent.socialMedia.messages.unauthorized'));
       } else {
         toast.error(t('manageContent.socialMedia.messages.loadError'));
       }
+      // En caso de error también mostramos todas las plataformas como desconectadas
+      updateAccountsStatus([]);
     } finally {
       setLoading(false);
     }
   };
 
   const updateAccountsStatus = (connectedAccounts: any[]) => {
-    setConnectedAccountsCount(connectedAccounts?.length || 0);
+    const safeAccounts = Array.isArray(connectedAccounts) ? connectedAccounts : [];
+    setConnectedAccountsCount(safeAccounts.length);
     const platformCards: Account[] = [];
+
     Object.entries(SOCIAL_PLATFORMS)
       .filter(([_, config]) => config?.active)
       .forEach(([key, config]) => {
         if (!config?.gradient) return;
-        const filtered = connectedAccounts.filter(
-          (ca) => ca.platform.toLowerCase() === key.toLowerCase(),
+
+        // Una sola card por plataforma: si hay varias conexiones se toma la primera.
+        // El flujo de OAuth impide conectar más de una, pero lo aplicamos aquí también.
+        const ca = safeAccounts.find(
+          (account) => account.platform.toLowerCase() === key.toLowerCase(),
         );
-        if (filtered.length === 0) {
+
+        if (!ca) {
+          // Plataforma sin cuenta → mostrar card con botón "Conectar"
           platformCards.push({
             id: config.id,
             platform: key,
@@ -168,22 +180,22 @@ const SocialMediaAccounts = memo(() => {
             gradient: config.gradient,
           });
         } else {
-          filtered.forEach((ca) => {
-            platformCards.push({
-              id: ca.id,
-              platform: key,
-              name: config.name,
-              logo: config.logo,
-              isConnected: true,
-              accountId: ca.id,
-              accountDetails: ca,
-              color: config.color,
-              gradient: config.gradient,
-              connectedBy: ca.user?.name,
-            });
+          // Plataforma conectada → mostrar info de la cuenta
+          platformCards.push({
+            id: ca.id,
+            platform: key,
+            name: config.name,
+            logo: config.logo,
+            isConnected: true,
+            accountId: ca.id,
+            accountDetails: ca,
+            color: config.color,
+            gradient: config.gradient,
+            connectedBy: ca.user?.name,
           });
         }
       });
+
     setAccounts(platformCards);
   };
 
@@ -567,7 +579,7 @@ const SocialMediaAccounts = memo(() => {
                                         );
                                         try {
                                           const response = await axios.get(
-                                            `/social-accounts/auth-url/${account.platform}`,
+                                            `/api/v1/social-accounts/auth-url/${account.platform}`,
                                           );
                                           if (response.data?.url) {
                                             toast.success(

@@ -88,15 +88,12 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
         key={item.routeName + (item.url || '')}
         href={getRouteUrl(item)}
         active={active}
-        className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${
-          isSidebarOpen ? '' : 'justify-center'
-        } rounded-lg font-medium transition-all duration-200 ${classes.hoverBg} ${
-          classes.textColor
-        } ${
-          active
+        className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${isSidebarOpen ? '' : 'justify-center'
+          } rounded-lg font-medium transition-all duration-200 ${classes.hoverBg} ${classes.textColor
+          } ${active
             ? `${classes.activeGradient} text-white shadow-md`
             : `${classes.textColor} ${classes.hoverText}`
-        }`}
+          }`}
       >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
           <item.icon className="h-[18px] w-[18px]" />
@@ -112,9 +109,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
         {!isSidebarOpen && (
           <div
-            className={`pointer-events-none absolute left-full z-50 ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 ${
-              isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
-            }`}
+            className={`pointer-events-none absolute left-full z-50 ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
+              }`}
           >
             {t(item.nameKey)}
           </div>
@@ -126,9 +122,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
   return (
     <>
       <div
-        className={`fixed z-50 hidden h-full pb-10 transition-all duration-500 ease-in-out lg:block ${
-          isSidebarOpen ? 'w-80' : 'w-32'
-        }`}
+        className={`fixed z-50 hidden h-full pb-10 transition-all duration-500 ease-in-out lg:block ${isSidebarOpen ? 'w-80' : 'w-32'
+          }`}
       >
         <div
           className={`absolute inset-0 border-r backdrop-blur-3xl ${classes.borderColor} opacity-90 shadow-2xl ${classes.sidebarBg}`}
@@ -140,14 +135,12 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
           >
             <Link
               href="/"
-              className={`flex items-center transition-all duration-300 ${
-                !isSidebarOpen && 'justify-center'
-              }`}
+              className={`flex items-center transition-all duration-300 ${!isSidebarOpen && 'justify-center'
+                }`}
             >
               <div
-                className={`relative flex h-12 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg ${
-                  !auth?.current_workspace?.white_label_logo_url ? 'bg-linear-to-r from-primary-600 to-primary-800' : ''
-                }`}
+                className={`relative flex h-12 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg ${!auth?.current_workspace?.white_label_logo_url ? '' : ''
+                  }`}
               >
                 {!logoLoaded && !logoError && (
                   <div className="absolute inset-0 overflow-hidden rounded-lg bg-gray-200 dark:bg-neutral-700">
@@ -165,13 +158,11 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                     alt={`${auth?.current_workspace?.name || 'Intellipost'} logo`}
                     onLoad={() => setLogoLoaded(true)}
                     onError={() => setLogoError(true)}
-                    className={`transition-opacity duration-300 ${
-                      logoLoaded ? 'opacity-100' : 'opacity-0'
-                    } ${
-                      auth?.current_workspace?.white_label_logo_url
+                    className={`transition-opacity duration-300 ${logoLoaded ? 'opacity-100' : 'opacity-0'
+                      } ${auth?.current_workspace?.white_label_logo_url
                         ? 'h-full w-full object-contain p-1'
                         : 'h-14 w-14 object-contain'
-                    }`}
+                      }`}
                   />
                 )}
               </div>
@@ -211,7 +202,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
           <nav
             ref={navRef}
-            className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2"
+            className="flex-1 space-y-0.5  px-3 py-2"
             aria-label="Main navigation"
             role="navigation"
           >
@@ -224,16 +215,14 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                   {isSidebarOpen ? (
                     <div className="group/section mb-1 mt-4 flex items-center gap-2 first:mt-0">
                       <span
-                        className={`flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase ${
-                          sectionActive
-                            ? classes.sectionActiveText
-                            : classes.sectionInactiveText
-                        }`}
+                        className={`flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold tracking-[0.15em] uppercase ${sectionActive
+                          ? classes.sectionActiveText
+                          : classes.sectionInactiveText
+                          }`}
                       >
                         <span className="truncate">{t(section.labelKey)}</span>
-                        <span className={`rounded px-1 py-0.5 text-[9px] font-mono ${
-                          isDark ? 'bg-neutral-800 text-neutral-500' : 'bg-gray-200 text-gray-400'
-                        }`}>
+                        <span className={`rounded px-1 py-0.5 text-[9px] font-mono ${isDark ? 'bg-neutral-800 text-neutral-500' : 'bg-gray-200 text-gray-400'
+                          }`}>
                           Alt+{SECTION_SHORTCUT_KEYS[section.shortcutIndex]}
                         </span>
                       </span>
@@ -244,16 +233,14 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                   ) : (
                     <div className="group/section relative flex flex-col items-center py-1.5">
                       <div
-                        className={`h-px w-6 transition-colors duration-200 ${
-                          sectionActive
-                            ? 'bg-primary-400/50'
-                            : 'bg-gray-300 dark:bg-neutral-700'
-                        }`}
+                        className={`h-px w-6 transition-colors duration-200 ${sectionActive
+                          ? 'bg-primary-400/50'
+                          : 'bg-gray-300 dark:bg-neutral-700'
+                          }`}
                       />
                       <span
-                        className={`mt-1 text-[8px] font-mono ${
-                          isDark ? 'text-neutral-600' : 'text-gray-400'
-                        } opacity-0 transition-opacity duration-200 group-hover/section:opacity-100`}
+                        className={`mt-1 text-[8px] font-mono ${isDark ? 'text-neutral-600' : 'text-gray-400'
+                          } opacity-0 transition-opacity duration-200 group-hover/section:opacity-100`}
                       >
                         Alt+{SECTION_SHORTCUT_KEYS[section.shortcutIndex]}
                       </span>
