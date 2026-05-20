@@ -56,6 +56,32 @@
       "upgrade_cta": "Actualizar Plan",
       "daily_metrics": "Métricas diarias actualizadas por cron jobs",
       "platform_breakdown": "Desglose por plataforma y evolución diaria"
+    },
+    "tabs": {
+      "general": "General",
+      "content": "Contenido",
+      "socialMedia": "Redes Sociales",
+      "advanced": "Análisis Profundo"
+    },
+    "formatPerformance": {
+      "title": "Rendimiento por Formato",
+      "subtitle": "Interacción basada en el tipo de contenido"
+    },
+    "topPosts": {
+      "title": "Mejores Publicaciones",
+      "subtitle": "Top 10 publicaciones por interacción"
+    },
+    "demographics": {
+      "title": "Demografía de la Audiencia",
+      "subtitle": "Conoce mejor quién interactúa con tu contenido",
+      "emptyTitle": "Faltan datos de la audiencia",
+      "emptyDesc": "La plataforma está recolectando datos, se necesita más interacción o tiempo para generar el reporte."
+    },
+    "bestTimeToPost": {
+      "title": "Mejor Hora para Publicar",
+      "subtitle": "Momentos de mayor actividad de tu audiencia",
+      "emptyTitle": "Recopilando tendencias",
+      "emptyDesc": "Continúa publicando para que el sistema encuentre el momento óptimo para tu audiencia."
     }
   }
 }

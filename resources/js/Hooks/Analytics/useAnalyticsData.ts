@@ -42,7 +42,7 @@ async function fetchAnalyticsDataFn(period: number): Promise<AnalyticsData> {
  */
 export function useAnalyticsData(period: number, workspaceId: number | undefined) {
   return useQuery({
-    queryKey: queryKeys.analyticsData.period(period, workspaceId!),
+    queryKey: [...queryKeys.analyticsData.period(period, workspaceId!), 'v2'],
     queryFn: () => fetchAnalyticsDataFn(period),
     enabled: !!workspaceId,
     staleTime: 10 * 60 * 1000, // 10 min — historical data is stable

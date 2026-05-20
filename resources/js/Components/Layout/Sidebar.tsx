@@ -137,7 +137,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
         {!isSidebarOpen && (
           <div
-            className={`pointer-events-none absolute left-full ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
+            className={`pointer-events-none fixed left-[110px] mt-0.5 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 z-[99999] ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
               }`}
           >
             {t(item.nameKey)}

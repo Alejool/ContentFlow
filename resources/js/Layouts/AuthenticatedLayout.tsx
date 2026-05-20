@@ -75,7 +75,13 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
         <div className="flex w-full max-w-full flex-col overflow-hidden">
           <div className="flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden">
-            <div className="absolute inset-0 bg-white dark:bg-theme-bg-secondary" />
+            <div className="absolute inset-0 bg-white dark:bg-theme-bg-secondary overflow-hidden">
+              <img 
+                src="/assets/mascot-watermark.png" 
+                alt="System Mascot Watermark"
+                className="fixed bottom-[-50px] right-[-50px] w-[600px] object-contain opacity-[0.04] dark:opacity-[0.02] pointer-events-none"
+              />
+            </div>
 
             <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 

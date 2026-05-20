@@ -151,6 +151,10 @@ class AnalyticsController extends Controller
                 'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId, $days),
                 'detailedPlatforms' => $this->statisticsService->getDetailedPlatformAnalytics($workspaceId, $days),
                 'detailedPublications' => $this->statisticsService->getDetailedPublicationPerformance($workspaceId, $days),
+                'audienceDemographics' => $this->statisticsService->getAudienceDemographics($workspaceId),
+                'bestTimeToPost' => $this->statisticsService->getBestTimeToPost($workspaceId),
+                'contentFormatPerformance' => $this->statisticsService->getContentFormatPerformance($workspaceId),
+                'topPerformingPosts' => $this->statisticsService->getTopPerformingPostsList($workspaceId, $days),
             ]),
             'period' => $days,
         ]);
@@ -191,6 +195,10 @@ class AnalyticsController extends Controller
             'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId, $days),
             'detailedPlatforms' => $this->statisticsService->getDetailedPlatformAnalytics($workspaceId, $days),
             'detailedPublications' => $this->statisticsService->getDetailedPublicationPerformance($workspaceId, $days),
+            'audienceDemographics' => $this->statisticsService->getAudienceDemographics($workspaceId),
+            'bestTimeToPost' => $this->statisticsService->getBestTimeToPost($workspaceId),
+            'contentFormatPerformance' => $this->statisticsService->getContentFormatPerformance($workspaceId),
+            'topPerformingPosts' => $this->statisticsService->getTopPerformingPostsList($workspaceId, $days),
         ]));
     }
 

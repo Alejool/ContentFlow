@@ -52,6 +52,32 @@
       "upgrade_cta": "Upgrade Plan",
       "daily_metrics": "Daily metrics updated by cron jobs",
       "platform_breakdown": "Platform breakdown and daily evolution"
+    },
+    "tabs": {
+      "general": "General",
+      "content": "Content",
+      "socialMedia": "Social Media",
+      "advanced": "Deep Analysis"
+    },
+    "formatPerformance": {
+      "title": "Format Performance",
+      "subtitle": "Engagement based on content type"
+    },
+    "topPosts": {
+      "title": "Top Performing Posts",
+      "subtitle": "Top 10 posts by engagement"
+    },
+    "demographics": {
+      "title": "Audience Demographics",
+      "subtitle": "Get to know who interacts with your content",
+      "emptyTitle": "No audience data yet",
+      "emptyDesc": "The platform is collecting data, more interaction or time is needed to generate the report."
+    },
+    "bestTimeToPost": {
+      "title": "Best Time to Post",
+      "subtitle": "Peak activity moments of your audience",
+      "emptyTitle": "Collecting trends",
+      "emptyDesc": "Keep publishing so the system can find the optimal time for your audience."
     }
   }
 }

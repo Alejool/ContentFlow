@@ -623,4 +623,103 @@ class StatisticsService
       ];
     });
   }
+
+  /**
+   * Mock data for Audience Demographics (Premium)
+   */
+  public function getAudienceDemographics(int $workspaceId)
+  {
+    return [
+      'age' => [
+        ['name' => '13-17', 'value' => rand(5, 15)],
+        ['name' => '18-24', 'value' => rand(20, 35)],
+        ['name' => '25-34', 'value' => rand(25, 40)],
+        ['name' => '35-44', 'value' => rand(10, 20)],
+        ['name' => '45-54', 'value' => rand(5, 10)],
+        ['name' => '55+', 'value' => rand(1, 5)],
+      ],
+      'gender' => [
+        ['name' => 'Mujeres', 'value' => rand(40, 60)],
+        ['name' => 'Hombres', 'value' => rand(30, 50)],
+        ['name' => 'Otros', 'value' => rand(1, 10)],
+      ],
+      'top_locations' => [
+        ['name' => 'Ciudad de México', 'value' => rand(1000, 5000)],
+        ['name' => 'Madrid', 'value' => rand(800, 3000)],
+        ['name' => 'Bogotá', 'value' => rand(500, 2000)],
+        ['name' => 'Buenos Aires', 'value' => rand(300, 1500)],
+        ['name' => 'Lima', 'value' => rand(200, 1000)],
+      ]
+    ];
+  }
+
+  /**
+   * Mock data for Best Time to Post Heatmap (Premium)
+   */
+  public function getBestTimeToPost(int $workspaceId)
+  {
+    $days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    $hours = range(0, 23);
+    
+    $heatmap = [];
+    foreach ($days as $day) {
+      $dayData = ['day' => $day];
+      foreach ($hours as $hour) {
+        // Generate higher engagement for certain hours to make it realistic
+        $baseMultiplier = ($hour >= 9 && $hour <= 20) ? 2 : 1;
+        $dayData[(string)$hour] = rand(10, 100) * $baseMultiplier;
+      }
+      $heatmap[] = $dayData;
+    }
+    
+    return $heatmap;
+  }
+
+  /**
+   * Mock data for Content Format Performance
+   */
+  public function getContentFormatPerformance(int $workspaceId)
+  {
+    return [
+      ['format' => 'Video', 'engagement' => rand(5000, 15000), 'reach' => rand(10000, 30000), 'color' => '#3b82f6'],
+      ['format' => 'Imagen', 'engagement' => rand(3000, 8000), 'reach' => rand(8000, 20000), 'color' => '#10b981'],
+      ['format' => 'Carrusel', 'engagement' => rand(4000, 10000), 'reach' => rand(12000, 25000), 'color' => '#8b5cf6'],
+      ['format' => 'Texto', 'engagement' => rand(1000, 3000), 'reach' => rand(2000, 8000), 'color' => '#f59e0b'],
+    ];
+  }
+
+  /**
+   * Get a simplified list of top performing posts across platforms
+   */
+  public function getTopPerformingPostsList(int $workspaceId, int $days = 30)
+  {
+    $startDate = now()->subDays($days);
+    
+    // Using a simplified query to get the top 10 publications by engagement
+    $publications = Publication::where('workspace_id', $workspaceId)
+      ->where('status', 'published')
+      ->with('analytics')
+      ->get()
+      ->map(function ($pub) {
+        $analytics = $pub->analytics;
+        $engagement = $analytics->sum(function ($record) {
+          return $record->likes + $record->comments + $record->shares + $record->saves;
+        });
+        
+        return [
+          'id' => $pub->id,
+          'title' => $pub->title,
+          'type' => 'publication',
+          'views' => $analytics->sum('views'),
+          'clicks' => $analytics->sum('clicks'),
+          'engagement' => $engagement,
+          'published_at' => $pub->published_at?->format('M d, Y'),
+        ];
+      })
+      ->sortByDesc('engagement')
+      ->take(10)
+      ->values();
+      
+    return $publications;
+  }
 }

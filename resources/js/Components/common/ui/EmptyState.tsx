@@ -23,8 +23,8 @@ export default function EmptyState({
     >
       <div className={`${sizeMap[imageSize]} mb-6 opacity-80 dark:opacity-60`}>
         <img
-          src="/assets/empty-state.svg"
-          alt="No results"
+          src="/assets/empty-state-mascot.png"
+          alt="No results mascot"
           className="h-full w-full object-contain"
         />
       </div>
