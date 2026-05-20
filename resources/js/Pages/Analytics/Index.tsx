@@ -302,14 +302,20 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 )}
               </div>
               
-              <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
-                <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {t('analytics.topPosts.title', 'Mejores Publicaciones')}
-                </h2>
-                <p className="text-sm text-gray-500 mb-6">{t('analytics.topPosts.subtitle', 'Top 10 publicaciones por interacción')}</p>
-                <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
-                  <TopPostsList posts={topPerformingPosts} />
-                </Suspense>
+              <div className="min-h-0 h-full">
+                <div className="h-full flex flex-col rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
+                  <div className="shrink-0">
+                    <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+                      {t('analytics.topPosts.title', 'Mejores Publicaciones')}
+                    </h2>
+                    <p className="text-sm text-gray-500 mb-6">{t('analytics.topPosts.subtitle', 'Top 10 publicaciones por interacción')}</p>
+                  </div>
+                  <div className="flex-1 overflow-y-auto pr-2 -mr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-700">
+                    <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>
+                      <TopPostsList posts={topPerformingPosts} />
+                    </Suspense>
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -95,7 +95,7 @@ export default function CampaignPerformance({
 
   return (
     <div
-      className={`mb-8 rounded-lg p-6 transition-colors duration-300 ${
+      className={`h-full rounded-lg p-6 transition-colors duration-300 ${
         theme === 'dark'
           ? 'border border-neutral-700/50 bg-neutral-800/50 backdrop-blur-sm'
           : 'border border-gray-100 bg-white shadow-xl'
