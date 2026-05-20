@@ -116,7 +116,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
         key={item.routeName + '-' + item.nameKey}
         href={getRouteUrl(item, { currentWorkspaceId })}
         active={active}
-        className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${isSidebarOpen ? '' : 'justify-center'
+        className={`group relative flex w-full items-center px-4 py-2.5 text-sm ${isSidebarOpen ? '' : 'justify-center '
           } rounded-lg font-medium transition-all duration-200 ${classes.hoverBg} ${classes.textColor
           } ${active
             ? `${classes.activeGradient} text-white shadow-md`
@@ -137,7 +137,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
         {!isSidebarOpen && (
           <div
-            className={`pointer-events-none absolute left-full z-50 ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
+            className={`pointer-events-none absolute left-full ml-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
               }`}
           >
             {t(item.nameKey)}
@@ -150,7 +150,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
   return (
     <>
       <div
-        className={`fixed z-50 hidden h-full pb-10 transition-all duration-500 ease-in-out lg:block ${isSidebarOpen ? 'w-80' : 'w-32'
+        className={`overflow-x-hidden fixed z-50 hidden h-full pb-10 transition-all duration-500 ease-in-out lg:block ${isSidebarOpen ? 'w-80' : 'w-32'
           }`}
       >
         <div
@@ -230,7 +230,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
           <nav
             ref={navRef}
-            className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2 scroll-smooth select-none [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-800"
+            className="flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden px-3 py-2 scroll-smooth select-none [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-800"
             aria-label="Main navigation"
             role="navigation"
           >
@@ -306,17 +306,17 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
                 <Command className="h-3 w-3" />
                 <span>
-                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
                     Alt
                   </kbd>
                   <span className="mx-1">+</span>
-                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
                     #
                   </kbd>
                   <span className="ml-1">{t('nav.section.quickNavHint') || 'para navegar'}</span>
                 </span>
                 <span className="mx-1 text-gray-300 dark:text-neutral-600">·</span>
-                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
                   ⌘K
                 </kbd>
               </div>

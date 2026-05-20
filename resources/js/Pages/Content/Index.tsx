@@ -428,7 +428,7 @@ export default function ManageContentPage() {
                   </MenuButton>
                   <MenuItems
                     transition
-                    className="ring-black/8 absolute right-0 z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-lg bg-white shadow-2xl ring-1 transition focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in dark:bg-neutral-900 dark:ring-white/10"
+                    className="ring-black/8 absolute right-0 z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-lg bg-white shadow-2xl ring-1 transition focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in dark:bg-theme-bg-secondary dark:ring-white/10"
                   >
                     <div className="px-4 pb-2 pt-3">
                       <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
@@ -451,7 +451,7 @@ export default function ManageContentPage() {
                               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                                 focus
                                   ? 'bg-primary-100 dark:bg-primary-900/50'
-                                  : 'bg-gray-100 dark:bg-neutral-800'
+                                  : 'bg-gray-100 dark:bg-theme-bg-secondary'
                               }`}
                             >
                               <FileText className="h-4 w-4" />
@@ -482,7 +482,7 @@ export default function ManageContentPage() {
                               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                                 focus
                                   ? 'bg-primary-100 dark:bg-primary-900/50'
-                                  : 'bg-gray-100 dark:bg-neutral-800'
+                                  : 'bg-gray-100 dark:bg-theme-bg-secondary'
                               }`}
                             >
                               <Target className="h-4 w-4" />
@@ -507,7 +507,7 @@ export default function ManageContentPage() {
     >
       <Head title={t('manageContent.title')} />
 
-      <div className=" w-full min-w-0 max-w-full  bg-gray-50/30 dark:bg-neutral-900/10">
+      <div className=" w-full min-w-0 max-w-full  bg-gray-50/30 dark:bg-theme-bg-secondary">
         <div className="mx-auto min-w-0 max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
           <div className="mb-8">
             <SocialMediaAccounts
@@ -588,7 +588,7 @@ export default function ManageContentPage() {
                 </div>
 
                 {/* Approval Content */}
-                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <div className="p-0">
                     {approvalTab === 'pending' ? (
                       <ApprovalList

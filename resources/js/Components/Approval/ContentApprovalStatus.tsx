@@ -214,7 +214,7 @@ export default function ContentApprovalStatus({
   return (
     <div className="space-y-4">
       {/* Status Badge and Info */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="mb-2 font-bold text-gray-900 dark:text-white">
@@ -249,7 +249,7 @@ export default function ContentApprovalStatus({
       </div>
 
       {/* Action Buttons */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex flex-wrap gap-3">
           {/* Submit for Approval */}
           {canSubmit && approvalStatus.status === 'draft' && (
@@ -295,7 +295,7 @@ export default function ContentApprovalStatus({
       {/* Approve Modal */}
       {showApproveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-neutral-900">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-theme-bg-secondary">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
               {t('approval.approve_content')}
             </h3>
@@ -340,7 +340,7 @@ export default function ContentApprovalStatus({
       {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-neutral-900">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-theme-bg-secondary">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
               {t('approval.reject_content')}
             </h3>

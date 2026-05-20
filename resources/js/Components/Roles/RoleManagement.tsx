@@ -129,7 +129,7 @@ export default function RoleManagement({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-2 flex items-center gap-3">
           <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
             <Shield className="h-6 w-6 text-primary-600 dark:text-primary-400" />
@@ -150,7 +150,7 @@ export default function RoleManagement({
         {roles.map((role) => (
           <div
             key={role.id}
-            className="rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-700"
+            className="rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-theme-bg-secondary dark:hover:border-primary-700"
           >
             <div className="mb-3 flex items-center justify-between">
               <h4 className="font-bold text-gray-900 dark:text-white">{role.display_name}</h4>
@@ -212,7 +212,7 @@ export default function RoleManagement({
       </div>
 
       {/* Users List */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="border-b border-gray-200 p-6 dark:border-neutral-800">
           <h4 className="font-bold text-gray-900 dark:text-white">{t('roles.users_list')}</h4>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -222,7 +222,7 @@ export default function RoleManagement({
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <thead className="border-b border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   {t('roles.table.user')}
@@ -281,14 +281,14 @@ export default function RoleManagement({
                         {userRole?.permissions.slice(0, 3).map((permission) => (
                           <span
                             key={permission.id}
-                            className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-800 dark:text-gray-400"
+                            className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400"
                             title={permission.description}
                           >
                             {permission.display_name}
                           </span>
                         ))}
                         {userRole && userRole.permissions.length > 3 && (
-                          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-800 dark:text-gray-400">
+                          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400">
                             +{userRole.permissions.length - 3}
                           </span>
                         )}

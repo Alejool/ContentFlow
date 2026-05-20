@@ -113,7 +113,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
     <Menu as="div" className="relative">
       {({ open }) => (
         <>
-          <MenuButton className="group inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-3 text-gray-700 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-gray-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800">
+          <MenuButton className="group inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-3 text-gray-700 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800">
             <div className="relative">
               <Avatar
                 src={user?.photo_url ?? null}
@@ -133,7 +133,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
 
           <MenuItems
             transition
-            className="absolute right-0 z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-100 data-[enter]:ease-out data-[leave]:ease-in dark:border-neutral-800/90 dark:bg-neutral-900"
+            className="absolute right-0 z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-100 data-[enter]:ease-out data-[leave]:ease-in dark:border-neutral-800/90 dark:bg-theme-bg-secondary"
           >
             {/* Header: Avatar + info + color picker */}
             <div className="px-4 pb-2 pt-4">
@@ -238,7 +238,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                         `flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                           checked
                             ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:text-gray-400 dark:hover:bg-neutral-700'
                         }`
                       }
                     >
@@ -273,7 +273,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                       `flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                         checked
                           ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/40 dark:text-primary-400'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:text-gray-400 dark:hover:bg-neutral-700'
                       }`
                     }
                   >
@@ -302,7 +302,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                   className={`rounded-md p-1.5 ${
                     isProfileActive
                       ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400'
-                      : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400'
+                      : 'bg-gray-100 text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-400'
                   }`}
                 >
                   <User className="h-4 w-4" />
@@ -313,7 +313,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                 )}
               </InertiaLink>
 
-              <div className="mx-2 h-px bg-gray-100 dark:bg-neutral-800" />
+              <div className="mx-2 h-px bg-gray-100 dark:bg-theme-bg-secondary" />
 
               <InertiaLink
                 href={route('logout')}
@@ -321,7 +321,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                 as="button"
                 className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-gray-300 dark:hover:bg-red-900/10 dark:hover:text-red-400"
               >
-                <div className="rounded-md bg-gray-100 p-1.5 text-gray-500 transition-colors group-hover:bg-red-100 group-hover:text-red-500 dark:bg-neutral-800 dark:text-gray-400 dark:group-hover:bg-red-900/30 dark:group-hover:text-red-400">
+                <div className="rounded-md bg-gray-100 p-1.5 text-gray-500 transition-colors group-hover:bg-red-100 group-hover:text-red-500 dark:bg-theme-bg-secondary dark:text-gray-400 dark:group-hover:bg-red-900/30 dark:group-hover:text-red-400">
                   <LogOut className="h-4 w-4" />
                 </div>
                 {t('nav.logout')}

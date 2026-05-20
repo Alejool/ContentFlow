@@ -58,7 +58,7 @@ export default function ApprovalHistoryTimeline({
 
   if (timelineEntries.length === 0) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <Clock className="mx-auto mb-3 h-12 w-12 text-gray-400" />
         <p className="text-gray-500 dark:text-gray-400">{t('approval.no_history')}</p>
       </div>
@@ -66,7 +66,7 @@ export default function ApprovalHistoryTimeline({
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+    <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
       <h4 className="mb-6 font-bold text-gray-900 dark:text-white">
         {t('approval.history_title')}
       </h4>
@@ -109,7 +109,7 @@ export default function ApprovalHistoryTimeline({
                           {label}
                         </span>
                         {entry.approval_level && (
-                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-neutral-800 dark:text-gray-400">
+                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400">
                             {t('approval.level')} {entry.approval_level}
                           </span>
                         )}
@@ -132,7 +132,7 @@ export default function ApprovalHistoryTimeline({
                     )}
                   </div>
                   {entry.comment && (
-                    <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
+                    <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                       <div className="flex items-start gap-2">
                         <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
                         <p className="text-sm text-gray-700 dark:text-gray-300">{entry.comment}</p>

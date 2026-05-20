@@ -382,7 +382,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                             animate="visible"
                             exit="exit"
                             whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                            className={`group hover:border-primary-100 dark:hover:border-primary-900/30 relative rounded-lg border border-gray-100 bg-white p-4 transition-colors duration-300 hover:shadow-xl sm:p-5 dark:border-neutral-800 dark:bg-neutral-900 ${
+                            className={`group hover:border-primary-100 dark:hover:border-primary-900/30 relative rounded-lg border border-gray-100 bg-white p-4 transition-colors duration-300 hover:shadow-xl sm:p-5 dark:border-neutral-800 dark:bg-theme-bg-secondary ${
                               account.isConnected
                                 ? 'ring-1 ring-emerald-500/10 dark:ring-emerald-500/5'
                                 : 'opacity-90 hover:opacity-100'
@@ -394,7 +394,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                 className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-tight uppercase transition-colors ${
                                   account.isConnected
                                     ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/80 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                    : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400'
+                                    : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-400'
                                 }`}
                               >
                                 {account.isConnected ? (
@@ -426,7 +426,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                               >
-                                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-gray-100 bg-gray-50 p-0.5 shadow-inner dark:border-neutral-800 dark:bg-neutral-800">
+                                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-gray-100 bg-gray-50 p-0.5 shadow-inner dark:border-neutral-800 dark:bg-theme-bg-secondary">
                                   {account.isConnected &&
                                   account.accountDetails?.account_metadata?.avatar ? (
                                     <img
@@ -469,7 +469,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
 
                               {account.isConnected && account.accountDetails ? (
                                 <div className="mt-1.5 flex flex-col items-center gap-1">
-                                  <p className="rounded-full border border-gray-100 bg-gray-50 px-2 py-0.5 text-[10px] font-bold text-gray-500 dark:border-neutral-700/50 dark:bg-neutral-800 dark:text-gray-400">
+                                  <p className="rounded-full border border-gray-100 bg-gray-50 px-2 py-0.5 text-[10px] font-bold text-gray-500 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:text-gray-400">
                                     {account.accountDetails.account_metadata?.username
                                       ? `@${account.accountDetails.account_metadata.username}`
                                       : `ID: ${account.accountDetails.account_id}`}
@@ -495,7 +495,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                             const apiLimits = platformConfig?.apiLimits;
                             if (!apiLimits) return null;
                             return (
-                              <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50/80 px-3 py-2.5 dark:border-neutral-700/50 dark:bg-neutral-800/50">
+                              <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50/80 px-3 py-2.5 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
                                 <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                   {t('manageContent.socialMedia.apiLimits')}
                                 </p>

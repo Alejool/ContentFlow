@@ -73,7 +73,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
             } ${
               isSelected
                 ? 'border-primary-500 bg-primary-50 shadow-sm dark:bg-primary-900/20'
-                : 'border-gray-200 bg-white hover:border-primary-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700/50'
+                : 'border-gray-200 bg-white hover:border-primary-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700/50'
             }`}
           >
             <Checkbox isSelected={isSelected} disabled={disabled} />

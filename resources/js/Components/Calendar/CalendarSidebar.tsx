@@ -40,7 +40,7 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
     .sort((a, b) => a.start.localeCompare(b.start));
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-neutral-800/50 dark:bg-neutral-800/30">
+    <div className="flex h-full flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-neutral-800/50 dark:bg-theme-bg-secondary">
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-start justify-between">
@@ -192,8 +192,8 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
             );
           })
         ) : (
-          <div className="rounded-lg border-2 border-dashed border-gray-200 bg-white/50 py-12 text-center dark:border-neutral-800 dark:bg-neutral-900/10">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-800">
+          <div className="rounded-lg border-2 border-dashed border-gray-200 bg-white/50 py-12 text-center dark:border-neutral-800 dark:bg-theme-bg-secondary">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-theme-bg-secondary">
               <CalendarIcon className="h-6 w-6 text-gray-300" />
             </div>
             <p className="text-sm font-medium text-gray-400">{t('calendar.events.empty')}</p>

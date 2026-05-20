@@ -137,9 +137,9 @@ export default function SetupWizard({
       aria-labelledby="wizard-title"
       aria-describedby="wizard-description"
     >
-      <div className="max-h-[95vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white shadow-2xl md:max-h-[90vh] dark:bg-neutral-800">
+      <div className="max-h-[95vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white shadow-2xl md:max-h-[90vh] dark:bg-theme-bg-secondary">
         {/* Header - Responsive layout (Requirement 7.1, 7.2) */}
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-2 border-b border-gray-200 bg-white px-4 py-3 md:items-center md:gap-4 md:px-6 md:py-4 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-2 border-b border-gray-200 bg-white px-4 py-3 md:items-center md:gap-4 md:px-6 md:py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="min-w-0 flex-1">
             <h2
               id="wizard-title"
@@ -169,7 +169,7 @@ export default function SetupWizard({
         </div>
 
         {/* Content - Responsive padding (Requirement 7.1) */}
-        <div className="px-4 py-6 md:px-6 dark:bg-neutral-900">
+        <div className="px-4 py-6 md:px-6 dark:bg-theme-bg-secondary">
           {currentStep === 'welcome' && <WelcomeScreen onNext={handleNext} onSkip={handleSkip} />}
 
           {currentStep === 'platforms' && (
@@ -185,7 +185,7 @@ export default function SetupWizard({
         </div>
 
         {/* Footer Navigation - Responsive layout (Requirement 7.1) */}
-        <div className="sticky bottom-0 z-10 flex flex-col items-stretch justify-between gap-3 border-t border-gray-200 bg-gray-50 px-4 py-3 md:flex-row md:items-center md:px-6 md:py-4 dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="sticky bottom-0 z-10 flex flex-col items-stretch justify-between gap-3 border-t border-gray-200 bg-gray-50 px-4 py-3 md:flex-row md:items-center md:px-6 md:py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <button
             onClick={handleBack}
             disabled={currentStep === 'welcome' || state.isLoading}
@@ -291,7 +291,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
       </div>
 
       <div className="grid grid-cols-1 gap-3 pt-2 md:grid-cols-3 md:gap-4 md:pt-4">
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
             <svg
               className="h-5 w-5 text-blue-600"
@@ -315,7 +315,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
           </p>
         </div>
 
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/20">
             <svg
               className="h-5 w-5 text-green-600"
@@ -339,7 +339,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
           </p>
         </div>
 
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/20">
             <svg
               className="h-5 w-5 text-purple-600"
@@ -465,7 +465,7 @@ function SuccessScreen({
         </p>
       </div>
 
-      <div className="rounded-lg bg-gray-50 p-6 dark:bg-neutral-900">
+      <div className="rounded-lg bg-gray-50 p-6 dark:bg-theme-bg-secondary">
         <h4 className="mb-4 font-medium text-gray-900 dark:text-white">
           {t('wizard.success.connectedAccounts')}
         </h4>
@@ -473,7 +473,7 @@ function SuccessScreen({
           {connectedAccounts.map((account, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 rounded-lg bg-white p-3 dark:bg-neutral-900"
+              className="flex items-center gap-3 rounded-lg bg-white p-3 dark:bg-theme-bg-secondary"
             >
               <div className="bg-primary-100 dark:bg-primary-900/20 flex h-10 w-10 items-center justify-center rounded-full">
                 <span className="text-primary-600 text-sm font-medium uppercase">

@@ -51,7 +51,7 @@ export default function LanguageSwitcher() {
       onClick={toggleLanguage}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="group relative overflow-hidden rounded-lg border border-gray-200/30 bg-white/60 p-2 backdrop-blur-md transition-all duration-300 hover:border-primary-200/40 hover:bg-white/70 hover:shadow-md dark:border-neutral-700/30 dark:bg-neutral-800/40 dark:hover:border-primary-500/20 dark:hover:bg-neutral-800/60"
+      className="group relative overflow-hidden rounded-lg border border-gray-200/30 bg-white/60 p-2 backdrop-blur-md transition-all duration-300 hover:border-primary-200/40 hover:bg-white/70 hover:shadow-md dark:border-neutral-700/30 dark:bg-theme-bg-secondary dark:hover:border-primary-500/20 dark:hover:bg-neutral-800/60"
       aria-label={`Switch to ${nextLanguage.code.toUpperCase()}`}
     >
       <div className="relative flex h-8 w-8 items-center justify-center">
@@ -82,7 +82,7 @@ export default function LanguageSwitcher() {
             animate={{ scale: 1, opacity: 1, x: 0, y: 0 }}
             exit={{ scale: 0, opacity: 0, x: -10, y: -10 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="absolute -bottom-1 -right-1 h-3.5 w-5 overflow-hidden rounded-sm border border-gray-200/40 bg-white/80 p-0.5 shadow-md backdrop-blur-sm dark:border-neutral-600/40 dark:bg-neutral-800/80"
+            className="absolute -bottom-1 -right-1 h-3.5 w-5 overflow-hidden rounded-sm border border-gray-200/40 bg-white/80 p-0.5 shadow-md backdrop-blur-sm dark:border-neutral-600/40 dark:bg-theme-bg-secondary"
           >
             <OptimizedImage
               src={nextLanguage.flag}

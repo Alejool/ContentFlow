@@ -140,12 +140,12 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
         return (
           <div
             key={item.id}
-            className="group relative flex min-h-[16rem] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+            className="group relative flex min-h-[16rem] flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-neutral-800 dark:bg-theme-bg-secondary"
           >
             {/* Primary Visual/Info Area */}
             <div className="flex-1 p-5">
               <div className="mb-4 flex items-start gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50/50 shadow-inner transition-transform duration-300 group-hover:scale-105 dark:border-neutral-800 dark:bg-neutral-800/50">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50/50 shadow-inner transition-transform duration-300 group-hover:scale-105 dark:border-neutral-800 dark:bg-theme-bg-secondary">
                   <PublicationThumbnail publication={item} t={t} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -200,7 +200,7 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
             </div>
 
             {/* Action Bar */}
-            <div className="mt-auto flex gap-3 border-t border-gray-50 bg-gray-50/50 px-5 py-4 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-800/20">
+            <div className="mt-auto flex gap-3 border-t border-gray-50 bg-gray-50/50 px-5 py-4 backdrop-blur-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
               {!canManageContent ? (
                 <Button
                   onClick={(e) => {

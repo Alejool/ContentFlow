@@ -115,7 +115,7 @@ export default function ApprovalWorkflowsTab({
             {t('common.approvals.upgrade.description')}
           </p>
 
-          <div className="mx-auto mb-6 max-w-md rounded-lg bg-white p-6 dark:bg-neutral-900">
+          <div className="mx-auto mb-6 max-w-md rounded-lg bg-white p-6 dark:bg-theme-bg-secondary">
             <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
               {t('common.approvals.upgrade.benefits_title') || 'With approvals you get:'}
             </p>
@@ -405,8 +405,8 @@ export default function ApprovalWorkflowsTab({
 
   if (isEditing && editingWorkflow) {
     return (
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <div className="flex flex-col border-b border-gray-200 bg-gray-50 p-6 md:flex-row md:items-center md:justify-between dark:border-neutral-800 dark:bg-neutral-800/50">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="flex flex-col border-b border-gray-200 bg-gray-50 p-6 md:flex-row md:items-center md:justify-between dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {editingWorkflow.id === 0
@@ -511,7 +511,7 @@ export default function ApprovalWorkflowsTab({
               {editingWorkflow.steps.map((step, index) => (
                 <div
                   key={index}
-                  className="animate-in fade-in slide-in-from-top-2 group flex flex-col items-start gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 duration-300 xl:flex-row xl:items-center dark:border-neutral-800 dark:bg-neutral-800/20"
+                  className="animate-in fade-in slide-in-from-top-2 group flex flex-col items-start gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 duration-300 xl:flex-row xl:items-center dark:border-neutral-800 dark:bg-theme-bg-secondary"
                 >
                   <div className="flex w-full flex-1 items-center gap-3">
                     <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
@@ -673,7 +673,7 @@ export default function ApprovalWorkflowsTab({
       </div>
 
       {workflows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="bg-primary-50 dark:bg-primary-900/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
             <CheckCircle className="text-primary-600 h-8 w-8" />
           </div>
@@ -698,7 +698,7 @@ export default function ApprovalWorkflowsTab({
           {workflows.map((workflow) => (
             <div
               key={workflow.id}
-              className="group hover:border-primary-300 dark:hover:border-primary-700 rounded-xl border border-gray-200 bg-white p-5 transition-all dark:border-neutral-800 dark:bg-neutral-900"
+              className="group hover:border-primary-300 dark:hover:border-primary-700 rounded-xl border border-gray-200 bg-white p-5 transition-all dark:border-neutral-800 dark:bg-theme-bg-secondary"
             >
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -736,7 +736,7 @@ export default function ApprovalWorkflowsTab({
               <div className="flex flex-wrap items-center gap-2">
                 {workflow.steps.map((step, idx) => (
                   <div key={idx} className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300">
+                    <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300">
                       {step.user_id ? <User className="h-3 w-3" /> : <Users className="h-3 w-3" />}
                       {step.name}
                     </div>

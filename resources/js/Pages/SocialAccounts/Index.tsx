@@ -117,7 +117,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
     >
       <Head title={t('socialAccounts.title', 'Cuentas Sociales')} />
 
-      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-theme-bg-secondary">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Connected Accounts */}
           {accounts.length > 0 && (
@@ -133,8 +133,8 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
                       key={account.id}
                       className={`rounded-lg border-2 p-6 transition-all ${
                         expired
-                          ? 'border-amber-300 bg-amber-50/40 dark:border-amber-600/50 dark:bg-neutral-800/30'
-                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900'
+                          ? 'border-amber-300 bg-amber-50/40 dark:border-amber-600/50 dark:bg-theme-bg-secondary'
+                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-theme-bg-secondary'
                       }`}
                     >
                       <div className="mb-4 flex items-start justify-between">
@@ -226,7 +226,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
                 return (
                   <div
                     key={platform}
-                    className="rounded-lg border-2 border-dashed border-gray-300 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900"
+                    className="rounded-lg border-2 border-dashed border-gray-300 bg-white p-6 dark:border-neutral-700 dark:bg-theme-bg-secondary"
                   >
                     <div className="mb-4 flex items-center gap-3">
                       <img src={platformLogos[platform]} alt={platform} className="h-10 w-10" />

@@ -44,7 +44,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-[88px] animate-pulse rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700/50 dark:bg-neutral-800"
+            className="h-[88px] animate-pulse rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700/50 dark:bg-theme-bg-secondary"
           >
             <div className="flex h-full items-center gap-4">
               <div className="h-12 w-12 shrink-0 rounded-full bg-gray-100 dark:bg-neutral-700"></div>
@@ -101,7 +101,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
       {statCards.map((stat, index) => (
         <div
           key={index}
-          className={`rounded-lg border bg-white p-4 dark:bg-neutral-800 ${stat.borderColor} shadow-sm transition-all duration-200 hover:shadow-md`}
+          className={`rounded-lg border bg-white p-4 dark:bg-theme-bg-secondary ${stat.borderColor} shadow-sm transition-all duration-200 hover:shadow-md`}
         >
           <div className="flex items-center gap-4">
             <div className={`shrink-0 rounded-full p-3 ${stat.bgColor}`}>

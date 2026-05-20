@@ -45,7 +45,7 @@ export default function MultiSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-primary-400 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:border-primary-500"
+        className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-primary-400 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:border-primary-500"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Select options. ${selected.length} of ${options.length} selected`}
@@ -56,7 +56,7 @@ export default function MultiSelect({
 
       {isOpen && (
         <div
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-neutral-600 dark:bg-theme-bg-secondary"
           role="listbox"
           aria-multiselectable="true"
         >

@@ -54,7 +54,7 @@ function ApprovalRequestItem({
   const mediaPreview = firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
 
   return (
-    <div className="group hover:border-primary-400 dark:hover:border-primary-600 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl dark:border-neutral-700 dark:bg-neutral-800">
+    <div className="group hover:border-primary-400 dark:hover:border-primary-600 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary">
       {/* Header Section */}
       <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 dark:border-neutral-700 dark:from-neutral-900 dark:to-neutral-800">
         <div className="flex flex-wrap items-center gap-2">
@@ -72,7 +72,7 @@ function ApprovalRequestItem({
             </span>
           )}
           <span
-            className="ml-auto flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-gray-400"
+            className="ml-auto flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-400"
             title={formatDateTimeString(request.submitted_at, {
               dateStyle: 'long',
               timeStyle: 'short',
@@ -123,7 +123,7 @@ function ApprovalRequestItem({
             {/* Metadata Grid */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {/* Submitter */}
-              <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-neutral-900/50">
+              <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-theme-bg-secondary">
                 <div className="bg-primary-100 dark:bg-primary-900/30 flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
                   <User className="text-primary-600 dark:text-primary-400 h-4 w-4" />
                 </div>
@@ -139,7 +139,7 @@ function ApprovalRequestItem({
 
               {/* Content Type */}
               {publication.content_type && (
-                <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-neutral-900/50">
+                <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2 dark:bg-theme-bg-secondary">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
                     <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   </div>
@@ -181,7 +181,7 @@ function ApprovalRequestItem({
       </div>
 
       {/* Actions Footer */}
-      <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+      <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
             variant="ghost"
@@ -348,7 +348,7 @@ export default function ApprovalList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800"
+            className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary"
           >
             {/* Header skeleton */}
             <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 dark:border-neutral-700 dark:from-neutral-900 dark:to-neutral-800">
@@ -374,8 +374,8 @@ export default function ApprovalList({
                     <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-neutral-700" />
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-900/50" />
-                    <div className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-900/50" />
+                    <div className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-theme-bg-secondary" />
+                    <div className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-theme-bg-secondary" />
                   </div>
                   <div className="space-y-2 pt-3">
                     <div className="h-4 w-32 animate-pulse rounded bg-gray-200 dark:bg-neutral-700" />
@@ -386,7 +386,7 @@ export default function ApprovalList({
             </div>
 
             {/* Actions skeleton */}
-            <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+            <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <div className="flex gap-3">
                 <div className="h-10 w-32 animate-pulse rounded-lg bg-gray-200 dark:bg-neutral-700" />
                 <div className="h-10 flex-1 animate-pulse rounded-lg bg-gray-200 dark:bg-neutral-700" />
@@ -455,7 +455,7 @@ export default function ApprovalList({
           />
         </div>
 
-        <div className="mt-4 bg-white pt-4 dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="mt-4 bg-white pt-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <AdvancedPagination
             currentPage={currentPage}
             lastPage={totalPages}

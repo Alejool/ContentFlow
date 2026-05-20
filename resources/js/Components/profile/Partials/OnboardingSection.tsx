@@ -19,7 +19,7 @@ function ConfirmationDialog({ isOpen, onClose, onConfirm, isLoading }: Confirmat
 
   return (
     <div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm duration-200">
-      <div className="animate-in zoom-in-95 w-full max-w-md rounded-xl bg-white p-6 shadow-2xl duration-200 dark:bg-neutral-800">
+      <div className="animate-in zoom-in-95 w-full max-w-md rounded-xl bg-white p-6 shadow-2xl duration-200 dark:bg-theme-bg-secondary">
         <div className="mb-6 flex items-start gap-4">
           <div className="rounded-full bg-amber-100 p-3 dark:bg-amber-900/30">
             <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
@@ -118,7 +118,7 @@ export default function OnboardingSection() {
         </div>
 
         {/* Restart Button */}
-        <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+        <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {t('profile.onboarding.restartLabel') || 'Restart Onboarding Tour'}

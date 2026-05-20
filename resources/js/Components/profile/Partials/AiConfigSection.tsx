@@ -112,8 +112,8 @@ export default function AiConfigSection({
               key={provider.id}
               className={`group rounded-lg border p-6 transition-all duration-300 ${
                 isEnabled
-                  ? 'border-primary-500/30 ring-primary-500/10 bg-white shadow-md ring-1 dark:bg-neutral-800/60'
-                  : 'border-gray-200 bg-gray-50/50 opacity-80 dark:border-neutral-800 dark:bg-neutral-900/30'
+                  ? 'border-primary-500/30 ring-primary-500/10 bg-white shadow-md ring-1 dark:bg-theme-bg-secondary'
+                  : 'border-gray-200 bg-gray-50/50 opacity-80 dark:border-neutral-800 dark:bg-theme-bg-secondary'
               } `}
             >
               <div className="mb-6 flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -122,7 +122,7 @@ export default function AiConfigSection({
                     className={`rounded-lg p-3 transition-colors ${
                       isEnabled
                         ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30'
-                        : 'bg-gray-200 text-gray-400 dark:bg-neutral-800'
+                        : 'bg-gray-200 text-gray-400 dark:bg-theme-bg-secondary'
                     }`}
                   >
                     <Sparkles className="h-5 w-5" />

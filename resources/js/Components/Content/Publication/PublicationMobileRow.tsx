@@ -127,7 +127,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
         return (
           <div
             key={item.id}
-            className="relative rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900"
+            className="relative rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-700 dark:bg-theme-bg-secondary"
             style={{
               contentVisibility: 'auto',
               containIntrinsicSize: '0 88px',
@@ -300,13 +300,13 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
 
                   {/* More options menu */}
                   <Menu>
-                    <MenuButton className="focus:ring-primary-500 inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700">
+                    <MenuButton className="focus:ring-primary-500 inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700">
                       <MoreVertical className="h-5 w-5" />
                       <span className="sr-only">{t('common.more')}</span>
                     </MenuButton>
                     <MenuItems
                       anchor="bottom end"
-                      className="ring-opacity-5 z-[9999] mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white shadow-lg ring-1 ring-black focus:outline-none dark:border-neutral-700 dark:bg-neutral-800"
+                      className="ring-opacity-5 z-[9999] mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white shadow-lg ring-1 ring-black focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary"
                     >
                       <div className="space-y-1 p-2">
                         <MenuItem>

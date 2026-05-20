@@ -74,12 +74,12 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
         </a>
 
         <div className="flex w-full max-w-full flex-col overflow-hidden">
-          <div className="relative flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden">
-            <div className="absolute inset-0 bg-white dark:bg-neutral-900" />
+          <div className="flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden">
+            <div className="absolute inset-0 bg-white dark:bg-theme-bg-secondary" />
 
             <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
-            <div className="relative z-5 flex min-h-0 max-w-full min-w-0 flex-1 flex-col">
+            <div className="relative z-5 flex min-h-0 max-w-full min-w-0 flex-1 flex-col h-screen">
               <MobileNavbar
                 user={user}
                 showingNavigationDropdown={showingNavigationDropdown}
@@ -88,9 +88,8 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
               <main
                 id="main-content"
-                className={`max-w-full min-w-0 flex-1 overflow-x-hidden transition-all duration-500 ease-in-out ${
-                  isSidebarOpen ? 'lg:ml-80' : 'lg:ml-32'
-                }`}
+                className={`max-w-full min-w-0   transition-all duration-500 ease-in-out ${isSidebarOpen ? 'lg:ml-80' : 'lg:ml-32'
+                  }`}
                 role="main"
                 aria-label="Main content"
                 tabIndex={-1}
@@ -113,9 +112,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                     </div>
                     <div className="flex min-w-0 shrink-0 items-center gap-3">
                       <div className="hidden items-center gap-2 md:flex">
-                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800" />
+                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-theme-bg-secondary" />
                         <NotificationButton />
-                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-neutral-800" />
+                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-theme-bg-secondary" />
                         <ProfileDropdown
                           user={user}
                           isProfileActive={!!route().current('profile.edit')}

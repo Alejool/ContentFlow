@@ -149,7 +149,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
 
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-neutral-900/50">
+          <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
               {!publicationId && (
                 <th className="w-[20%] px-6 py-4 text-left font-bold">

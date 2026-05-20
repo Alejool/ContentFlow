@@ -54,7 +54,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
     'border-gray-200 dark:border-neutral-700';
   const badgeColor =
     categoryBadgeColors[template.category as keyof typeof categoryBadgeColors] ||
-    'bg-white/90 dark:bg-neutral-800/90 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-neutral-600';
+    'bg-white/90 dark:bg-theme-bg-secondary text-gray-700 dark:text-gray-300 border-gray-200 dark:border-neutral-600';
 
   const handleSelect = async () => {
     setIsSelecting(true);
@@ -67,7 +67,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
 
   return (
     <div
-      className={`group relative rounded-lg border bg-white dark:bg-neutral-800 ${borderColor} cursor-pointer overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}
+      className={`group relative rounded-lg border bg-white dark:bg-theme-bg-secondary ${borderColor} cursor-pointer overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleSelect}
@@ -76,7 +76,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
       <div className={`relative aspect-video bg-gradient-to-br ${bgGradient} overflow-hidden`}>
         {/* Generated Content Preview */}
         <div className="absolute inset-0 flex flex-col justify-center p-6">
-          <div className="max-h-full overflow-hidden rounded-lg bg-white p-4 shadow-lg dark:bg-neutral-800">
+          <div className="max-h-full overflow-hidden rounded-lg bg-white p-4 shadow-lg dark:bg-theme-bg-secondary">
             <p className="line-clamp-6 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
               {template.content.text}
             </p>

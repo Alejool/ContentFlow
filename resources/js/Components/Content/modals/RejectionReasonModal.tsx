@@ -71,7 +71,7 @@ export default function RejectionReasonModal({
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700/50 dark:bg-neutral-800">
+        <DialogPanel className="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
           <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700/50">
             <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
               <AlertCircle className="h-6 w-6 text-red-500" />
@@ -119,7 +119,7 @@ export default function RejectionReasonModal({
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50/30 p-6 dark:border-neutral-700/50 dark:bg-neutral-900/10">
+            <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50/30 p-6 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
               <Button
                 variant="secondary"
                 buttonStyle="ghost"

@@ -52,7 +52,7 @@ function ModalShell({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div
-        className={`max-h-[90vh] w-full overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-neutral-800 ${
+        className={`max-h-[90vh] w-full overflow-y-auto rounded-lg bg-white p-8 shadow-2xl dark:bg-theme-bg-secondary ${
           wide ? 'max-w-7xl' : 'max-w-4xl'
         }`}
       >
@@ -66,7 +66,7 @@ function ModalShell({
 function StepLoadingFallback() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl dark:bg-neutral-800">
+      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-8 shadow-xl dark:bg-theme-bg-secondary">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
         <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading…</p>
       </div>
@@ -105,7 +105,7 @@ function OnboardingProgressIndicator({
     return (
       <button
         onClick={() => setIsCollapsed(false)}
-        className="fixed right-6 top-6 z-[99] flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-lg transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+        className="fixed right-6 top-6 z-[99] flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-lg transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700"
       >
         <span className="text-sm font-medium text-gray-900 dark:text-white">
           {currentIndex + 1} / {PROGRESS_STAGES.length}
@@ -116,7 +116,7 @@ function OnboardingProgressIndicator({
   }
 
   return (
-    <div className="fixed right-6 top-6 z-[99] w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-700 dark:bg-neutral-800">
+    <div className="fixed right-6 top-6 z-[99] w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary">
       <div className="mb-2 flex items-center justify-between">
         <p className="text-sm font-semibold text-gray-900 dark:text-white">
           {t('progress.title')}

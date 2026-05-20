@@ -264,7 +264,7 @@ export const LivePreviewSection = ({
 
   return (
     <div className={`space-y-4 ${className || ''}`}>
-      <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800">
+      <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-theme-bg-secondary">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const hasPublishedLink = publishedLinks && publishedLinks[tab.id];
@@ -289,7 +289,7 @@ export const LivePreviewSection = ({
         })}
       </div>
 
-      <div className="min-h-[400px] rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-800 dark:bg-neutral-900/50">
+      <div className="min-h-[400px] rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         {publishedLinks && publishedLinks[activePlatform] ? (
           <div className="space-y-4">
             <div className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
@@ -323,7 +323,7 @@ export const LivePreviewSection = ({
                 </a>
               </div>
             </div>
-            <div className="flex min-h-[500px] items-center justify-center rounded-lg bg-white p-4 dark:bg-neutral-800">
+            <div className="flex min-h-[500px] items-center justify-center rounded-lg bg-white p-4 dark:bg-theme-bg-secondary">
               <EmbeddedPost platform={activePlatform} url={publishedLinks[activePlatform]} />
             </div>
           </div>

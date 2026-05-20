@@ -20,7 +20,7 @@ export default function Cancel({ auth }: Props) {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           {/* Cancel Icon */}
           <div className="mb-8 text-center">
-            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800">
+            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-theme-bg-secondary">
               <XCircle className="h-12 w-12 text-gray-600 dark:text-gray-400" />
             </div>
 

@@ -36,7 +36,7 @@ export default function PublishedPostsSection({
   };
 
   return (
-    <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
+    <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary md:col-span-2">
       <div className="mb-3 flex items-center gap-2">
         <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
         <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">

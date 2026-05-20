@@ -31,7 +31,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
                       ? 'border-2 border-primary-400 bg-primary-100 shadow-sm dark:border-primary-600 dark:bg-primary-900/40'
                       : isPast
                         ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                        : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50'
+                        : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-theme-bg-secondary'
                   }`}
                 >
                   <div

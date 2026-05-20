@@ -110,7 +110,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-2xl rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700 dark:bg-neutral-800">
+        <DialogPanel className="w-full max-w-2xl rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex items-center justify-between border-b border-gray-200 p-6 pb-4 dark:border-neutral-700">
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
               <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
                   {categoryShortcuts.map((shortcut, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-neutral-900/50 dark:hover:bg-neutral-900"
+                      className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-theme-bg-secondary dark:hover:bg-neutral-900"
                     >
                       <span className="text-sm text-gray-700 dark:text-gray-300">
                         {shortcut.description}

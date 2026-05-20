@@ -116,7 +116,7 @@ export default function ApprovalWorkflowStatus({
 
       {/* Progreso del flujo */}
       {levels.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <h5 className="mb-4 font-semibold text-gray-900 dark:text-white">
             {t('approvals.workflowProgress') || 'Progreso del flujo'}
           </h5>

@@ -37,7 +37,7 @@ export default function PlatformSettingsModal({
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="lg">
-      <div className="relative overflow-hidden bg-white text-neutral-900 dark:bg-neutral-900 dark:text-white">
+      <div className="relative overflow-hidden bg-white text-neutral-900 dark:bg-theme-bg-secondary dark:text-white">
         <div className="pointer-events-none absolute right-0 top-0 -mr-10 -mt-10 h-40 w-40 rounded-full bg-primary-500/5 blur-lg" />
 
         <div className="px-6">

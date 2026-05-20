@@ -47,7 +47,7 @@ export function Popover({
         placement={placement}
         offset={offset}
         className={({ isEntering, isExiting }) =>
-          `overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-neutral-800/90 dark:bg-neutral-900 ${isEntering ? 'animate-in fade-in-0 zoom-in-95 duration-150' : ''} ${isExiting ? 'animate-out fade-out-0 zoom-out-95 duration-100' : ''} ${className} `.trim()
+          `overflow-hidden rounded-lg border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-neutral-800/90 dark:bg-theme-bg-secondary ${isEntering ? 'animate-in fade-in-0 zoom-in-95 duration-150' : ''} ${isExiting ? 'animate-out fade-out-0 zoom-out-95 duration-100' : ''} ${className} `.trim()
         }
         {...props}
       >

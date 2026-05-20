@@ -82,7 +82,7 @@ const ActivityTimelineItem = ({
           />
         </div>
 
-        <span className="absolute -bottom-1 -right-1 rounded-full bg-white p-0.5 dark:bg-neutral-800">
+        <span className="absolute -bottom-1 -right-1 rounded-full bg-white p-0.5 dark:bg-theme-bg-secondary">
           {getActivityIcon(activity.type)}
         </span>
       </div>

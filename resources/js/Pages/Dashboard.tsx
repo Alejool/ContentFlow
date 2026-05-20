@@ -154,20 +154,42 @@ export default function Dashboard({
           className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 md:flex-row dark:border-neutral-700 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900"
         >
           <div>
-            <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-              {t('dashboard.welcomeMessage', { name: auth.user.name })}
+            <h1 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">
+              ¡Bienvenido, {auth.user.name}!
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">{t('dashboard.systemStats')}</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Estadísticas generales del sistema.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a
+                href="#rendimiento"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-white/20 dark:bg-black/20 dark:text-gray-200 dark:hover:bg-black/30"
+              >
+                Rendimiento
+              </a>
+              <a
+                href="#interaccion"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-white/20 dark:bg-black/20 dark:text-gray-200 dark:hover:bg-black/30"
+              >
+                Interacción
+              </a>
+              <a
+                href="#publicaciones"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-white/20 dark:bg-black/20 dark:text-gray-200 dark:hover:bg-black/30"
+              >
+                Publicaciones
+              </a>
+            </div>
           </div>
 
-          <div className="flex rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
+          <div className="flex rounded-lg bg-neutral-100 p-1 dark:bg-theme-bg-secondary">
             {[7, 30, 90].map((days) => (
               <button
                 key={days}
                 onClick={() => handlePeriodChange(days)}
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                   period === days
-                    ? 'bg-white text-gray-900 shadow-sm dark:bg-neutral-900 dark:text-white'
+                    ? 'bg-white text-gray-900 shadow-sm dark:bg-theme-bg-secondary dark:text-white'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                 }`}
               >
@@ -227,7 +249,16 @@ export default function Dashboard({
           </motion.div>
         )}
 
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div id="rendimiento" className="mb-8 scroll-mt-24">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Resumen de Rendimiento
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Métricas clave sobre el alcance y la interacción de tu contenido.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               title: t('dashboard.totalViews'),
@@ -271,8 +302,19 @@ export default function Dashboard({
             </motion.div>
           ))}
         </div>
+        </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+        <div id="interaccion" className="mb-8 scroll-mt-24">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Métricas de Interacción
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Análisis detallado de cómo los usuarios interactúan con tu marca.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             {
               title: t('dashboard.totalEngagement'),
@@ -306,13 +348,24 @@ export default function Dashboard({
             </motion.div>
           ))}
         </div>
+        </div>
 
-        <PublicationStatusCards
-          variant="carousel"
-          stats={pubStats}
-          loading={loadingPubStats}
-          className="mb-8"
-        />
+
+        <div id="publicaciones" className="mb-8 scroll-mt-24">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Estado de Publicaciones
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Reporte del estado actual de tus campañas y publicaciones recientes.
+            </p>
+          </div>
+          <PublicationStatusCards
+            variant="carousel"
+            stats={pubStats}
+            loading={loadingPubStats}
+          />
+        </div>
 
         {/* Add-ons Promotion Card con Carrusel */}
         <div className="mb-8">
@@ -321,7 +374,7 @@ export default function Dashboard({
 
         <div className="mb-8 grid grid-cols-1 gap-6">
           {stats.engagementTrends.length > 0 && (
-            <div className="rounded-lg border border-gray-100 bg-white/60 p-6 shadow-sm backdrop-blur-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/70 dark:backdrop-blur-sm">
+            <div className="rounded-lg border border-gray-100 bg-white/60 p-6 shadow-sm backdrop-blur-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
               <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
                 <div className="bg-primary-100 dark:bg-primary-900/20 rounded-lg p-2">
                   <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -382,7 +435,7 @@ export default function Dashboard({
             <Link
               key={action.href}
               href={action.href}
-              className="group relative overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl dark:border-neutral-700/50 dark:bg-neutral-800/40 dark:backdrop-blur-md dark:hover:bg-neutral-800/60"
+              className="group relative overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-md dark:hover:bg-neutral-800/60"
             >
               <div
                 className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-110 bg-${action.color}-50 text-${action.color}-600 dark:bg-${action.color}-900/20 dark:text-${action.color}-400`}

@@ -20,7 +20,7 @@ export default function WorkspaceInfoBadge({ variant = 'compact' }: WorkspaceInf
   return (
     <Link
       href={route('workspaces.index')}
-      className={`group hover:border-primary-500/60 hover:shadow-primary-600/15 inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-white/90 px-3 py-2 shadow-md backdrop-blur-xl transition-all duration-300 hover:bg-white hover:shadow-xl dark:border-neutral-700/50 dark:bg-neutral-900/95 dark:hover:bg-neutral-900`}
+      className={`group hover:border-primary-500/60 hover:shadow-primary-600/15 inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-white/90 px-3 py-2 shadow-md backdrop-blur-xl transition-all duration-300 hover:bg-white hover:shadow-xl dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:hover:bg-neutral-900`}
     >
       <div className="flex min-w-0 items-center gap-2">
         <div className="from-primary-500 to-primary-700 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-xs font-bold text-white shadow-md transition-transform duration-300 group-hover:scale-110">

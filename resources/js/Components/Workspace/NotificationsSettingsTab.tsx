@@ -145,7 +145,7 @@ export default function NotificationsSettingsTab({ workspace }: NotificationsSet
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-            <thead className="bg-gray-50 dark:bg-neutral-900/50">
+            <thead className="bg-gray-50 dark:bg-theme-bg-secondary">
               <tr>
                 {[
                   t('workspace.activity.time'),
@@ -188,7 +188,7 @@ export default function NotificationsSettingsTab({ workspace }: NotificationsSet
                             ? 'bg-purple-100 dark:bg-purple-900/30'
                             : log.channel === 'discord'
                               ? 'bg-blue-100 dark:bg-blue-900/30'
-                              : 'bg-gray-100 dark:bg-neutral-800'
+                              : 'bg-gray-100 dark:bg-theme-bg-secondary'
                         }`}
                       >
                         {log.channel === 'slack' ? (

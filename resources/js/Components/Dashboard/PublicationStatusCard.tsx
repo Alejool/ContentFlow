@@ -42,7 +42,7 @@ export function PublicationStatusCard({
       whileHover={{ scale: 1.02, y: -2 }}
       className={cn(
         'group relative flex flex-col items-center overflow-hidden rounded-xl border p-3 text-center shadow-sm transition-all duration-300 sm:p-4',
-        'bg-white/80 backdrop-blur-sm dark:bg-neutral-800/50',
+        'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
         'hover:shadow-lg',
       )}
     >
@@ -79,7 +79,7 @@ export function PublicationStatusCard({
                 leaveFrom="opacity-100 translate-y-0"
                 leaveTo="opacity-0 translate-y-1"
               >
-                <Popover.Panel className="absolute right-0 top-8 z-30 w-48 rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-neutral-700 dark:bg-neutral-800">
+                <Popover.Panel className="absolute right-0 top-8 z-30 w-48 rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <p className="text-xs text-gray-600 dark:text-gray-300">{tooltipContent}</p>
                 </Popover.Panel>
               </Transition>

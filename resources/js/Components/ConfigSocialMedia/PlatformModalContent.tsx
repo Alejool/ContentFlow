@@ -81,7 +81,7 @@ export default function PlatformModalContent({
         {allPlatforms.map((platformName) => (
           <div
             key={platformName}
-            className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-700 dark:bg-neutral-800/50"
+            className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-700 dark:bg-theme-bg-secondary"
           >
             <div className="mb-6 flex items-center gap-3">
               {getPlatformIcon(platformName)}

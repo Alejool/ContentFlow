@@ -39,7 +39,7 @@ function PlatformCard({
     <div
       key={platform.key}
       {...keyboardProps}
-      className="flex h-full cursor-pointer flex-col rounded-lg border-2 border-gray-200 bg-white p-6 transition-all hover:border-primary-500 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-primary-600"
+      className="flex h-full cursor-pointer flex-col rounded-lg border-2 border-gray-200 bg-white p-6 transition-all hover:border-primary-500 hover:shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-primary-600"
     >
       <div className="mb-5 flex items-start gap-4">
         <div className="rounded-lg p-3">
@@ -92,7 +92,7 @@ function PlatformCard({
                 return (
                   <div
                     key={key}
-                    className="flex items-start justify-between gap-2 rounded-lg bg-gray-50 p-2.5 dark:bg-neutral-800/50"
+                    className="flex items-start justify-between gap-2 rounded-lg bg-gray-50 p-2.5 dark:bg-theme-bg-secondary"
                   >
                     <span className="truncate text-xs font-medium text-gray-600 dark:text-gray-400">
                       {label}
@@ -203,7 +203,7 @@ export default function SocialConfig({ settings: initialSettings }: SocialConfig
     >
       <Head title={t('platformSettings.title')} />
 
-      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-theme-bg-secondary">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {activePlatforms.map((platform) => {

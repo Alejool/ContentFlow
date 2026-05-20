@@ -415,13 +415,13 @@ export default function MobileNavbar({
               <div className="mt-3 flex items-center justify-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
                 <Command className="h-3 w-3" />
                 <span>
-                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
                     Esc
                   </kbd>
                   <span className="mx-1">{t('common.close') || 'cerrar'}</span>
                 </span>
                 <span className="mx-1 text-gray-300 dark:text-neutral-600">·</span>
-                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-neutral-800">
+                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
                   ⌘K
                 </kbd>
               </div>

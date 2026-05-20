@@ -95,7 +95,7 @@ export default function ValidationLimitsCard({
 
       {/* Limits Info */}
       {showDetails && (
-        <div className="mb-3 rounded-md border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="mb-3 rounded-md border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h5 className="mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
             Límites de la plataforma:
           </h5>

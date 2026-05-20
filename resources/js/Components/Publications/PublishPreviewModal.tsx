@@ -315,9 +315,9 @@ export default function PublishPreviewModal({
 
   return (
     <Modal show={show} onClose={handleClose} maxWidth="2xl">
-      <div className="flex max-h-[90vh] flex-col overflow-hidden rounded-lg bg-white dark:bg-neutral-900">
+      <div className="flex max-h-[90vh] flex-col overflow-hidden rounded-lg bg-white dark:bg-theme-bg-secondary">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-6 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-6 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Previsualización de Publicación
           </h2>
@@ -341,7 +341,7 @@ export default function PublishPreviewModal({
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-6">
                 {/* Media Info Section */}
-                <div className="mb-6 flex gap-5 rounded-lg bg-gray-50 p-5 dark:bg-neutral-800">
+                <div className="mb-6 flex gap-5 rounded-lg bg-gray-50 p-5 dark:bg-theme-bg-secondary">
                   <div className="shrink-0">
                     {previewData.main_thumbnail ? (
                       <img
@@ -432,7 +432,7 @@ export default function PublishPreviewModal({
                       );
                       return (
                         <>
-                          <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
+                          <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                             <div className="grid grid-cols-3 gap-4 text-center">
                               <div>
                                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -631,7 +631,7 @@ export default function PublishPreviewModal({
 
                 {/* Schedule Section */}
                 {!isSimpleMode && (
-                  <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
+                  <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
                     <label className="mb-3 flex cursor-pointer items-center gap-2 font-medium">
                       <input
                         type="checkbox"
@@ -661,7 +661,7 @@ export default function PublishPreviewModal({
                 <div className="border-t border-gray-200 pt-4 text-center dark:border-neutral-700">
                   <button
                     onClick={toggleMode}
-                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-xs text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-400 dark:hover:border-neutral-500 dark:hover:bg-neutral-700"
+                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-xs text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-400 dark:hover:border-neutral-500 dark:hover:bg-neutral-700"
                   >
                     {isSimpleMode ? '⚙ Modo avanzado' : '⚡ Modo simplificado'}
                   </button>
@@ -669,7 +669,7 @@ export default function PublishPreviewModal({
               </div>
 
               {/* Footer */}
-              <div className="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 p-5 dark:border-neutral-700 dark:bg-neutral-800">
+              <div className="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                 {/* Validation Warning in Footer */}
                 {hasValidationErrors && validationSummary && (
                   <div

@@ -115,7 +115,7 @@ export default function PlatformVideoSettings({
 
       {/* Metadatos del video */}
       {videoMetadata && videoMetadata.width && videoMetadata.height && (
-        <div className="rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
+        <div className="rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-secondary">
           <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
             {t('videoValidation.videoInfo')}
           </p>

@@ -57,7 +57,7 @@ export default function ConfirmDialog({
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-lg border border-transparent bg-white p-6 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
+        <DialogPanel className="w-full max-w-md rounded-lg border border-transparent bg-white p-6 shadow-2xl dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex items-start gap-4">
             <div
               className={`h-12 w-12 shrink-0 rounded-full ${styles.iconBg} flex items-center justify-center`}

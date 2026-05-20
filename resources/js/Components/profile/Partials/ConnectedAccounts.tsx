@@ -101,7 +101,7 @@ export default function ConnectedAccounts({ className = '' }) {
               className={`group relative flex flex-col items-center rounded-lg border-2 p-5 transition-all duration-200 ${
                 account.isConnected
                   ? `${account.bgClass} ${account.darkColor} border-transparent hover:scale-105 hover:shadow-lg`
-                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-neutral-600'
               } cursor-pointer`}
             >
               {/* Logo */}

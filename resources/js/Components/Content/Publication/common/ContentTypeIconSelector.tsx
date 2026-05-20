@@ -75,7 +75,7 @@ export default function ContentTypeIconSelector({
   }, [selectedPlatforms]);
 
   return (
-    <div className="items-centergap-1 flex rounded-lg border border-gray-200 bg-gray-50 p-1 dark:border-neutral-700 dark:bg-neutral-800/50">
+    <div className="items-centergap-1 flex rounded-lg border border-gray-200 bg-gray-50 p-1 dark:border-neutral-700 dark:bg-theme-bg-secondary">
       {availableTypes.map((type) => {
         const Icon = type.icon;
         const isSelected = selectedType === type.value;
@@ -113,7 +113,7 @@ export default function ContentTypeIconSelector({
 
             {/* Tooltip */}
             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 group-hover:block">
-              <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-neutral-800">
+              <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-theme-bg-secondary">
                 {tooltipMessage}
                 <div className="absolute left-1/2 top-full -mt-px -translate-x-1/2">
                   <div className="border-4 border-transparent border-t-gray-900 dark:border-t-neutral-800"></div>

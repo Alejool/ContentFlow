@@ -2,7 +2,7 @@ import Skeleton from '@/Components/common/ui/Skeleton';
 
 const SocialAccountCardSkeleton = () => {
   return (
-    <div className="rounded-lg border border-gray-100 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800">
+    <div className="rounded-lg border border-gray-100 bg-white p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
       <div className="flex items-center gap-4">
         {/* Avatar */}
         <Skeleton variant="circle" className="h-12 w-12 shrink-0" />

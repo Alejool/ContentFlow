@@ -49,7 +49,7 @@ export default function DisconnectBlockerModal({
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-lg transform overflow-hidden rounded-lg border border-gray-200 bg-white p-6 text-left align-middle shadow-xl transition-all dark:border-neutral-700 dark:bg-neutral-800">
+        <DialogPanel className="w-full max-w-lg transform overflow-hidden rounded-lg border border-gray-200 bg-white p-6 text-left align-middle shadow-xl transition-all dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex items-start gap-4">
             <div className="shrink-0">
               <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/30">
@@ -72,10 +72,10 @@ export default function DisconnectBlockerModal({
                   {getMessage()}
                 </p>
 
-                <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <div className="max-h-60 overflow-y-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="sticky top-0 bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400">
+                      <thead className="sticky top-0 bg-gray-100 text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400">
                         <tr>
                           <th className="px-4 py-2 font-medium">
                             {t('manageContent.socialMedia.blockerModal.table.publication') ||

@@ -368,7 +368,7 @@ export default function SubscriptionSection({
                 Math.ceil((periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
               );
               return (
-                <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700/50 dark:bg-neutral-800/50">
+                <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
                   <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                     <span className="font-medium">Periodo de facturación</span>
                     <span className="font-semibold">
@@ -471,7 +471,7 @@ export default function SubscriptionSection({
                     }),
                   )
                 }
-                className="group cursor-pointer rounded-xl border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-neutral-900"
+                className="group cursor-pointer rounded-xl border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-theme-bg-secondary"
               >
                 <div className="mb-2 flex items-center gap-3">
                   <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400">
@@ -498,7 +498,7 @@ export default function SubscriptionSection({
                     }),
                   )
                 }
-                className="group cursor-pointer rounded-xl border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-neutral-900"
+                className="group cursor-pointer rounded-xl border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-theme-bg-secondary"
               >
                 <div className="mb-2 flex items-center gap-3">
                   <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400">
@@ -540,7 +540,7 @@ export default function SubscriptionSection({
                   className="flex items-center justify-between rounded-lg border border-gray-100 p-3 transition-colors hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="rounded-md bg-gray-100 p-2 text-gray-500 dark:bg-neutral-800">
+                    <div className="rounded-md bg-gray-100 p-2 text-gray-500 dark:bg-theme-bg-secondary">
                       <Calendar className="h-4 w-4" />
                     </div>
                     <div>

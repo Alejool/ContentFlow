@@ -82,7 +82,7 @@ export function LazyImage({
   if (!imageSrc && !fallbackSrc) {
     return (
       <div
-        className={`flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 ${className}`}
+        className={`flex items-center justify-center bg-neutral-100 dark:bg-theme-bg-secondary ${className}`}
       >
         <span className="text-xs text-neutral-400 dark:text-neutral-600">Sin imagen</span>
       </div>
@@ -94,7 +94,7 @@ export function LazyImage({
       {/* Loader mientras carga */}
       {showLoader && isLoading && !hasError && (
         <div
-          className={`absolute inset-0 flex animate-pulse items-center justify-center bg-neutral-100 dark:bg-neutral-800 ${loaderClassName}`}
+          className={`absolute inset-0 flex animate-pulse items-center justify-center bg-neutral-100 dark:bg-theme-bg-secondary ${loaderClassName}`}
         >
           <div className="border-3 h-8 w-8 animate-spin rounded-full border-primary-200 border-t-primary-600"></div>
         </div>
@@ -113,7 +113,7 @@ export function LazyImage({
 
       {/* Fallback visual si todo falla */}
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-theme-bg-secondary">
           <svg
             className="h-1/3 w-1/3 text-neutral-300 dark:text-neutral-600"
             fill="none"

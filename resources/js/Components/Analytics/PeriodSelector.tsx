@@ -22,7 +22,7 @@ export default function PeriodSelector({ selectedPeriod, onPeriodChange }: Perio
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-fit rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
+    <div className="flex w-fit rounded-lg bg-neutral-100 p-1 dark:bg-theme-bg-secondary">
       {PERIOD_OPTIONS.map(({ days, labelKey, fallback }) => (
         <button
           key={days}

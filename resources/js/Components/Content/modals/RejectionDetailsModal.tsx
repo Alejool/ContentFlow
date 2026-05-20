@@ -31,7 +31,7 @@ export default function RejectionDetailsModal({
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700 dark:bg-neutral-800">
+        <DialogPanel className="w-full max-w-md rounded-lg bg-white shadow-2xl dark:border dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex items-center justify-between border-b border-gray-100 p-6 dark:border-neutral-700">
             <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
               <XCircle className="h-6 w-6 text-rose-500" />
@@ -63,7 +63,7 @@ export default function RejectionDetailsModal({
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-neutral-900/50">
+              <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-secondary">
                 <div className="shrink-0">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
                     <User className="h-5 w-5" />
@@ -88,7 +88,7 @@ export default function RejectionDetailsModal({
                 <label className="mb-2 block text-xs font-medium text-gray-500 dark:text-gray-400">
                   {t('approvals.rejectionReason') || 'Razón del Rechazo'}
                 </label>
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">
                     {publication.rejection_reason ||
                       t('approvals.noReasonProvided') ||

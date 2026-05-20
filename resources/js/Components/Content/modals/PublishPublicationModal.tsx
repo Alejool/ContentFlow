@@ -47,7 +47,7 @@ const RecurringPostsSection = ({
   if (!hasRecurring) return null;
 
   return (
-    <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
+    <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
       <div className="mb-2 flex items-center gap-2">
         <Clock className="text-primary-600 dark:text-primary-400 h-3.5 w-3.5" />
         <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
@@ -59,7 +59,7 @@ const RecurringPostsSection = ({
         {uniqueScheduled.map((post: any) => (
           <div
             key={post.id}
-            className="flex items-center justify-between rounded border border-blue-200 bg-white p-2 text-xs dark:border-blue-800 dark:bg-neutral-900"
+            className="flex items-center justify-between rounded border border-blue-200 bg-white p-2 text-xs dark:border-blue-800 dark:bg-theme-bg-secondary"
           >
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3 text-blue-600 dark:text-blue-400" />
@@ -76,7 +76,7 @@ const RecurringPostsSection = ({
         {uniquePublished.map((post: any) => (
           <div
             key={post.id}
-            className="flex items-center justify-between rounded border border-green-200 bg-white p-2 text-xs dark:border-green-800 dark:bg-neutral-900"
+            className="flex items-center justify-between rounded border border-green-200 bg-white p-2 text-xs dark:border-green-800 dark:bg-theme-bg-secondary"
           >
             <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3 text-green-600 dark:text-green-400" />
@@ -582,7 +582,7 @@ export default function PublishPublicationModal({
                 </div>
               )}
 
-              <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+              <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
                 <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
                   {publication.title}
                 </h3>
@@ -762,14 +762,14 @@ export default function PublishPublicationModal({
 
               <div className="mb-6">
                 {isLoadingAccounts ? (
-                  <div className="rounded-lg bg-gray-50 py-12 text-center dark:bg-neutral-900/50">
+                  <div className="rounded-lg bg-gray-50 py-12 text-center dark:bg-theme-bg-secondary">
                     <div className="border-primary-500 mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
                     <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                       {t('publications.modal.publish.loadingAccounts') || 'Cargando cuentas...'}
                     </p>
                   </div>
                 ) : compatibleAccounts.length === 0 ? (
-                  <div className="rounded-lg bg-gray-50 py-8 text-center dark:bg-neutral-900/50">
+                  <div className="rounded-lg bg-gray-50 py-8 text-center dark:bg-theme-bg-secondary">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {connectedAccounts.length === 0 ? (
                         <>
@@ -850,7 +850,7 @@ export default function PublishPublicationModal({
                   <button
                     type="button"
                     onClick={() => setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)}
-                    className="hover:text-primary-600 dark:hover:text-primary-400 mb-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-gray-300 dark:hover:bg-neutral-700"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 mb-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     <div className="flex items-center gap-2">
                       <img

@@ -110,18 +110,18 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
         : 'focus:ring-primary-500/20 dark:focus:ring-primary-500/30';
 
       if (error) {
-        return `${base} border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+        return `${base} border-primary-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
       }
       if (success) {
-        return `${base} border-green-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-green-500/20 dark:focus:ring-green-500/30`;
+        return `${base} border-green-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white focus:ring-green-500/20 dark:focus:ring-green-500/30`;
       }
       if (variant === 'outlined') {
         return `${base} bg-transparent border-2 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 text-gray-900 dark:text-white ${ringColorClass}`;
       }
       if (variant === 'filled') {
-        return `${base} bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 hover:bg-white dark:hover:bg-neutral-700/80 text-gray-900 dark:text-white ${ringColorClass}`;
+        return `${base} bg-gray-50 dark:bg-theme-bg-secondary border border-gray-300 dark:border-neutral-700 hover:bg-white dark:hover:bg-neutral-700/80 text-gray-900 dark:text-white ${ringColorClass}`;
       }
-      return `${base} bg-white dark:bg-neutral-800/50 border border-gray-300 dark:border-neutral-700/50 hover:border-gray-400 dark:hover:border-neutral-600/70 text-gray-900 dark:text-white ${ringColorClass}`;
+      return `${base} bg-white dark:bg-theme-bg-secondary border border-gray-300 dark:border-neutral-700/50 hover:border-gray-400 dark:hover:border-neutral-600/70 text-gray-900 dark:text-white ${ringColorClass}`;
     };
 
     const getMessageStyles = (type: 'error' | 'success') => {

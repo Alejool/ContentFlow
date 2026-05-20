@@ -34,7 +34,7 @@ export default function PublicationStatusSection({
 
   return (
     <div className="px-6 pb-4">
-      <div className="overflow-hidden rounded-xl border-2 border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+      <div className="overflow-hidden rounded-xl border-2 border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary">
         {/* Header */}
         <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:border-neutral-700 dark:from-blue-950/30 dark:to-indigo-950/30">
           <div className="p-4">
@@ -125,7 +125,7 @@ export default function PublicationStatusSection({
 
         {/* Expandable Content */}
         {isExpanded && (
-          <div className="space-y-3 bg-gray-50 p-4 dark:bg-neutral-900/50">
+          <div className="space-y-3 bg-gray-50 p-4 dark:bg-theme-bg-secondary">
             {/* Publishing Accounts (In Progress) */}
             {publishingAccounts.length > 0 && (
               <div className="space-y-2">
@@ -137,7 +137,7 @@ export default function PublicationStatusSection({
                   {publishingAccounts.map((account) => (
                     <div
                       key={account.id}
-                      className="flex items-center gap-3 rounded-lg border border-blue-200 bg-white p-3 shadow-sm dark:border-blue-900/50 dark:bg-neutral-800"
+                      className="flex items-center gap-3 rounded-lg border border-blue-200 bg-white p-3 shadow-sm dark:border-blue-900/50 dark:bg-theme-bg-secondary"
                     >
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
                         <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
@@ -172,7 +172,7 @@ export default function PublicationStatusSection({
                   {publishedAccounts.map((account) => (
                     <div
                       key={account.id}
-                      className="flex items-center gap-3 rounded-lg border border-green-200 bg-white p-3 shadow-sm dark:border-green-900/50 dark:bg-neutral-800"
+                      className="flex items-center gap-3 rounded-lg border border-green-200 bg-white p-3 shadow-sm dark:border-green-900/50 dark:bg-theme-bg-secondary"
                     >
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
                         <Check className="h-4 w-4 stroke-[3] text-green-600 dark:text-green-400" />

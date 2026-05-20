@@ -166,7 +166,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
           </div>
 
           {data.orphaned_posts_list && data.orphaned_posts_list.length > 0 && (
-            <div className="mt-2 rounded bg-gray-100 p-2 text-xs dark:bg-neutral-800">
+            <div className="mt-2 rounded bg-gray-100 p-2 text-xs dark:bg-theme-bg-secondary">
               <p className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
                 {t('common.affected_publications')}
               </p>
@@ -187,7 +187,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
         </div>
 
         {data.thumbnail_url && !imageError && (
-          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 sm:h-16 sm:w-16 dark:bg-neutral-800">
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 sm:h-16 sm:w-16 dark:bg-theme-bg-secondary">
             <img
               src={data.thumbnail_url}
               alt={data.publication_title || 'Thumbnail'}
@@ -199,7 +199,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
         )}
 
         {data.thumbnail_url && imageError && (
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-gray-100 sm:h-16 sm:w-16 dark:bg-neutral-800">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-gray-100 sm:h-16 sm:w-16 dark:bg-theme-bg-secondary">
             <ImageOff className="h-6 w-6 text-gray-400 dark:text-neutral-600" />
           </div>
         )}

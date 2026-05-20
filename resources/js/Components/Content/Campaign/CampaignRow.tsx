@@ -50,7 +50,7 @@ const CampaignRow = memo(
       <tr
         data-campaign-id={item.id}
         className={`group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 ${
-          expandedCampaigns.includes(item.id) ? 'bg-gray-50 dark:bg-neutral-800' : ''
+          expandedCampaigns.includes(item.id) ? 'bg-gray-50 dark:bg-theme-bg-secondary' : ''
         }`}
       >
         <td className="px-2 py-4 text-center">
@@ -69,7 +69,7 @@ const CampaignRow = memo(
         </td>
         <td className="px-6 py-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <Layers className="h-6 w-6 text-gray-400" />
             </div>
             <div className="min-w-0 flex-1">

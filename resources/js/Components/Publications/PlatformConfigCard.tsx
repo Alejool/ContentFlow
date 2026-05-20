@@ -114,10 +114,10 @@ export default function PlatformConfigCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-lg border-2 bg-white transition-all dark:bg-neutral-900 ${cardBorderClass} hover:shadow-lg`}
+      className={`overflow-hidden rounded-lg border-2 bg-white transition-all dark:bg-theme-bg-secondary ${cardBorderClass} hover:shadow-lg`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         <div className="flex items-center gap-2.5">
           <span className="text-2xl">{getPlatformIcon(config.platform)}</span>
           <div className="flex flex-col gap-0.5">
@@ -152,7 +152,7 @@ export default function PlatformConfigCard({
 
       {/* Thumbnail */}
       {config.thumbnail_url && (
-        <div className="h-36 w-full overflow-hidden bg-gray-100 dark:bg-neutral-800">
+        <div className="h-36 w-full overflow-hidden bg-gray-100 dark:bg-theme-bg-secondary">
           <img src={config.thumbnail_url} alt="Preview" className="h-full w-full object-cover" />
         </div>
       )}
@@ -169,7 +169,7 @@ export default function PlatformConfigCard({
               <select
                 value={selectedType}
                 onChange={handleTypeChange}
-                className="flex-1 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100"
+                className="flex-1 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-100"
               >
                 {config.available_types.map((type) => (
                   <option key={type} value={type}>
@@ -178,7 +178,7 @@ export default function PlatformConfigCard({
                 ))}
               </select>
             ) : (
-              <span className="flex-1 rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-gray-300">
+              <span className="flex-1 rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-gray-300">
                 {formatType(config.type)}
               </span>
             )}
@@ -212,7 +212,7 @@ export default function PlatformConfigCard({
             <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-gray-400">
               Formato:
             </label>
-            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-gray-300">
+            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-gray-300">
               {config.format.extension}
             </span>
           </div>
@@ -266,7 +266,7 @@ export default function PlatformConfigCard({
               <span>Configuración aplicada</span>
             </button>
             {settingsExpanded && (
-              <div className="mt-2 rounded-md bg-gray-50 p-2 dark:bg-neutral-800">
+              <div className="mt-2 rounded-md bg-gray-50 p-2 dark:bg-theme-bg-secondary">
                 {Object.entries(config.applied_settings).map(([key, value]) => (
                   <div key={key} className="flex justify-between py-1 text-xs">
                     <span className="font-medium text-gray-500 dark:text-gray-400">

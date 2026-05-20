@@ -143,7 +143,7 @@ export default function ApprovalLevelCard({
 
         {/* Approved Action Info */}
         {level.approved_action && (
-          <div className="mt-3 rounded-lg border border-green-200 bg-white p-4 dark:border-green-800 dark:bg-neutral-800">
+          <div className="mt-3 rounded-lg border border-green-200 bg-white p-4 dark:border-green-800 dark:bg-theme-bg-secondary">
             <div className="flex items-start gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
                 <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -174,7 +174,7 @@ export default function ApprovalLevelCard({
 
         {/* Rejected Action Info */}
         {level.rejected_action && (
-          <div className="mt-3 rounded-lg border border-red-200 bg-white p-4 dark:border-red-800 dark:bg-neutral-800">
+          <div className="mt-3 rounded-lg border border-red-200 bg-white p-4 dark:border-red-800 dark:bg-theme-bg-secondary">
             <div className="flex items-start gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
                 <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />

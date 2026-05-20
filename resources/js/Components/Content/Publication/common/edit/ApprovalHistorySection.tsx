@@ -113,7 +113,7 @@ export default function ApprovalHistorySection({
     <div className="space-y-6">
       {/* Workflow Flow Visualization - SOLO mostrar si hay solicitud activa (pending) */}
       {hasActiveRequest && workflow && workflowSteps.length > 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/50">
+        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">
               {t('approvals.workflow_status') || 'Estado del Flujo'}
@@ -127,7 +127,7 @@ export default function ApprovalHistorySection({
 
           <div className="relative flex justify-between">
             {/* Line connecting the steps */}
-            <div className="absolute left-0 top-[18px] h-0.5 w-full bg-gray-100 dark:bg-neutral-800" />
+            <div className="absolute left-0 top-[18px] h-0.5 w-full bg-gray-100 dark:bg-theme-bg-secondary" />
 
             {workflowSteps.map((step) => {
               const stepLog = logs.find(
@@ -175,7 +175,7 @@ export default function ApprovalHistorySection({
                             ? 'scale-110 border-primary-500 bg-primary-500 text-white shadow-[0_0_15px_rgba(var(--color-primary-500),0.4)]'
                             : isPast || isCompleted
                               ? 'border-green-500 bg-green-500 text-white'
-                              : 'border-gray-200 bg-white text-gray-400 dark:border-neutral-700 dark:bg-neutral-800'
+                              : 'border-gray-200 bg-white text-gray-400 dark:border-neutral-700 dark:bg-theme-bg-secondary'
                         }`}
                       >
                         {isCurrent ? (
@@ -289,7 +289,7 @@ export default function ApprovalHistorySection({
                     </div>
 
                     {log.action === 'rejected' && log.comment && (
-                      <div className="mt-2 rounded border border-rose-200 bg-white/50 p-2 dark:border-rose-900/30 dark:bg-neutral-800/50">
+                      <div className="mt-2 rounded border border-rose-200 bg-white/50 p-2 dark:border-rose-900/30 dark:bg-theme-bg-secondary">
                         <div className="mb-1 flex items-center gap-2">
                           <MessageSquare className="h-3 w-3 text-rose-500" />
                           <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">

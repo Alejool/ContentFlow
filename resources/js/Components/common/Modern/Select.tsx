@@ -81,7 +81,7 @@ function DropdownPortal({
     <div
       ref={dropdownRef}
       style={portalStyles}
-      className={`border border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800 ${
+      className={`border border-gray-200 bg-white dark:border-neutral-700 dark:bg-theme-bg-secondary ${
         !usePortal
           ? dropdownDirection === 'up'
             ? 'bottom-full left-0 mb-1'
@@ -308,10 +308,10 @@ export default function Select<T extends FieldValues>({
     `;
 
     if (error) {
-      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+      return `${base} bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
     }
     if (success) {
-      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30`;
+      return `${base} bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30`;
     }
 
     const ringColorClass = activeColor
@@ -322,9 +322,9 @@ export default function Select<T extends FieldValues>({
       return `${base} bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 ${ringColorClass}`;
     }
     if (variant === 'filled') {
-      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 ${ringColorClass}`;
+      return `${base} bg-gray-50 dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 ${ringColorClass}`;
     }
-    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 ${ringColorClass}`;
+    return `${base} bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 ${ringColorClass}`;
   };
 
   const getOptionStyles = (isSelected: boolean, isDisabled: boolean) => {
@@ -578,7 +578,7 @@ export default function Select<T extends FieldValues>({
               }
             >
               {searchable && (
-                <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900">
+                <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <div className="relative">
                     <Search className="absolute top-1/2 left-2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <input
@@ -589,7 +589,7 @@ export default function Select<T extends FieldValues>({
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => e.stopPropagation()}
-                      className="focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pr-2 pl-8 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500"
+                      className="focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pr-2 pl-8 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-100 dark:placeholder-gray-500"
                       aria-label="Search options"
                     />
                   </div>

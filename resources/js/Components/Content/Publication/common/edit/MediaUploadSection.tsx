@@ -154,7 +154,7 @@ const MediaUploadSection = memo(
 
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
-        return 'bg-gray-100 dark:bg-neutral-800/90 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700';
+        return 'bg-gray-100 dark:bg-theme-bg-secondary cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700';
       }
       if (imageError) {
         return 'border-primary-300 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20';
@@ -162,7 +162,7 @@ const MediaUploadSection = memo(
       if (isDragOver) {
         return 'bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-400';
       }
-      return 'border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-900/90';
+      return 'border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-theme-bg-secondary';
     };
 
     return (
@@ -243,7 +243,7 @@ const MediaUploadSection = memo(
               {isAnyMediaProcessing && (
                 <div className="animate-in slide-in-from-bottom-2 absolute inset-x-0 bottom-0 border-t border-primary-500/20 bg-primary-500/10 px-4 py-1.5 backdrop-blur-md">
                   <div className="flex items-center gap-3">
-                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-800">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-theme-bg-secondary">
                       <div
                         className="h-full bg-primary-500 transition-all duration-500 ease-out"
                         style={{
@@ -506,7 +506,7 @@ const VideoPreview = memo(
 const AddMoreButton = memo(() => (
   <label
     htmlFor="media-file-input"
-    className="flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition-colors hover:bg-neutral-200/90 hover:dark:bg-neutral-800/90"
+    className="flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition-colors hover:bg-neutral-200/90 hover:dark:bg-theme-bg-secondary"
   >
     <div className="text-center">
       <Upload className="mx-auto h-6 w-6 text-gray-400" />

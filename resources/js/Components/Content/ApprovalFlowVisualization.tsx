@@ -142,7 +142,7 @@ export default function ApprovalFlowVisualization({
   return (
     <div className="space-y-5">
       {/* Barra de progreso */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-800">
+      <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         <div className="mb-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
           <span>
             {t('approvals.flowVisualization.completedLevels') || 'Niveles completados'}:{' '}
@@ -168,7 +168,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Línea de tiempo de niveles */}
       {levels.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">
             {t('approvals.flowVisualization.title') || 'Flujo de aprobación'}
           </h4>
@@ -259,7 +259,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Historial de logs */}
       {logs.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h4 className="mb-3 font-semibold text-gray-900 dark:text-white">
             {t('approvals.auditTrail') || 'Historial de acciones'}
           </h4>
@@ -297,7 +297,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Acciones: Aprobar / Rechazar */}
       {isPending && (
-        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h4 className="font-semibold text-gray-900 dark:text-white">
             {t('approvals.yourAction') || 'Tu acción'}
           </h4>
@@ -305,7 +305,7 @@ export default function ApprovalFlowVisualization({
           {/* Comentario opcional */}
           {!showRejectInput && (
             <textarea
-              className="focus:ring-primary-500 w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:outline-none dark:border-neutral-600 dark:bg-neutral-900 dark:text-white"
+              className="focus:ring-primary-500 w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
               rows={2}
               placeholder={t('approvals.commentOptional') || 'Comentario opcional...'}
               value={comment}
@@ -317,7 +317,7 @@ export default function ApprovalFlowVisualization({
           {showRejectInput && (
             <div className="space-y-2">
               <textarea
-                className="w-full resize-none rounded-lg border border-red-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-red-700 dark:bg-neutral-900 dark:text-white"
+                className="w-full resize-none rounded-lg border border-red-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-red-500 focus:outline-none dark:border-red-700 dark:bg-theme-bg-secondary dark:text-white"
                 rows={3}
                 placeholder={
                   t('approvals.rejectionReasonRequired') || 'Razón del rechazo (requerida)...'

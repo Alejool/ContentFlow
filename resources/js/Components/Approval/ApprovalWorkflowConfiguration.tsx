@@ -319,7 +319,7 @@ export default function ApprovalWorkflowConfiguration({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
@@ -359,7 +359,7 @@ export default function ApprovalWorkflowConfiguration({
       )}
 
       {/* Enable/Disable Workflow */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
@@ -387,7 +387,7 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Multi-Level Toggle */}
       {workflow.is_enabled && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
@@ -416,7 +416,7 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Multi-Level Configuration */}
       {workflow.is_enabled && workflow.is_multi_level && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center justify-between">
             <h4 className="font-bold text-gray-900 dark:text-white">
               {t('approval.approval_levels')}
@@ -442,7 +442,7 @@ export default function ApprovalWorkflowConfiguration({
             {workflow.levels.map((level, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-800/20"
+                className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-theme-bg-secondary"
               >
                 <div className="flex flex-1 items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">

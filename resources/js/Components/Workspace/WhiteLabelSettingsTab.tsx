@@ -193,7 +193,7 @@ export default function WhiteLabelSettingsTab({
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
         {/* Form Section */}
         <div className="space-y-8 xl:col-span-2">
-          <div className="rounded-lg border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="rounded-lg border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
             <form onSubmit={handleSubmit} className="space-y-10">
               {/* Asset Grid */}
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
@@ -209,7 +209,7 @@ export default function WhiteLabelSettingsTab({
                     </p>
                   </div>
 
-                  <div className="group hover:border-primary-500 dark:hover:border-primary-500 relative flex aspect-video items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-800/40">
+                  <div className="group hover:border-primary-500 dark:hover:border-primary-500 relative flex aspect-video items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                     {logoPreview ? (
                       <img
                         src={logoPreview}
@@ -316,7 +316,7 @@ export default function WhiteLabelSettingsTab({
                     </p>
                   </div>
 
-                  <div className="group hover:border-primary-500 dark:hover:border-primary-500 relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 dark:border-neutral-700 dark:bg-neutral-800/40">
+                  <div className="group hover:border-primary-500 dark:hover:border-primary-500 relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 transition-all duration-300 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                     {faviconPreview ? (
                       <img
                         src={faviconPreview}
@@ -385,7 +385,7 @@ export default function WhiteLabelSettingsTab({
                 </div>
               </div>
 
-              <div className="h-px bg-neutral-100 dark:bg-neutral-800" />
+              <div className="h-px bg-neutral-100 dark:bg-theme-bg-secondary" />
 
               {/* Color Selection */}
               <ColorArea
@@ -433,7 +433,7 @@ export default function WhiteLabelSettingsTab({
 
             <div className="space-y-6">
               {/* Button Preview */}
-              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
                 <p className="mb-4 text-xs font-bold text-gray-400 dark:text-neutral-500">
                   {t('workspace.white_label.buttons_actions') || 'BOTONES Y ACCIONES'}
                 </p>
@@ -469,13 +469,13 @@ export default function WhiteLabelSettingsTab({
               </div>
 
               {/* Sidebar Header Preview */}
-              <div className="relative overflow-hidden rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+              <div className="relative overflow-hidden rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
                 <p className="mb-4 text-xs font-bold text-gray-400 uppercase dark:text-neutral-500">
                   {t('workspace.white_label.sidebar_header') || 'Cabecera del Menú'}
                 </p>
 
                 <div className="flex items-center gap-3 rounded-lg border bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-black/20">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-neutral-800">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-theme-bg-secondary">
                     {logoPreview ? (
                       <img src={logoPreview} className="max-h-[80%] max-w-[80%] object-contain" />
                     ) : (

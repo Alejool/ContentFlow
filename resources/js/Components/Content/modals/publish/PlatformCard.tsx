@@ -193,12 +193,12 @@ const PlatformCard = memo(
                           ? 'border-gray-500 bg-gray-50 shadow-md dark:border-gray-600 dark:bg-gray-900/30'
                           : isSelected
                             ? 'border-primary-600 bg-primary-100 ring-primary-300/60 dark:border-primary-400 dark:bg-primary-900/50 dark:ring-primary-600/50 shadow-lg ring-4'
-                            : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-white hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900/30'
+                            : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-white hover:shadow-md dark:border-neutral-700 dark:bg-theme-bg-secondary'
           }`}
         >
           {/* Publishing Overlay */}
           {(isPublishing || isRetrying) && !isFailed && (
-            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-full bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
+            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-full bg-white/95 backdrop-blur-sm duration-300 dark:bg-theme-bg-secondary">
               <div className="flex flex-col items-center gap-2">
                 <div className="relative shrink-0">
                   <div className="h-10 w-10 rounded-full border border-yellow-200 dark:border-yellow-900" />
@@ -244,7 +244,7 @@ const PlatformCard = memo(
                     await onCancelPlatform(publication.id, account.id);
                   }
                 }}
-                className="mt-3 rounded-lg border border-yellow-300 bg-white px-3 py-1.5 text-xs font-medium text-yellow-700 transition-colors hover:bg-yellow-50 hover:text-yellow-900 dark:border-yellow-700 dark:bg-neutral-800 dark:text-yellow-400 dark:hover:bg-neutral-700 dark:hover:text-yellow-200"
+                className="mt-3 rounded-lg border border-yellow-300 bg-white px-3 py-1.5 text-xs font-medium text-yellow-700 transition-colors hover:bg-yellow-50 hover:text-yellow-900 dark:border-yellow-700 dark:bg-theme-bg-secondary dark:text-yellow-400 dark:hover:bg-neutral-700 dark:hover:text-yellow-200"
               >
                 {t('common.cancel') || 'Cancelar'}
               </button>
@@ -270,7 +270,7 @@ const PlatformCard = memo(
 
           {/* Unpublishing Overlay */}
           {isUnpublishing && (
-            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-neutral-900/95">
+            <div className="animate-in fade-in absolute inset-0 z-30 flex flex-col items-center justify-center rounded-lg bg-white/95 backdrop-blur-sm duration-300 dark:bg-theme-bg-secondary">
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="h-10 w-10 animate-spin text-amber-600 dark:text-amber-400" />
                 <span className="text-xs font-bold tracking-wide text-amber-600 uppercase dark:text-amber-400">
@@ -506,7 +506,7 @@ const PlatformCard = memo(
                   (sp: any) => sp.social_account_id === account.id,
                 );
                 return schedPost?.scheduled_at ? (
-                  <span className="rounded-lg bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-neutral-800 dark:text-gray-400">
+                  <span className="rounded-lg bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-theme-bg-secondary dark:text-gray-400">
                     {formatDateTimeStyled(schedPost.scheduled_at, 'short', 'short')}
                   </span>
                 ) : null;

@@ -255,7 +255,7 @@ export default function UserEventModal({
             {/* Selector de color: acento fuerte al tono elegido, sin animaciones pesadas */}
             <div
               className={cn(
-                'overflow-hidden rounded-lg border-2 bg-white transition-[border-color,box-shadow] duration-200 ease-out dark:bg-neutral-950',
+                'overflow-hidden rounded-lg border-2 bg-white transition-[border-color,box-shadow] duration-200 ease-out dark:bg-theme-bg-secondary',
                 isReadOnly && 'pointer-events-none opacity-70',
               )}
               style={{

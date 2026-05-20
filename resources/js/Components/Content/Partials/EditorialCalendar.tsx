@@ -175,7 +175,7 @@ export default function EditorialCalendar() {
       {renderHeader()}
       <div className="relative">
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm dark:bg-neutral-900/50">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm dark:bg-theme-bg-secondary">
             <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
           </div>
         )}

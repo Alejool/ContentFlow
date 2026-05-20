@@ -158,7 +158,7 @@ export default function ApprovalAnalyticsDashboard({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
@@ -202,7 +202,7 @@ export default function ApprovalAnalyticsDashboard({
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Average Publication Time */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-3">
             <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/20">
               <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -220,7 +220,7 @@ export default function ApprovalAnalyticsDashboard({
         </div>
 
         {/* Total Pending Content */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-3">
             <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/20">
               <FileText className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -241,7 +241,7 @@ export default function ApprovalAnalyticsDashboard({
         </div>
 
         {/* Stale Content */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-3">
             <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/20">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -262,7 +262,7 @@ export default function ApprovalAnalyticsDashboard({
       {/* Charts Row 1: Average Approval Time & Approval Rates */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Average Approval Time by Level */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -291,7 +291,7 @@ export default function ApprovalAnalyticsDashboard({
         </div>
 
         {/* Approval/Rejection Rates by Role */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -328,7 +328,7 @@ export default function ApprovalAnalyticsDashboard({
       {/* Charts Row 2: Pending by Level & Approval Rate Distribution */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Pending Content by Level */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -357,7 +357,7 @@ export default function ApprovalAnalyticsDashboard({
         </div>
 
         {/* Approval Rate Distribution */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -375,7 +375,7 @@ export default function ApprovalAnalyticsDashboard({
       </div>
 
       {/* Approver Workload */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-4 flex items-center gap-2">
           <Users className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           <h4 className="font-bold text-gray-900 dark:text-white">
@@ -406,7 +406,7 @@ export default function ApprovalAnalyticsDashboard({
 
       {/* Stale Content Table */}
       {analytics.stale_pending_content.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -461,7 +461,7 @@ export default function ApprovalAnalyticsDashboard({
 
       {/* Detailed Stats Table */}
       {analytics.approval_rates_by_role.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">

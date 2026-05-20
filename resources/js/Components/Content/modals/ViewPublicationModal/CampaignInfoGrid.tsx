@@ -24,7 +24,7 @@ export default function CampaignInfoGrid({
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {goal && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-2">
             <Target className="h-4 w-4 text-primary-600 dark:text-primary-400" />
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
@@ -36,7 +36,7 @@ export default function CampaignInfoGrid({
       )}
 
       {hashtags && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-2">
             <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
@@ -64,7 +64,7 @@ export default function CampaignInfoGrid({
       )}
 
       {startDate && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-2">
             <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
@@ -78,7 +78,7 @@ export default function CampaignInfoGrid({
       )}
 
       {endDate && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary-600 dark:text-primary-400" />
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
@@ -92,7 +92,7 @@ export default function CampaignInfoGrid({
       )}
 
       {publishDate && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50 md:col-span-2">
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary md:col-span-2">
           <div className="mb-2 flex items-center gap-2">
             <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">

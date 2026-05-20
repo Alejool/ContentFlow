@@ -91,7 +91,7 @@ export function UsageCard({
   const barColor = getBarColor(percentage, ACCENT_BAR_OK[accent]);
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
+    <div className="relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-neutral-800 dark:bg-theme-bg-secondary">
       {/* Top accent strip */}
       <div className={`h-1 w-full ${ACCENT_BAR_OK[accent]}`} />
 

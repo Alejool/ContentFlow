@@ -87,7 +87,7 @@ function TabNavigation({
   if (variant === 'horizontal') {
     return (
       <div className={`mb-8 overflow-x-auto ${className}`}>
-        <div className="inline-flex min-w-max items-center gap-1 rounded-lg border border-gray-200/60 bg-white p-1.5 shadow-sm backdrop-blur-sm dark:border-neutral-700/60 dark:bg-neutral-800">
+        <div className="inline-flex min-w-max items-center gap-1 rounded-lg border border-gray-200/60 bg-white p-1.5 shadow-sm backdrop-blur-sm dark:border-neutral-700/60 dark:bg-theme-bg-secondary">
           {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;

@@ -19,7 +19,7 @@ export default function EmptyState({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-white p-8 text-center shadow-sm dark:border-neutral-700/50 dark:bg-neutral-800 ${className}`}
+      className={`flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-white p-8 text-center shadow-sm dark:border-neutral-700/50 dark:bg-theme-bg-secondary ${className}`}
     >
       <div className={`${sizeMap[imageSize]} mb-6 opacity-80 dark:opacity-60`}>
         <img

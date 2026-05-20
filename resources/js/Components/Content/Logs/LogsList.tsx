@@ -207,7 +207,7 @@ const LogsList = memo(
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}
             >
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <tr>
                     <th className="px-4 py-3 text-xs font-semibold sm:text-sm">
                       {t('logs.table.date')}
@@ -321,9 +321,9 @@ const LogsList = memo(
             </div>
 
             {smoothLoading && (
-              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-neutral-800/50">
+              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-theme-bg-secondary">
                 <table className="w-full text-left text-sm">
-                  <thead className="border-b border-gray-100 bg-gray-50/90 dark:border-neutral-700 dark:bg-neutral-800/90">
+                  <thead className="border-b border-gray-100 bg-gray-50/90 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                     <tr>
                       <th className="px-4 py-3 text-xs font-semibold sm:text-sm">
                         {t('logs.table.date')}
@@ -448,7 +448,7 @@ const LogsList = memo(
             </div>
 
             {smoothLoading && (
-              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 space-y-3 bg-white duration-500 dark:bg-neutral-800">
+              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 space-y-3 bg-white duration-500 dark:bg-theme-bg-secondary">
                 {[...Array(5)].map((_, i) => (
                   <LogCardSkeleton key={i} />
                 ))}

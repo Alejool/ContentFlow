@@ -213,7 +213,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             Copia este token ahora. Por seguridad, <strong>no se mostrará de nuevo</strong>.
           </p>
           <div className="flex items-center gap-2">
-            <div className="flex flex-1 select-all items-center justify-between break-all rounded-md border border-green-300 bg-white p-3 font-mono text-sm dark:border-green-700 dark:bg-neutral-900">
+            <div className="flex flex-1 select-all items-center justify-between break-all rounded-md border border-green-300 bg-white p-3 font-mono text-sm dark:border-green-700 dark:bg-theme-bg-secondary">
               <span>
                 {showToken
                   ? generatedToken
@@ -246,7 +246,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       )}
 
       {/* ── Token Table Card ──────────────────────────────────── */}
-      <div className="border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-neutral-800 sm:rounded-lg">
+      <div className="border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-theme-bg-secondary sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           {/* Header */}
           <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
@@ -274,7 +274,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   placeholder={
                     t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'
                   }
-                  className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-neutral-900 sm:w-64"
+                  className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-theme-bg-secondary sm:w-64"
                   required
                 />
                 <button
@@ -299,7 +299,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
             </div>
           ) : tokens.length === 0 ? (
-            <div className="rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 py-12 text-center dark:border-neutral-700 dark:bg-neutral-900/50">
+            <div className="rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 py-12 text-center dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <Key className="mx-auto mb-4 h-12 w-12 text-neutral-300 dark:text-neutral-600" />
               <p className="text-gray-500 dark:text-neutral-400">
                 {t('workspace.api.no_tokens') || 'No hay tokens generados aún.'}
@@ -370,7 +370,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-                    <thead className="bg-neutral-50 dark:bg-neutral-900/50">
+                    <thead className="bg-neutral-50 dark:bg-theme-bg-secondary">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                           {t('workspace.api.table.name')}
@@ -392,7 +392,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-neutral-800">
+                    <tbody className="divide-y divide-neutral-200 bg-white dark:divide-neutral-700 dark:bg-theme-bg-secondary">
                       {paginatedTokens.map((token) => {
                         const meta = getTokenMeta(token);
                         return (
@@ -474,7 +474,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       </div>
 
       {/* ── API Documentation Downloads ───────────────────────── */}
-      <div className="border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-neutral-800 sm:rounded-lg">
+      <div className="border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-theme-bg-secondary sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <div className="mb-5 flex items-center gap-3">
             <div className="rounded-lg bg-indigo-100 p-2 dark:bg-indigo-900/30">
@@ -582,7 +582,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
           <div className="mt-6 flex justify-end gap-3">
             <button
               onClick={() => setIsRevokeModalOpen(false)}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700"
             >
               {t('common.cancel') || 'Cancelar'}
             </button>

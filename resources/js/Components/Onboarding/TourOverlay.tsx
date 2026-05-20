@@ -375,7 +375,7 @@ export default function TourOverlay({
   if (shouldNavigate || navIsNavigating) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="rounded-lg bg-white p-6 shadow-2xl dark:bg-neutral-800">
+        <div className="rounded-lg bg-white p-6 shadow-2xl dark:bg-theme-bg-secondary">
           <div className="flex items-center gap-3">
             <div className="border-3 h-6 w-6 animate-spin rounded-full border-primary-200 border-t-primary-600" />
             <p className="text-gray-700 dark:text-gray-300">
@@ -399,7 +399,7 @@ export default function TourOverlay({
 
         <div
           ref={cardRef}
-          className="relative w-full max-w-md rounded-lg bg-white shadow-2xl dark:bg-neutral-800"
+          className="relative w-full max-w-md rounded-lg bg-white shadow-2xl dark:bg-theme-bg-secondary"
           role="document"
         >
           {/* Header */}
@@ -434,7 +434,7 @@ export default function TourOverlay({
           </div>
 
           {/* Footer */}
-          <div className="rounded-b-lg border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+          <div className="rounded-b-lg border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <div className="flex flex-col items-stretch justify-between gap-3 md:flex-row md:items-center">
               <div className="flex justify-center gap-1.5 md:justify-start">
                 {Array.from({ length: totalSteps }).map((_, index) => (
@@ -509,7 +509,7 @@ export default function TourOverlay({
       {/* Explanation card - Responsive layout (Requirement 7.1, 7.2) */}
       <div
         ref={cardRef}
-        className="absolute w-full rounded-lg bg-white shadow-2xl transition-all duration-300 dark:bg-neutral-800 md:w-auto md:max-w-md"
+        className="absolute w-full rounded-lg bg-white shadow-2xl transition-all duration-300 dark:bg-theme-bg-secondary md:w-auto md:max-w-md"
         style={{
           top: `${cardPosition.top}px`,
           left: `${cardPosition.left}px`,
@@ -556,7 +556,7 @@ export default function TourOverlay({
         </div>
 
         {/* Footer with actions - Responsive layout (Requirement 7.1) */}
-        <div className="rounded-b-lg border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-neutral-700 dark:bg-neutral-900/50 md:px-6">
+        <div className="rounded-b-lg border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary md:px-6">
           <div className="flex flex-col items-stretch justify-between gap-3 md:flex-row md:items-center">
             {/* Progress indicator */}
             <div

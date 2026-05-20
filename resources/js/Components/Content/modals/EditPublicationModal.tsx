@@ -468,7 +468,7 @@ const EditPublicationModal = ({
 
       <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
-        className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-5xl flex-col rounded-lg bg-white shadow-2xl backdrop-blur-2xl duration-300 dark:bg-neutral-900/90"
+        className="animate-in fade-in zoom-in relative flex max-h-[90vh] w-full max-w-5xl flex-col rounded-lg bg-white shadow-2xl backdrop-blur-2xl duration-300 dark:bg-theme-bg-secondary"
       >
         <ModalHeader
           t={t}
@@ -686,7 +686,7 @@ const EditPublicationModal = ({
                                         ? 'border-primary-300 bg-primary-100 dark:border-primary-700 dark:bg-primary-900/40 border'
                                         : isPast
                                           ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                                          : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-neutral-800/50'
+                                          : 'border border-gray-200 bg-white/50 dark:border-neutral-700 dark:bg-theme-bg-secondary'
                                     }`}
                                   >
                                     <div

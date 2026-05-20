@@ -4,7 +4,7 @@ import Skeleton from '@/Components/common/ui/Skeleton';
 const StatCardSkeleton = ({ compact = false }: { compact?: boolean }) => {
   return (
     <div
-      className={`overflow-hidden rounded-lg border border-gray-100 bg-white/60 backdrop-blur-sm dark:border-neutral-700/50 dark:bg-neutral-800/50`}
+      className={`overflow-hidden rounded-lg border border-gray-100 bg-white/60 backdrop-blur-sm dark:border-neutral-700/50 dark:bg-theme-bg-secondary`}
     >
       {/* Header Skeleton */}
       <div className={`bg-gray-100 dark:bg-neutral-700/30 ${compact ? 'p-3' : 'p-4'}`}>

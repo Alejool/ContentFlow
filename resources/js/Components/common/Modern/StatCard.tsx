@@ -108,7 +108,7 @@ export default function StatCard({
 
   return (
     <div
-      className={`shadow-xs group relative flex items-center gap-4 rounded-lg border bg-white px-5 py-4 transition-all hover:shadow-md dark:bg-neutral-900/80 dark:backdrop-blur-sm ${c.border}`}
+      className={`shadow-xs group relative flex items-center gap-4 rounded-lg border bg-white px-5 py-4 transition-all hover:shadow-md dark:bg-theme-bg-secondary dark:backdrop-blur-sm ${c.border}`}
     >
       {/* Icon Container */}
       <div

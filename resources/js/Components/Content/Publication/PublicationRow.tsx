@@ -49,7 +49,7 @@ export default function PublicationRow({
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <PublicationThumbnail publication={item} />
           </div>
           <div>

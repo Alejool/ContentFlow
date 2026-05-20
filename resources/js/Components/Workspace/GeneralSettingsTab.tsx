@@ -125,7 +125,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
   return (
     <div className="space-y-8">
       {/* ── Single unified form card ─────────────────────────── */}
-      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
         {/* Card header */}
         <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-5 dark:border-neutral-800">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-500/10 text-primary-600 dark:bg-primary-500/20 dark:text-primary-400">
@@ -207,7 +207,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
 
             <div className="space-y-3">
               {/* Public toggle row */}
-              <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-800/40">
+              <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 dark:border-neutral-800 dark:bg-theme-bg-secondary">
                 <div className="flex items-center gap-3">
                   <div
                     className={`flex h-8 w-8 items-center justify-center rounded-md ${
@@ -241,7 +241,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
 
               {/* Public invites row */}
               {isPublic && (
-                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-800/40">
+                <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 dark:border-neutral-800 dark:bg-theme-bg-secondary">
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary-100 text-primary-600 dark:bg-primary-500/20 dark:text-primary-400">
                       <UserCheck className="h-4 w-4" />
@@ -269,7 +269,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
           {/* ── Section: Workspace ID ────────────────────────── */}
           <div className="px-6 py-6">
             <div className="mb-3 flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-theme-bg-secondary dark:text-neutral-400">
                 <Hash className="h-4 w-4" />
               </div>
               <p className="font-medium text-gray-900 dark:text-white">
@@ -277,7 +277,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <code className="flex-1 truncate rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 font-mono text-sm text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300">
+              <code className="flex-1 truncate rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 font-mono text-sm text-gray-700 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300">
                 {workspace.id}
               </code>
               <button
@@ -286,7 +286,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
                   void navigator.clipboard.writeText(String(workspace.id));
                   toast.success(t('workspace.id_copied'));
                 }}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700"
                 title={t('common.copy')}
               >
                 <Copy className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
@@ -335,7 +335,7 @@ export default function GeneralSettingsTab({ workspace }: GeneralSettingsTabProp
             </div>
           </div>
 
-          <div className="flex items-start justify-between gap-6 bg-white px-6 py-5 dark:bg-neutral-900">
+          <div className="flex items-start justify-between gap-6 bg-white px-6 py-5 dark:bg-theme-bg-secondary">
             <div className="max-w-sm">
               <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                 {t('workspace.delete_workspace')}

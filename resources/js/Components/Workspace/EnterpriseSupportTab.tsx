@@ -40,7 +40,7 @@ export default function EnterpriseSupportTab() {
         {features.map((feature, idx) => (
           <div
             key={idx}
-            className="flex flex-col border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-neutral-800 sm:rounded-lg"
+            className="flex flex-col border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-theme-bg-secondary sm:rounded-lg"
           >
             <div className="flex-1 px-4 py-5 sm:p-6">
               <div
@@ -55,7 +55,7 @@ export default function EnterpriseSupportTab() {
                 {feature.description}
               </p>
             </div>
-            <div className="border-t border-neutral-200 bg-neutral-50 px-4 py-4 dark:border-neutral-700 dark:bg-neutral-900/50 sm:px-6">
+            <div className="border-t border-neutral-200 bg-neutral-50 px-4 py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary sm:px-6">
               <button
                 type="button"
                 className={`text-sm font-semibold text-${feature.color}-600 dark:text-${feature.color}-400 hover:text-${feature.color}-700 dark:hover:text-${feature.color}-300 flex items-center gap-2`}
@@ -68,7 +68,7 @@ export default function EnterpriseSupportTab() {
         ))}
       </div>
 
-      <div className="overflow-hidden border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-neutral-800 sm:rounded-lg">
+      <div className="overflow-hidden border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-theme-bg-secondary sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
             {t('workspace.enterprise.info_title') || 'Enterprise Workspace Status'}

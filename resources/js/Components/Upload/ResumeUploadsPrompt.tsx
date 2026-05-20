@@ -33,7 +33,7 @@ export function ResumeUploadsPrompt() {
   };
 
   return (
-    <div className="animate-slide-in-right border-primary-200 dark:border-primary-700 fixed top-4 right-4 z-[101] w-96 overflow-hidden rounded-lg border bg-white shadow-2xl dark:bg-neutral-800">
+    <div className="animate-slide-in-right border-primary-200 dark:border-primary-700 fixed top-4 right-4 z-[101] w-96 overflow-hidden rounded-lg border bg-white shadow-2xl dark:bg-theme-bg-secondary">
       <div className="border-primary-200 from-primary-50 to-primary-100 dark:border-primary-700 dark:from-primary-900/30 dark:to-primary-800/30 border-b bg-gradient-to-r p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">

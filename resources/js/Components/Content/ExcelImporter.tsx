@@ -236,14 +236,14 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
               className={`flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
                 isDragging
                   ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
-                  : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-neutral-900/90'
+                  : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-theme-bg-secondary'
               }`}
             >
               {!file ? (
                 <div className="space-y-4">
                   <div className="relative">
                     <div className="bg-primary-500/10 dark:bg-primary-400/10 absolute inset-0 rounded-full blur-xl"></div>
-                    <div className="relative rounded-full bg-white p-4 shadow-lg dark:bg-neutral-800">
+                    <div className="relative rounded-full bg-white p-4 shadow-lg dark:bg-theme-bg-secondary">
                       <Upload className="text-primary-500 dark:text-primary-400 h-10 w-10" />
                     </div>
                   </div>
@@ -256,7 +256,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                     </p>
                   </div>
                   <div className="pt-2">
-                    <p className="inline-block rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-500 dark:bg-neutral-800 dark:text-gray-500">
+                    <p className="inline-block rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-500">
                       {t('excel.supportedFormats') || 'Formatos: .xlsx, .xls, .csv (Máx. 10MB)'}
                     </p>
                   </div>
@@ -265,11 +265,11 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                 <div className="w-full space-y-4">
                   <div className="relative">
                     <div className="absolute inset-0 rounded-full bg-green-500/10 blur-xl dark:bg-green-400/10"></div>
-                    <div className="relative mx-auto w-fit rounded-full bg-white p-4 shadow-lg dark:bg-neutral-800">
+                    <div className="relative mx-auto w-fit rounded-full bg-white p-4 shadow-lg dark:bg-theme-bg-secondary">
                       <FileSpreadsheet className="h-10 w-10 text-green-500 dark:text-green-400" />
                     </div>
                   </div>
-                  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800">
+                  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                     <div className="flex items-center justify-between">
                       <div className="flex min-w-0 flex-1 items-center gap-3">
                         <FileSpreadsheet className="h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />

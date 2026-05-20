@@ -94,7 +94,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
                 className={`group relative flex flex-col items-center justify-center rounded-lg border-2 p-4 transition-all duration-200 ${
                   data.theme_color === color.value
                     ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/10'
-                    : 'border-gray-200 bg-white hover:border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600'
+                    : 'border-gray-200 bg-white hover:border-gray-300 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-neutral-600'
                 }`}
               >
                 <div
@@ -171,7 +171,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
               </div>
             </div>
             {/* Lock overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/60 backdrop-blur-[2px] dark:bg-neutral-900/60">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/60 backdrop-blur-[2px] dark:bg-theme-bg-secondary">
               <Lock className="h-6 w-6 text-amber-500" />
               <p className="px-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200">
                 Disponible en plan <strong>Professional</strong> o superior

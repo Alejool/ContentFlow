@@ -46,7 +46,7 @@ export default function Verify() {
   return (
     <AuthenticatedLayout>
       <Head title="Two-Factor Authentication" />
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-neutral-900">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-theme-bg-secondary">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
             <div className="bg-primary-100 dark:bg-primary-900/30 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full">

@@ -101,7 +101,7 @@ const IntegrationCard = ({
               ? t('workspace.integrations.slack_placeholder')
               : 'https://discord.com/api/webhooks/...'
           }
-          className="bg-white dark:bg-neutral-900"
+          className="bg-white dark:bg-theme-bg-secondary"
         />
         <div className="flex justify-end">
           <Button
@@ -300,12 +300,12 @@ export default function IntegrationsSettingsTab({
         />
       </div>
 
-      <div className="flex w-fit items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800/50">
+      <div className="flex w-fit items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-theme-bg-secondary">
         <button
           onClick={() => setActiveSubTab('config')}
           className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
             activeSubTab === 'config'
-              ? 'bg-white text-primary-500 shadow-sm dark:bg-neutral-900'
+              ? 'bg-white text-primary-500 shadow-sm dark:bg-theme-bg-secondary'
               : 'text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200'
           }`}
         >
@@ -315,7 +315,7 @@ export default function IntegrationsSettingsTab({
           onClick={() => setActiveSubTab('activity')}
           className={`rounded-lg px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
             activeSubTab === 'activity'
-              ? 'bg-white text-primary-500 shadow-sm dark:bg-neutral-900'
+              ? 'bg-white text-primary-500 shadow-sm dark:bg-theme-bg-secondary'
               : 'text-gray-500 hover:bg-white/50 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-200'
           }`}
         >
@@ -410,7 +410,7 @@ export default function IntegrationsSettingsTab({
                       type="text"
                       {...register('webhook_secret')}
                       disabled={!canManageWorkspace}
-                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-white"
                       placeholder={t('workspace.integrations.secret_placeholder')}
                     />
                     <Button
@@ -491,7 +491,7 @@ export default function IntegrationsSettingsTab({
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-              <thead className="bg-gray-50 dark:bg-neutral-900/50">
+              <thead className="bg-gray-50 dark:bg-theme-bg-secondary">
                 <tr>
                   {[
                     t('workspace.activity.time'),
@@ -537,7 +537,7 @@ export default function IntegrationsSettingsTab({
                                 ? 'bg-purple-100 dark:bg-purple-900/30'
                                 : log.channel === 'discord'
                                   ? 'bg-blue-100 dark:bg-blue-900/30'
-                                  : 'bg-gray-100 dark:bg-neutral-800'
+                                  : 'bg-gray-100 dark:bg-theme-bg-secondary'
                             }`}
                           >
                             {log.channel === 'slack' ? (

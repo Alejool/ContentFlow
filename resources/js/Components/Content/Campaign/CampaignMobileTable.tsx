@@ -55,7 +55,7 @@ export default function CampaignMobileTable({
         {items.map((item) => (
           <div
             key={item.id}
-            className="rounded-lg border border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800"
+            className="rounded-lg border border-gray-200 bg-white dark:border-neutral-700 dark:bg-theme-bg-secondary"
           >
             <div className="p-4">
               <div className="mb-2 flex items-start justify-between">
@@ -80,7 +80,7 @@ export default function CampaignMobileTable({
               {(item.goal || item.budget) && (
                 <div className="mb-3 flex flex-wrap gap-2">
                   {item.goal && (
-                    <div className="flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-xs text-gray-500 dark:bg-neutral-900/50 dark:text-gray-400">
+                    <div className="flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-xs text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-400">
                       <Target className="text-primary-500 h-3 w-3" />
                       <span className="line-clamp-1">{item.goal}</span>
                     </div>
@@ -127,7 +127,7 @@ export default function CampaignMobileTable({
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
                           ? 'bg-primary-50 text-primary-700 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800 ring-1'
-                          : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
+                          : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-theme-bg-secondary dark:text-gray-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
                       }`}
                     >
                       {expandedCampaigns.includes(item.id) ? (
@@ -148,7 +148,7 @@ export default function CampaignMobileTable({
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 rounded-lg border border-gray-100 bg-gray-50/50 p-1 dark:border-neutral-700/50 dark:bg-neutral-800/30">
+                <div className="flex items-center gap-1.5 rounded-lg border border-gray-100 bg-gray-50/50 p-1 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
                   <button
                     onClick={() => onViewDetails(item)}
                     className="hover:text-primary-600 dark:hover:text-primary-400 rounded-lg p-2 text-gray-500 transition-all hover:bg-white dark:hover:bg-neutral-800"
@@ -200,7 +200,7 @@ export default function CampaignMobileTable({
                       >
                         <div className="flex items-center gap-3">
                           <div className="shrink-0">
-                            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-gray-200 bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800">
+                            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-gray-200 bg-gray-100 dark:border-neutral-600 dark:bg-theme-bg-secondary">
                               <PublicationThumbnail publication={pub} />
                             </div>
                           </div>

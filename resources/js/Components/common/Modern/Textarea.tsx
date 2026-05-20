@@ -79,14 +79,14 @@ export default function Textarea<T extends FieldValues>({
     `;
 
     if (error)
-      return `${base} border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
+      return `${base} border-primary-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
     if (success)
-      return `${base} border-green-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
+      return `${base} border-green-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
     if (variant === 'outlined')
       return `${base} border-2 border-gray-300 dark:border-neutral-600 bg-transparent text-gray-900 dark:text-white`;
     if (variant === 'filled')
-      return `${base} border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white`;
-    return `${base} border-gray-300/50 dark:border-neutral-700/50 bg-white dark:bg-neutral-800/50 text-gray-900 dark:text-white`;
+      return `${base} border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
+    return `${base} border-gray-300/50 dark:border-neutral-700/50 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
   };
 
   const {

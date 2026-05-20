@@ -193,7 +193,7 @@ export default function ContentList(props: ContentListProps) {
               {t('common.filters.title') || 'Filtros'}
             </Button>
 
-            <div className="flex items-center gap-1 rounded-lg border border-white/20 bg-gray-100/80 p-1 shadow-inner ring-1 ring-black/5 backdrop-blur-sm dark:border-white/5 dark:bg-neutral-900/80 dark:ring-white/5">
+            <div className="flex items-center gap-1 rounded-lg border border-white/20 bg-gray-100/80 p-1 shadow-inner ring-1 ring-black/5 backdrop-blur-sm dark:border-white/5 dark:bg-theme-bg-secondary dark:ring-white/5">
               <Button
                 variant="ghost"
                 buttonStyle="ghost"
@@ -205,7 +205,7 @@ export default function ContentList(props: ContentListProps) {
                 }}
                 className={`rounded-lg border-0 p-2 transition-all duration-300 ease-out ${
                   viewMode === 'grid'
-                    ? 'scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-neutral-800 dark:text-primary-400 dark:ring-white/10'
+                    ? 'scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-theme-bg-secondary dark:text-primary-400 dark:ring-white/10'
                     : 'text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300'
                 }`}
                 title={t('common.gridView')}
@@ -223,7 +223,7 @@ export default function ContentList(props: ContentListProps) {
                 }}
                 className={`rounded-lg border-0 p-2 transition-all duration-300 ease-out ${
                   viewMode === 'list'
-                    ? 'scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-neutral-800 dark:text-primary-400 dark:ring-white/10'
+                    ? 'scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-theme-bg-secondary dark:text-primary-400 dark:ring-white/10'
                     : 'text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300'
                 }`}
                 title={t('common.listView')}
@@ -278,7 +278,7 @@ export default function ContentList(props: ContentListProps) {
               </div>
 
               {smoothLoading && (
-                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 overflow-y-auto bg-gray-50 duration-500 dark:bg-neutral-900">
+                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 overflow-y-auto bg-gray-50 duration-500 dark:bg-theme-bg-secondary">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {[...Array(12)].map((_, i) => (
                       <ContentCardSkeleton key={i} />
@@ -290,7 +290,7 @@ export default function ContentList(props: ContentListProps) {
           </div>
 
           {props.pagination && (
-            <div className="mt-4 bg-white pt-4 dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="mt-4 bg-white pt-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <AdvancedPagination
                 currentPage={props.pagination.current_page}
                 lastPage={props.pagination.last_page}

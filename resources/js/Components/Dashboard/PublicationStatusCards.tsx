@@ -97,7 +97,7 @@ export function PublicationStatusCards({
                 transition={{ duration: 0.4 }}
                 className={cn(
                   'group relative flex w-[148px] flex-none flex-col items-center overflow-hidden rounded-xl border p-3 text-center shadow-sm sm:p-4',
-                  'bg-white/80 backdrop-blur-sm dark:bg-neutral-800/50',
+                  'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
                   statusConfig.border,
                   isActive && 'shadow-md',
                 )}
@@ -149,7 +149,7 @@ export function PublicationStatusCards({
           onClick={() => nudge('left')}
           disabled={activeIndex === 0}
           className={cn(
-            'absolute left-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
+            'absolute left-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-theme-bg-secondary',
             activeIndex === 0 ? 'pointer-events-none opacity-0' : 'opacity-100 hover:scale-110',
           )}
         >
@@ -159,7 +159,7 @@ export function PublicationStatusCards({
           onClick={() => nudge('right')}
           disabled={activeIndex === total - 1}
           className={cn(
-            'absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-neutral-800',
+            'absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 shadow-md transition-all duration-200 dark:border-neutral-700 dark:bg-theme-bg-secondary',
             activeIndex === total - 1
               ? 'pointer-events-none opacity-0'
               : 'opacity-100 hover:scale-110',
@@ -228,7 +228,7 @@ export function PublicationStatusCards({
             transition={{ duration: 0.3, delay: index * 0.05 }}
             className={cn(
               'group relative flex flex-col items-center overflow-hidden rounded-xl border p-3 text-center shadow-sm transition-all duration-300 sm:p-4',
-              'bg-white/80 backdrop-blur-sm dark:bg-neutral-800/50',
+              'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
               statusConfig.border,
               statusConfig.hover,
               'hover:-translate-y-0.5 hover:shadow-md',

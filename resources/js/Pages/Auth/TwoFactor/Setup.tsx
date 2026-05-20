@@ -71,7 +71,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
   return (
     <AuthenticatedLayout>
       <Head title={t('twoFactor.setup.title')} />
-      <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-neutral-900">
+      <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-theme-bg-secondary">
         <div className="mx-auto max-w-3xl">
           <div className="mb-8 text-center">
             <div className="bg-primary-100 dark:bg-primary-900/30 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full">

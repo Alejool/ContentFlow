@@ -85,7 +85,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
       case 'publication_failed':
         return 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20';
       default:
-        return 'bg-gray-50 dark:bg-neutral-800/50 border-gray-100 dark:border-neutral-700';
+        return 'bg-gray-50 dark:bg-theme-bg-secondary border-gray-100 dark:border-neutral-700';
     }
   };
 
@@ -132,7 +132,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
       <div className="relative space-y-6 border-l-2 border-gray-200 pl-8 dark:border-neutral-700">
         {activities.map((activity) => (
           <div key={activity.id} className="group relative">
-            <div className="absolute -left-[39px] top-1.5 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm dark:border-neutral-600 dark:bg-neutral-800">
+            <div className="absolute -left-[39px] top-1.5 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm dark:border-neutral-600 dark:bg-theme-bg-secondary">
               {getActivityIcon(activity.type)}
             </div>
 
@@ -155,7 +155,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
                 </div>
 
                 {/* {activity.details && (
-                  <div className="bg-gray-50 dark:bg-neutral-900/50 p-2.5 rounded-lg border border-gray-100 dark:border-neutral-700/50">
+                  <div className="bg-gray-50 dark:bg-theme-bg-secondary p-2.5 rounded-lg border border-gray-100 dark:border-neutral-700/50">
                     {activity.type === "updated" && activity.details.changes ? (
                       <p>
                         <span className="font-medium">{t("activity.timeline.status.updated")}:</span>{" "}

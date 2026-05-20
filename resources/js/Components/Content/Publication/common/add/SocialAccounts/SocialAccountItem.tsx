@@ -89,7 +89,7 @@ const SocialAccountItem = memo(
                 ? 'border-amber-500 bg-amber-50 shadow-md dark:border-amber-600 dark:bg-amber-900/30'
                 : isCheckedActually
                   ? `border-primary-500 bg-primary-100 shadow-lg ring-2 ring-primary-200 dark:border-primary-400 dark:bg-primary-900/40 dark:ring-primary-800`
-                  : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-800/30 dark:hover:border-neutral-500 dark:hover:bg-neutral-700/20'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:hover:border-neutral-500 dark:hover:bg-neutral-700/20'
           }`}
           data-platform={account.platform}
           onClick={() => {
@@ -121,7 +121,7 @@ const SocialAccountItem = memo(
                   <div className="group relative">
                     <Info className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
                     <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 hidden group-hover:block">
-                      <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-neutral-800">
+                      <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-theme-bg-secondary">
                         {`${account.platform} doesn't support ${contentType} content type`}
                         <div className="absolute left-4 top-full -mt-px">
                           <div className="border-4 border-transparent border-t-gray-900 dark:border-t-neutral-800"></div>
@@ -345,7 +345,7 @@ const SocialAccountItem = memo(
                   setIsYouTubeThumbnailExpanded &&
                   setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)
                 }
-                className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-gray-300 dark:hover:text-primary-400"
+                className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:text-primary-400"
               >
                 <span>YouTube Thumbnail</span>
                 <ChevronDown
@@ -354,7 +354,7 @@ const SocialAccountItem = memo(
               </button>
 
               {isYouTubeThumbnailExpanded && (
-                <div className="animate-in fade-in slide-in-from-top-2 rounded-lg border border-gray-200 bg-white p-4 duration-200 dark:border-neutral-700 dark:bg-neutral-900">
+                <div className="animate-in fade-in slide-in-from-top-2 rounded-lg border border-gray-200 bg-white p-4 duration-200 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <YouTubeThumbnailUploader
                     videoId={mediaFiles.find((m) => m.type === 'video')?.id || 0}
                     {...(mediaFiles.find((m) => m.type === 'video')?.url

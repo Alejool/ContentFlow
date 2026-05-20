@@ -129,7 +129,7 @@ export default function AiReelsGallery() {
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-theme-bg-secondary dark:text-white"
             >
               <option value="all">Todas las plataformas</option>
               <option value="instagram">📸 Instagram</option>
@@ -140,7 +140,7 @@ export default function AiReelsGallery() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-theme-bg-secondary dark:text-white"
             >
               <option value="all">Todos los estados</option>
               <option value="completed">Completados</option>
@@ -164,7 +164,7 @@ export default function AiReelsGallery() {
                 {reels.map((reel) => (
                   <div
                     key={reel.id}
-                    className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-primary-300 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-primary-600"
+                    className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-primary-300 hover:shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-primary-600"
                   >
                     {/* Video Preview */}
                     <div className="relative aspect-[9/16] bg-black">
@@ -238,7 +238,7 @@ export default function AiReelsGallery() {
                   <button
                     onClick={() => fetchReels(pagination.current_page - 1)}
                     disabled={pagination.current_page === 1}
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     Anterior
                   </button>
@@ -248,7 +248,7 @@ export default function AiReelsGallery() {
                   <button
                     onClick={() => fetchReels(pagination.current_page + 1)}
                     disabled={pagination.current_page === pagination.last_page}
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700"
                   >
                     Siguiente
                   </button>

@@ -139,7 +139,7 @@ export default function FilterSection({
   const showExportButtons = ['publications', 'campaigns', 'logs'].includes(mode);
 
   return (
-    <div className="mt-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800/50">
+    <div className="mt-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           <Filter className="h-4 w-4" />

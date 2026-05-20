@@ -93,7 +93,7 @@ export default function SearchableSelector<T>({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={searchPlaceholder}
-          className="focus:ring-primary-500 block w-full rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 dark:border-neutral-600 dark:bg-neutral-800 dark:text-gray-100 dark:placeholder-gray-500"
+          className="focus:ring-primary-500 block w-full rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-100 dark:placeholder-gray-500"
           disabled={disabled}
         />
         {searchQuery && (

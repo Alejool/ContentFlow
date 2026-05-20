@@ -14,7 +14,7 @@ export default function CreatorInfo({ user }: CreatorInfoProps) {
   if (!user) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+    <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
       <Avatar src={user.photo_url} name={user.name} size="md" className="shrink-0" />
       <div>
         <h4 className="text-sm font-bold text-gray-900 dark:text-white">{user.name}</h4>

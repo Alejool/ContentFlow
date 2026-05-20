@@ -147,7 +147,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
     <div className="space-y-3">
       {/* Video Preview */}
       {videoPreviewUrl && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex items-center gap-3">
             <div className="group relative shrink-0 cursor-pointer" onClick={handleShowVideoModal}>
               {/* Thumbnail estático sin cargar el video */}
@@ -217,7 +217,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <button
             type="button"
             onClick={handleInputClick}
-            className="hover:bg-opacity-80 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
+            className="hover:bg-opacity-80 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300"
           >
             {t('publications.modal.publish.button.change')}
           </button>
@@ -231,7 +231,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-all ${
             isDragging
               ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-              : 'hover:border-primary-400 border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800'
+              : 'hover:border-primary-400 border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary'
           }`}
         >
           <Upload

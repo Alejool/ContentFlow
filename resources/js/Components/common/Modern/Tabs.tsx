@@ -236,7 +236,7 @@ export default function Tabs({
           : variant === 'underline'
             ? 'gap-0 border-b border-gray-200 dark:border-neutral-700'
             : 'gap-2'
-      } ${variant === 'boxed' ? 'min-w-max items-center gap-1 rounded-lg border border-gray-200/60 bg-white p-1.5 shadow-sm backdrop-blur-sm dark:border-neutral-700/60 dark:bg-neutral-800' : ''}`}
+      } ${variant === 'boxed' ? 'min-w-max items-center gap-1 rounded-lg border border-gray-200/60 bg-white p-1.5 shadow-sm backdrop-blur-sm dark:border-neutral-700/60 dark:bg-theme-bg-secondary' : ''}`}
     >
       {tabsToRender.map((tab) => {
         if (isDraggable && variant === 'boxed') {
@@ -307,10 +307,10 @@ export default function Tabs({
 
               return `${baseClasses} rounded-lg border ${
                 isSelected
-                  ? 'border-primary-500 bg-white text-primary-600 shadow-sm dark:bg-neutral-800 dark:text-primary-400'
+                  ? 'border-primary-500 bg-white text-primary-600 shadow-sm dark:bg-theme-bg-secondary dark:text-primary-400'
                   : isHovered && !disabled
                     ? 'border-gray-300 bg-gray-50 text-gray-900 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white'
-                    : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-gray-400'
+                    : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-400'
               }`;
             }}
           >

@@ -51,7 +51,7 @@ export default function MediaPreviewButton({
   return (
     <button
       onClick={handleClick}
-      className={`group relative w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-100 transition-all hover:shadow-lg dark:bg-neutral-900 ${height} ${className}`}
+      className={`group relative w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-100 transition-all hover:shadow-lg dark:bg-theme-bg-secondary ${height} ${className}`}
     >
       {isVideo ? (
         // Mostrar video real

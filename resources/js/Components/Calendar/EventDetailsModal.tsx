@@ -186,7 +186,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Reschedule section */}
         {canEdit && onUpdateDate && (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                 <CalendarClock className="h-4 w-4 text-primary-500" />
@@ -239,7 +239,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Description */}
         {event.extendedProps?.description && (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
               Descripción
             </p>
@@ -251,7 +251,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Campaign */}
         {event.campaign && (
-          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <Megaphone className="h-5 w-5 shrink-0 text-primary-500" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
@@ -264,7 +264,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Creator */}
         {(event.user?.name || event.extendedProps?.user_name) && (
-          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <User className="h-5 w-5 shrink-0 text-gray-400" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">

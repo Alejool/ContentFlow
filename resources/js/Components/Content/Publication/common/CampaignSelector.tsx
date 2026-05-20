@@ -86,7 +86,7 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
             } ${
               isSelected
                 ? 'border-primary-500 bg-primary-50 ring-primary-500/20 dark:bg-primary-900/20 shadow-sm ring-2'
-                : 'hover:border-primary-300 border-gray-200 bg-white hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700/50'
+                : 'hover:border-primary-300 border-gray-200 bg-white hover:bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700/50'
             }`}
           >
             {/* Icon */}

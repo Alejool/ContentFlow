@@ -139,7 +139,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
     >
       <Head title={t('nav.profile')} />
 
-      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-neutral-900/10">
+      <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-gray-50/30 dark:bg-theme-bg-secondary">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Horizontal Menu */}
           <TabNavigation
@@ -159,7 +159,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
           {/* Main Content Area */}
           <div className="w-full">
             <div
-              className={`dark:border-neutral-800"bg-white border-gray-100" } rounded-lg p-6 shadow-sm dark:bg-neutral-900 md:p-10`}
+              className={`dark:border-neutral-800"bg-white border-gray-100" } rounded-lg p-6 shadow-sm dark:bg-theme-bg-secondary md:p-10`}
             >
               {activeTab === 'profile' && (
                 <div

@@ -116,8 +116,8 @@ const PublicationTable = memo(function PublicationTable({
               ) : (
                 <div className="w-full overflow-x-auto">
                   <table className="z-0 w-full border-collapse text-left">
-                    <thead className="sticky top-0 z-10 border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-neutral-900/50">
-                      <tr className="border-b bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500 dark:bg-neutral-900/80 dark:text-gray-400">
+                    <thead className="sticky top-0 z-10 border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+                      <tr className="border-b bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-400">
                         <TableHeader mode="publications" t={t} />
                       </tr>
                     </thead>
@@ -152,7 +152,7 @@ const PublicationTable = memo(function PublicationTable({
             </div>
 
             {smoothLoading && (
-              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-neutral-900/50">
+              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-theme-bg-secondary">
                 <table className="w-full border-collapse text-left">
                   <thead>
                     <tr className="border-b text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
@@ -202,7 +202,7 @@ const PublicationTable = memo(function PublicationTable({
               </div>
 
               {smoothLoading && (
-                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white duration-500 dark:bg-neutral-900">
+                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white duration-500 dark:bg-theme-bg-secondary">
                   <PublicationMobileRowSkeleton />
                 </div>
               )}

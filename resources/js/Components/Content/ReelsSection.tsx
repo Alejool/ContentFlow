@@ -178,7 +178,7 @@ export default function ReelsSection({
       </Label>
 
       {generatedReels.length > 0 ? (
-        <div className="overflow-hidden rounded-lg border-2 border-purple-200 bg-white dark:border-purple-800 dark:bg-neutral-800">
+        <div className="overflow-hidden rounded-lg border-2 border-purple-200 bg-white dark:border-purple-800 dark:bg-theme-bg-secondary">
           {/* Header with actions */}
           <div className="border-b border-purple-200 bg-gradient-to-r from-purple-50 to-purple-100 px-4 py-3 dark:border-purple-700 dark:from-purple-900/30 dark:to-purple-800/30">
             <div className="flex items-center justify-between">
@@ -222,7 +222,7 @@ export default function ReelsSection({
             {generatedReels.map((reel) => (
               <div
                 key={reel.id}
-                className="group hover:border-primary-300 dark:hover:border-primary-600 relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all dark:border-neutral-700 dark:bg-neutral-900/50"
+                className="group hover:border-primary-300 dark:hover:border-primary-600 relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all dark:border-neutral-700 dark:bg-theme-bg-secondary"
               >
                 {/* Video Thumbnail */}
                 <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-black">
@@ -295,7 +295,7 @@ export default function ReelsSection({
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center dark:border-gray-700 dark:bg-neutral-800/50">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center dark:border-gray-700 dark:bg-theme-bg-secondary">
           <div className="flex flex-col items-center gap-3">
             <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br">
               <Sparkles className="text-primary-600 dark:text-primary-400 h-8 w-8" />

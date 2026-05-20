@@ -75,7 +75,7 @@ export default function PublicationThumbnailCard({
     <button
       type="button"
       onClick={handleClick}
-      className={`focus:ring-primary-500 relative shrink-0 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-100 shadow-sm transition-all hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 ${sizeClasses[size]} ${className} cursor-pointer`}
+      className={`focus:ring-primary-500 relative shrink-0 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-100 shadow-sm transition-all hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary ${sizeClasses[size]} ${className} cursor-pointer`}
     >
       <div className="relative h-full w-full">
         {/* User Event Icon */}

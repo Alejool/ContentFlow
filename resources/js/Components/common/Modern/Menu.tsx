@@ -36,7 +36,7 @@ export function Menu<T extends object>({
       {trigger}
       <Popover
         placement={placement}
-        className="min-w-[12rem] overflow-auto rounded-lg border border-gray-200 bg-white p-1 shadow-2xl outline-none dark:border-neutral-800 dark:bg-neutral-900"
+        className="min-w-[12rem] overflow-auto rounded-lg border border-gray-200 bg-white p-1 shadow-2xl outline-none dark:border-neutral-800 dark:bg-theme-bg-secondary"
       >
         <AriaMenu {...props} className="outline-none">
           {children}

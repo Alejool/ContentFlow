@@ -8,7 +8,7 @@ import { useAnalyticsSync } from '@/Hooks/Analytics/useAnalyticsSync';
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { getEmptyStateByKey } from '@/Utils/Content/emptyStateMapper';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Eye, Heart, LockKeyhole, MousePointer2, RefreshCw, TrendingUp, Users } from 'lucide-react';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -107,8 +107,8 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
       <div className="mx-auto max-w-7xl px-4 py-8 text-gray-900 transition-colors duration-300 dark:text-gray-100 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 dark:border-black/70 dark:from-black/90 dark:to-black/95 md:flex-row">
           <div>
-            <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-              {t('analytics.title')}
+            <h1 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">
+              ¡Bienvenido, {auth.user.name}!
               {isFetching && (
                 <span className="ml-3 inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-400 border-t-transparent align-middle" />
               )}
@@ -120,6 +120,26 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 {lastSyncedAt.toLocaleTimeString()}
               </p>
             )}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a
+                href="#general"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-white/20 dark:bg-black/20 dark:text-gray-200 dark:hover:bg-black/30"
+              >
+                General
+              </a>
+              <a
+                href="#interaccion"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-white/20 dark:bg-black/20 dark:text-gray-200 dark:hover:bg-black/30"
+              >
+                Interacción
+              </a>
+              <a
+                href="#tendencias"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-white/20 dark:bg-black/20 dark:text-gray-200 dark:hover:bg-black/30"
+              >
+                Tendencias
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -155,7 +175,18 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           </div>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+
+        <div id="general" className="mb-8 scroll-mt-24">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Estadísticas Generales del Sistema
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Vista general del alcance y efectividad de tu contenido en todas las plataformas.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title={t('analytics.stats.totalViews')}
             value={overview.total_views || 0}
@@ -193,8 +224,18 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             theme={theme}
           />
         </div>
+        </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div id="interaccion" className="mb-8 scroll-mt-24">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Análisis de Interacción
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Métricas detalladas sobre la respuesta y engagement de la audiencia.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title={t('analytics.stats.avgEngagementRate')}
             value={overview.avg_engagement_rate || 0}
@@ -230,10 +271,11 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             variant={4}
             theme={theme}
           />
+          </div>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-6">
-          <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:backdrop-blur-sm">
+        <div id="tendencias" className="mb-8 grid grid-cols-1 gap-6 scroll-mt-24">
+          <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
             <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100">
               {t('analytics.charts.engagementTrends')}
             </h2>
@@ -252,7 +294,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
         {/* Publication performance — visible for all plans */}
         {(detailedPublications.length > 0 || campaigns.length > 0) && (
           <div className="mb-8">
-            <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:backdrop-blur-sm">
+            <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
               <div className="mb-5 flex flex-col gap-1">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                   {t('analytics.charts.detailedPublications', 'Rendimiento de Publicaciones')}
@@ -296,7 +338,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           <>
             {detailedPlatforms.length > 0 && (
               <div className="mb-8">
-                <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:backdrop-blur-sm">
+                <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {t('analytics.charts.detailedPlatforms')}
                   </h2>
@@ -312,7 +354,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
           </>
         ) : (
           <div className="relative mb-8 overflow-hidden rounded-2xl border border-primary-200/50 shadow-lg dark:border-primary-800/30">
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 p-8 backdrop-blur-sm dark:bg-neutral-900/80">
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 p-8 backdrop-blur-sm dark:bg-theme-bg-secondary">
               <div className="rounded-full bg-primary-100 p-4 dark:bg-primary-900/40">
                 <LockKeyhole className="h-8 w-8 text-primary-600 dark:text-primary-400" />
               </div>

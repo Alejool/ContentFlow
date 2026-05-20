@@ -72,7 +72,7 @@ export const YouTubePreview = memo(
 
             {/* Video Actions */}
             <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
-              <div className="flex items-center rounded-full bg-gray-100 dark:bg-neutral-800">
+              <div className="flex items-center rounded-full bg-gray-100 dark:bg-theme-bg-secondary">
                 <button
                   type="button"
                   className="flex items-center gap-2 border-r border-gray-300 px-3 py-1.5 hover:bg-gray-200 dark:border-neutral-700 dark:hover:bg-neutral-700"
@@ -88,13 +88,13 @@ export const YouTubePreview = memo(
               </div>
               <button
                 type="button"
-                className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+                className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700"
               >
                 <Share2 className="h-4 w-4" /> <span className="text-xs font-semibold">Share</span>
               </button>
               <button
                 type="button"
-                className="hidden items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 lg:flex"
+                className="hidden items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700 lg:flex"
               >
                 <Scissors className="h-4 w-4" /> <span className="text-xs font-semibold">Clip</span>
               </button>
@@ -102,7 +102,7 @@ export const YouTubePreview = memo(
           </div>
 
           {/* Description Box */}
-          <div className="cursor-pointer rounded-lg bg-gray-100 p-3 text-[13px] transition-colors hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700">
+          <div className="cursor-pointer rounded-lg bg-gray-100 p-3 text-[13px] transition-colors hover:bg-gray-200 dark:bg-theme-bg-secondary dark:hover:bg-neutral-700">
             <div className="mb-1 font-bold">
               0 views{' '}
               {publishedAt

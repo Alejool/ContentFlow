@@ -37,7 +37,7 @@ const ScheduleButton = memo(
         </button>
 
         {activePopover === account.id && (
-          <div className="animate-in fade-in zoom-in-95 absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-600 dark:bg-neutral-800">
+          <div className="animate-in fade-in zoom-in-95 absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-600 dark:bg-theme-bg-secondary">
             <SchedulePopoverContent
               account={account}
               customSchedule={customSchedule}

@@ -82,7 +82,7 @@ export default function NotificationPreferences() {
       </div>
 
       {/* Notification Types */}
-      <div className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800">
+      <div className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white dark:divide-neutral-700 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         {/* In-App Notifications */}
         <div className="p-4">
           <div className="flex items-center justify-between">

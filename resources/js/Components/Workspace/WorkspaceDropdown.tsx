@@ -63,9 +63,9 @@ export default function WorkspaceDropdown({
       )}
 
       {!isSidebarOpen && (
-        <div className="pointer-events-none absolute left-full z-50 ml-3 translate-x-1 whitespace-nowrap rounded-lg border border-white/10 bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-xl transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 dark:bg-neutral-800">
+        <div className="pointer-events-none absolute left-full z-50 ml-3 translate-x-1 whitespace-nowrap rounded-lg border border-white/10 bg-gray-900 px-3 py-2 text-xs text-white opacity-0 shadow-xl transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 dark:bg-theme-bg-secondary">
           {current_workspace.name}
-          <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1 -translate-y-1/2 rotate-45 transform bg-gray-900 dark:bg-neutral-800" />
+          <div className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1 -translate-y-1/2 rotate-45 transform bg-gray-900 dark:bg-theme-bg-secondary" />
         </div>
       )}
     </div>
@@ -98,7 +98,7 @@ export default function WorkspaceDropdown({
                     className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded font-bold ${
                       ws.id === current_workspace.id
                         ? 'bg-primary-600 text-white'
-                        : 'bg-gray-200 text-gray-600 dark:bg-neutral-800 dark:text-neutral-400'
+                        : 'bg-gray-200 text-gray-600 dark:bg-theme-bg-secondary dark:text-neutral-400'
                     }`}
                   >
                     {ws.white_label_logo_url ? (
@@ -129,7 +129,7 @@ export default function WorkspaceDropdown({
         </div>
 
         {/* Footer actions */}
-        <div className="bg-gray-50 p-2 dark:bg-neutral-900/50">
+        <div className="bg-gray-50 p-2 dark:bg-theme-bg-secondary">
           <Link
             href={route('workspaces.index')}
             className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-sm text-gray-700 shadow-sm transition-all duration-200 hover:border-gray-200 hover:bg-white hover:text-primary-600 dark:text-neutral-300 dark:hover:border-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-white"

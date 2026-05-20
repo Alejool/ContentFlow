@@ -66,7 +66,7 @@ export default function AccountStatistics({
         {statisticsItems.map((item, index) => (
           <div
             key={index}
-            className="rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800"
+            className="rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary"
           >
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-gray-100 p-2 dark:bg-neutral-700">

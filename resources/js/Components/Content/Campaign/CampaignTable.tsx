@@ -85,7 +85,7 @@ const CampaignTable = memo(
             >
               <table className="z-0 w-full border-collapse whitespace-nowrap text-left">
                 {items.length > 0 && (
-                  <thead className="border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-neutral-900/50">
+                  <thead className="border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                     <tr className="border-b text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       <TableHeader mode="campaigns" t={t} />
                     </tr>
@@ -131,9 +131,9 @@ const CampaignTable = memo(
 
             {/* Skeleton Layer */}
             {smoothLoading && (
-              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-neutral-900/50">
+              <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-theme-bg-secondary">
                 <table className="w-full border-collapse whitespace-nowrap text-left">
-                  <thead className="border-gray-100 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900">
+                  <thead className="border-gray-100 bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                     <tr className="border-b text-[10px] uppercase tracking-wider">
                       <TableHeader mode="campaigns" t={t} />
                     </tr>
@@ -180,7 +180,7 @@ const CampaignTable = memo(
 
               {/* Skeleton Layer */}
               {smoothLoading && (
-                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 space-y-3 bg-white duration-500 dark:bg-neutral-900">
+                <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 space-y-3 bg-white duration-500 dark:bg-theme-bg-secondary">
                   {[...Array(3)].map((_, i) => (
                     <CampaignMobileRowSkeleton key={i} />
                   ))}

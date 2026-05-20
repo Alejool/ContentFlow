@@ -88,7 +88,7 @@ export default function SocialMediaAccounts({
 
   return (
     <div
-      className={`rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-neutral-800/50 dark:backdrop-blur-sm`}
+      className={`rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm`}
     >
       <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
         <h2 className={`text-xl font-bold text-gray-900 dark:text-gray-100`}>

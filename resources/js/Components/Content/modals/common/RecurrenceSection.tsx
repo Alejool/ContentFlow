@@ -172,11 +172,11 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
             }}
             isDisabled={disabled}
             size="md"
-            containerClassName="rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50"
+            containerClassName="rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary"
           />
 
           {isRecurring && (
-            <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary">
               {/* Selector de redes con recurrencia - Solo si hay más de una red */}
               {allAvailableAccounts.length > 1 ? (
                 <div className="space-y-3 border-b border-gray-100 pb-4 dark:border-neutral-800">
@@ -435,7 +435,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                         className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-all ${
                           recurrenceDays.includes(day.value)
                             ? 'bg-primary-600 ring-primary-100 dark:ring-primary-900/30 text-white shadow-md ring-2'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:text-gray-400 dark:hover:bg-neutral-700'
                         }`}
                       >
                         {day.label}
@@ -599,7 +599,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                                     return (
                                       <div
                                         key={idx}
-                                        className="flex items-center justify-between rounded-md bg-white/50 p-2 transition-colors hover:bg-white/80 dark:bg-neutral-900/30 dark:hover:bg-neutral-900/50"
+                                        className="flex items-center justify-between rounded-md bg-white/50 p-2 transition-colors hover:bg-white/80 dark:bg-theme-bg-secondary dark:hover:bg-neutral-900/50"
                                       >
                                         <div className="flex items-center gap-2">
                                           <span

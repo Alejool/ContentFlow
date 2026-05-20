@@ -177,7 +177,7 @@ export default function RolesManagementTab({
 
                   {/* Badges + actions */}
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-neutral-800 dark:text-neutral-400">
+                    <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-neutral-400">
                       {role.slug}
                     </span>
                     {isProtectedRole(role) && (
@@ -251,14 +251,14 @@ export default function RolesManagementTab({
                     {role.permissions?.slice(0, 4).map((permission) => (
                       <div
                         key={permission.id}
-                        className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
+                        className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300"
                         title={permission.description ?? undefined}
                       >
                         {permission.name}
                       </div>
                     ))}
                     {(role.permissions?.length ?? 0) > 4 && (
-                      <div className="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
+                      <div className="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500 dark:bg-theme-bg-secondary dark:text-neutral-400">
                         +{(role.permissions?.length ?? 0) - 4} {t('workspace.more')}
                       </div>
                     )}

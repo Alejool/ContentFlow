@@ -262,7 +262,7 @@ export default function PricingPlansSection({
 
           {/* ── Billing toggle ──────────────────────────────────────────────── */}
           {showBillingToggle && (
-            <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-1.5 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-1.5 shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <button
                 onClick={() => setBillingCycle('monthly')}
                 className={cn(
@@ -280,7 +280,7 @@ export default function PricingPlansSection({
           {/* ── My Plans Panel ──────────────────────────────────────────────── */}
           {isAuthenticated && isOwner && currentPlan && (
             <div className="mx-auto mt-6 max-w-2xl text-left">
-              <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-md dark:border-neutral-800 dark:bg-neutral-900">
+              <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-md dark:border-neutral-800 dark:bg-theme-bg-secondary">
                 {/* Header row */}
                 <div className="bg-primary-600 flex items-center gap-3 px-5 py-4">
                   <Zap className="h-5 w-5 shrink-0 text-white" />
@@ -424,7 +424,7 @@ export default function PricingPlansSection({
               onClick={closeModal}
               className={cn(
                 'rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors',
-                'bg-white text-gray-700 dark:bg-neutral-800 dark:text-gray-200',
+                'bg-white text-gray-700 dark:bg-theme-bg-secondary dark:text-gray-200',
                 'border-gray-200 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-700',
                 !modal.actionLabel && 'flex-1',
               )}

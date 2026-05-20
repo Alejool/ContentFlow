@@ -87,7 +87,7 @@ export default function ContentValidationPanel({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
+    <div className="flex flex-col gap-3 rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary">
       {/* Resumen General */}
       {hasCompatiblePlatforms && (
         <div className="flex items-center gap-3 rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
@@ -185,7 +185,7 @@ export default function ContentValidationPanel({
             <span>Detalles técnicos</span>
           </button>
           {mediaInfoExpanded && (
-            <div className="mt-3 rounded-md border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="mt-3 rounded-md border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {validationResult.media_info.extension && (
                   <div className="flex flex-col gap-1">

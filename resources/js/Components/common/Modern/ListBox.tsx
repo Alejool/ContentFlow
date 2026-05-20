@@ -78,15 +78,15 @@ export default function ListBox({
     }
 
     if (variant === 'bordered') {
-      return `${base} border-2 border-gray-300 bg-white dark:border-neutral-700 dark:bg-neutral-900`;
+      return `${base} border-2 border-gray-300 bg-white dark:border-neutral-700 dark:bg-theme-bg-secondary`;
     }
 
     if (variant === 'flat') {
-      return `${base} bg-gray-50 dark:bg-neutral-800`;
+      return `${base} bg-gray-50 dark:bg-theme-bg-secondary`;
     }
 
     // default
-    return `${base} border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900`;
+    return `${base} border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary`;
   };
 
   return (
@@ -162,7 +162,7 @@ export default function ListBox({
               }
 
               if (isHovered && !isDisabled) {
-                return `${baseClasses} bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-white`;
+                return `${baseClasses} bg-gray-100 text-gray-900 dark:bg-theme-bg-secondary dark:text-white`;
               }
 
               return `${baseClasses} text-gray-700 dark:text-gray-300`;

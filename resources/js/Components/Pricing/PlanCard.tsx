@@ -312,8 +312,8 @@ export default function PlanCard({
         className={cn(
           'relative flex h-full flex-col transition-all duration-300 hover:shadow-lg',
           isPopular
-            ? 'border-primary-600 border-2 bg-white shadow-xl dark:bg-neutral-900'
-            : 'hover:border-primary-400 dark:hover:border-primary-800 border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900',
+            ? 'border-primary-600 border-2 bg-white shadow-xl dark:bg-theme-bg-secondary'
+            : 'hover:border-primary-400 dark:hover:border-primary-800 border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary',
           isCurrentPlan && 'ring-primary-200 dark:ring-primary-900/50 ring-2',
         )}
       >
@@ -364,7 +364,7 @@ export default function PlanCard({
                   ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
                   : plan.id === 'demo'
                     ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                    : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
+                    : 'bg-neutral-100 text-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-400',
               )}
             >
               {getPlanIcon(plan.id)}
@@ -550,8 +550,8 @@ export default function PlanCard({
         className={cn(
           'relative flex h-full flex-col transition-all duration-300',
           isPopular
-            ? 'border-primary-600 border-2 bg-white shadow-xl dark:bg-neutral-900'
-            : 'hover:border-primary-400 dark:hover:border-primary-800 border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900',
+            ? 'border-primary-600 border-2 bg-white shadow-xl dark:bg-theme-bg-secondary'
+            : 'hover:border-primary-400 dark:hover:border-primary-800 border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary',
           isCurrentPlan && 'border-green-500',
         )}
       >
@@ -700,7 +700,7 @@ export default function PlanCard({
                 {(showAllMissing ? missingFeatures : missingFeatures.slice(0, 4)).map(
                   (feature, index) => (
                     <li key={index} className="group/item flex items-start gap-3">
-                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-neutral-800/50">
+                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
                         <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
                       </div>
                       <span className="text-sm text-gray-400 italic dark:text-neutral-500">
@@ -713,7 +713,7 @@ export default function PlanCard({
               {missingFeatures.length > 4 && (
                 <button
                   onClick={() => setShowAllMissing(!showAllMissing)}
-                  className="text-primary-600 hover:border-primary-300 hover:bg-primary-50 dark:text-primary-400 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium transition-all dark:border-neutral-700 dark:bg-neutral-800/50"
+                  className="text-primary-600 hover:border-primary-300 hover:bg-primary-50 dark:text-primary-400 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium transition-all dark:border-neutral-700 dark:bg-theme-bg-secondary"
                 >
                   {showAllMissing ? (
                     <>

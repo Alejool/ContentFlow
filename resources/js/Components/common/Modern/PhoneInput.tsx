@@ -262,7 +262,7 @@ export default function PhoneInput({
               onChange={handleNumberChange}
               disabled={disabled}
               placeholder={placeholder || t('profile.information.phonePlaceholder')}
-              className={`w-full rounded-lg border bg-gray-50 py-3 pr-4 text-base text-gray-900 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:bg-neutral-800/50 dark:text-white ${validationError ? 'border-red-500 focus:ring-red-500/20' : 'hover:border-primary-400 focus:border-primary-500 focus:ring-primary-500/20 dark:hover:border-primary-600 border-gray-200 dark:border-neutral-700'} ${disabled ? 'cursor-not-allowed opacity-60' : ''} `}
+              className={`w-full rounded-lg border bg-gray-50 py-3 pr-4 text-base text-gray-900 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:bg-theme-bg-secondary dark:text-white ${validationError ? 'border-red-500 focus:ring-red-500/20' : 'hover:border-primary-400 focus:border-primary-500 focus:ring-primary-500/20 dark:hover:border-primary-600 border-gray-200 dark:border-neutral-700'} ${disabled ? 'cursor-not-allowed opacity-60' : ''} `}
               style={{ paddingLeft: `${2.5 + callingCode.length * 0.6}rem` }}
             />
           </div>

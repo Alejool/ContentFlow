@@ -197,7 +197,7 @@ export default function ContentTypeSelector({
                       className={`rounded-lg p-2 transition-colors ${
                         isSelected
                           ? 'bg-primary-100 dark:bg-primary-800/30'
-                          : 'bg-gray-100 group-hover:bg-primary-50 dark:bg-neutral-800 dark:group-hover:bg-primary-900/10'
+                          : 'bg-gray-100 group-hover:bg-primary-50 dark:bg-theme-bg-secondary dark:group-hover:bg-primary-900/10'
                       } `}
                     >
                       <Icon
@@ -249,7 +249,7 @@ export default function ContentTypeSelector({
 
         {/* Columna 2: Información del tipo seleccionado */}
         {selectedTypeDetails && (
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
             <h4 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
               {t('publications.modal.contentType.rules') || 'Content Rules'}
             </h4>

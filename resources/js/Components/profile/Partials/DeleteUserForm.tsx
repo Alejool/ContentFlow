@@ -87,7 +87,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
       </div>
 
       <Modal show={confirmingUserDeletion} onClose={closeModal}>
-        <form onSubmit={handleSubmit(deleteUser)} className="p-8 dark:bg-neutral-900">
+        <form onSubmit={handleSubmit(deleteUser)} className="p-8 dark:bg-theme-bg-secondary">
           <div className="mb-6 flex items-center gap-4">
             <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3">
               <AlertTriangle className="text-primary-600 dark:text-primary-400 h-8 w-8" />
