@@ -2,6 +2,7 @@ import { useTheme } from '@/Hooks/Layout/useTheme';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Avatar } from '@/Components/common/Avatar';
 
 export default function ActiveWorkspace() {
   const { t } = useTranslation();
@@ -21,10 +22,13 @@ export default function ActiveWorkspace() {
       <span className="opacity-70">{t('workspace.active_context')}:</span>
       <div className="flex items-center gap-1.5">
         {auth?.current_workspace?.white_label_logo_url ? (
-          <img
+          <Avatar
             src={auth.current_workspace.white_label_logo_url}
-            alt=""
-            className="h-4 w-4 object-contain"
+            name={auth?.current_workspace?.name}
+            size="none"
+            className="h-4 w-4 rounded-sm text-[8px]"
+            imageClassName="object-contain rounded-sm"
+            fallbackStrategy="initials"
           />
         ) : (
           <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-current" />

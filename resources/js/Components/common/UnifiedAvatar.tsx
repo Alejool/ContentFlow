@@ -7,9 +7,11 @@ interface UnifiedAvatarProps {
   name?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
+  imageClassName?: string;
   showStatus?: boolean;
   statusColor?: string;
   loading?: 'lazy' | 'eager';
+  fallbackStrategy?: 'initials' | 'none';
 }
 
 // Iconos disponibles por defecto
@@ -30,9 +32,11 @@ export function UnifiedAvatar({
   name = 'User',
   size = 'md',
   className = '',
+  imageClassName = 'object-cover',
   showStatus = false,
   statusColor = 'bg-emerald-500',
   loading = 'lazy',
+  fallbackStrategy = 'initials',
 }: UnifiedAvatarProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -53,6 +57,7 @@ export function UnifiedAvatar({
     lg: 'w-12 h-12 text-base',
     xl: 'w-16 h-16 text-xl',
     '2xl': 'w-24 h-24 text-2xl',
+    none: '', // Para custom sizes
   };
 
   const iconSizes = {
@@ -62,6 +67,7 @@ export function UnifiedAvatar({
     lg: 24,
     xl: 32,
     '2xl': 48,
+    none: 24,
   };
 
   const getInitials = (name: string) => {
@@ -92,7 +98,7 @@ export function UnifiedAvatar({
             alt={name}
             loading={loading}
             ref={handleImageRef}
-            className={`h-full w-full object-cover transition-opacity duration-300 ${
+            className={`h-full w-full transition-opacity duration-300 ${imageClassName} ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={() => setImageLoaded(true)}
@@ -123,10 +129,13 @@ export function UnifiedAvatar({
     );
   };
 
+  if (imageError && fallbackStrategy === 'none') return null;
+  if (!src && !defaultIcon && fallbackStrategy === 'none') return null;
+
   return (
     <div className={`relative inline-block ${className}`}>
       <div
-        className={`${sizeClasses[size]} relative flex items-center justify-center overflow-hidden rounded-full`}
+        className={`${sizeClasses[size as keyof typeof sizeClasses]} relative flex items-center justify-center overflow-hidden ${size !== 'none' ? 'rounded-full' : 'w-full h-full'}`}
       >
         {renderContent()}
       </div>
