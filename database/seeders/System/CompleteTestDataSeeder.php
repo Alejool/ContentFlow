@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\System;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
@@ -8,6 +8,8 @@ use App\Models\Campaigns\Campaign;
 use App\Models\Social\SocialAccount;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Database\Seeders\Social\CampaignAnalyticsSeeder;
+use Database\Seeders\Social\SocialMediaMetricsSeeder;
 
 class CompleteTestDataSeeder extends Seeder
 {

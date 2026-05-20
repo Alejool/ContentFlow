@@ -1,9 +1,9 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Social;
 
 use Illuminate\Database\Seeder;
-use App\Models\SocialMediaMetrics;
+use App\Models\Social\SocialMediaMetrics;
 use App\Models\Social\SocialAccount;
 use Carbon\Carbon;
 

@@ -1,17 +1,21 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Intellipost Enterprise API",
-    "description": "API completa para la integración programática con Intellipost. Disponible exclusivamente para clientes del plan Enterprise.",
+    "title": "ContentFlow API",
+    "description": "API completa de ContentFlow. Los endpoints bajo /api/v1 requieren autenticación Bearer (Sanctum). Los endpoints de Enterprise requieren plan enterprise. Generado automáticamente desde las rutas reales del sistema.",
     "version": "1.0.0",
     "contact": {
-      "email": "enterprise-support@Intellipost.app"
+      "email": "support@contentflow.app"
     }
   },
   "servers": [
     {
-      "url": "https://tu-dominio.com/api/v1",
+      "url": "https://tu-dominio.com/api",
       "description": "Servidor de Producción"
+    },
+    {
+      "url": "http://localhost/api",
+      "description": "Servidor Local"
     }
   ],
   "components": {
@@ -19,7 +23,8 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "description": "Token de autenticación Sanctum. Obtener via POST /api/auth/token"
       }
     },
     "schemas": {
@@ -62,6 +67,40 @@
           "users_count": { "type": "integer" }
         }
       },
+      "Campaign": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string" },
+          "start_date": { "type": "string", "format": "date" },
+          "end_date": { "type": "string", "format": "date" },
+          "workspace_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "SocialAccount": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "platform": { "type": "string", "enum": ["facebook","instagram","twitter","linkedin","youtube","tiktok"] },
+          "account_name": { "type": "string" },
+          "is_active": { "type": "boolean" },
+          "token_expires_at": { "type": "string", "format": "date-time" },
+          "workspace_id": { "type": "integer" }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "data": { "type": "object" },
+          "read_at": { "type": "string", "format": "date-time", "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -77,24 +116,254 @@
           "message": { "type": "string" },
           "data": { "type": "object" }
         }
+      },
+      "PaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array", "items": {} },
+          "current_page": { "type": "integer" },
+          "last_page": { "type": "integer" },
+          "per_page": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
       }
     }
   },
   "security": [
     { "bearerAuth": [] }
   ],
+  "tags": [
+    { "name": "Auth", "description": "Autenticación y tokens de acceso" },
+    { "name": "Health", "description": "Estado del servidor" },
+    { "name": "Portal", "description": "Portal de clientes (público con token)" },
+    { "name": "Plans", "description": "Planes de suscripción disponibles (público)" },
+    { "name": "Workspaces", "description": "Gestión de workspaces" },
+    { "name": "Members", "description": "Gestión de miembros y roles del workspace" },
+    { "name": "Approval Workflow", "description": "Flujos de aprobación de contenido" },
+    { "name": "Publications", "description": "Publicaciones y contenido" },
+    { "name": "Publication Locks", "description": "Bloqueo colaborativo de publicaciones" },
+    { "name": "Publication Comments", "description": "Comentarios en publicaciones" },
+    { "name": "Content Approval", "description": "Flujo de aprobación de contenido (sistema simplificado)" },
+    { "name": "Approvals", "description": "Sistema de aprobaciones y pendientes" },
+    { "name": "Campaigns", "description": "Campañas de marketing" },
+    { "name": "Analytics", "description": "Métricas y estadísticas" },
+    { "name": "Social Accounts", "description": "Cuentas de redes sociales conectadas" },
+    { "name": "Calendar", "description": "Calendario de publicaciones y eventos" },
+    { "name": "Uploads", "description": "Subida de archivos a S3" },
+    { "name": "Notifications", "description": "Notificaciones del sistema" },
+    { "name": "Profile", "description": "Perfil del usuario" },
+    { "name": "Subscription", "description": "Suscripción y límites del plan" },
+    { "name": "Addons", "description": "Paquetes adicionales de créditos y almacenamiento" },
+    { "name": "Reports", "description": "Reportes programados" },
+    { "name": "Hashtags", "description": "Biblioteca de hashtags" },
+    { "name": "AI", "description": "Asistente de inteligencia artificial" },
+    { "name": "Onboarding", "description": "Flujo de incorporación del usuario" },
+    { "name": "Content Verification", "description": "Verificación de contenido publicado" },
+    { "name": "Webhooks", "description": "Webhooks de plataformas externas" }
+  ],
   "paths": {
-    "/workspaces": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Verificar estado del servidor",
+        "security": [],
+        "responses": {
+          "200": { "description": "Servidor operativo" }
+        }
+      }
+    },
+    "/auth/google": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Autenticación con Google OAuth",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token"],
+                "properties": {
+                  "token": { "type": "string", "description": "Google OAuth token" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Autenticación exitosa con token Sanctum" },
+          "401": { "description": "Token inválido" }
+        }
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Generar access token + refresh token (Enterprise API)",
+        "security": [],
+        "description": "Genera un par de tokens (access + refresh) para sistemas externos. Requiere credenciales del usuario y el slug o ID del workspace.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "workspace"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "workspace": { "type": "string", "description": "Slug o ID del workspace" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens generados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": { "type": "string" },
+                    "refresh_token": { "type": "string" },
+                    "expires_in": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Credenciales inválidas" },
+          "403": { "description": "Plan no soporta API enterprise" }
+        }
+      }
+    },
+    "/auth/token/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Refrescar access token con refresh token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["refresh_token"],
+                "properties": {
+                  "refresh_token": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Nuevo access token emitido" },
+          "401": { "description": "Refresh token inválido o expirado" }
+        }
+      }
+    },
+    "/auth/token/validate": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Validar token actual y verificar estado del plan (Enterprise)",
+        "responses": {
+          "200": { "description": "Token válido con info de plan" },
+          "401": { "description": "Token inválido" }
+        }
+      }
+    },
+    "/auth/token/revoke": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Revocar todos los tokens API del workspace (Enterprise)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workspace": { "type": "string", "description": "Slug del workspace (opcional para scope)" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Tokens revocados exitosamente" }
+        }
+      }
+    },
+    "/v1/plans": {
+      "get": {
+        "tags": ["Plans"],
+        "summary": "Obtener planes de suscripción disponibles",
+        "security": [],
+        "responses": {
+          "200": { "description": "Lista de planes con precios y características" }
+        }
+      }
+    },
+    "/v1/portal/{token}": {
+      "get": {
+        "tags": ["Portal"],
+        "summary": "Ver portal del cliente por token",
+        "security": [],
+        "parameters": [
+          { "name": "token", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Datos del portal del cliente" },
+          "404": { "description": "Token no encontrado o expirado" }
+        }
+      }
+    },
+    "/v1/portal/{token}/approve": {
+      "post": {
+        "tags": ["Portal"],
+        "summary": "Aprobar publicación desde el portal del cliente",
+        "security": [],
+        "parameters": [
+          { "name": "token", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Publicación aprobada" }
+        }
+      }
+    },
+    "/v1/portal/{token}/reject": {
+      "post": {
+        "tags": ["Portal"],
+        "summary": "Rechazar publicación desde el portal del cliente",
+        "security": [],
+        "parameters": [
+          { "name": "token", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Publicación rechazada" }
+        }
+      }
+    },
+    "/v1/workspaces": {
       "get": {
         "tags": ["Workspaces"],
-        "summary": "Listar workspaces del usuario",
+        "summary": "Listar todos los workspaces del usuario autenticado",
         "responses": {
-          "200": { "description": "Lista de workspaces" }
+          "200": {
+            "description": "Lista de workspaces",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Workspace" } }
+              }
+            }
+          }
         }
       },
       "post": {
         "tags": ["Workspaces"],
-        "summary": "Crear un nuevo workspace",
+        "summary": "Crear nuevo workspace",
         "requestBody": {
           "required": true,
           "content": {
@@ -116,34 +385,71 @@
         }
       }
     },
-    "/workspaces/{idOrSlug}/switch": {
+    "/v1/workspaces/{idOrSlug}": {
+      "put": {
+        "tags": ["Workspaces"],
+        "summary": "Actualizar workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Workspace actualizado" }
+        }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/switch": {
       "post": {
         "tags": ["Workspaces"],
-        "summary": "Cambiar workspace activo",
+        "summary": "Cambiar al workspace indicado como activo",
         "parameters": [
           { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "Workspace cambiado exitosamente" }
+          "200": { "description": "Workspace activo cambiado" }
         }
       }
     },
-    "/workspaces/{idOrSlug}/members": {
+    "/v1/workspaces/{idOrSlug}/settings": {
       "get": {
-        "tags": ["Miembros"],
-        "summary": "Listar miembros del workspace",
+        "tags": ["Workspaces"],
+        "summary": "Obtener configuración completa del workspace",
         "parameters": [
           { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "Lista de miembros con roles" }
+          "200": { "description": "Configuración del workspace" }
         }
       }
     },
-    "/workspaces/{idOrSlug}/invite": {
+    "/v1/workspaces/{idOrSlug}/members": {
+      "get": {
+        "tags": ["Members"],
+        "summary": "Listar miembros del workspace con sus roles",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Lista de miembros y roles" }
+        }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/invite": {
       "post": {
-        "tags": ["Miembros"],
-        "summary": "Invitar miembro al workspace",
+        "tags": ["Members"],
+        "summary": "Invitar un nuevo miembro al workspace",
         "parameters": [
           { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
@@ -163,17 +469,165 @@
           }
         },
         "responses": {
-          "200": { "description": "Miembro invitado" },
+          "200": { "description": "Invitación enviada" },
           "422": { "description": "Usuario no encontrado o ya es miembro" }
         }
       }
     },
-    "/publications": {
+    "/v1/workspaces/{idOrSlug}/members/{user}/role": {
+      "put": {
+        "tags": ["Members"],
+        "summary": "Actualizar el rol de un miembro del workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "user", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["role_id"],
+                "properties": {
+                  "role_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Rol actualizado" }
+        }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/members/{user}": {
+      "delete": {
+        "tags": ["Members"],
+        "summary": "Remover miembro del workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "user", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Miembro eliminado" }
+        }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/roles": {
       "get": {
-        "tags": ["Publicaciones"],
+        "tags": ["Members"],
+        "summary": "Listar roles disponibles en el workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Lista de roles" } }
+      },
+      "post": {
+        "tags": ["Members"],
+        "summary": "Crear nuevo rol en el workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "201": { "description": "Rol creado" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/permissions": {
+      "get": {
+        "tags": ["Members"],
+        "summary": "Listar permisos disponibles del workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Lista de permisos" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/approval-workflow": {
+      "get": {
+        "tags": ["Approval Workflow"],
+        "summary": "Ver configuración del flujo de aprobación del workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Configuración del flujo de aprobación" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/approval-workflow/enable": {
+      "post": {
+        "tags": ["Approval Workflow"],
+        "summary": "Habilitar flujo de aprobación en el workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Flujo habilitado" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/approval-workflow/disable": {
+      "post": {
+        "tags": ["Approval Workflow"],
+        "summary": "Deshabilitar flujo de aprobación en el workspace",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Flujo deshabilitado" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/approval-workflow/configure": {
+      "put": {
+        "tags": ["Approval Workflow"],
+        "summary": "Configurar flujo de aprobación (niveles, roles requeridos)",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Flujo configurado" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/approval-workflow/levels": {
+      "post": {
+        "tags": ["Approval Workflow"],
+        "summary": "Agregar nivel de aprobación",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Nivel agregado" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/approval-workflow/levels/{level}": {
+      "put": {
+        "tags": ["Approval Workflow"],
+        "summary": "Actualizar nivel de aprobación",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "level", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Nivel actualizado" } }
+      },
+      "delete": {
+        "tags": ["Approval Workflow"],
+        "summary": "Eliminar nivel de aprobación",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "level", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Nivel eliminado" } }
+      }
+    },
+    "/v1/workspaces/{idOrSlug}/activity": {
+      "get": {
+        "tags": ["Workspaces"],
+        "summary": "Ver registro de actividad del workspace (Enterprise)",
+        "parameters": [
+          { "name": "idOrSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Log de actividad" } }
+      }
+    },
+    "/v1/publications": {
+      "get": {
+        "tags": ["Publications"],
         "summary": "Listar publicaciones del workspace activo",
         "parameters": [
-          { "name": "status", "in": "query", "schema": { "type": "string" }, "description": "Filtrar por estado(s) separados por coma. Ej: draft,approved" },
+          { "name": "status", "in": "query", "schema": { "type": "string" }, "description": "Estado(s) separados por coma. Ej: draft,approved" },
           { "name": "search", "in": "query", "schema": { "type": "string" } },
           { "name": "platform", "in": "query", "schema": { "type": "string" } },
           { "name": "date_start", "in": "query", "schema": { "type": "string", "format": "date" } },
@@ -183,12 +637,12 @@
           { "name": "simplified", "in": "query", "schema": { "type": "boolean" } }
         ],
         "responses": {
-          "200": { "description": "Lista paginada de publicaciones" }
+          "200": { "description": "Lista paginada de publicaciones", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedResponse" } } } }
         }
       },
       "post": {
-        "tags": ["Publicaciones"],
-        "summary": "Crear una nueva publicación",
+        "tags": ["Publications"],
+        "summary": "Crear nueva publicación",
         "requestBody": {
           "required": true,
           "content": {
@@ -219,55 +673,113 @@
         }
       }
     },
-    "/publications/{id}": {
+    "/v1/publications/stats": {
       "get": {
-        "tags": ["Publicaciones"],
-        "summary": "Ver detalle de publicación",
+        "tags": ["Publications"],
+        "summary": "Estadísticas de publicaciones del workspace",
+        "responses": { "200": { "description": "Conteos por estado de publicación" } }
+      }
+    },
+    "/v1/publications/export": {
+      "get": {
+        "tags": ["Publications"],
+        "summary": "Exportar publicaciones (CSV/JSON)",
+        "parameters": [
+          { "name": "format", "in": "query", "schema": { "type": "string", "enum": ["csv","json"] } }
+        ],
+        "responses": { "200": { "description": "Archivo de exportación" } }
+      }
+    },
+    "/v1/publications/pending-approvals": {
+      "get": {
+        "tags": ["Publications"],
+        "summary": "Listar publicaciones pendientes de aprobación",
+        "responses": { "200": { "description": "Publicaciones en estado pending_review" } }
+      }
+    },
+    "/v1/publications/{id}": {
+      "get": {
+        "tags": ["Publications"],
+        "summary": "Obtener detalle de una publicación",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
         "responses": {
-          "200": { "description": "Publicación con todos los detalles" },
+          "200": { "description": "Publicación con detalles completos", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Publication" } } } },
           "404": { "description": "No encontrada" }
         }
       },
       "put": {
-        "tags": ["Publicaciones"],
+        "tags": ["Publications"],
         "summary": "Actualizar publicación",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
         "responses": {
           "200": { "description": "Publicación actualizada" },
-          "423": { "description": "Publicación bloqueada" }
+          "423": { "description": "Publicación bloqueada por otro usuario" }
         }
       },
       "delete": {
-        "tags": ["Publicaciones"],
+        "tags": ["Publications"],
         "summary": "Eliminar publicación",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
-        "responses": {
-          "200": { "description": "Publicación eliminada" }
-        }
+        "responses": { "200": { "description": "Publicación eliminada" } }
       }
     },
-    "/publications/{id}/request-review": {
+    "/v1/publications/{id}/publish": {
       "post": {
-        "tags": ["Publicaciones", "Aprobaciones"],
-        "summary": "Solicitar revisión de una publicación",
+        "tags": ["Publications"],
+        "summary": "Publicar en redes sociales seleccionadas",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["platforms"],
+                "properties": {
+                  "platforms": { "type": "array", "items": { "type": "integer" }, "description": "IDs de cuentas sociales" },
+                  "platform_settings": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "Publicación enviada a revisión y bloqueada" }
+          "200": { "description": "Publicación iniciada en background" },
+          "422": { "description": "Estado inválido para publicar" }
         }
       }
     },
-    "/publications/{id}/approve": {
+    "/v1/publications/{id}/unpublish": {
       "post": {
-        "tags": ["Publicaciones", "Aprobaciones"],
+        "tags": ["Publications"],
+        "summary": "Despublicar (retirar de redes sociales)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Publicación retirada" } }
+      }
+    },
+    "/v1/publications/{id}/request-review": {
+      "post": {
+        "tags": ["Publications"],
+        "summary": "Enviar publicación a revisión/aprobación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Publicación enviada a revisión y bloqueada" } }
+      }
+    },
+    "/v1/publications/{id}/approve": {
+      "post": {
+        "tags": ["Publications"],
         "summary": "Aprobar publicación",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
@@ -285,14 +797,14 @@
           }
         },
         "responses": {
-          "200": { "description": "Publicación aprobada o avanzada al siguiente paso" },
+          "200": { "description": "Aprobada o avanzada al siguiente nivel" },
           "403": { "description": "Sin permiso de aprobación" }
         }
       }
     },
-    "/publications/{id}/reject": {
+    "/v1/publications/{id}/reject": {
       "post": {
-        "tags": ["Publicaciones", "Aprobaciones"],
+        "tags": ["Publications"],
         "summary": "Rechazar publicación",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
@@ -312,15 +824,109 @@
             }
           }
         },
-        "responses": {
-          "200": { "description": "Publicación rechazada" }
-        }
+        "responses": { "200": { "description": "Publicación rechazada" } }
       }
     },
-    "/publications/{id}/publish": {
+    "/v1/publications/{id}/cancel": {
       "post": {
-        "tags": ["Publicaciones"],
-        "summary": "Publicar en redes sociales",
+        "tags": ["Publications"],
+        "summary": "Cancelar publicación programada",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Publicación cancelada" } }
+      }
+    },
+    "/v1/publications/{id}/duplicate": {
+      "post": {
+        "tags": ["Publications"],
+        "summary": "Duplicar publicación como borrador",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "201": { "description": "Nueva publicación duplicada en estado draft" } }
+      }
+    },
+    "/v1/publications/{id}/preview": {
+      "get": {
+        "tags": ["Publications"],
+        "summary": "Ver preview de la publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Preview del contenido" } }
+      }
+    },
+    "/v1/publications/{id}/preview/multi": {
+      "get": {
+        "tags": ["Publications"],
+        "summary": "Ver preview multi-plataforma de la publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Preview por cada plataforma conectada" } }
+      }
+    },
+    "/v1/publications/{id}/auto-optimize": {
+      "post": {
+        "tags": ["Publications"],
+        "summary": "Optimizar automáticamente el contenido para cada plataforma (AI)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Variantes optimizadas por plataforma" } }
+      }
+    },
+    "/v1/publications/{id}/portal-token": {
+      "post": {
+        "tags": ["Publications"],
+        "summary": "Generar token de portal para que el cliente revise",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Token y URL del portal generados" } }
+      }
+    },
+    "/v1/publications/{id}/lock": {
+      "post": {
+        "tags": ["Publication Locks"],
+        "summary": "Bloquear publicación para edición colaborativa",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Publicación bloqueada" } }
+      },
+      "get": {
+        "tags": ["Publication Locks"],
+        "summary": "Ver estado del bloqueo de una publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Estado del lock (quién la tiene bloqueada)" } }
+      }
+    },
+    "/v1/publications/{id}/unlock": {
+      "post": {
+        "tags": ["Publication Locks"],
+        "summary": "Desbloquear publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Publicación desbloqueada" } }
+      }
+    },
+    "/v1/publications/{id}/comments": {
+      "get": {
+        "tags": ["Publication Comments"],
+        "summary": "Listar comentarios de una publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Lista de comentarios" } }
+      },
+      "post": {
+        "tags": ["Publication Comments"],
+        "summary": "Agregar comentario a una publicación",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
@@ -330,22 +936,434 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["platforms"],
+                "required": ["body"],
                 "properties": {
-                  "platforms": { "type": "array", "items": { "type": "integer" } },
-                  "platform_settings": { "type": "object" }
+                  "body": { "type": "string" }
                 }
               }
             }
           }
         },
+        "responses": { "201": { "description": "Comentario creado" } }
+      }
+    },
+    "/v1/publications/{id}/comments/{comment}": {
+      "delete": {
+        "tags": ["Publication Comments"],
+        "summary": "Eliminar comentario",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } },
+          { "name": "comment", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Comentario eliminado" } }
+      }
+    },
+    "/v1/publications/{id}/activities": {
+      "get": {
+        "tags": ["Publications"],
+        "summary": "Ver historial de actividad de una publicación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Log de cambios y eventos de la publicación" } }
+      }
+    },
+    "/v1/content/{id}/submit-for-approval": {
+      "post": {
+        "tags": ["Content Approval"],
+        "summary": "Enviar contenido al flujo de aprobación simplificado",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Contenido enviado a aprobación" } }
+      }
+    },
+    "/v1/content/{id}/approval-status": {
+      "get": {
+        "tags": ["Content Approval"],
+        "summary": "Ver estado actual del flujo de aprobación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Estado actual de aprobación con nivel activo" } }
+      }
+    },
+    "/v1/content/{id}/approval-history": {
+      "get": {
+        "tags": ["Content Approval"],
+        "summary": "Ver historial completo de aprobaciones del contenido",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Historial cronológico de acciones" } }
+      }
+    },
+    "/v1/content/{id}/approval-flow": {
+      "get": {
+        "tags": ["Content Approval"],
+        "summary": "Ver visualización completa del flujo de aprobación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Flujo completo con cada nivel y su estado" } }
+      }
+    },
+    "/v1/content/{id}/approve": {
+      "post": {
+        "tags": ["Content Approval"],
+        "summary": "Aprobar contenido en el nivel actual",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
         "responses": {
-          "200": { "description": "Publicación iniciada en background" },
-          "422": { "description": "Estado inválido para publicar" }
+          "200": { "description": "Aprobado y avanzado al siguiente nivel" },
+          "403": { "description": "Sin permiso para este nivel" }
         }
       }
     },
-    "/uploads/sign": {
+    "/v1/content/{id}/reject": {
+      "post": {
+        "tags": ["Content Approval"],
+        "summary": "Rechazar contenido y devolver al creador",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Rechazado con motivo" } }
+      }
+    },
+    "/v1/content/{id}/publish": {
+      "post": {
+        "tags": ["Content Approval"],
+        "summary": "Publicar contenido aprobado",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Publicación iniciada" } }
+      }
+    },
+    "/v1/approvals": {
+      "get": {
+        "tags": ["Approvals"],
+        "summary": "Listar solicitudes de aprobación del usuario",
+        "responses": { "200": { "description": "Solicitudes de aprobación" } }
+      }
+    },
+    "/v1/approvals/pending": {
+      "get": {
+        "tags": ["Approvals"],
+        "summary": "Listar aprobaciones pendientes para el usuario actual",
+        "responses": { "200": { "description": "Publicaciones esperando aprobación del usuario" } }
+      }
+    },
+    "/v1/approvals/stats": {
+      "get": {
+        "tags": ["Approvals"],
+        "summary": "Estadísticas del sistema de aprobaciones",
+        "responses": { "200": { "description": "Tiempos promedio, tasas de aprobación, etc." } }
+      }
+    },
+    "/v1/approvals/history": {
+      "get": {
+        "tags": ["Approvals"],
+        "summary": "Historial de todas las aprobaciones",
+        "responses": { "200": { "description": "Historial paginado" } }
+      }
+    },
+    "/v1/approvals/submit": {
+      "post": {
+        "tags": ["Approvals"],
+        "summary": "Enviar publicación al flujo de aprobación",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["publication_id"],
+                "properties": {
+                  "publication_id": { "type": "integer" },
+                  "note": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Enviado al flujo de aprobación" } }
+      }
+    },
+    "/v1/approvals/{request}/approve": {
+      "post": {
+        "tags": ["Approvals"],
+        "summary": "Aprobar solicitud en el nivel actual",
+        "parameters": [
+          { "name": "request", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Aprobado" } }
+      }
+    },
+    "/v1/approvals/{request}/reject": {
+      "post": {
+        "tags": ["Approvals"],
+        "summary": "Rechazar solicitud de aprobación",
+        "parameters": [
+          { "name": "request", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Rechazado" } }
+      }
+    },
+    "/v1/approvals/{request}/status": {
+      "get": {
+        "tags": ["Approvals"],
+        "summary": "Ver estado detallado de una solicitud de aprobación",
+        "parameters": [
+          { "name": "request", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Estado con todos los niveles" } }
+      }
+    },
+    "/v1/campaigns": {
+      "get": {
+        "tags": ["Campaigns"],
+        "summary": "Listar campañas del workspace",
+        "responses": {
+          "200": { "description": "Lista de campañas", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Campaign" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Campaigns"],
+        "summary": "Crear nueva campaña",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Campaña creada" } }
+      }
+    },
+    "/v1/campaigns/export": {
+      "get": {
+        "tags": ["Campaigns"],
+        "summary": "Exportar campañas",
+        "responses": { "200": { "description": "Archivo de exportación" } }
+      }
+    },
+    "/v1/campaigns/{campaign}": {
+      "get": {
+        "tags": ["Campaigns"],
+        "summary": "Ver detalle de campaña",
+        "parameters": [
+          { "name": "campaign", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Campaña con publicaciones asociadas" } }
+      },
+      "put": {
+        "tags": ["Campaigns"],
+        "summary": "Actualizar campaña",
+        "parameters": [
+          { "name": "campaign", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Campaña actualizada" } }
+      },
+      "delete": {
+        "tags": ["Campaigns"],
+        "summary": "Eliminar campaña",
+        "parameters": [
+          { "name": "campaign", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Campaña eliminada" } }
+      }
+    },
+    "/v1/campaigns/{campaign}/duplicate": {
+      "post": {
+        "tags": ["Campaigns"],
+        "summary": "Duplicar campaña",
+        "parameters": [
+          { "name": "campaign", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "201": { "description": "Campaña duplicada" } }
+      }
+    },
+    "/v1/analytics/dashboard": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Dashboard de métricas generales del workspace",
+        "parameters": [
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 7 } }
+        ],
+        "responses": { "200": { "description": "KPIs: vistas, clicks, conversiones, alcance, engagement" } }
+      }
+    },
+    "/v1/analytics/social-media": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Métricas por red social conectada",
+        "parameters": [
+          { "name": "platform", "in": "query", "schema": { "type": "string" } },
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+        ],
+        "responses": { "200": { "description": "Métricas por plataforma" } }
+      }
+    },
+    "/v1/analytics/engagement": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Datos de engagement en el tiempo",
+        "parameters": [
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+        ],
+        "responses": { "200": { "description": "Tendencias de engagement" } }
+      }
+    },
+    "/v1/analytics/platform-comparison": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Comparación de rendimiento entre plataformas",
+        "responses": { "200": { "description": "Datos comparativos por plataforma" } }
+      }
+    },
+    "/v1/analytics/campaigns/{id}": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Analytics de una campaña específica",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Métricas de la campaña" } }
+      }
+    },
+    "/v1/analytics/export": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Exportar datos de analytics",
+        "parameters": [
+          { "name": "format", "in": "query", "schema": { "type": "string", "enum": ["json","csv"], "default": "json" } },
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+        ],
+        "responses": { "200": { "description": "Datos exportados" } }
+      }
+    },
+    "/v1/analytics/sync": {
+      "post": {
+        "tags": ["Analytics"],
+        "summary": "Sincronizar datos de analytics desde redes sociales",
+        "responses": { "200": { "description": "Sincronización iniciada" } }
+      }
+    },
+    "/v1/analytics/sync/status": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Ver estado de la última sincronización",
+        "responses": { "200": { "description": "Estado: idle, syncing, done, locked con retryAfter" } }
+      }
+    },
+    "/v1/social-accounts": {
+      "get": {
+        "tags": ["Social Accounts"],
+        "summary": "Listar cuentas de redes sociales conectadas",
+        "responses": {
+          "200": { "description": "Lista de cuentas conectadas", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/SocialAccount" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["Social Accounts"],
+        "summary": "Conectar nueva cuenta de red social",
+        "responses": { "201": { "description": "Cuenta conectada" } }
+      }
+    },
+    "/v1/social-accounts/{id}": {
+      "delete": {
+        "tags": ["Social Accounts"],
+        "summary": "Desconectar cuenta de red social",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Cuenta desconectada" } }
+      }
+    },
+    "/v1/social-accounts/token-health": {
+      "get": {
+        "tags": ["Social Accounts"],
+        "summary": "Verificar salud de los tokens de todas las cuentas conectadas",
+        "responses": { "200": { "description": "Estado del token por cada cuenta (válido/expirado/con fallas)" } }
+      }
+    },
+    "/v1/social-accounts/auth-url/{platform}": {
+      "get": {
+        "tags": ["Social Accounts"],
+        "summary": "Obtener URL de autorización OAuth para una plataforma",
+        "parameters": [
+          { "name": "platform", "in": "path", "required": true, "schema": { "type": "string", "enum": ["facebook","instagram","twitter","linkedin","youtube","tiktok"] } }
+        ],
+        "responses": { "200": { "description": "URL de redirección OAuth" } }
+      }
+    },
+    "/v1/calendar/events": {
+      "get": {
+        "tags": ["Calendar"],
+        "summary": "Listar eventos del calendario (publicaciones programadas + eventos)",
+        "parameters": [
+          { "name": "start", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "end", "in": "query", "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": { "200": { "description": "Lista de eventos para el rango de fechas" } }
+      }
+    },
+    "/v1/calendar/events/{id}": {
+      "patch": {
+        "tags": ["Calendar"],
+        "summary": "Actualizar fecha/hora de un evento del calendario (drag & drop)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Evento reprogramado" } }
+      }
+    },
+    "/v1/calendar/user-events": {
+      "get": {
+        "tags": ["Calendar"],
+        "summary": "Listar eventos personales del usuario en el calendario",
+        "responses": { "200": { "description": "Lista de eventos personales" } }
+      },
+      "post": {
+        "tags": ["Calendar"],
+        "summary": "Crear evento personal en el calendario",
+        "responses": { "201": { "description": "Evento creado" } }
+      }
+    },
+    "/v1/calendar/bulk-update": {
+      "post": {
+        "tags": ["Calendar"],
+        "summary": "Actualización masiva de eventos del calendario",
+        "responses": { "200": { "description": "Eventos actualizados" } }
+      }
+    },
+    "/v1/calendar/export/google": {
+      "post": {
+        "tags": ["Calendar"],
+        "summary": "Exportar calendario a Google Calendar",
+        "responses": { "200": { "description": "Exportación iniciada" } }
+      }
+    },
+    "/v1/calendar/export/outlook": {
+      "post": {
+        "tags": ["Calendar"],
+        "summary": "Exportar calendario a Outlook Calendar",
+        "responses": { "200": { "description": "Exportación iniciada" } }
+      }
+    },
+    "/v1/uploads/sign": {
       "post": {
         "tags": ["Uploads"],
         "summary": "Obtener URL firmada de S3 para subida directa",
@@ -358,7 +1376,7 @@
                 "required": ["filename", "content_type"],
                 "properties": {
                   "filename": { "type": "string" },
-                  "content_type": { "type": "string", "enum": ["image/jpeg","image/png","image/gif","video/mp4","application/pdf"] },
+                  "content_type": { "type": "string", "enum": ["image/jpeg","image/png","image/gif","image/webp","video/mp4","video/quicktime","application/pdf"] },
                   "file_size": { "type": "integer", "description": "Tamaño en bytes" }
                 }
               }
@@ -367,7 +1385,7 @@
         },
         "responses": {
           "200": {
-            "description": "URL firmada para subir",
+            "description": "URL firmada para PUT directo a S3",
             "content": {
               "application/json": {
                 "schema": {
@@ -385,10 +1403,10 @@
         }
       }
     },
-    "/uploads/multipart/init": {
+    "/v1/uploads/multipart/init": {
       "post": {
         "tags": ["Uploads"],
-        "summary": "Iniciar subida multiparte (archivos grandes)",
+        "summary": "Iniciar subida multiparte para archivos grandes (>100MB)",
         "requestBody": {
           "required": true,
           "content": {
@@ -423,51 +1441,540 @@
         }
       }
     },
-    "/analytics/dashboard": {
+    "/v1/uploads/multipart/sign-part": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Firmar URL para una parte de la subida multiparte",
+        "responses": { "200": { "description": "URL firmada para la parte" } }
+      }
+    },
+    "/v1/uploads/multipart/complete": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Completar subida multiparte (unir partes)",
+        "responses": { "200": { "description": "Archivo ensamblado en S3" } }
+      }
+    },
+    "/v1/notifications": {
       "get": {
-        "tags": ["Analytics"],
-        "summary": "Dashboard de métricas generales",
-        "parameters": [
-          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 7 } }
-        ],
+        "tags": ["Notifications"],
+        "summary": "Listar notificaciones del usuario",
         "responses": {
-          "200": { "description": "Estadísticas del workspace" }
+          "200": { "description": "Lista de notificaciones", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Notification" } } } } }
         }
       }
     },
-    "/analytics/social-media": {
-      "get": {
-        "tags": ["Analytics"],
-        "summary": "Métricas por red social",
+    "/v1/notifications/{id}/read": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Marcar notificación como leída",
         "parameters": [
-          { "name": "platform", "in": "query", "schema": { "type": "string" } },
-          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
+        "responses": { "200": { "description": "Notificación marcada como leída" } }
+      }
+    },
+    "/v1/notifications/read-all": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Marcar todas las notificaciones como leídas",
+        "responses": { "200": { "description": "Todas marcadas como leídas" } }
+      }
+    },
+    "/v1/notifications/{id}": {
+      "delete": {
+        "tags": ["Notifications"],
+        "summary": "Eliminar una notificación",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Notificación eliminada" } }
+      }
+    },
+    "/v1/notifications/stats": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Estadísticas de notificaciones (total, no leídas)",
+        "responses": { "200": { "description": "Contadores de notificaciones" } }
+      }
+    },
+    "/v1/profile": {
+      "patch": {
+        "tags": ["Profile"],
+        "summary": "Actualizar datos del perfil del usuario",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Perfil actualizado" } }
+      },
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Eliminar cuenta del usuario",
+        "responses": { "200": { "description": "Cuenta eliminada" } }
+      }
+    },
+    "/v1/profile/avatar": {
+      "post": {
+        "tags": ["Profile"],
+        "summary": "Subir avatar de perfil",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Avatar actualizado" } }
+      },
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Eliminar avatar de perfil",
+        "responses": { "200": { "description": "Avatar eliminado" } }
+      }
+    },
+    "/v1/profile/password": {
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Cambiar contraseña",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["current_password","password","password_confirmation"],
+                "properties": {
+                  "current_password": { "type": "string" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "password_confirmation": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "Métricas por plataforma" }
+          "200": { "description": "Contraseña actualizada" },
+          "422": { "description": "Contraseña actual incorrecta" }
         }
       }
     },
-    "/analytics/export": {
+    "/v1/profile/theme": {
       "get": {
-        "tags": ["Analytics"],
-        "summary": "Exportar analytics",
+        "tags": ["Profile"],
+        "summary": "Obtener preferencia de tema (light/dark)",
+        "responses": { "200": { "description": "Tema actual del usuario" } }
+      },
+      "patch": {
+        "tags": ["Profile"],
+        "summary": "Actualizar preferencia de tema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "theme": { "type": "string", "enum": ["light","dark","system"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Tema actualizado" } }
+      }
+    },
+    "/v1/subscription/usage": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Ver uso actual del plan (publicaciones, cuentas, storage, AI)",
+        "responses": { "200": { "description": "Métricas de uso vs límites del plan" } }
+      }
+    },
+    "/v1/subscription/permissions": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Obtener permisos y características disponibles para el plan",
+        "responses": { "200": { "description": "Mapa de features habilitadas" } }
+      }
+    },
+    "/v1/subscription/check-active": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Verificar si el workspace tiene suscripción activa",
+        "responses": { "200": { "description": "Estado de la suscripción" } }
+      }
+    },
+    "/v1/subscription/checkout": {
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Crear sesión de checkout de Stripe para cambio de plan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan"],
+                "properties": {
+                  "plan": { "type": "string", "enum": ["basic","professional","enterprise"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "URL de checkout de Stripe" } }
+      }
+    },
+    "/v1/subscription/cancel": {
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Cancelar suscripción (finaliza al término del periodo)",
+        "responses": { "200": { "description": "Suscripción cancelada" } }
+      }
+    },
+    "/v1/subscription/change-plan": {
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Cambiar plan de suscripción",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan"],
+                "properties": {
+                  "plan": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Plan cambiado" } }
+      }
+    },
+    "/v1/subscription/limits/usage": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Ver uso detallado por tipo de límite",
+        "responses": { "200": { "description": "Uso por categoría (publicaciones, storage, AI, etc.)" } }
+      }
+    },
+    "/v1/subscription/limits/features": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Listar características disponibles según el plan actual",
+        "responses": { "200": { "description": "Features habilitadas/deshabilitadas" } }
+      }
+    },
+    "/v1/addons": {
+      "get": {
+        "tags": ["Addons"],
+        "summary": "Listar paquetes de add-ons disponibles para comprar",
+        "responses": { "200": { "description": "Paquetes de créditos AI y almacenamiento adicional" } }
+      }
+    },
+    "/v1/addons/active": {
+      "get": {
+        "tags": ["Addons"],
+        "summary": "Ver add-ons activos con su uso agrupado",
+        "responses": { "200": { "description": "Add-ons activos con saldo restante" } }
+      }
+    },
+    "/v1/addons/balance": {
+      "get": {
+        "tags": ["Addons"],
+        "summary": "Ver balance total de add-ons del workspace",
+        "responses": { "200": { "description": "Balance de AI credits y storage adicional" } }
+      }
+    },
+    "/v1/addons/summary": {
+      "get": {
+        "tags": ["Addons"],
+        "summary": "Resumen detallado de add-ons con información del plan",
+        "responses": { "200": { "description": "Resumen completo del uso de add-ons" } }
+      }
+    },
+    "/v1/addons/purchase/intent": {
+      "post": {
+        "tags": ["Addons"],
+        "summary": "Crear Payment Intent de Stripe para compra de add-on",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["addon_id"],
+                "properties": {
+                  "addon_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Client secret de Stripe para confirmar en frontend" } }
+      }
+    },
+    "/v1/addons/purchase/confirm": {
+      "post": {
+        "tags": ["Addons"],
+        "summary": "Confirmar compra de add-on tras pago exitoso",
+        "responses": { "200": { "description": "Add-on activado en el workspace" } }
+      }
+    },
+    "/v1/reports": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Listar reportes programados del workspace",
+        "responses": { "200": { "description": "Lista de reportes programados" } }
+      },
+      "post": {
+        "tags": ["Reports"],
+        "summary": "Crear nuevo reporte programado",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name","frequency"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "frequency": { "type": "string", "enum": ["daily","weekly","monthly"] },
+                  "recipients": { "type": "array", "items": { "type": "string", "format": "email" } },
+                  "metrics": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Reporte creado" } }
+      }
+    },
+    "/v1/reports/{report}": {
+      "put": {
+        "tags": ["Reports"],
+        "summary": "Actualizar reporte programado",
         "parameters": [
-          { "name": "format", "in": "query", "schema": { "type": "string", "enum": ["json","csv"], "default": "json" } },
-          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30 } }
+          { "name": "report", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
+        "responses": { "200": { "description": "Reporte actualizado" } }
+      },
+      "delete": {
+        "tags": ["Reports"],
+        "summary": "Eliminar reporte programado",
+        "parameters": [
+          { "name": "report", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Reporte eliminado" } }
+      }
+    },
+    "/v1/reports/{report}/preview": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Previsualizar reporte sin enviarlo",
+        "parameters": [
+          { "name": "report", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Preview del reporte con datos actuales" } }
+      }
+    },
+    "/v1/hashtags": {
+      "get": {
+        "tags": ["Hashtags"],
+        "summary": "Listar hashtags de la biblioteca del workspace",
+        "responses": { "200": { "description": "Biblioteca de hashtags" } }
+      },
+      "post": {
+        "tags": ["Hashtags"],
+        "summary": "Crear nuevo grupo de hashtags en la biblioteca",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name","hashtags"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "hashtags": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Grupo de hashtags creado" } }
+      }
+    },
+    "/v1/hashtags/{hashtagLibrary}": {
+      "put": {
+        "tags": ["Hashtags"],
+        "summary": "Actualizar grupo de hashtags",
+        "parameters": [
+          { "name": "hashtagLibrary", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Grupo actualizado" } }
+      },
+      "delete": {
+        "tags": ["Hashtags"],
+        "summary": "Eliminar grupo de hashtags",
+        "parameters": [
+          { "name": "hashtagLibrary", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Grupo eliminado" } }
+      }
+    },
+    "/v1/hashtags/{hashtagLibrary}/use": {
+      "post": {
+        "tags": ["Hashtags"],
+        "summary": "Registrar uso de grupo de hashtags (incrementa contador)",
+        "parameters": [
+          { "name": "hashtagLibrary", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Uso registrado" } }
+      }
+    },
+    "/v1/ai/chat": {
+      "post": {
+        "tags": ["AI"],
+        "summary": "Enviar mensaje al asistente de IA para generar contenido",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": { "type": "string" },
+                  "context": { "type": "object", "description": "Contexto adicional (tipo de contenido, plataforma, etc.)" }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "Datos de analytics en formato solicitado" }
+          "200": { "description": "Respuesta del asistente de IA con contenido generado" },
+          "429": { "description": "Límite de créditos de IA alcanzado" }
         }
       }
     },
-    "/subscription/usage": {
+    "/v1/ai/suggest-fields": {
+      "post": {
+        "tags": ["AI"],
+        "summary": "Sugerir campos de publicación usando IA (título, hashtags, descripción)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["context"],
+                "properties": {
+                  "context": { "type": "string", "description": "Contexto o tema del contenido" },
+                  "platform": { "type": "string", "description": "Plataforma destino" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Sugerencias de campos generadas por IA" } }
+      }
+    },
+    "/v1/onboarding/start": {
+      "post": {
+        "tags": ["Onboarding"],
+        "summary": "Iniciar proceso de onboarding del nuevo usuario",
+        "responses": { "200": { "description": "Onboarding iniciado" } }
+      }
+    },
+    "/v1/onboarding/state": {
       "get": {
-        "tags": ["Suscripción"],
-        "summary": "Ver uso actual del plan",
-        "responses": {
-          "200": { "description": "Métricas de uso del workspace" }
-        }
+        "tags": ["Onboarding"],
+        "summary": "Obtener estado actual del onboarding del usuario",
+        "responses": { "200": { "description": "Estado completo del onboarding con pasos completados" } }
+      }
+    },
+    "/v1/onboarding/business-info/complete": {
+      "post": {
+        "tags": ["Onboarding"],
+        "summary": "Completar paso de información del negocio",
+        "responses": { "200": { "description": "Paso completado" } }
+      }
+    },
+    "/v1/onboarding/plan/select": {
+      "post": {
+        "tags": ["Onboarding"],
+        "summary": "Seleccionar plan durante el onboarding",
+        "responses": { "200": { "description": "Plan seleccionado" } }
+      }
+    },
+    "/v1/onboarding/tour/complete": {
+      "post": {
+        "tags": ["Onboarding"],
+        "summary": "Marcar paso del tour de producto como completado",
+        "responses": { "200": { "description": "Paso del tour completado" } }
+      }
+    },
+    "/v1/onboarding/tour/skip": {
+      "post": {
+        "tags": ["Onboarding"],
+        "summary": "Saltarse el tour del producto",
+        "responses": { "200": { "description": "Tour omitido" } }
+      }
+    },
+    "/v1/content-verification/publications/{publication}/status": {
+      "get": {
+        "tags": ["Content Verification"],
+        "summary": "Verificar estado de publicación en las redes sociales reales",
+        "parameters": [
+          { "name": "publication", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Estado verificado en cada plataforma" } }
+      }
+    },
+    "/v1/content-verification/workspace/stats": {
+      "get": {
+        "tags": ["Content Verification"],
+        "summary": "Estadísticas de verificación de contenido del workspace",
+        "responses": { "200": { "description": "Conteos de publicaciones verificadas, con errores, etc." } }
+      }
+    },
+    "/webhooks/youtube": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Recibir notificaciones de YouTube (PubSubHubbub)",
+        "security": [],
+        "responses": { "200": { "description": "Webhook procesado" } }
+      },
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "Verificación del webhook de YouTube",
+        "security": [],
+        "responses": { "200": { "description": "Challenge respondido" } }
+      }
+    },
+    "/webhooks/stripe/addons": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Recibir eventos de Stripe para compras de add-ons",
+        "security": [],
+        "responses": { "200": { "description": "Evento procesado" } }
       }
     }
   }

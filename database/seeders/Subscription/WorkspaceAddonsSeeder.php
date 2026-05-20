@@ -1,8 +1,8 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Subscription;
 
-use App\Models\Workspace;
+use App\Models\Workspace\Workspace;
 use App\Models\Subscription\WorkspaceAddon;
 use Illuminate\Database\Seeder;
 

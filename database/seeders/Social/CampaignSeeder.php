@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Social;
 
 use App\Models\Campaigns\Campaign;
 use Illuminate\Database\Seeder;
