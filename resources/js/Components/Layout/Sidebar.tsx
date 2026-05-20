@@ -3,6 +3,7 @@ import WorkspaceSwitcher from '@/Components/Workspace/WorkspaceSwitcher';
 import { NAV_SECTIONS, getRouteUrl, isRouteActive, isSectionActive } from '@/Constants/navigation';
 import type { NavRoute, NavSection } from '@/types/navigation';
 import { useTheme } from '@/Hooks/Layout/useTheme';
+import { Avatar } from '@/Components/common/Avatar';
 import Logo from '@assets/logo.png';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Command, ChevronDown, ChevronUp } from 'lucide-react';
@@ -302,8 +303,14 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
           {/* Footer - keyboard shortcut hint */}
           {isSidebarOpen && (
-            <div className={`shrink-0 border-t px-4 py-3 ${classes.borderColor}`}>
-              <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
+            <div className={`shrink-0 border-t px-4 py-3 ${classes.borderColor} relative overflow-hidden`}>
+              <img 
+                src="/assets/mascot-watermark.png" 
+                alt=""
+                className="absolute right-[-10px] bottom-[-10px] w-16 h-16 object-contain opacity-20 dark:opacity-20 pointer-events-none z-0"
+                onError={(e) => e.currentTarget.style.display = 'none'}
+              />
+              <div className="relative z-10 flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
                 <Command className="h-3 w-3" />
                 <span>
                   <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">

@@ -138,7 +138,13 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
             {/* Header: Avatar + info + color picker */}
             <div className="px-4 pb-2 pt-4">
               <div className="group relative overflow-hidden rounded-lg border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-neutral-700/50 dark:from-neutral-800 dark:to-neutral-900">
-                <div className="relative flex items-center gap-4">
+                <img 
+                  src="/assets/mascot-watermark.png" 
+                  alt=""
+                  className="absolute right-[-15px] bottom-[-15px] w-24 h-24 object-contain opacity-15 dark:opacity-15 pointer-events-none z-0"
+                  onError={(e) => e.currentTarget.style.display = 'none'}
+                />
+                <div className="relative z-10 flex items-center gap-4">
                   <Avatar
                     src={user?.photo_url ?? null}
                     defaultIcon={user?.default_avatar_icon ?? null}

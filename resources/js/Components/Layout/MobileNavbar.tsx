@@ -1,5 +1,6 @@
 import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 import ResponsiveNavLink from '@/Components/common/ui/ResponsiveNavLink';
+import { Avatar } from '@/Components/common/Avatar';
 import { NAV_SECTIONS, isRouteActive as isNavRouteActive, getRouteUrl } from '@/Constants/navigation';
 import type { NavSection } from '@/types/navigation';
 import { useTheme } from '@/Hooks/Layout/useTheme';
@@ -412,18 +413,26 @@ export default function MobileNavbar({
               </div>
 
               {/* Footer hint */}
-              <div className="mt-3 flex items-center justify-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
-                <Command className="h-3 w-3" />
-                <span>
+              <div className="relative overflow-hidden mt-3 pt-3">
+                <img 
+                  src="/assets/mascot-watermark.png" 
+                  alt=""
+                  className="absolute left-[-10px] bottom-[-10px] w-12 h-12 object-contain opacity-20 dark:opacity-20 pointer-events-none z-0"
+                  onError={(e) => e.currentTarget.style.display = 'none'}
+                />
+                <div className="relative z-10 flex items-center justify-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
+                  <Command className="h-3 w-3" />
+                  <span>
+                    <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
+                      Esc
+                    </kbd>
+                    <span className="mx-1">{t('common.close') || 'cerrar'}</span>
+                  </span>
+                  <span className="mx-1 text-gray-300 dark:text-neutral-600">·</span>
                   <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
-                    Esc
+                    ⌘K
                   </kbd>
-                  <span className="mx-1">{t('common.close') || 'cerrar'}</span>
-                </span>
-                <span className="mx-1 text-gray-300 dark:text-neutral-600">·</span>
-                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
-                  ⌘K
-                </kbd>
+                </div>
               </div>
             </div>
           </motion.div>

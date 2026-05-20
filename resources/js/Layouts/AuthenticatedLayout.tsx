@@ -17,6 +17,7 @@ import type { AuthenticatedLayoutProps, AuthPageProps } from '@/types/common/lay
 import { shouldDisplayOnboarding } from '@/Utils/Onboarding/onboardingHelpers';
 import { usePage } from '@inertiajs/react';
 import { lazy, Suspense, useState } from 'react';
+import { Avatar } from '@/Components/common/Avatar';
 
 // ─── Lazy: componentes pesados no críticos para el render inicial ─────────────
 const CommandPalette = lazy(() => import('@/Components/CommandPalette/CommandPalette'));
@@ -75,11 +76,12 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
         <div className="flex w-full max-w-full flex-col overflow-hidden">
           <div className="flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden">
-            <div className="absolute inset-0 bg-white dark:bg-theme-bg-secondary overflow-hidden">
+            <div className="absolute inset-0 bg-white dark:bg-theme-bg-secondary overflow-hidden pointer-events-none">
               <img 
                 src="/assets/mascot-watermark.png" 
-                alt="System Mascot Watermark"
-                className="fixed bottom-[-50px] right-[-50px] w-[600px] object-contain opacity-[0.04] dark:opacity-[0.02] pointer-events-none"
+                alt=""
+                className="fixed bottom-[-50px] right-[-50px] w-[600px] h-[600px] object-contain opacity-[0.04] dark:opacity-[0.02]"
+                onError={(e) => e.currentTarget.style.display = 'none'}
               />
             </div>
 
