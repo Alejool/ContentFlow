@@ -55,9 +55,13 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
 
     try {
       // Nuevo endpoint del sistema simplificado
-      const response = await axios.post(route('api.v1.approvals.submit'), {
-        publication_id: itemId,
-      });
+      const response = await axios.post(
+        route('api.v1.approvals.submit'),
+        {
+          publication_id: itemId,
+        },
+        { skipErrorHandler: true },
+      );
 
       // Backend can return either { data: { request, publication } } or { request, publication }
       const approvalRequest = response.data?.data?.request ?? response.data?.request;
@@ -95,17 +99,16 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
         );
       }
 
-      return {
-        success: true,
-        approvalInfo: approvalRequest
-          ? {
-              current_level: approvalRequest.currentStep?.level_number ?? 1,
-              level_name: approvalRequest.currentStep?.level_name ?? '',
-              approvers: [],
-              approver_count: 0,
-            }
-          : undefined,
-      };
+      const approvalInfo = approvalRequest
+        ? {
+            current_level: Number(approvalRequest.currentStep?.level_number ?? 1),
+            level_name: String(approvalRequest.currentStep?.level_name ?? ''),
+            approvers: [] as string[],
+            approver_count: 0,
+          }
+        : undefined;
+
+      return approvalInfo ? { success: true, approvalInfo } : { success: true };
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       return {
