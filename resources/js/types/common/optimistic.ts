@@ -95,6 +95,7 @@ export interface InterceptorConfig {
   optimisticData?: unknown;
   resource?: string;
   rollbackOnError?: boolean;
+  skipErrorHandler?: boolean;
 }
 
 declare module 'axios' {
@@ -103,5 +104,6 @@ declare module 'axios' {
     optimisticData?: unknown;
     resource?: string;
     rollbackOnError?: boolean;
+    skipErrorHandler?: boolean;
   }
 }

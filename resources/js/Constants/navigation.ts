@@ -33,19 +33,19 @@ export const NAV_SECTIONS: NavSection[] = [
     labelKey: 'nav.section.content',
     routes: [
       {
-        nameKey: 'nav.content_records',
+        nameKey: 'nav.content.records',
         routeName: 'content.index',
         url: '/content?tab=logs',
         icon: FileText,
       },
       {
-        nameKey: 'nav.content_publications',
+        nameKey: 'nav.content.publications',
         routeName: 'content.index',
         url: '/content?tab=publications',
         icon: Film,
       },
       {
-        nameKey: 'nav.content_campaigns',
+        nameKey: 'nav.content.campaigns',
         routeName: 'content.index',
         url: '/content?tab=campaigns',
         icon: Building2,
@@ -63,7 +63,7 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: Calendar,
       },
       {
-        nameKey: 'nav.content_approvals',
+        nameKey: 'nav.content.approvals',
         routeName: 'content.index',
         url: '/content?tab=approvals',
         icon: Shield,
@@ -86,7 +86,7 @@ export const NAV_SECTIONS: NavSection[] = [
     labelKey: 'nav.section.workspaces',
     routes: [
       {
-        nameKey: 'nav.workspaces_overview',
+        nameKey: 'nav.workspaces.overview',
         routeName: 'workspaces.settings',
         routeParams: { tab: 'overview' },
         icon: Layers,
