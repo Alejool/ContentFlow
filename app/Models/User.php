@@ -24,6 +24,7 @@ use App\Models\Social\SocialPostLog;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Workspace\Workspace;
 use App\Models\Auth\Role;
+use App\Models\Auth\Permission;
 use App\Models\Calendar\ExternalCalendarConnection;
 use App\Models\Calendar\BulkOperationHistory;
 use App\Models\Subscription\SubscriptionHistory;
@@ -176,15 +177,17 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     return $this->load('workspaces')->workspaces;
   }
 
-
-  public function hasPermission($permissionSlug, $workspaceId = null)
-  {
-    $workspaceId = $workspaceId ?: $this->current_workspace_id;
-
-    if (!$workspaceId) {
-      return false;
+    /**
+     * Get normalized permission variants for the legacy/new permission definitions.
+     */
+    private function getPermissionVariants(string $permission): array
+    {
+        return Permission::normalizeIdentifier($permission);
     }
 
+    public function hasPermission($permissionSlug, $workspaceId = null)
+    {
+        $workspaceId = $workspaceId ?: $this->current_workspace_id;
     // Get the workspace with pivot data
     $workspace = $this->workspaces()
       ->where('workspaces.id', $workspaceId)
@@ -222,7 +225,14 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
       return true;
     }
 
-    return $role->permissions()->where('slug', $permissionSlug)->exists();
+    $permissionVariants = $this->getPermissionVariants($permissionSlug);
+
+    return $role->permissions()
+      ->where(function ($query) use ($permissionVariants) {
+        $query->whereIn('slug', $permissionVariants)
+              ->orWhereIn('name', $permissionVariants);
+      })
+      ->exists();
   }
 
   /**

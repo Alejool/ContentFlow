@@ -19,6 +19,7 @@ use App\Models\Subscription\Subscription;
 use App\Models\Subscription\UsageMetric;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Services\Workspace\WorkspaceUsageService;
 
 
 class Workspace extends Model
@@ -313,7 +314,7 @@ class Workspace extends Model
      */
     public function canPerformAction(string $limitType): bool
     {
-        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService = app(WorkspaceUsageService::class);
         return $usageService->canPerformAction($this, $limitType);
     }
 
@@ -412,7 +413,7 @@ class Workspace extends Model
      */
     public function incrementUsage(string $metricType, int $amount = 1): void
     {
-        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService = app(WorkspaceUsageService::class);
         $usageService->incrementUsage($this, $metricType, $amount);
     }
 
@@ -421,7 +422,7 @@ class Workspace extends Model
      */
     public function decrementUsage(string $metricType, int $amount = 1): void
     {
-        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService = app(WorkspaceUsageService::class);
         $usageService->decrementUsage($this, $metricType, $amount);
     }
 }
