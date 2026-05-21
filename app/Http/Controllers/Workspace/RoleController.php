@@ -223,7 +223,7 @@ class RoleController extends Controller
         $user = Auth::user();
 
         // Check if user has permission to manage roles
-        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-roles')) {
+        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-team')) {
             return $this->errorResponse('You do not have permission to update roles.', 403);
         }
 
@@ -244,6 +244,16 @@ class RoleController extends Controller
 
             // Clear role cache
             \Illuminate\Support\Facades\Cache::tags(['roles', "role_{$role->id}"])->flush();
+
+            // Clear all users' permission cache in Redis since role permissions changed
+            $keys = \Illuminate\Support\Facades\Redis::keys("permission:user:*");
+            if (!empty($keys)) {
+                \Illuminate\Support\Facades\Redis::del($keys);
+            }
+            $aggregatedKeys = \Illuminate\Support\Facades\Redis::keys("permissions:user:*");
+            if (!empty($aggregatedKeys)) {
+                \Illuminate\Support\Facades\Redis::del($aggregatedKeys);
+            }
 
             // Reload role with permissions
             $role->load('permissions');
@@ -300,7 +310,7 @@ class RoleController extends Controller
         $user = Auth::user();
 
         // Check if user has permission to manage roles
-        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-roles')) {
+        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-team')) {
             return $this->errorResponse('You do not have permission to delete roles.', 403);
         }
 

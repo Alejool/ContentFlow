@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Models\Logs\WebhookLog;
 use App\Models\Workspace\Workspace;
 use App\Models\Auth\Role;
+use App\Services\Subscription\WorkspaceUsageService;
 
 class WorkspaceController extends Controller
 {
@@ -192,8 +193,8 @@ class WorkspaceController extends Controller
       $q->orWhere('slug', $idOrSlug);
     })->firstOrFail();
 
-    if (Auth::id() !== $workspace->created_by) {
-      abort(403, 'Only the workspace owner can update workspace settings');
+    if (Auth::id() !== $workspace->created_by && !Auth::user()->hasPermission('manage-team', $workspace->id)) {
+      abort(403, 'Only the workspace owner or administrators can update workspace settings');
     }
 
     $validated = $request->validate([
@@ -231,8 +232,8 @@ class WorkspaceController extends Controller
       'primary_color' => $request->primary_color
     ]);
 
-    if (Auth::id() !== $workspace->created_by) {
-      abort(403, 'Only the workspace owner can update white-label settings');
+    if (Auth::id() !== $workspace->created_by && !Auth::user()->hasPermission('manage-team', $workspace->id)) {
+      abort(403, 'Only the workspace owner or administrators can update white-label settings');
     }
 
     // Check if the workspace is on the enterprise plan
@@ -444,7 +445,7 @@ class WorkspaceController extends Controller
 
     // Check member limits
     if (!$workspace->canAddTeamMember()) {
-      $usageService = app(\App\Services\WorkspaceUsageService::class);
+      $usageService = app(WorkspaceUsageService::class);
       return response()->json([
         'success' => false,
         'message' => $usageService->getLimitReachedMessage($workspace, 'team_members')
@@ -683,6 +684,16 @@ class WorkspaceController extends Controller
 
       if (!empty($validated['permissions'])) {
         $role->permissions()->sync($validated['permissions']);
+      }
+
+      // Clear all users' permission cache in Redis since role permissions might have changed
+      $keys = \Illuminate\Support\Facades\Redis::keys("permission:user:*");
+      if (!empty($keys)) {
+        \Illuminate\Support\Facades\Redis::del($keys);
+      }
+      $aggregatedKeys = \Illuminate\Support\Facades\Redis::keys("permissions:user:*");
+      if (!empty($aggregatedKeys)) {
+        \Illuminate\Support\Facades\Redis::del($aggregatedKeys);
       }
 
       return $this->successResponse([
