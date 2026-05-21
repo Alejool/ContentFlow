@@ -3,6 +3,7 @@ import toast from '@/Utils/common/toast';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Download, FileSpreadsheet, FileText, Info } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -43,11 +44,7 @@ export default function ExportButtons({
         setHistoryDays(days); // Update with actual value from backend
 
         if (showHistoryInfo && startDate) {
-          const formattedDate = new Date(startDate).toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          });
+          const formattedDate = formatDateString(startDate);
 
           toast.success(
             t('common.exportCompleted', {
