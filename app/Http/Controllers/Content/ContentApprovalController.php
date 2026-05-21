@@ -229,7 +229,12 @@ class ContentApprovalController extends Controller
     public function approvalStatus(Publication $content): JsonResponse
     {
         try {
-            $activeRequest = ApprovalRequest::with(['currentStep.role', 'workflow', 'submitter'])
+            $activeRequest = ApprovalRequest::with([
+                'currentStep.role', 
+                'workflow.levels.role', 
+                'submitter',
+                'logs.user'
+            ])
                 ->where('publication_id', $content->id)
                 ->where('status', ApprovalRequest::STATUS_PENDING)
                 ->latest('submitted_at')

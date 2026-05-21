@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Logs\ApprovalLog;
 
 class ApprovalWorkflowController extends Controller
 {
@@ -36,12 +37,27 @@ class ApprovalWorkflowController extends Controller
             ]);
 
             $publication = Publication::findOrFail($validated['publication_id']);
-            
-            // Authorize
-            Gate::authorize('submitForApproval', $publication);
-
             $user = Auth::user();
-            
+
+            if (!$user) {
+                \Log::error('Approval submit failed: no authenticated user', [
+                    'publication_id' => $publication->id,
+                    'workspace_id' => $publication->workspace_id,
+                ]);
+
+                return $this->errorResponse('No authenticated user found.', 401);
+            }
+
+            \Log::info('Approval submit attempt', [
+                'publication_id' => $publication->id,
+                'user_id' => $user->id,
+                'workspace_id' => $publication->workspace_id,
+                'current_workspace_id' => $user->current_workspace_id,
+            ]);
+
+            // Authorize explicitly with the current user
+            Gate::forUser($user)->authorize('submitForApproval', $publication);
+
             // Check if there's an enabled workflow
             $workflow = $publication->workspace->approvalWorkflow;
             $hasWorkflow = $workflow && $workflow->is_enabled && $workflow->levels && $workflow->levels->isNotEmpty();
@@ -66,11 +82,11 @@ class ApprovalWorkflowController extends Controller
                 ]);
                 
                 // Create simple approval request
-                $approvalRequest = \App\Models\Approval\ApprovalRequest::create([
+                $approvalRequest = ApprovalRequest::create([
                     'publication_id' => $publication->id,
                     'workflow_id' => null,
                     'current_step_id' => null,
-                    'status' => \App\Models\Approval\ApprovalRequest::STATUS_PENDING,
+                    'status' => ApprovalRequest::STATUS_PENDING,
                     'submitted_by' => $user->id,
                     'submitted_at' => now(),
                     'metadata' => [
@@ -82,11 +98,11 @@ class ApprovalWorkflowController extends Controller
                 ]);
                 
                 // Create initial log entry
-                \App\Models\Logs\ApprovalLog::create([
+                ApprovalLog::create([
                     'approval_request_id' => $approvalRequest->id,
                     'approval_step_id' => null,
                     'user_id' => $user->id,
-                    'action' => \App\Models\Logs\ApprovalLog::ACTION_SUBMITTED,
+                    'action' => ApprovalLog::ACTION_SUBMITTED,
                     'level_number' => 0,
                     'comment' => 'Publication submitted for simple approval (no workflow)',
                     'metadata' => [
