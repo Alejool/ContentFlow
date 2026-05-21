@@ -13,11 +13,17 @@ export function usePublicationPermissions(permissions: string[] = []) {
   const currentUserId = auth.user?.id;
   const currentWorkspace = auth.current_workspace;
 
-  // Permisos básicos usando CASL
-  const canManageContent = useMemo(
-    () => ability.can('update', 'Publication') || ability.can('create', 'Publication'),
-    [ability],
-  );
+  const canManageContent = useMemo(() => {
+    if (!currentUserId) {
+      return ability.can('create', 'Publication');
+    }
+
+    return (
+      ability.can('update', 'Publication') ||
+      ability.can('create', 'Publication') ||
+      ability.can('update', 'Publication', { user_id: currentUserId })
+    );
+  }, [ability, currentUserId]);
 
   const canPublish = useMemo(() => ability.can('publish', 'Publication'), [ability]);
 
@@ -68,7 +74,12 @@ export function usePublicationPermissions(permissions: string[] = []) {
     return userRoleSlug === lastLevelRoleSlug;
   }, [hasWorkflow, currentWorkspace]);
 
-  const isOwner = useMemo(() => currentWorkspace?.user_role_slug === 'owner', [currentWorkspace]);
+  const isOwner = useMemo(
+    () =>
+      currentWorkspace?.user_role_slug === 'owner' ||
+      currentWorkspace?.user_role_slug === 'admin-owner',
+    [currentWorkspace],
+  );
 
   const isAdmin = useMemo(() => currentWorkspace?.user_role_slug === 'admin', [currentWorkspace]);
 
@@ -110,34 +121,23 @@ export function usePublicationPermissions(permissions: string[] = []) {
 
   // Verificar si debe mostrar botón de enviar a revisión
   const shouldShowSendToReview = (item: Publication) => {
-    console.log('item shouldShowSendToReview');
-    console.log(item);
-    // Admin y Owner nunca necesitan enviar a revisión (publican directamente)
-    if (isAdminOrOwner) return false;
+    if (!item) return false;
 
-    // Si no tiene permiso de enviar a revisión, no mostrar
+    // Owner can publish directly and does not need the review flow
+    if (isOwner) return false;
+
+    // If the user cannot submit for approval, do not show the button
     if (!canSubmitForApproval) return false;
 
-    // CRÍTICO: Si NO hay workflow activo, los roles que no son Admin/Owner
-    // DEBEN enviar a revisión (no pueden publicar directamente)
-    // Esto aplica incluso si tienen el permiso "publish"
-    if (!hasWorkflow) {
-      // Mostrar para estados draft, rejected, failed
-      return ['draft', 'rejected', 'failed'].includes(item.status || 'draft');
-    }
-
-    // Si es el aprobador del último nivel, no necesita enviar a revisión
-    // (puede publicar directamente)
-    if (isLastLevelApprover) return false;
-
-    // No mostrar si está en proceso de revisión o publicación
+    // Do not display when the publication is already in review or publishing
     if (['pending_review', 'publishing', 'retrying'].includes(item.status || '')) {
       return false;
     }
 
-    // Mostrar para estados draft, rejected, failed
-    // También para published y scheduled si quieren republicar en otras redes
-    return ['draft', 'rejected', 'scheduled'].includes(item.status || 'draft');
+    // If the user can publish directly, they should not see a review button
+    if (canPublishDirectly(item)) return false;
+
+    return ['draft', 'rejected', 'failed'].includes(item.status || 'draft');
   };
 
   // Detectar si el workflow es multinivel

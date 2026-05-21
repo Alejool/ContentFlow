@@ -1,7 +1,7 @@
 import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import { getErrorMessage } from '@/Utils/common/validation';
 import { useForm } from '@inertiajs/react';
-import axios from 'axios';
+import axios from '@/config/axios';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
