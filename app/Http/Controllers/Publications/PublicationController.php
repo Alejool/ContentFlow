@@ -433,7 +433,7 @@ class PublicationController extends Controller
         })->toArray(),
         'status_info' => [
           'current_status' => $publication->status,
-          'can_submit_for_approval' => in_array($publication->status, ['draft', 'rejected']),
+          'can_submit_for_approval' => in_array($publication->status, ['draft', 'rejected', 'failed']),
           'is_pending_review' => $publication->status === 'pending_review',
           'is_approved' => $publication->status === 'approved',
           'is_rejected' => $publication->status === 'rejected',
@@ -907,9 +907,10 @@ class PublicationController extends Controller
 
   public function requestReview(Request $request, Publication $publication)
   {
-    // Simple check: user must have publish permission
-    if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
-      return $this->errorResponse('You do not have permission to submit content for approval. You need publish permission.', 403);
+    // Simple check: user must have publish or manage-content permission
+    if (!Auth::user()->hasPermission('publish', $publication->workspace_id) && 
+        !Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to submit content for approval. You need manage-content or publish permission.', 403);
     }
 
     // Use PublicationFlowService to validate
