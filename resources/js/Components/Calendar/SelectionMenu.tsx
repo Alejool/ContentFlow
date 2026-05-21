@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, CheckCheck } from 'lucide-react';
 import React from 'react';
+import { formatDateString } from '@/Utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 interface SelectionMenuProps {
@@ -110,9 +111,9 @@ export const SelectionMenu: React.FC<SelectionMenuProps> = ({
                       Seleccionar este día
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {dayDate.toLocaleDateString('es-ES', { 
-                        day: 'numeric', 
-                        month: 'short' 
+                      {formatDateString(dayDate, {
+                        day: 'numeric',
+                        month: 'short',
                       })}
                     </p>
                   </div>

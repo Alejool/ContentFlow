@@ -4,6 +4,7 @@ import Select from '@/Components/common/Modern/Select';
 import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import { toLocalDate, toUTC } from '@/Utils/common/timezoneUtils';
 import { CalendarDate } from '@internationalized/date';
+import { formatDateString, formatDateTimeString } from '@/Utils/formatters';
 import {
   Calendar,
   ChevronDown,
@@ -339,13 +340,8 @@ const DatePickerModern = <T extends FieldValues>({
 
   const formattedValue = displayDate
     ? showTimeSelect
-      ? displayDate.toLocaleString(currentLocale === 'es' ? 'es-ES' : 'en-US', {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        })
-      : displayDate.toLocaleDateString(currentLocale === 'es' ? 'es-ES' : 'en-US', {
-          dateStyle: 'medium',
-        })
+      ? formatDateTimeString(displayDate, { dateStyle: 'medium', timeStyle: 'short' })
+      : formatDateString(displayDate, { dateStyle: 'medium' })
     : '';
 
   const [navDate, setNavDate] = useState<Date>(displayDate ?? new Date());
@@ -422,7 +418,7 @@ const DatePickerModern = <T extends FieldValues>({
       ? { dateStyle: 'medium', timeStyle: 'short' }
       : { dateStyle: 'medium' };
 
-    const formatted = date.toLocaleString(currentLocale === 'es' ? 'es-ES' : 'en-US', options);
+    const formatted = showTimeSelect ? formatDateTimeString(date, options) : formatDateString(date, options);
 
     // Truncar si es muy largo (más de 30 caracteres)
     return formatted.length > 30 ? `${formatted.substring(0, 27)}...` : formatted;

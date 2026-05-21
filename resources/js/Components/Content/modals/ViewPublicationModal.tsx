@@ -15,6 +15,7 @@ import type { Campaign } from '@/types/Campaign/Campaign';
 import type { Publication } from '@/types/Publications/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
+import { usePublicationPermissions } from '@/Hooks/Publications/usePublicationPermissions';
 import { Edit, FileText, Layers, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +35,7 @@ export default function ViewPublicationModal({
 }: ViewPublicationModalProps) {
   const { t } = useTranslation();
   const { auth } = usePage<any>().props;
+  const { canEdit: canEditPublication } = usePublicationPermissions();
   const [activeTab, setActiveTab] = useState('overview');
   const [lightboxMedia, setLightboxMedia] = useState<
     | {
@@ -44,7 +46,7 @@ export default function ViewPublicationModal({
     | null
   >(null);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const canEdit = auth.current_workspace?.permissions?.includes('manage-content');
+  const canEdit = canEditPublication;
 
   // Get fresh data from publicationStore if this is a publication
   const publicationsFromStore = usePublicationStore((s) => s.publications);

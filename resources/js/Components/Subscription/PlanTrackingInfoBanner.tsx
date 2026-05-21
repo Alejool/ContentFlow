@@ -1,4 +1,5 @@
 import { Calendar, RefreshCw, Shield, Zap } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 interface PlanTrackingInfoBannerProps {
@@ -8,7 +9,7 @@ interface PlanTrackingInfoBannerProps {
 export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProps) {
   const { t } = useTranslation();
 
-  const formattedDate = startDate || new Date().toLocaleDateString();
+  const formattedDate = startDate ? formatDateString(startDate) : formatDateString(new Date());
 
   return (
     <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 p-6 dark:border-green-700/50 dark:from-green-900/20 dark:to-emerald-800/20">

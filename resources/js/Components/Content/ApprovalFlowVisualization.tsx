@@ -5,6 +5,7 @@ import { CheckCircle, Clock, Loader2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 interface ApprovalFlowVisualizationProps {
   publication: Publication;
@@ -138,9 +139,38 @@ export default function ApprovalFlowVisualization({
 
   // Determinar si el usuario puede aprobar (viene del backend en canApprove)
   const isPending = approvalRequest.status === 'pending';
+  const isMultiLevel = totalLevels > 1 || approvalRequest.workflow !== null;
 
   return (
     <div className="space-y-5">
+      {/* Información del envío original */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+        <h4 className="mb-3 font-semibold text-gray-900 dark:text-white">
+          {t('approvals.submissionDetails') || 'Detalles del Envío'}
+        </h4>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {t('approvals.submittedBy') || 'Enviado por'}:{' '}
+                <span className="font-bold">{approvalRequest.submitter?.name || t('common.system')}</span>
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {formatDateTimeString(approvalRequest.submitted_at)}
+              </p>
+            </div>
+          </div>
+          <div>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold ${isMultiLevel ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+              {isMultiLevel ? (t('approvals.multiLevelFlow') || 'Flujo Multinivel') : (t('approvals.directFlow') || 'Flujo Directo')}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Barra de progreso */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         <div className="mb-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
@@ -241,7 +271,12 @@ export default function ApprovalFlowVisualization({
                       </div>
                       {level.role && (
                         <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                          {t('approvals.approverRole') || 'Rol'}: {level.role.name}
+                          {t('approvals.approverRole') || 'Revisado por Rol'}: <span className="font-medium text-gray-700 dark:text-gray-300">{level.role.name}</span>
+                        </p>
+                      )}
+                      {level.timeout_hours > 0 && (
+                        <p className="mt-0.5 text-xs text-orange-600 dark:text-orange-400">
+                          <Clock className="mb-0.5 inline-block h-3 w-3" /> {t('approvals.timeoutLimit') || 'Tiempo límite'}: {level.timeout_hours}h
                         </p>
                       )}
                       {/* Log de acción */}
@@ -287,7 +322,7 @@ export default function ApprovalFlowVisualization({
                   )}
                 </div>
                 <span className="text-xs whitespace-nowrap text-gray-400">
-                  {new Date(log.created_at).toLocaleString()}
+                  {formatDateTimeString(log.created_at)}
                 </span>
               </div>
             ))}
@@ -433,7 +468,7 @@ function LogEntry({ log, t }: { log: ApprovalLog; t: any }) {
   return (
     <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
       {log.user?.name && <span>{log.user.name} · </span>}
-      {new Date(log.created_at).toLocaleString()}
+      {formatDateTimeString(log.created_at)}
       {log.comment && <span className="ml-1 italic">"{log.comment}"</span>}
     </div>
   );

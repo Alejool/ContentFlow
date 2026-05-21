@@ -3,6 +3,7 @@ import Input from '@/Components/common/Modern/Input';
 import Modal from '@/Components/common/Modern/Modal';
 import { router } from '@inertiajs/react';
 import { AlertTriangle, RefreshCw, Shield, ShieldCheck, ShieldOff } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -108,7 +109,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
       {isEnabled && enabledAt && (
         <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
           <p className="text-sm text-blue-700 dark:text-blue-400">
-            Enabled on {new Date(enabledAt).toLocaleDateString()}
+            Enabled on {formatDateString(enabledAt)}
           </p>
         </div>
       )}

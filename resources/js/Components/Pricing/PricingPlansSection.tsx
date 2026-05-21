@@ -4,6 +4,7 @@ import { Badge } from '@/Components/ui/badge';
 import { usePricing } from '@/Hooks/Pricing/usePricing';
 import { cn } from '@/lib/common/utils';
 import { AlertTriangle, CheckCircle, Info, RefreshCw, Sparkles, XCircle, Zap } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -213,7 +214,7 @@ export default function PricingPlansSection({
                               <p className="text-xs text-blue-700 dark:text-blue-300">
                                 {sub.cancel_at_period_end
                                   ? t('pricing.endsOn', {
-                                      date: new Date(sub.ends_at).toLocaleDateString(),
+                                      date: formatDateString(sub.ends_at),
                                     })
                                   : t('pricing.autoRenewal')}
                               </p>

@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import Checkbox from '@/Components/common/Modern/Checkbox';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { isDarkColor } from '@/Utils/Calendar/colorHelpers';
-import { formatTimeString } from '@/Utils/formatters';
+import { formatDateString, formatTimeString } from '@/Utils/formatters';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { isSameDay, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -47,7 +47,7 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
           <h4 className="flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
             <CalendarIcon className="text-primary-500 h-5 w-5" />
             <span className="truncate">
-              {selectedDate.toLocaleDateString(undefined, {
+              {formatDateString(selectedDate, {
                 weekday: 'short',
                 day: 'numeric',
                 month: 'short',

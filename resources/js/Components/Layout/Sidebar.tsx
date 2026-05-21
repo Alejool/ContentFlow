@@ -216,7 +216,11 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className={`rounded-lg p-2 transition-colors duration-200 ${classes.buttonHoverBg} ${classes.textColor}`}
-              aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              aria-label={
+                isSidebarOpen
+                  ? t('nav.sidebar.collapse') || 'Collapse sidebar'
+                  : t('nav.sidebar.expand') || 'Expand sidebar'
+              }
               aria-expanded={isSidebarOpen}
             >
               {isSidebarOpen ? (
@@ -232,7 +236,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
           <nav
             ref={navRef}
             className="flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden px-3 py-2 scroll-smooth select-none [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-800"
-            aria-label="Main navigation"
+            aria-label={t('nav.mainNavigation') || 'Main navigation'}
             role="navigation"
           >
             {sections.map((section) => {

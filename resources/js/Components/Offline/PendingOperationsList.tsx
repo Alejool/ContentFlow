@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Video,
 } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import React, { useEffect, useState } from 'react';
 
 /**
@@ -134,7 +135,7 @@ export const PendingOperationsList: React.FC = () => {
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
 
-    return date.toLocaleDateString();
+    return formatDateString(date);
   };
 
   if (isLoading) {

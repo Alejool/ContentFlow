@@ -258,10 +258,15 @@ export default function ApprovalHistorySection({
                               : t('approvals.status.pending') || 'Pendiente'}
                         </span>
                         {log.approvalStep && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {t('approvals.step') || 'Nivel'} {log.approvalStep.level_number}:{' '}
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <span className="font-medium">{t('approvals.step') || 'Nivel'} {log.approvalStep.level_number}:</span>{' '}
                             {log.approvalStep.level_name}
-                          </span>
+                            {log.approvalStep.role && (
+                              <span className="ml-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                {log.approvalStep.role.name}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-0.5">

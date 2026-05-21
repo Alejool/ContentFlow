@@ -2,6 +2,7 @@ import type { CalendarEvent, DataConflict } from '@/types/Calendar/calendar';
 import { AlertTriangle, Clock, User } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 export type { DataConflict };
 
@@ -27,7 +28,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
 
   const formatValue = (value: unknown): string => {
     if (value instanceof Date) {
-      return value.toLocaleString();
+      return formatDateTimeString(value);
     }
     if (typeof value === 'object' && value !== null) {
       return JSON.stringify(value, null, 2);
@@ -145,7 +146,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                 <div className="ml-6 space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                     <Clock className="h-3 w-3" />
-                    <span>{conflict.localTimestamp.toLocaleString()}</span>
+                    <span>{formatDateTimeString(conflict.localTimestamp)}</span>
                   </div>
                   {conflict.localUser && (
                     <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
@@ -198,7 +199,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                 <div className="ml-6 space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                     <Clock className="h-3 w-3" />
-                    <span>{conflict.serverTimestamp.toLocaleString()}</span>
+                    <span>{formatDateTimeString(conflict.serverTimestamp)}</span>
                   </div>
                   {conflict.serverUser && (
                     <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">

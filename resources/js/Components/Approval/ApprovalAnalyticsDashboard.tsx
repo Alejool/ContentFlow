@@ -7,6 +7,7 @@ import { AlertCircle, BarChart3, Clock, Download, FileText, TrendingUp, Users } 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { formatDateString } from '@/Utils/formatters';
 import { route } from 'ziggy-js';
 
 interface AnalyticsData {
@@ -441,7 +442,7 @@ export default function ApprovalAnalyticsDashboard({
                       {content.title}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(content.submitted_at).toLocaleDateString()}
+                      {formatDateString(content.submitted_at)}
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">

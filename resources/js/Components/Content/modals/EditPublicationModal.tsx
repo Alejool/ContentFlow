@@ -23,6 +23,7 @@ import { useContentType } from '@/Hooks/Publications/useContentType';
 import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
 import { usePublicationForm } from '@/Hooks/Publications/usePublicationForm';
 import { usePublicationLock } from '@/Hooks/Publications/usePublicationLock';
+import { usePublicationPermissions } from '@/Hooks/Publications/usePublicationPermissions';
 import { usePublishedPlatforms } from '@/Hooks/Publications/usePublicationsList';
 import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import toast from '@/Utils/common/toast';
@@ -330,7 +331,8 @@ const EditPublicationModal = ({
 
   const { auth } = usePage<any>().props;
   const user = auth.user;
-  const canManage = auth.current_workspace?.permissions?.includes('manage-content');
+  const { canManageContent, canPublish: canPublishPermission } = usePublicationPermissions();
+  const canManage = canManageContent;
   const canManageAccounts = auth.current_workspace?.permissions?.includes('manage-accounts');
   const planId = auth.current_workspace?.plan?.toLowerCase() || 'demo';
   const hasRecurrenceAccess = ['demo', 'professional', 'enterprise'].includes(planId);
@@ -422,7 +424,7 @@ const EditPublicationModal = ({
   // - Content/Settings section lock: ONLY if another user has lock OR pending review
   const isContentSectionDisabled = isLockedByOtherEditor || !canManage || isPendingReview;
 
-  const canPublish = auth.current_workspace?.permissions?.includes('publish');
+  const canPublish = canPublishPermission;
 
   // Strict check on status to avoid stale approved_at dates on failed posts
   const isApprovedStatus =

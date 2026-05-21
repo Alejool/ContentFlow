@@ -1,5 +1,6 @@
 import { Avatar } from '@/Components/common/Avatar';
 import { MessageSquare, MoreHorizontal, Share2, ThumbsUp } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import { memo } from 'react';
 
 interface FacebookPreviewProps {
@@ -37,7 +38,7 @@ export const FacebookPreview = memo(
               </div>
               <div className="flex items-center gap-1 text-[13px] leading-tight text-gray-500 dark:text-[#b0b3b8]">
                 {publishedAt
-                  ? new Date(publishedAt).toLocaleDateString('en-US', {
+                  ? formatDateString(publishedAt, {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',

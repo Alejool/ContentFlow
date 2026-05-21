@@ -1,4 +1,5 @@
 import { validateDate } from '@/Utils/common/dateValidation';
+import { formatDateTimeString } from '@/Utils/formatters';
 import { CalendarDate } from '@internationalized/date';
 import { AlertTriangle } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -164,7 +165,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
               {t('calendar.selected_date', 'Selected date:')}
             </p>
             <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-              {selectedDate.toLocaleString('es-ES', {
+              {formatDateTimeString(selectedDate, {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',

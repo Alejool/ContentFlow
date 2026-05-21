@@ -1,5 +1,6 @@
 import { Avatar } from '@/Components/common/Avatar';
 import { Scissors, Share2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 import { memo } from 'react';
 
 interface YouTubePreviewProps {
@@ -106,7 +107,7 @@ export const YouTubePreview = memo(
             <div className="mb-1 font-bold">
               0 views{' '}
               {publishedAt
-                ? new Date(publishedAt).toLocaleDateString('en-US', {
+                ? formatDateString(publishedAt, {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric',

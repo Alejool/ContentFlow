@@ -2,6 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTypeBadge';
 import PublicationThumbnail from '@/Components/Content/Publication/PublicationThumbnail';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
+import { usePublicationActions } from '@/Hooks/Publications/usePublicationActions';
 import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -46,15 +47,22 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
   onDuplicate,
   permissions,
 }: PublicationMobileGridProps) {
-  const { auth } = usePage<PageProps>().props;
+  const { auth } = usePage<any>().props;
   const currentWorkspace = auth.current_workspace;
 
   const [isSubmittingForApproval, setIsSubmittingForApproval] = useState<Record<number, boolean>>(
     {},
   );
 
-  // Verificar permisos usando la misma lógica que ContentCard
-  const canManageContent = permissions?.includes('publish');
+  const { canManageContent } = usePublicationActions({
+    onEdit,
+    onDelete,
+    onPublish,
+    ...(onEditRequest ? { onEditRequest } : {}),
+    ...(onViewDetails ? { onViewDetails } : {}),
+    ...(onDuplicate ? { onDuplicate } : {}),
+    permissions: permissions || [],
+  });
 
   // Verificar si hay workflow habilitado
   const hasWorkflow = currentWorkspace?.approval_workflow?.is_enabled === true;
@@ -69,7 +77,11 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
     try {
       setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: true }));
 
-      const response = await axios.post(`/api/v1/content/${item.id}/submit-for-approval`);
+      const response = await axios.post(
+        `/api/v1/content/${item.id}/submit-for-approval`,
+        {},
+        { skipErrorHandler: true },
+      );
 
       // Update stores with fresh data
       const publication = response.data?.data?.content || response.data?.data?.publication;
@@ -152,8 +164,8 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
                   <div className="mb-1 flex items-center justify-between gap-2">
                     {/* Content Type Badge */}
                     <SimpleContentTypeBadge
-                      contentType={item.content_type}
-                      mediaFiles={item.media_files}
+                      contentType={item.content_type || 'post'}
+                      mediaFiles={item.media_files || []}
                       size="sm"
                     />
 

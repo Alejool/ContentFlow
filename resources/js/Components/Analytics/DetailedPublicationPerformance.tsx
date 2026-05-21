@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatDateString } from '@/Utils/formatters';
 import {
   Bar,
   BarChart,
@@ -243,7 +244,7 @@ export default function DetailedPublicationPerformance({ publications, theme = '
       const d = new Date();
       d.setDate(d.getDate() - i);
       defaultMetrics.push({
-        date: d.toLocaleDateString('es-ES', {
+        date: formatDateString(d, {
           day: '2-digit',
           month: '2-digit',
         }),

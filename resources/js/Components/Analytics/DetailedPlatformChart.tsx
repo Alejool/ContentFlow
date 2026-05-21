@@ -1,6 +1,7 @@
 import { SeededRandom } from '@/Utils/common/stableMock';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
+import { formatDateString } from '@/Utils/formatters';
 import {
   Bar,
   BarChart,
@@ -197,7 +198,7 @@ export default function DetailedPlatformChart({ platforms, theme = 'light' }: Pr
       baseFollowers = baseFollowers + dailyEarned - dailyLost;
 
       defaultMetrics.push({
-        date: d.toLocaleDateString('es-ES', {
+        date: formatDateString(d, {
           day: '2-digit',
           month: '2-digit',
         }),

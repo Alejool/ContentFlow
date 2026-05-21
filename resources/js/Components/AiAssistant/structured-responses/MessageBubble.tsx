@@ -1,6 +1,7 @@
 import { AIMessage } from '@/Hooks/useAIChat';
 import { Bot } from 'lucide-react';
 import StructuredResponseRenderer from './StructuredResponseRenderer';
+import { formatTimeString } from '@/Utils/formatters';
 
 interface MessageBubbleProps {
   message: AIMessage;
@@ -46,7 +47,7 @@ export default function MessageBubble({ message, theme }: MessageBubbleProps) {
                   {message.aiResponse._metadata.provider} • {message.aiResponse._metadata.model}
                 </span>
                 <span>
-                  {new Date(message.aiResponse._metadata.timestamp).toLocaleTimeString([], {
+                  {formatTimeString(message.aiResponse._metadata.timestamp, {
                     hour: '2-digit',
                     minute: '2-digit',
                   })}

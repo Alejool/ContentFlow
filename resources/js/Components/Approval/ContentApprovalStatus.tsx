@@ -5,6 +5,7 @@ import { AlertCircle, CheckCircle, Clock, Send, ThumbsDown, ThumbsUp, XCircle } 
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 interface ApprovalStatus {
   status: string;
@@ -125,7 +126,11 @@ export default function ContentApprovalStatus({
   const handleSubmitForApproval = async () => {
     try {
       setIsSubmitting(true);
-      const response = await axios.post(route('api.content.submit-for-approval', content.id));
+      const response = await axios.post(
+        route('api.content.submit-for-approval', content.id),
+        {},
+        { skipErrorHandler: true },
+      );
 
       // Update stores with fresh data
       const publication = response.data?.data?.content || response.data?.data?.publication;
@@ -220,9 +225,31 @@ export default function ContentApprovalStatus({
             <h4 className="mb-2 font-bold text-gray-900 dark:text-white">
               {t('approval.current_status')}
             </h4>
-            {getStatusBadge()}
+            <div className="flex items-center gap-3">
+              {getStatusBadge()}
+              <span className={`rounded-full px-3 py-1 text-xs font-bold ${isMultiLevel ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                {isMultiLevel ? (t('approvals.multiLevelFlow') || 'Flujo Multinivel') : (t('approvals.directFlow') || 'Flujo Directo')}
+              </span>
+            </div>
           </div>
         </div>
+
+        {/* Sender details */}
+        {approvalStatus.status !== 'draft' && (
+          <div className="mb-4 flex items-start gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+            <Clock className="mt-0.5 h-4 w-4 text-gray-500" />
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('approvals.last_submission') || 'Último envío por'}: <span className="font-semibold text-gray-700 dark:text-gray-300">{approvalStatus.last_action_by || t('common.system')}</span>
+              </p>
+              {approvalStatus.last_action_at && (
+                <p className="text-[10px] text-gray-400">
+                  {formatDateTimeString(approvalStatus.last_action_at)}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Next Approver Info */}
         {approvalStatus.status === 'pending_review' && approvalStatus.next_approver_role && (

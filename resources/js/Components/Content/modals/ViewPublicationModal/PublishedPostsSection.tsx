@@ -1,4 +1,5 @@
 import { formatPublicationDate } from '@/Utils/Publications/publicationHelpers';
+import { formatTimeString } from '@/Utils/formatters';
 import { Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,18 +22,10 @@ export default function PublishedPostsSection({
   if (!hasPublishedPosts) return null;
 
   const formatTime = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      if (!isNaN(date.getTime())) {
-        return date.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      }
-      return '';
-    } catch {
-      return '';
-    }
+    return formatTimeString(dateString, {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (

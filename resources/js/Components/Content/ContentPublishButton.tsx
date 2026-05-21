@@ -1,5 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import { usePage } from '@inertiajs/react';
+import { usePublicationPermissions } from '@/Hooks/Publications/usePublicationPermissions';
 import { AlertCircle, CheckCircle2, Send, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,10 +17,11 @@ export default function ContentPublishButton({
 }: ContentPublishButtonProps) {
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
+  const { canPublish } = usePublicationPermissions();
 
   // Permissions check
   const isOwner = auth.user.id === content.workspace?.created_by;
-  const hasPublishPermission = auth.current_workspace?.permissions?.includes('publish');
+  const hasPublishPermission = canPublish;
 
   // Check if approved based on approval_request (source of truth)
   const isApproved =

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/common/utils';
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { formatDateString } from '@/Utils/formatters';
 
 interface ContentVerificationStatusProps {
   status: 'published' | 'removed_on_platform' | 'failed' | 'orphaned' | 'pending';
@@ -65,7 +66,7 @@ export default function ContentVerificationStatus({
     if (diffHours < 1) return 'Hace menos de 1 hora';
     if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
     if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
-    return verified.toLocaleDateString();
+    return formatDateString(verified);
   };
 
   return (

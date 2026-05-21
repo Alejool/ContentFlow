@@ -210,7 +210,11 @@ export default function MobileNavbar({
                   ? 'text-gray-400 hover:bg-neutral-800 hover:text-white'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-primary-600'
               }`}
-              aria-label={showingNavigationDropdown ? 'Close menu' : 'Open menu'}
+              aria-label={
+                showingNavigationDropdown
+                  ? t('nav.menu.close') || 'Close menu'
+                  : t('nav.menu.open') || 'Open menu'
+              }
               aria-expanded={showingNavigationDropdown}
               aria-controls="mobile-menu-panel"
             >
@@ -246,7 +250,7 @@ export default function MobileNavbar({
             id="mobile-menu-panel"
             role="dialog"
             aria-modal="true"
-            aria-label="Navigation menu"
+            aria-label={t('nav.menu.navigation') || 'Navigation menu'}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -285,7 +289,7 @@ export default function MobileNavbar({
                     className={`absolute right-3 top-1/2 -translate-y-1/2 ${
                       actualTheme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
                     }`}
-                    aria-label="Clear search"
+                    aria-label={t('nav.search.clear') || 'Clear search'}
                   >
                     <CloseIcon className="h-4 w-4" />
                   </button>
@@ -316,7 +320,7 @@ export default function MobileNavbar({
                       aria-controls={`section-${section.id}`}
                     >
                       <span className="flex items-center gap-2">
-                        <span className="text-[11px] tracking-widest uppercase">
+                        <span className="text-sm font-semibold tracking-normal normal-case">
                           {t(section.labelKey)}
                         </span>
                         {hasActive && (
@@ -379,7 +383,7 @@ export default function MobileNavbar({
                                       className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-400'}`}
                                     />
                                   )}
-                                  <span className="font-medium">{t(item.nameKey)}</span>
+                                  <span className="text-base font-medium">{t(item.nameKey)}</span>
                                   {isActive && (
                                     <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
                                   )}

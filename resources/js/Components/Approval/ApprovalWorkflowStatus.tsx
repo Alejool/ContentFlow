@@ -215,7 +215,7 @@ export default function ApprovalWorkflowStatus({
                       {(approvedLog || rejectedLog) && (
                         <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                           {(approvedLog || rejectedLog)!.user?.name} ·{' '}
-                          {new Date((approvedLog || rejectedLog)!.created_at).toLocaleString()}
+                          {formatDateTimeString((approvedLog || rejectedLog)!.created_at)}
                           {(approvedLog || rejectedLog)!.comment && (
                             <span className="ml-1 italic">
                               &ldquo;{(approvedLog || rejectedLog)!.comment}&rdquo;
