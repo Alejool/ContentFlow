@@ -56,11 +56,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        if (!Auth::attempt($credentials, true)) {
+        $remember = $this->boolean('remember');
+
+        if (!Auth::guard('web')->attempt($credentials, $remember)) {
             Log::warning('Login: Auth::attempt failed', ['email' => $credentials['email']]);
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => 'These credentials do not match our records'
+                'email' => __('auth.failed'),
             ]);
         }
 
@@ -105,7 +107,7 @@ class LoginRequest extends FormRequest
         $missingGeo = empty($user->country_code) || empty($user->timezone);
 
         if ($ipChanged || $missingGeo) {
-            $geo = app(\App\Services\GeoIpService::class)->lookup($currentIp);
+            $geo = app(\App\Services\Analytics\GeoIpService::class)->lookup($currentIp);
 
             if ($geo) {
                 $updates['country_code'] = $geo['country_code'];

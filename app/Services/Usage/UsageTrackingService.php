@@ -8,6 +8,7 @@ use App\Events\Subscription\LimitReached;
 use App\Events\Subscription\LimitWarning;
 use Illuminate\Support\Facades\Cache;
 use App\Helpers\System\LogHelper;
+use App\Services\Subscription\WorkspaceUsageService;
 
 class UsageTrackingService
 {
@@ -127,7 +128,7 @@ class UsageTrackingService
 
     public function getAllUsageMetrics(Workspace $workspace): array
     {
-        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService = app(WorkspaceUsageService::class);
         $summary = $usageService->getUsageSummary($workspace);
 
         $metrics = [];

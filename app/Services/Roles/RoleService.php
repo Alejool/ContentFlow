@@ -257,9 +257,14 @@ class RoleService
             return true;
         }
 
-        // Check if role has the specific permission
+        // Check if role has the specific permission using normalized legacy/new permission identifiers
+        $permissionVariants = Permission::normalizeIdentifier($permission);
+
         return $role->permissions()
-            ->where('slug', $permission)
+            ->where(function ($query) use ($permissionVariants) {
+                $query->whereIn('slug', $permissionVariants)
+                      ->orWhereIn('name', $permissionVariants);
+            })
             ->exists();
     }
 
