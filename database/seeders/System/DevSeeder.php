@@ -122,48 +122,70 @@ class DevSeeder extends Seeder
             return;
         }
 
-        $users = User::all();
-        $wsCreatedCount = 0;
+        $devUser = User::where('email', 'dev@contentflow.test')->first();
+        $maria = User::where('email', 'maria@contentflow.test')->first();
+        $carlos = User::where('email', 'carlos@contentflow.test')->first();
+        $ana = User::where('email', 'ana@contentflow.test')->first();
 
-        foreach ($users as $user) {
-            if (!$user->workspaces()->exists()) {
-                $workspace = Workspace::create([
-                    'name'       => $user->name . "'s Workspace",
-                    'slug'       => Str::slug($user->name . '-workspace-' . Str::random(4)),
-                    'created_by' => $user->id,
-                ]);
+        // Crear workspace compartido principal
+        $workspace = Workspace::firstOrCreate(
+            ['slug' => 'dev-shared-workspace'],
+            ['name' => 'Dev Shared Workspace', 'created_by' => $devUser->id]
+        );
 
-                $user->workspaces()->attach($workspace->id, ['role_id' => $ownerRole->id]);
-                $user->update(['current_workspace_id' => $workspace->id]);
-                $wsCreatedCount++;
-            } else {
-                $workspace = $user->workspaces()->first();
-                if (!$user->current_workspace_id) {
-                    $user->update(['current_workspace_id' => $workspace->id]);
-                }
-            }
+        $adminRole = Role::where('slug', 'admin')->first();
+        $editorRole = Role::where('slug', 'editor')->first();
+        $viewerRole = Role::where('slug', 'viewer')->first();
+
+        // Asignar roles al workspace compartido
+        $devUser->workspaces()->syncWithoutDetaching([$workspace->id => ['role_id' => $ownerRole->id]]);
+        $devUser->update(['current_workspace_id' => $workspace->id]);
+
+        $maria->workspaces()->syncWithoutDetaching([$workspace->id => ['role_id' => $adminRole->id]]);
+        $maria->update(['current_workspace_id' => $workspace->id]);
+
+        $carlos->workspaces()->syncWithoutDetaching([$workspace->id => ['role_id' => $editorRole->id]]);
+        $carlos->update(['current_workspace_id' => $workspace->id]);
+
+        $ana->workspaces()->syncWithoutDetaching([$workspace->id => ['role_id' => $viewerRole->id]]);
+        $ana->update(['current_workspace_id' => $workspace->id]);
+
+        $wsCreatedCount = 1;
+
+        $this->command->info("   ✅ {$wsCreatedCount} workspaces creados (Shared Workspace)");
+
+        // ── 4.5. Configurar Flujos de Aprobación ────────────────────────
+        $this->command->info('▶  Flujos de Aprobación...');
+        
+        $workflow = \App\Models\Approval\ApprovalWorkflow::firstOrCreate(
+            ['workspace_id' => $workspace->id, 'name' => 'Flujo Estándar de Aprobación'],
+            ['is_active' => true, 'is_enabled' => true, 'is_multi_level' => true, 'was_multi_level' => true]
+        );
+
+        if ($workflow->levels()->count() === 0) {
+            // Nivel 1: Revisor (Carlos - Editor)
+            \App\Models\Approval\ApprovalLevel::create([
+                'approval_workflow_id' => $workflow->id,
+                'level_number' => 1,
+                'level_name' => 'Revisión Inicial',
+                'user_id' => $carlos->id,
+            ]);
+
+            // Nivel 2: Aprobación Final (Maria - Admin)
+            \App\Models\Approval\ApprovalLevel::create([
+                'approval_workflow_id' => $workflow->id,
+                'level_number' => 2,
+                'level_name' => 'Aprobación Final',
+                'user_id' => $maria->id,
+            ]);
         }
+        $this->command->info('   ✅ Flujo de Aprobación creado');
 
-        $this->command->info("   ✅ {$wsCreatedCount} workspaces creados");
-
-        // ── 5. Generar datos para cada usuario ──────────────────────────
-        foreach ($users as $user) {
-            $workspaceId = $user->fresh()->current_workspace_id;
-
-            $this->command->info("▶  Procesando usuario: {$user->email}");
-
-            // Redes sociales
-            $this->seedSocialAccounts($user, $workspaceId);
-
-            // Métricas de redes sociales
-            $this->seedSocialMetrics($user, $workspaceId);
-
-            // Campañas
-            $this->seedCampaigns($user, $workspaceId);
-
-            // Publicaciones y analytics
-            $this->seedPublications($user, $workspaceId);
-        }
+        // Solo se procesa el workspace compartido con el usuario principal
+        $this->seedSocialAccounts($devUser, $workspace->id);
+        $this->seedSocialMetrics($devUser, $workspace->id);
+        $this->seedCampaigns($devUser, $workspace->id);
+        $this->seedPublications($devUser, $workspace->id);
 
         // ── Resumen ────────────────────────────────────────────────────
         $this->command->info('');
@@ -582,6 +604,28 @@ class DevSeeder extends Seeder
             // Generar analytics si está publicada
             if ($status === 'published') {
                 $this->generatePublicationAnalytics($publication);
+            }
+
+            // Simular flujos de aprobación para posts en estado "draft" o "pending_review"
+            // Forzaremos que algunas sean 'pending_review'
+            if ($status === 'draft' && rand(0, 1) === 1) {
+                $publication->update(['status' => 'pending_review']);
+                
+                $workflow = \App\Models\Approval\ApprovalWorkflow::where('workspace_id', $workspaceId)->first();
+                if ($workflow) {
+                    $firstStep = $workflow->levels()->orderBy('level_number')->first();
+                    
+                    if ($firstStep) {
+                        \App\Models\Approval\ApprovalRequest::create([
+                            'publication_id' => $publication->id,
+                            'workflow_id' => $workflow->id,
+                            'current_step_id' => $firstStep->id,
+                            'status' => 'pending',
+                            'submitted_by' => $user->id,
+                            'submitted_at' => now(),
+                        ]);
+                    }
+                }
             }
 
             $created++;
