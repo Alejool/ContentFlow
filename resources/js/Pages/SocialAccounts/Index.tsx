@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle, Plus, RefreshCw, Share2, Trash2 } from 'luc
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { formatDateString } from '@/Utils/formatters';
 
 interface SocialAccount {
   id: number;
@@ -180,7 +181,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
                             {t('socialAccounts.connectedAt', 'Conectado')}
                           </span>
                           <span className="font-medium text-gray-900 dark:text-white">
-                            {new Date(account.created_at).toLocaleDateString()}
+                            {formatDateString(account.created_at)}
                           </span>
                         </div>
                       </div>

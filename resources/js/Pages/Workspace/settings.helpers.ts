@@ -81,7 +81,7 @@ export function buildTabs(opts: BuildTabsOptions): TabDefinition[] {
     });
   }
 
-  if (isEnterprise && isOwner) {
+  if (canManageWorkspace) {
     tabs.push(
       {
         id: 'white-label',

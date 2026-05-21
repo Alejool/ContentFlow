@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatDateTimeString } from '@/Utils/formatters';
 
 interface Setting {
   id: number;
@@ -167,7 +168,10 @@ export default function SystemSettings({ settings, categories }: Props) {
             {setting.updated_by && (
               <p className="text-xs text-gray-500 dark:text-gray-500">
                 {t('admin.system_settings.last_updated', {
-                  date: new Date(setting.updated_at).toLocaleString(t('common.locale') || 'es-ES'),
+                  date: formatDateTimeString(setting.updated_at, {
+                    dateStyle: 'long',
+                    timeStyle: 'short',
+                  }),
                   user: setting.updated_by,
                 })}
               </p>

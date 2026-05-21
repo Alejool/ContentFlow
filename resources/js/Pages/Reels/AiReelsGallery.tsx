@@ -202,7 +202,7 @@ export default function AiReelsGallery() {
                           {reel.publication?.title || reel.file_name}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(reel.created_at).toLocaleDateString('es-ES', {
+                          {formatDateString(reel.created_at, {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',

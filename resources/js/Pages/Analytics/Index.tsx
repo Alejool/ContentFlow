@@ -172,7 +172,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             {lastSyncedAt && (
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                 {t('analytics.lastSynced', 'Última actualización')}:{' '}
-                {lastSyncedAt.toLocaleTimeString()}
+                {formatTimeString(lastSyncedAt)}
               </p>
             )}
           </div>
