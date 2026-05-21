@@ -136,7 +136,7 @@ export function formatDateTimeString(
     const timezone = getUserTimezone();
     const locale = getUserLocale();
 
-    return dateObj.toLocaleString(locale, {
+    return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -145,7 +145,7 @@ export function formatDateTimeString(
       hour12: false,
       ...options,
       timeZone: timezone,
-    });
+    }).format(dateObj);
   } catch {
     return '';
   }
@@ -163,13 +163,13 @@ export function formatDateString(
     const timezone = getUserTimezone();
     const locale = getUserLocale();
 
-    return dateObj.toLocaleDateString(locale, {
+    return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       ...options,
       timeZone: timezone,
-    });
+    }).format(dateObj);
   } catch {
     return '';
   }
@@ -187,13 +187,13 @@ export function formatTimeString(
     const timezone = getUserTimezone();
     const locale = getUserLocale();
 
-    return dateObj.toLocaleTimeString(locale, {
+    return new Intl.DateTimeFormat(locale, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
       ...options,
       timeZone: timezone,
-    });
+    }).format(dateObj);
   } catch {
     return '';
   }
