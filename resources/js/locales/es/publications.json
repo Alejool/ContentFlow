@@ -113,7 +113,9 @@
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
           "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
-          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos."
+          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos.",
+          "youAreEditor": "Eres el editor actual.",
+          "usersWaiting": "Hay {{count}} usuario(s) en espera para cuando termines."
         }
       },
       "schedule": {
@@ -257,7 +259,9 @@
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
           "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
-          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos."
+          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos.",
+          "youAreEditor": "Eres el editor actual.",
+          "usersWaiting": "Hay {{count}} usuario(s) en espera para cuando termines."
         }
       },
       "approvals": {

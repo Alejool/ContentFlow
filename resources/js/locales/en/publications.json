@@ -87,7 +87,9 @@
         "lockedByOther": "Post locked by another user",
         "locking": {
           "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
-          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
+          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts.",
+          "youAreEditor": "You are the current editor.",
+          "usersWaiting": "There are {{count}} user(s) waiting for you to finish."
         }
       },
       "add": {
@@ -253,7 +255,9 @@
         "lockedByOther": "Post locked by another user",
         "locking": {
           "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
-          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
+          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts.",
+          "youAreEditor": "You are the current editor.",
+          "usersWaiting": "There are {{count}} user(s) waiting for you to finish."
         }
       },
       "approvals": {
