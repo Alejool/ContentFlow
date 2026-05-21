@@ -8,11 +8,17 @@
 import { setupOptimisticInterceptor } from '@/plugins/common/optimisticAxios';
 import axios from 'axios';
 
-// Create a configured axios instance
+const tokenElement = document.head?.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
+const csrfToken = tokenElement?.content || '';
+
+// Create a configured axios instance with CSRF and credential support.
 const axiosInstance = axios.create({
   withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
+    ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
   },
 });
 
