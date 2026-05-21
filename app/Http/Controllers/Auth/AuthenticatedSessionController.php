@@ -39,14 +39,11 @@ class AuthenticatedSessionController extends Controller
         Log::info('Login: Attempting Normal Login', ['email' => $request->input('email')]);
         try {
             $return = $request->authenticate();
-            Log::info('Login: Authenticate Success', ['user_id' => Auth::id()]);
+            Log::info('Login: Authenticate Success', ['user_id' => Auth::id(), 'email' => $request->input('email')]);
 
             $request->session()->regenerate();
             // Explicitly save session to prevent race conditions
             $request->session()->save();
-            Log::info('Login: Session Regenerated and Saved');
-
-            return response()->json($return);
             Log::info('Login: Session Regenerated and Saved');
 
             return response()->json($return);

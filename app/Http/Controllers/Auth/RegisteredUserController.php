@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
         ]);
 
         $createdIp = $request->ip();
-        $geo = app(\App\Services\GeoIpService::class)->lookup($createdIp);
+        $geo = app(\App\Services\Analytics\GeoIpService::class)->lookup($createdIp);
 
         $user = User::create([
             'name'         => $request->name,
