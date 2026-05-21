@@ -5,6 +5,8 @@
  * Requirements: 10.5
  */
 
+import { formatTimeString } from '@/Utils/formatters';
+
 export interface PerformanceMetric {
   id: string;
   timestamp: number;
@@ -350,7 +352,7 @@ class PerformanceMetricsTracker {
       .sort(([a], [b]) => Number(a) - Number(b))
       .forEach(([timestamp, metrics]) => {
         const date = new Date(Number(timestamp));
-        labels.push(date.toLocaleTimeString());
+        labels.push(formatTimeString(date));
 
         const successCount = metrics.filter((m) => m.success).length;
         successRate.push((successCount / metrics.length) * 100);

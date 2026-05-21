@@ -1,13 +1,10 @@
 /**
  * Formatea la fecha seleccionada en un formato legible
  */
-export function formatSelectedDate(date: Date, locale: string = 'es-ES'): string {
-  return date.toLocaleDateString(locale, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+import { formatDate } from '@/Utils/formatters';
+
+export function formatSelectedDate(date: Date): string {
+  return formatDate(date, 'long');
 }
 
 /**
