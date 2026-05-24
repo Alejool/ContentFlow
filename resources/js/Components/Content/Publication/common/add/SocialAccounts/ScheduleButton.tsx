@@ -1,7 +1,7 @@
 import { Clock } from 'lucide-react';
 import React, { memo } from 'react';
 import SchedulePopoverContent from '@/Components/Content/Publication/common/add/SocialAccounts/SchedulePopoverContent';
-import type { SocialAccount } from '@/Components/Content/Publication/common/add/SocialAccounts/types';
+import type { SocialAccount } from '@/types/Content/socialAccounts';
 
 interface ScheduleButtonProps {
   account: SocialAccount;

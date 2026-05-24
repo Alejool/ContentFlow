@@ -17,8 +17,8 @@ import { Building2, ChevronDown, ChevronUp, Gem, Link2, Target } from 'lucide-re
 import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingErrorBoundary } from '@/Components/Onboarding/OnboardingErrorBoundary';
-import type { OnboardingStage } from '@/Components/Onboarding/hooks/useOnboardingStage';
-import { useOnboardingStage } from '@/Components/Onboarding/hooks/useOnboardingStage';
+import type { OnboardingStage } from '@/Hooks/onboarding/useOnboardingStage';
+import { useOnboardingStage } from '@/Hooks/onboarding/useOnboardingStage';
 
 // Lazy-loaded step components
 const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));

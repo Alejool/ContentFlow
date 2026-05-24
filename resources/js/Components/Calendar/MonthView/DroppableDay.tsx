@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
 import React from 'react';
 import { DraggableEvent } from '@/Components/Calendar/MonthView/DraggableEvent';
-import type { DroppableDayProps } from '@/Components/Calendar/MonthView/types';
+import type { DroppableDayProps } from '@/types/Calendar/monthView';
 
 export const DroppableDay: React.FC<DroppableDayProps> = ({
   day,

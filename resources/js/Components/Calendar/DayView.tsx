@@ -19,7 +19,7 @@ import { Clock, Plus } from 'lucide-react';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { toAddEventDateTime } from '@/Utils/Calendar/dayAddEventDate';
 import React, { useState } from 'react';
-import type { DayViewProps, DraggableDayEventProps, DroppableHourSlotProps } from '@/Components/Calendar/viewTypes';
+import type { DayViewProps, DraggableDayEventProps, DroppableHourSlotProps } from '@/types/Calendar/viewTypes';
 
 const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
   event,

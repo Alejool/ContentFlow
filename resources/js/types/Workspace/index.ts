@@ -4,3 +4,4 @@
  */
 
 export * from '@/types/Workspace/Workspace';
+export * from '@/types/Workspace/apiSettings';

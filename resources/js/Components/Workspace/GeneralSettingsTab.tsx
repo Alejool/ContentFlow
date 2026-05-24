@@ -4,11 +4,11 @@ import Select from '@/Components/common/Modern/Select';
 import Switch from '@/Components/common/Modern/Switch';
 import Textarea from '@/Components/common/Modern/Textarea';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
-import { getSettingsSchema } from '@/Components/Workspace/generalSettings.schema';
+import { getSettingsSchema } from '@/schemas/Workspace/generalSettings';
 import type {
   GeneralSettingsTabProps,
   SettingsFormData,
-} from '@/Components/Workspace/generalSettings.types';
+} from '@/types/Workspace/generalSettings';
 import { useTimezoneStore } from '@/stores/common/timezoneStore';
 import type { PageProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';

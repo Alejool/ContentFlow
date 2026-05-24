@@ -1,10 +1,10 @@
 import StatCard from '@/Components/common/Modern/StatCard';
-import { buildQuickActions, buildStats } from '@/Components/Workspace/overviewTab.config';
+import { buildQuickActions, buildStats } from '@/Utils/Workspace/overviewTab.config';
 import type {
   OverviewTabProps,
   QuickAction,
   StatItem,
-} from '@/Components/Workspace/overviewTab.types';
+} from '@/types/Workspace/overviewTab';
 import { motion, type Variants } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

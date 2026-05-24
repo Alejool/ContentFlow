@@ -2,8 +2,6 @@ import AlertCard from '@/Components/common/Modern/AlertCard';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import { formatDateString, formatDateTimeStyled } from '@/Utils/formatters';
-import { useForm } from '@inertiajs/react';
-import axios from 'axios';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -22,154 +20,45 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-
-interface ApiSettingsTabProps {
-  workspace: any;
-  canManageWorkspace: boolean;
-}
-
-const PER_PAGE_OPTIONS = [5, 10, 25];
-
-/** Returns a token type label + badge colour */
-function getTokenMeta(token: any): {
-  label: string;
-  labelColor: string;
-  isExpired: boolean;
-  isRefreshToken: boolean;
-} {
-  const isProgrammaticAccess = token.name?.startsWith('api-access:');
-  const isRefresh = token.name?.startsWith('api-refresh:');
-  const isExpired = token.expires_at && new Date(token.expires_at) < new Date();
-
-  if (isRefresh) {
-    return {
-      label: 'API · Refresh',
-      labelColor: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300',
-      isExpired,
-      isRefreshToken: true,
-    };
-  }
-  if (isProgrammaticAccess) {
-    return {
-      label: 'API · Access',
-      labelColor: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
-      isExpired,
-      isRefreshToken: false,
-    };
-  }
-  return {
-    label: 'Dashboard',
-    labelColor: 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300',
-    isExpired: false, // dashboard tokens never expire
-    isRefreshToken: false,
-  };
-}
+import Input from '@/Components/common/Modern/Input';
+import Button from '@/Components/common/Modern/Button';
+import { useApiSettings } from '@/Hooks/Workspace/useApiSettings';
+import { getTokenMeta, PER_PAGE_OPTIONS } from '@/Utils/Workspace/apiSettings.helpers';
+import type { ApiSettingsTabProps, ApiToken } from '@/types/Workspace/apiSettings';
 
 export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSettingsTabProps) {
   const { t } = useTranslation();
 
-  // — Token list & loading
-  const [tokens, setTokens] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // — New token creation
-  const [generatedToken, setGeneratedToken] = useState<string | null>(null);
-  const [showToken, setShowToken] = useState<boolean>(false);
-  const [isCreating, setIsCreating] = useState(false);
-
-  // — Revocation modal
-  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
-  const [tokenToRevoke, setTokenToRevoke] = useState<number | null>(null);
-  const [revoking, setRevoking] = useState(false);
-
-  // — Pagination (client-side)
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-
-  const { data, setData, reset } = useForm({ name: '' });
-
-  // ─── Data fetching ────────────────────────────────────────────────────────
-  const fetchTokens = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(route('workspaces.api-tokens.index', workspace.slug));
-      const resData = response.data;
-      const fetched = resData?.data?.tokens || resData?.tokens || [];
-      setTokens(fetched);
-      setCurrentPage(1);
-    } catch (error) {
-      console.error('Failed to fetch tokens', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTokens();
-  }, [workspace.slug]);
-
-  // ─── Pagination derived state ─────────────────────────────────────────────
-  const totalTokens = tokens.length;
-  const lastPage = Math.max(1, Math.ceil(totalTokens / perPage));
-  const paginatedTokens = useMemo(() => {
-    const start = (currentPage - 1) * perPage;
-    return tokens.slice(start, start + perPage);
-  }, [tokens, currentPage, perPage]);
-
-  // ─── Token creation ───────────────────────────────────────────────────────
-  const createTokenDirectly = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!data.name || isCreating || !canManageWorkspace) return;
-
-    try {
-      setIsCreating(true);
-      const response = await axios.post(route('workspaces.api-tokens.store', workspace.slug), {
-        name: data.name,
-      });
-      setGeneratedToken(response.data.token || response.data.data?.token);
-      toast.success('API token creado exitosamente');
-      reset('name');
-      fetchTokens();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Error al crear el token');
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  // ─── Revocation ───────────────────────────────────────────────────────────
-  const handleRevokeToken = (tokenId: number) => {
-    setTokenToRevoke(tokenId);
-    setIsRevokeModalOpen(true);
-  };
-
-  const confirmRevocation = async () => {
-    if (!tokenToRevoke) return;
-    try {
-      setRevoking(true);
-      await axios.delete(route('workspaces.api-tokens.destroy', [workspace.slug, tokenToRevoke]));
-      toast.success('Token revocado exitosamente');
-      setIsRevokeModalOpen(false);
-      setTokenToRevoke(null);
-      fetchTokens();
-    } catch {
-      toast.error(t('workspace.api.table.revoke_error'));
-    } finally {
-      setRevoking(false);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(t('common.copied') || 'Copiado al portapapeles');
-  };
+  const {
+    tokens,
+    loading,
+    generatedToken,
+    setGeneratedToken,
+    showToken,
+    setShowToken,
+    isCreating,
+    isRevokeModalOpen,
+    setIsRevokeModalOpen,
+    revoking,
+    currentPage,
+    setCurrentPage,
+    perPage,
+    setPerPage,
+    data,
+    setData,
+    fetchTokens,
+    totalTokens,
+    lastPage,
+    paginatedTokens,
+    createTokenDirectly,
+    handleRevokeToken,
+    confirmRevocation,
+    copyToClipboard,
+  } = useApiSettings(workspace, canManageWorkspace);
 
   // ─── Expiry cell renderer ─────────────────────────────────────────────────
-  const renderExpiry = (token: any) => {
-    const meta = getTokenMeta(token);
+  const renderExpiry = (token: ApiToken) => {
     if (!token.expires_at) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
@@ -188,6 +77,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
         </span>
       );
     }
+    // eslint-disable-next-line react-hooks/purity
     const diffMs = date.getTime() - Date.now();
     const diffH = Math.floor(diffMs / 3_600_000);
     const diffD = Math.floor(diffH / 24);
@@ -219,29 +109,38 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   ? generatedToken
                   : '•'.repeat(generatedToken.length > 40 ? 40 : generatedToken.length)}
               </span>
-              <button
+              <Button
+                variant="ghost"
+                buttonStyle="ghost"
+                className="ml-2 !border-0 !p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 onClick={() => setShowToken(!showToken)}
-                className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 {showToken ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
+              </Button>
             </div>
-            <button
+            <Button
               onClick={() => copyToClipboard(generatedToken)}
-              className="rounded-md bg-green-600 p-3 text-white transition-colors hover:bg-green-700"
+              variant="success"
+              buttonStyle="solid"
+              size="md"
+              icon={<Copy className="h-5 w-5" />}
+              className="p-3"
             >
-              <Copy className="h-5 w-5" />
-            </button>
+              <span className="sr-only">Copiar</span>
+            </Button>
           </div>
-          <button
+          <Button
             onClick={() => {
               setGeneratedToken(null);
               setShowToken(false);
             }}
-            className="text-sm font-medium text-green-800 hover:underline dark:text-green-300"
+            variant="ghost"
+            buttonStyle="underline"
+            size="sm"
+            className="text-sm font-medium text-green-800 hover:text-green-950 dark:text-green-300 dark:hover:text-green-100 border-green-800 dark:border-green-300"
           >
             Lo guardé, cerrar este mensaje
-          </button>
+          </Button>
         </div>
       )}
 
@@ -251,7 +150,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
           {/* Header */}
           <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+              <div className="rounded-lg p-2">
                 <Key className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
@@ -267,28 +166,27 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
 
             {canManageWorkspace && !generatedToken && (
               <form onSubmit={createTokenDirectly} className="flex gap-2">
-                <input
+                <Input
+                  id="name"
                   type="text"
+                  sizeType="md"
                   value={data.name}
                   onChange={(e) => setData('name', e.target.value)}
-                  placeholder={
-                    t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'
-                  }
+                  placeholder={t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'}
                   className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-theme-bg-secondary sm:w-64"
                   required
                 />
-                <button
+
+                <Button
                   type="submit"
                   disabled={isCreating}
-                  className="inline-flex items-center whitespace-nowrap rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
+                  variant="primary"
+                  size="md"
+                  className="inline-flex items-center whitespace-nowrap"
+                  icon={isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
                 >
-                  {isCreating ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="mr-2 h-4 w-4" />
-                  )}
                   {t('workspace.api.generate') || 'Generar'}
-                </button>
+                </Button>
               </form>
             )}
           </div>
@@ -319,9 +217,9 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                     }}
                   />
                   <div className="overflow-x-auto rounded border border-blue-200/50 bg-white/50 p-2 font-mono text-xs dark:border-blue-800/50 dark:bg-black/20">
-                    curl -X GET "https://tu-dominio.com/api/v1/endpoint" \<br />
-                    &nbsp;&nbsp;-H "Authorization: Bearer TU_TOKEN_API" \<br />
-                    &nbsp;&nbsp;-H "Accept: application/json"
+                    curl -X GET &quot;https://tu-dominio.com/api/v1/endpoint&quot; \<br />
+                    &nbsp;&nbsp;-H &quot;Authorization: Bearer TU_TOKEN_API&quot; \<br />
+                    &nbsp;&nbsp;-H &quot;Accept: application/json&quot;
                   </div>
                   <p
                     className="mt-2 text-xs text-blue-600 dark:text-blue-400"
@@ -356,14 +254,16 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
 
               {/* Refresh list button */}
               <div className="flex justify-end">
-                <button
+                <Button
                   onClick={fetchTokens}
                   disabled={loading}
-                  className="inline-flex items-center gap-1.5 text-xs text-neutral-500 transition-colors hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  variant="secondary"
+                  buttonStyle="ghost"
+                  size="xs"
+                  icon={<RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />}
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
                   {t('workspace.api.table.refresh_list')}
-                </button>
+                </Button>
               </div>
 
               {/* Table */}
@@ -436,13 +336,17 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                             {/* Actions */}
                             <td className="whitespace-nowrap px-4 py-3 text-right">
                               {canManageWorkspace && (
-                                <button
+                                <Button
                                   onClick={() => handleRevokeToken(token.id)}
-                                  className="rounded p-1.5 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
+                                  variant="danger"
+                                  buttonStyle="ghost"
+                                  size="sm"
                                   title={t('workspace.api.table.revoke_token')}
+                                  icon={<Trash2 className="h-4 w-4" />}
+                                  className="!border-0 !bg-transparent text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                                 >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
+                                  <span className="sr-only">{t('workspace.api.table.revoke_token')}</span>
+                                </Button>
                               )}
                             </td>
                           </tr>
@@ -580,24 +484,26 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             acceso al instante.
           </p>
           <div className="mt-6 flex justify-end gap-3">
-            <button
+            <Button
               onClick={() => setIsRevokeModalOpen(false)}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700"
+              variant="secondary"
+              buttonStyle="ghost"
+              size="md"
             >
               {t('common.cancel') || 'Cancelar'}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={confirmRevocation}
               disabled={revoking}
-              className="flex items-center gap-2 rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
+              loading={revoking}
+              loadingText={t('common.deleting') || 'Eliminando...'}
+              variant="danger"
+              buttonStyle="solid"
+              size="md"
+              icon={<Trash2 className="h-4 w-4" />}
             >
-              {revoking ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
               {t('common.delete') || 'Eliminar'}
-            </button>
+            </Button>
           </div>
         </div>
       </DynamicModal>

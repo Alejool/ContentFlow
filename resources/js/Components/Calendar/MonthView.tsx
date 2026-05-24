@@ -13,10 +13,10 @@ import {
 } from 'date-fns';
 import React, { useState } from 'react';
 import { DroppableDay } from '@/Components/Calendar/MonthView/DroppableDay';
-import type { MonthViewProps } from '@/Components/Calendar/MonthView/types';
+import type { MonthViewProps } from '@/types/Calendar/monthView';
 import { WeekdayHeaderRow } from '@/Components/Calendar/MonthView/WeekdayHeaderRow';
 
-export type { MonthViewProps, MonthViewPlatformIcon, MonthViewPlatformIconProps } from '@/Components/Calendar/MonthView/types';
+export type { MonthViewProps, MonthViewPlatformIcon, MonthViewPlatformIconProps } from '@/types/Calendar/monthView';
 
 export const MonthView: React.FC<MonthViewProps> = ({
   currentDate,

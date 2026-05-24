@@ -1,4 +1,4 @@
-import type { Role, RolesWorkspace } from '@/Components/Workspace/rolesManagement.types';
+import type { Role, RolesWorkspace } from '@/types/Workspace/rolesManagement';
 
 // Slugs that can never be edited
 const PROTECTED_EDIT_SLUGS = ['owner', 'admin', 'editor'] as const;

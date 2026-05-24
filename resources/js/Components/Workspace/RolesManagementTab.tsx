@@ -5,12 +5,12 @@ import {
   canEditRole,
   getMemberCount,
   isProtectedRole,
-} from '@/Components/Workspace/rolesManagement.helpers';
+} from '@/Utils/Workspace/rolesManagement.helpers';
 import type {
   Permission,
   Role,
   RolesManagementTabProps,
-} from '@/Components/Workspace/rolesManagement.types';
+} from '@/types/Workspace/rolesManagement';
 import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import { router } from '@inertiajs/react';
 import axios from 'axios';

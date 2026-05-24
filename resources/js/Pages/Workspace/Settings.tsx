@@ -88,7 +88,7 @@ export default function WorkspaceSettings({
         );
 
       case 'members':
-        return <MembersManagement roles={roles} workspace={current_workspace} />;
+        return <MembersManagement roles={roles} workspace={current_workspace} canManageMembers={canManageWorkspace} />;
 
       case 'roles':
         return (
