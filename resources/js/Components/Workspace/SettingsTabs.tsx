@@ -1,5 +1,6 @@
 import { TabNavigation } from '@/Components/common/TabNavigation';
 import type { Tab as TabNavigationType } from '@/Components/common/TabNavigation';
+import type { SettingsTab } from '@/Pages/Workspace/types/workspace.types';
 
 interface Tab {
   id: string;
@@ -14,7 +15,7 @@ interface Tab {
 interface SettingsTabsProps {
   tabs: Tab[];
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  onTabChange: (tab: SettingsTab) => void;
   onTabOrderChange?: (newOrder: string[]) => void;
   tabOrder?: string[];
   isDraggable?: boolean;
@@ -51,7 +52,7 @@ export default function SettingsTabs({
       <TabNavigation
         tabs={navigationTabs}
         activeTab={activeTab}
-        onTabChange={onTabChange}
+        onTabChange={(key) => onTabChange(key as SettingsTab)}
         {...(onTabOrderChange && { onTabOrderChange })}
         {...(tabOrder && { tabOrder })}
         isDraggable={isDraggable}
