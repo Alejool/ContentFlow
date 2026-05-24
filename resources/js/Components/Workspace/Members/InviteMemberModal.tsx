@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import Modal from '@/Components/common/ui/Modal';
-import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
+import { buildRoleSelectOptions, getRoleConfig, getRoleLabel } from '@/Utils/Roles/roleHelpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Mail, UserPlus } from 'lucide-react';
@@ -63,23 +63,8 @@ export default function InviteMemberModal({
     // Form errors checking removed from prod logic
   }, [errors]);
 
-  const roleOptions = roles
-    .filter((role) => role.slug !== 'owner')
-    .map((role) => {
-      const config = getRoleConfig(role.slug);
-      const Icon = config.icon;
-      return {
-        value: role.id,
-        label: role.name,
-        icon: (
-          <span
-            className={`inline-flex h-5 w-5 items-center justify-center rounded ${config.badgeClass} bg-opacity-30`}
-          >
-            <Icon className={`h-3 w-3 ${config.textColor}`} />
-          </span>
-        ),
-      };
-    });
+  // Single source of truth: labels + icons come entirely from roleHelpers
+  const roleOptions = buildRoleSelectOptions(roles, t, { iconSize: 'h-3.5 w-3.5' });
 
   const onSubmit = async (data: InviteFormData) => {
     if (!workspace?.id) {
@@ -154,15 +139,9 @@ export default function InviteMemberModal({
                 if (!roleId) return undefined;
                 const selectedRole = roles.find((r) => r.id === roleId);
                 if (!selectedRole) return undefined;
-                const selectedConfig = getRoleConfig(selectedRole.slug);
-                const SelectedIcon = selectedConfig.icon;
-                return (
-                  <span
-                    className={`inline-flex h-5 w-5 items-center justify-center rounded ${selectedConfig.badgeClass} bg-opacity-30`}
-                  >
-                    <SelectedIcon className={`h-3 w-3 ${selectedConfig.textColor}`} />
-                  </span>
-                );
+                const config = getRoleConfig(selectedRole.slug);
+                const Icon = config.icon;
+                return <Icon className={`h-4 w-4 ${config.iconColor}`} />;
               })()}
             />
             {errors.role_id && (

@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
 import RoleBadge from '@/Components/Workspace/Members/RoleBadge';
-import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
+import { buildRoleSelectOptions, getRoleConfig, getRoleLabel } from '@/Utils/Roles/roleHelpers';
 import type { MemberRole, RoleOption, WorkspaceMember } from '@/types/Workspace/MembersManagement';
 import { UserCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -19,21 +19,9 @@ interface MemberRowProps {
   onRemoveMember: (userId: number) => void;
 }
 
-/**
- * Maps a role slug to its i18n key inside the "workspace" namespace.
- * Falls back to the raw role name from the backend if no mapping is found.
- */
-const ROLE_I18N_KEY: Record<string, string> = {
-  owner: 'workspace.owners',
-  admin: 'workspace.admins',
-  editor: 'workspace.editors',
-  member: 'workspace.member',
-  viewer: 'workspace.viewers',
-};
-
 export default function MemberRow({
   member,
-  roleOptions,
+  roles,
   authUserId,
   ownerId,
   canManageMembers,
@@ -44,10 +32,9 @@ export default function MemberRow({
 
   const currentRoleId = member.pivot?.role_id;
   const currentRoleSlug = member.pivot?.role?.slug ?? member.role?.slug ?? '';
-  const currentRoleName =
-    currentRoleSlug && ROLE_I18N_KEY[currentRoleSlug]
-      ? t(ROLE_I18N_KEY[currentRoleSlug], { defaultValue: member.pivot?.role?.name ?? member.role?.name ?? '' })
-      : (member.pivot?.role?.name ?? member.role?.name ?? '');
+
+  // Translated label via the centralized helper — respects active locale
+  const currentRoleName = getRoleLabel(currentRoleSlug, t);
 
   const isSelf = member.id === authUserId;
 
@@ -61,32 +48,19 @@ export default function MemberRow({
     currentRoleSlug === 'owner' ||
     (ownerId !== undefined && Number(member.id) === Number(ownerId));
 
-  // Owner role object to pass to RoleBadge
-  const ownerRoleObj = { slug: 'owner', name: t('workspace.owners', { defaultValue: 'Owner' }) };
+  // Role object passed to RoleBadge — label always translated
+  const currentRoleObj = {
+    slug: isOwner ? 'owner' : currentRoleSlug,
+    name: isOwner ? getRoleLabel('owner', t) : currentRoleName,
+  };
 
-  // Build options for the system Select:
-  // - Exclude 'owner' slug from the assignable list (cannot downgrade/upgrade via dropdown)
-  // - Translate labels via i18n keys
-  // - Attach the role icon for each option
-  const selectOptions = roleOptions
-    .filter((opt) => opt.slug !== 'owner')
-    .map((opt) => {
-      const config = getRoleConfig(opt.slug);
-      const Icon = config.icon;
-      const translatedLabel = ROLE_I18N_KEY[opt.slug]
-        ? t(ROLE_I18N_KEY[opt.slug], { defaultValue: opt.label })
-        : opt.label;
-      return {
-        value: opt.roleId,
-        label: translatedLabel,
-        icon: <Icon className={`h-3.5 w-3.5 ${config.iconColor}`} />,
-      };
-    });
+  // Options for the <Select /> — single source of truth via buildRoleSelectOptions
+  const selectOptions = buildRoleSelectOptions(roles as any[], t);
 
-  // Determine the icon to show in the Select trigger (the currently selected role icon)
-  const selectedRoleConfig = getRoleConfig(currentRoleSlug);
-  const SelectedIcon = selectedRoleConfig.icon;
-  const triggerIcon = <SelectedIcon className={`h-4 w-4 ${selectedRoleConfig.iconColor}`} />;
+  // Icon shown in the Select trigger for the currently selected role
+  const selectedConfig = getRoleConfig(currentRoleSlug);
+  const SelectedTriggerIcon = selectedConfig.icon;
+  const triggerIcon = <SelectedTriggerIcon className={`h-4 w-4 ${selectedConfig.iconColor}`} />;
 
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3">
@@ -121,9 +95,8 @@ export default function MemberRow({
         {isOwner ? (
           /**
            * Owner: always show the rich badge — no role selector, no remove button.
-           * The "You" chip next to the name already communicates it's the current user.
            */
-          <RoleBadge role={ownerRoleObj} showIcon size="md" />
+          <RoleBadge role={currentRoleObj} showIcon size="md" />
         ) : canManageMembers && !isSelf ? (
           <>
             <Select
@@ -148,15 +121,8 @@ export default function MemberRow({
             </Button>
           </>
         ) : (
-          /* Non-owner viewing their own row, or user without manage permission */
-          <RoleBadge
-            role={{
-              slug: currentRoleSlug,
-              name: currentRoleName,
-            }}
-            showIcon
-            size="md"
-          />
+          /* Non-owner on their own row, or user without manage permission */
+          <RoleBadge role={currentRoleObj} showIcon size="md" />
         )}
       </div>
     </div>
