@@ -1,7 +1,7 @@
 import type { Tab as TabNavigationType } from '@/Components/common/TabNavigation';
 import { TabNavigation } from '@/Components/common/TabNavigation';
 
-import type { SettingsTab } from '@/Pages/Workspace/settings.types';
+import type { SettingsTab } from '@/types/settings.types';
 import type { LucideIcon } from 'lucide-react';
 
 interface Tab {

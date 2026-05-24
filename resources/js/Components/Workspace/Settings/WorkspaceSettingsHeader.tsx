@@ -1,5 +1,5 @@
-import WorkspaceInfoBadge from '@/Components/Workspace/WorkspaceInfoBadge';
-import { WorkspaceLogo } from '@/Components/Workspace/WorkspaceLogo';
+import WorkspaceInfoBadge from '@/Components/Workspace/Core/WorkspaceInfoBadge';
+import { WorkspaceLogo } from '@/Components/Workspace/Core/WorkspaceLogo';
 import { Globe, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

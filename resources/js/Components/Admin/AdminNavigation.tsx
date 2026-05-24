@@ -1,4 +1,4 @@
-import SettingsTabs from '@/Components/Workspace/SettingsTabs';
+import SettingsTabs from '@/Components/Workspace/Settings/SettingsTabs';
 import { router } from '@inertiajs/react';
 import { Bell, CreditCard, LayoutDashboard, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

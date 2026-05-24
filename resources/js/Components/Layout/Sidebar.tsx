@@ -1,5 +1,5 @@
 import NavLink from '@/Components/common/ui/NavLink';
-import WorkspaceSwitcher from '@/Components/Workspace/WorkspaceSwitcher';
+import WorkspaceSwitcher from '@/Components/Workspace/Core/WorkspaceSwitcher';
 import { NAV_SECTIONS, getRouteUrl, isRouteActive, isSectionActive } from '@/Constants/navigation';
 import type { NavRoute, NavSection } from '@/types/navigation';
 import { useTheme } from '@/Hooks/Layout/useTheme';

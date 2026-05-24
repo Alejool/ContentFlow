@@ -12,8 +12,8 @@ import {
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
-import AvatarStack from '@/Components/Workspace/AvatarStack';
-import RoleBadge from '@/Components/Workspace/RoleBadge';
+import AvatarStack from '@/Components/Workspace/Members/AvatarStack';
+import RoleBadge from '@/Components/Workspace/Members/RoleBadge';
 import Button from '@/Components/common/Modern/Button';
 import { ContextMenu } from '@/Components/common/Modern/ContextMenu';
 

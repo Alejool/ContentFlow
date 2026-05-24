@@ -1,4 +1,4 @@
-import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
+import InviteMemberModal from '@/Components/Workspace/Members/InviteMemberModal';
 import Button from '@/Components/common/Modern/Button';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import { queryKeys } from '@/lib/common/queryKeys';
@@ -10,8 +10,8 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useMembersManagement } from '@/Hooks/Workspace/useMembersManagement';
-import MemberRow from '@/Components/Workspace/MemberRow';
-import MembersManagementStats from '@/Components/Workspace/MembersManagementStats';
+import MemberRow from '@/Components/Workspace/Members/MemberRow';
+import MembersManagementStats from '@/Components/Workspace/Members/MembersManagementStats';
 import type { MembersManagementProps } from '@/types/Workspace/MembersManagement';
 
 type MembersManagementPageProps = PageProps & {

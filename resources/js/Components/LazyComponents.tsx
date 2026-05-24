@@ -38,11 +38,11 @@ export const LazyVideoEditor = createLazyComponent(() => import('@/Components/Up
 
 // Modales pesados
 export const LazyCreateWorkspaceModal = createLazyComponent(
-  () => import('@/Components/Workspace/CreateWorkspaceModal'),
+  () => import('@/Components/Workspace/Core/CreateWorkspaceModal'),
 );
 
 export const LazyInviteMemberModal = createLazyComponent(
-  () => import('@/Components/Workspace/InviteMemberModal'),
+  () => import('@/Components/Workspace/Members/InviteMemberModal'),
 );
 
 export const LazyPlatformSettingsModal = createLazyComponent(
@@ -64,15 +64,15 @@ export const LazyAiPromptSection = createLazyComponent(
 
 // Workspace components
 export const LazyWorkspaceSwitcher = createLazyComponent(
-  () => import('@/Components/Workspace/WorkspaceSwitcher'),
+  () => import('@/Components/Workspace/Core/WorkspaceSwitcher'),
 );
 
 export const LazyMembersManagement = createLazyComponent(
-  () => import('@/Components/Workspace/MembersManagement'),
+  () => import('@/Components/Workspace/Members/MembersManagement'),
 );
 
 export const LazyRolesManagementTab = createLazyComponent(
-  () => import('@/Components/Workspace/RolesManagementTab'),
+  () => import('@/Components/Workspace/Settings/RolesManagementTab'),
 );
 
 // Upload components

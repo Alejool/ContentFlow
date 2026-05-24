@@ -23,7 +23,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import ActivityLogSkeleton from '@/Components/Workspace/ActivityLogSkeleton';
+import ActivityLogSkeleton from '@/Components/Workspace/Core/ActivityLogSkeleton';
 
 interface IntegrationsSettingsTabProps {
   workspace: any;

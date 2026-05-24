@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@/Components/common/Modern/Button';
-import CreateWorkspaceCard from '@/Components/Workspace/CreateWorkspaceCard';
-import CreateWorkspaceModal from '@/Components/Workspace/CreateWorkspaceModal';
-import WorkspaceCard from '@/Components/Workspace/WorkspaceCard';
+import CreateWorkspaceCard from '@/Components/Workspace/Core/CreateWorkspaceCard';
+import CreateWorkspaceModal from '@/Components/Workspace/Core/CreateWorkspaceModal';
+import WorkspaceCard from '@/Components/Workspace/Core/WorkspaceCard';
 import type { AuthPageProps, Role, Workspace } from '@/types';
 import { Plus } from 'lucide-react';
 

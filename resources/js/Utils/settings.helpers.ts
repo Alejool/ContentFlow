@@ -9,7 +9,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import type { SettingsAuth, SettingsTab, SettingsWorkspace, TabDefinition } from '@/Pages/Workspace/settings.types';
+import type { SettingsAuth, SettingsTab, SettingsWorkspace, TabDefinition } from '@/types/settings.types';
 
 // ── Role / permission resolution ──────────────────────────────────
 

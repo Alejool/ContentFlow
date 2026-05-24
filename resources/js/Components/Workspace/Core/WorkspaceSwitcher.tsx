@@ -1,5 +1,5 @@
 import { useForm, usePage } from '@inertiajs/react';
-import WorkspaceDropdown from '@/Components/Workspace/WorkspaceDropdown';
+import WorkspaceDropdown from '@/Components/Workspace/Core/WorkspaceDropdown';
 
 export default function WorkspaceSwitcher({ isSidebarOpen }: { isSidebarOpen: boolean }) {
   const { auth } = usePage().props as any;

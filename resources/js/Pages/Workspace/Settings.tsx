@@ -1,14 +1,14 @@
-import ApiSettingsTab from '@/Components/Workspace/ApiSettingsTab';
-import ApprovalWorkflowsTab from '@/Components/Workspace/ApprovalWorkflowsTab';
-import GeneralSettingsTab from '@/Components/Workspace/GeneralSettingsTab';
-import IntegrationsSettingsTab from '@/Components/Workspace/IntegrationsSettingsTab';
-import MembersManagement from '@/Components/Workspace/MembersManagement';
-import OverviewTab from '@/Components/Workspace/OverviewTab';
-import PlanUsageTab from '@/Components/Workspace/PlanUsageTab';
-import RolesManagementTab from '@/Components/Workspace/RolesManagementTab';
-import SettingsTabs from '@/Components/Workspace/SettingsTabs';
-import WhiteLabelSettingsTab from '@/Components/Workspace/WhiteLabelSettingsTab';
-import WorkspaceSettingsHeader from '@/Components/Workspace/WorkspaceSettingsHeader';
+import ApiSettingsTab from '@/Components/Workspace/Settings/ApiSettingsTab';
+import ApprovalWorkflowsTab from '@/Components/Workspace/Settings/ApprovalWorkflowsTab';
+import GeneralSettingsTab from '@/Components/Workspace/Settings/GeneralSettingsTab';
+import IntegrationsSettingsTab from '@/Components/Workspace/Settings/IntegrationsSettingsTab';
+import MembersManagement from '@/Components/Workspace/Members/MembersManagement';
+import OverviewTab from '@/Components/Workspace/Settings/OverviewTab';
+import PlanUsageTab from '@/Components/Workspace/Settings/PlanUsageTab';
+import RolesManagementTab from '@/Components/Workspace/Settings/RolesManagementTab';
+import SettingsTabs from '@/Components/Workspace/Settings/SettingsTabs';
+import WhiteLabelSettingsTab from '@/Components/Workspace/Settings/WhiteLabelSettingsTab';
+import WorkspaceSettingsHeader from '@/Components/Workspace/Settings/WorkspaceSettingsHeader';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
@@ -22,8 +22,8 @@ import {
   resolvePlanId,
   resolveUserRole,
   saveTabOrder,
-} from '@/Pages/Workspace/settings.helpers';
-import type { SettingsTab, WorkspaceSettingsProps } from '@/Pages/Workspace/settings.types';
+} from '@/Utils/settings.helpers';
+import type { SettingsTab, WorkspaceSettingsProps } from '@/types/settings.types';
 
 const EMPTY_ROLES: NonNullable<WorkspaceSettingsProps['roles']> = [];
 const EMPTY_PERMISSIONS: NonNullable<WorkspaceSettingsProps['permissions']> = [];

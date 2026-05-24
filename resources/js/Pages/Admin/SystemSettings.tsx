@@ -1,5 +1,5 @@
 import AdminNavigation from '@/Components/Admin/AdminNavigation';
-import SettingsTabs from '@/Components/Workspace/SettingsTabs';
+import SettingsTabs from '@/Components/Workspace/Settings/SettingsTabs';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
 import Switch from '@/Components/common/Modern/Switch';

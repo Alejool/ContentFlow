@@ -21,8 +21,8 @@ import {
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import CreateRoleModal from '@/Components/Workspace/CreateRoleModal';
-import InviteMemberModal from '@/Components/Workspace/InviteMemberModal';
+import CreateRoleModal from '@/Components/Workspace/Members/CreateRoleModal';
+import InviteMemberModal from '@/Components/Workspace/Members/InviteMemberModal';
 
 // @ts-ignore
 declare global {
