@@ -12,8 +12,8 @@ interface MemberRowProps {
   roles: MemberRole[];
   currentWorkspace: { id: number | string };
   authUserId: number;
-  /** Id of the workspace creator — dual check alongside role slug */
-  ownerId?: number | string;
+  /** Id of the workspace creator — dual check alongside role slug. Explicitly accepts undefined. */
+  ownerId?: number | string | undefined;
   canManageMembers: boolean;
   onRoleChange: (userId: number, roleId: number) => void;
   onRemoveMember: (userId: number) => void;
@@ -101,7 +101,7 @@ export default function MemberRow({
           <>
             <Select
               id={`role-select-${member.id}`}
-              size="sm"
+              size="md"
               value={currentRoleId ?? ''}
               onChange={(val) => onRoleChange(member.id, Number(val))}
               options={selectOptions}

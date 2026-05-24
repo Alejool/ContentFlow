@@ -54,7 +54,7 @@ export function useMembersManagement(
   // ── Queries & mutations ────────────────────────────────────────
   const { data: members = [], isLoading } = useWorkspaceMembers(workspaceId);
 
-  const updateRoleMutation = useUpdateMemberRole(workspaceId);
+  const updateRoleMutation = useUpdateMemberRole(workspaceId, roles);
   const removeMemberMutation = useRemoveWorkspaceMember(workspaceId);
 
   // ── Derived values ─────────────────────────────────────────────

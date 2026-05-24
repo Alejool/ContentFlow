@@ -1,5 +1,6 @@
 import Label from '@/Components/common/Modern/Label';
 import { AlertCircle, Check, CheckCircle, ChevronDown, Search, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ReactNode, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
@@ -27,6 +28,7 @@ function DropdownPortal({
     return () => setMounted(false);
   }, []);
 
+  // Position the portal-rendered dropdown relative to the trigger button
   useEffect(() => {
     if (usePortal && isOpen && selectRect && dropdownRef.current) {
       const dropdown = dropdownRef.current;
@@ -39,27 +41,22 @@ function DropdownPortal({
 
       if (dropdownDirection === 'up') {
         const topPosition = selectRect.top - dropdownHeight - 4;
-        if (topPosition > 0) {
-          dropdown.style.top = `${topPosition}px`;
-          dropdown.style.bottom = 'auto';
-        } else {
-          dropdown.style.top = `${selectRect.bottom + 4}px`;
-          dropdown.style.bottom = 'auto';
-        }
+        dropdown.style.top = topPosition > 0
+          ? `${topPosition}px`
+          : `${selectRect.bottom + 4}px`;
+        dropdown.style.bottom = 'auto';
       } else {
         const bottomPosition = viewportHeight - (selectRect.bottom + 4 + dropdownHeight);
-        if (bottomPosition > 0) {
-          dropdown.style.top = `${selectRect.bottom + 4}px`;
-          dropdown.style.bottom = 'auto';
-        } else {
-          dropdown.style.top = `${selectRect.top - dropdownHeight - 4}px`;
-          dropdown.style.bottom = 'auto';
-        }
+        dropdown.style.top = bottomPosition > 0
+          ? `${selectRect.bottom + 4}px`
+          : `${selectRect.top - dropdownHeight - 4}px`;
+        dropdown.style.bottom = 'auto';
       }
     }
   }, [isOpen, selectRect, dropdownDirection, usePortal]);
 
-  if (!isOpen || (usePortal && (!mounted || !selectRect))) return null;
+  // For portal mode we need the DOM to be mounted
+  if (usePortal && !mounted) return null;
 
   const portalStyles: React.CSSProperties = {
     position: usePortal ? 'fixed' : 'absolute',
@@ -68,29 +65,53 @@ function DropdownPortal({
     width: '100%',
     minWidth: '120px',
     overflowY: 'auto',
-    transition: 'opacity 150ms ease-out, transform 150ms ease-out',
-    opacity: isOpen ? 1 : 0,
-    transform: isOpen ? 'scale(1)' : 'scale(0.95)',
-    transformOrigin: dropdownDirection === 'up' ? 'bottom center' : 'top center',
     borderRadius: '0.5rem',
     borderWidth: '1px',
     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   };
 
+  const motionVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.96,
+      y: dropdownDirection === 'up' ? 6 : -6,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.96,
+      y: dropdownDirection === 'up' ? 6 : -6,
+      transition: { duration: 0.1, ease: 'easeIn' },
+    },
+  };
+
   const content = (
-    <div
-      ref={dropdownRef}
-      style={portalStyles}
-      className={`border border-gray-200 bg-white dark:border-neutral-700 dark:bg-theme-bg-secondary ${
-        !usePortal
-          ? dropdownDirection === 'up'
-            ? 'bottom-full left-0 mb-1'
-            : 'top-full left-0 mt-1'
-          : ''
-      }`}
-    >
-      {children}
-    </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          ref={dropdownRef}
+          style={portalStyles}
+          variants={motionVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          className={`border border-gray-200 bg-white dark:border-neutral-700 dark:bg-theme-bg-secondary ${
+            !usePortal
+              ? dropdownDirection === 'up'
+                ? 'bottom-full left-0 mb-1'
+                : 'top-full left-0 mt-1'
+              : ''
+          }`}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 
   if (!usePortal) {

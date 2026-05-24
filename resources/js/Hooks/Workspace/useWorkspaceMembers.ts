@@ -40,7 +40,11 @@ export function useWorkspaceMembers(workspaceId: number | undefined) {
   });
 }
 
-export function useUpdateMemberRole(workspaceId: number) {
+export function useUpdateMemberRole(
+  workspaceId: number,
+  /** Pass all available roles so the optimistic update can resolve slug+name immediately */
+  roles: Array<{ id: number; slug: string; name: string }> = [],
+) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -52,15 +56,32 @@ export function useUpdateMemberRole(workspaceId: number) {
         }),
         { role_id: roleId },
       ),
-    // Optimistic update: swap role immediately in cache
+    /**
+     * Optimistic update: swap role_id AND role slug/name immediately in cache.
+     * Without patching pivot.role the badge & trigger icon would stay stale
+     * until the background refetch completes.
+     */
     onMutate: async ({ userId, roleId }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.members.list(workspaceId) });
       const prev = queryClient.getQueryData<WorkspaceMember[]>(queryKeys.members.list(workspaceId));
+      const newRole = roles.find((r) => r.id === roleId);
       queryClient.setQueryData<WorkspaceMember[]>(
         queryKeys.members.list(workspaceId),
         (old) =>
           old?.map((m) =>
-            m.id === userId && m.pivot ? { ...m, pivot: { ...m.pivot, role_id: roleId } } : m,
+            m.id === userId && m.pivot
+              ? {
+                  ...m,
+                  pivot: {
+                    ...m.pivot,
+                    role_id: roleId,
+                    // Patch slug & name so the UI reflects the change instantly
+                    role: newRole
+                      ? { slug: newRole.slug, name: newRole.name }
+                      : m.pivot.role,
+                  },
+                }
+              : m,
           ) ?? [],
       );
       return { prev };
