@@ -12,6 +12,8 @@ interface MemberRowProps {
   roles: MemberRole[];
   currentWorkspace: { id: number | string };
   authUserId: number;
+  /** Id of the workspace creator — dual check alongside role slug */
+  ownerId?: number | string;
   canManageMembers: boolean;
   onRoleChange: (userId: number, roleId: number) => void;
   onRemoveMember: (userId: number) => void;
@@ -21,6 +23,7 @@ export default function MemberRow({
   member,
   roleOptions,
   authUserId,
+  ownerId,
   canManageMembers,
   onRoleChange,
   onRemoveMember,
@@ -31,7 +34,19 @@ export default function MemberRow({
   const currentRoleSlug = member.pivot?.role?.slug ?? member.role?.slug ?? '';
   const currentRoleName = member.pivot?.role?.name ?? member.role?.name ?? '';
   const isSelf = member.id === authUserId;
-  const isOwner = currentRoleSlug === 'owner';
+
+  /**
+   * A member is the owner if:
+   *  1. Their role slug is explicitly 'owner', OR
+   *  2. Their id matches workspace.created_by (backend sometimes doesn't
+   *     assign an explicit role to the creator)
+   */
+  const isOwner =
+    currentRoleSlug === 'owner' ||
+    (ownerId !== undefined && Number(member.id) === Number(ownerId));
+
+  // Owner role object to pass to RoleBadge
+  const ownerRoleObj = { slug: 'owner', name: currentRoleName || 'Owner' };
 
   // Build options for the system Select — each option gets an icon from roleHelpers
   const selectOptions = roleOptions
@@ -76,13 +91,12 @@ export default function MemberRow({
 
       {/* Role selector + remove */}
       <div className="flex shrink-0 items-center gap-2">
-        {/* Owner: always show a rich badge — no selector, no remove */}
         {isOwner ? (
-          <RoleBadge
-            role={{ slug: currentRoleSlug, name: currentRoleName || 'Owner' }}
-            showIcon
-            size="md"
-          />
+          /**
+           * Owner: always show the rich badge — no role selector, no remove button.
+           * The "You" chip next to the name already communicates it's the current user.
+           */
+          <RoleBadge role={ownerRoleObj} showIcon size="md" />
         ) : canManageMembers && !isSelf ? (
           <>
             <Select
@@ -104,9 +118,12 @@ export default function MemberRow({
             </Button>
           </>
         ) : (
-          /* Non-owner viewing their own row or no manage permission */
+          /* Non-owner viewing their own row, or user without manage permission */
           <RoleBadge
-            role={{ slug: currentRoleSlug, name: currentRoleName }}
+            role={{
+              slug: currentRoleSlug,
+              name: currentRoleName,
+            }}
             showIcon
             size="md"
           />

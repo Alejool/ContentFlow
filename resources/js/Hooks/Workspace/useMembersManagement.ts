@@ -74,6 +74,8 @@ export function useMembersManagement(
     roleOptions,
     canManageMembers,
     currentWorkspace: workspace,
+    /** Id of the workspace creator — used to detect owner independently of role slug */
+    ownerId: workspace.created_by,
     handleRoleChange,
     removeMemberMutation,
   };

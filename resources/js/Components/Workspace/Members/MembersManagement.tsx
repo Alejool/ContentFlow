@@ -34,6 +34,7 @@ export default function MembersManagement({ roles = [], workspace, canManageMemb
     stats,
     handleRoleChange,
     currentWorkspace,
+    ownerId,
     removeMemberMutation,
   } = useMembersManagement(workspace, roles, canManageMembers);
 
@@ -103,6 +104,7 @@ export default function MembersManagement({ roles = [], workspace, canManageMemb
               roles={roles}
               currentWorkspace={currentWorkspace}
               authUserId={Number(auth.user.id)}
+              ownerId={ownerId}
               canManageMembers={canManageMembers}
               onRoleChange={handleRoleChange}
               onRemoveMember={initiateRemoveMember}

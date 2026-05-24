@@ -20,6 +20,8 @@ export interface WorkspaceMember {
 
 export interface MembersWorkspace {
   id: number | string;
+  /** The user id of the workspace creator/owner */
+  created_by?: number | string;
   users?: WorkspaceMember[];
 }
 
