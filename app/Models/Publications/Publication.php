@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Social\SocialPostLog;
@@ -119,7 +120,7 @@ class Publication extends Model
     'content_metadata',
   ];
 
-  protected $appends = ['platform_status_summary', 'media_locked_by', 'approval_lock'];
+  protected $appends = ['platform_status_summary', 'media_locked_by', 'approval_lock', 'can_submit_for_approval'];
 
 
   protected $casts = [
@@ -660,6 +661,19 @@ class Publication extends Model
       ];
     }
     return null;
+  }
+
+  public function getCanSubmitForApprovalAttribute(): bool
+  {
+    if (!Auth::check()) {
+      return false;
+    }
+
+    try {
+      return Gate::forUser(Auth::user())->allows('submitForApproval', $this);
+    } catch (\Throwable $e) {
+      return false;
+    }
   }
 
   public function activities(): HasMany

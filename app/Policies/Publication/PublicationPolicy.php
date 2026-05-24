@@ -2,6 +2,7 @@
 
 namespace App\Policies\Publication;
 
+use App\Models\Auth\Permission;
 use App\Models\User;
 use App\Models\Publications\Publication;
 use App\Models\Workspace\Workspace;
@@ -25,6 +26,8 @@ class PublicationPolicy
      */
     public function submitForApproval(User $user, Publication $publication): bool
     {
+
+        
         $workspace = $publication->workspace;
 
         // Get user's role in workspace
@@ -38,19 +41,27 @@ class PublicationPolicy
             return false;
         }
 
+        \Log::info('submitForApproval: Checking permissions for user', [
+            'user_id' => $user->id,
+            'workspace_id' => $workspace->id,
+            'role' => $userRole->slug,
+        ]);
+
         // Usuarios con 'manage-content' O 'publish' pueden enviar a revisión
-        // Admin y Owner siempre pueden (tienen todos los permisos)
-        $isAdminOrOwner = in_array($userRole->slug, ['owner', 'admin']);
+        // Owner, Admin y roles híbridos como admin-owner siempre pueden
+        $isAdminOrOwner = in_array($userRole->slug, [Role::OWNER, Role::ADMIN, 'admin-owner']);
         $hasManageContent = $this->roleService->userHasPermission($user, $workspace, 'manage-content');
         $hasPublishPermission = $this->roleService->userHasPermission($user, $workspace, 'publish');
+        $hasSubmitApprovalPermission = $this->roleService->userHasPermission($user, $workspace, Permission::SUBMIT_FOR_APPROVAL);
         
-        if (!$isAdminOrOwner && !$hasManageContent && !$hasPublishPermission) {
-            \Log::warning('submitForApproval: User lacks manage-content or publish permission', [
+        if (!$isAdminOrOwner && !$hasManageContent && !$hasPublishPermission && !$hasSubmitApprovalPermission) {
+            \Log::warning('submitForApproval: User lacks required permission to submit for approval', [
                 'user_id' => $user->id,
                 'workspace_id' => $workspace->id,
                 'role' => $userRole->slug,
                 'has_manage_content' => $hasManageContent,
                 'has_publish' => $hasPublishPermission,
+                'has_submit_for_approval' => $hasSubmitApprovalPermission,
             ]);
             return false;
         }
@@ -126,7 +137,22 @@ class PublicationPolicy
             return false;
         }
 
-        return $userRole->id === $currentLevel->role_id;
+        // Check if assigned to specific user
+        if ($currentLevel->user_id && $user->id === $currentLevel->user_id) {
+            return true;
+        }
+
+        // Check if assigned to specific users via pivot table
+        if ($currentLevel->users()->where('users.id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if assigned to role
+        if ($currentLevel->role_id && $userRole->id === $currentLevel->role_id) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -294,8 +320,8 @@ class PublicationPolicy
             return false;
         }
 
-        // Only Admin and Owner can manually resolve
-        return in_array($userRole->slug, [Role::ADMIN, Role::OWNER]);
+        // Only Admin, Owner and hybrid admin-owner can manually resolve
+        return in_array($userRole->slug, [Role::ADMIN, Role::OWNER, 'admin-owner']);
     }
 
     /**
@@ -316,8 +342,8 @@ class PublicationPolicy
             return false;
         }
 
-        // Only Owner can bypass approval workflow
-        return $userRole->slug === Role::OWNER;
+        // Owner-like roles can bypass the workflow
+        return in_array($userRole->slug, [Role::OWNER, 'admin-owner']);
     }
 
     /**
@@ -347,16 +373,16 @@ class PublicationPolicy
         $workflowEnabled = $workflow && $workflow->is_enabled;
 
         if ($workflowEnabled) {
-            // When workflow is ENABLED: ONLY Owner can publish directly
+            // When workflow is ENABLED: ONLY Owner-like roles can publish directly
             // Admin and everyone else must go through the workflow
-            if ($userRole->slug === Role::OWNER) {
+            if (in_array($userRole->slug, [Role::OWNER, 'admin-owner'])) {
                 return 'publish';
             }
             return 'review';
         } else {
             // When NO workflow: Both Admin and Owner can publish directly
             // Everyone else must send to review
-            $isAdminOrOwner = in_array($userRole->slug, [Role::ADMIN, Role::OWNER]);
+            $isAdminOrOwner = in_array($userRole->slug, [Role::ADMIN, Role::OWNER, 'admin-owner']);
             if ($isAdminOrOwner) {
                 return 'publish';
             }
@@ -374,6 +400,11 @@ class PublicationPolicy
             ->first();
 
         if (!$workspaceUser || !$workspaceUser->pivot->role_id) {
+            // Workspace owner may not always have an explicit pivot role entry,
+            // especially for legacy or auto-created workspaces.
+            if ($workspace->created_by === $user->id) {
+                return Role::where('slug', Role::OWNER)->first();
+            }
             return null;
         }
 

@@ -112,6 +112,7 @@ export type Publication = {
       steps?: { id: number; name: string; step_order: number }[];
     };
   };
+  can_submit_for_approval?: boolean;
   approval_logs?: ApprovalLog[];
   // Nuevo sistema simplificado: approval_request activo
   approval_request?: import('@/types/Approval/ApprovalTypes').ApprovalRequest;

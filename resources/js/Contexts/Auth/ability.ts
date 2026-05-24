@@ -1,4 +1,5 @@
-import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
+import { AbilityBuilder, createMongoAbility, type MongoAbility, type MongoQuery } from '@casl/ability';
+import { PERMISSION_SLUGS, type PermissionSlug } from '@/Constants/permissions';
 
 export type Actions =
   | 'create'
@@ -13,86 +14,111 @@ export type Actions =
 
 export type Subjects = 'Publication' | 'ApprovalRequest' | 'Campaign' | 'MediaFile' | 'all';
 
-export type AppAbility = MongoAbility<[Actions, Subjects]>;
+export type AppAbility = MongoAbility<[Actions, Subjects], MongoQuery<Record<string, any>>>;
 
-/**
- * Define abilities for a user based on their role and permissions
- *
- * @param user - The authenticated user
- * @param workspace - The current workspace with user's role and permissions
- * @returns AppAbility - The ability instance
- */
-export function defineAbilityFor(user: any, workspace: any): AppAbility {
-  const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
+export type AuthUser = {
+  id?: string | number;
+};
 
-  const userRole = workspace?.user_role_slug;
-  const permissions = workspace?.permissions || [];
+export type AuthWorkspace = {
+  user_role_slug?: string;
+  permissions?: Array<PermissionSlug | string>;
+};
 
-  // Owner can do everything - explicit permissions for better CASL compatibility
-  if (userRole === 'owner') {
-    can('manage', 'all');
+export type AbilityCan = AbilityBuilder<AppAbility>['can'];
+
+const grantOwnerAbilities = (can: AbilityCan): void => {
+  // Owner tiene acceso total sobre el sistema.
+  // En CASL, esto se representa con manage + all.
+  can('manage', 'all');
+};
+
+const grantAdminAbilities = (can: AbilityCan): void => {
+  can('read', 'Publication');
+  can('create', 'Publication');
+  can('update', 'Publication');
+  can('delete', 'Publication');
+  can('approve', 'ApprovalRequest');
+  can('reject', 'ApprovalRequest');
+  can('publish', 'Publication');
+  can('submit_for_approval', 'Publication');
+  can('manage', 'Campaign');
+  can('manage', 'MediaFile');
+};
+
+const grantPermissionRules = (can: AbilityCan, permissions: PermissionSlug[], user: AuthUser): void => {
+  if (permissions.includes(PERMISSION_SLUGS.manageContent)) {
+    can('read', 'Publication');
+    can('create', 'Publication');
+
+    if (user.id !== undefined) {
+      const canWithConditions = can as unknown as (
+        action: Actions,
+        subject: Subjects,
+        conditions?: Record<string, any>,
+      ) => void;
+
+      canWithConditions('update', 'Publication', {
+        user_id: { $eq: user.id },
+      });
+    }
+
+    can('submit_for_approval', 'Publication');
+    can('read', 'Campaign');
+    can('read', 'MediaFile');
+  }
+
+  if (permissions.includes(PERMISSION_SLUGS.approve)) {
     can('approve', 'ApprovalRequest');
     can('reject', 'ApprovalRequest');
+  }
+
+  if (permissions.includes(PERMISSION_SLUGS.publishContent)) {
     can('publish', 'Publication');
     can('submit_for_approval', 'Publication');
+  }
+
+  if (permissions.includes(PERMISSION_SLUGS.submitForApproval)) {
+    can('submit_for_approval', 'Publication');
+  }
+
+  if (permissions.includes(PERMISSION_SLUGS.viewContent)) {
+    can('read', 'Publication');
+    can('read', 'Campaign');
+    can('read', 'MediaFile');
+  }
+};
+
+/**
+ * Define abilities for a user based on their role and permissions.
+ *
+ * `can('manage', 'all')` se usa solo cuando el usuario debe tener acceso total.
+ * Para permisos específicos, se deben mapear a acciones y sujetos concretos.
+ */
+export function defineAbilityFor(user: AuthUser, workspace: AuthWorkspace): AppAbility {
+  const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
+
+  const userRole = workspace.user_role_slug;
+  const permissions: PermissionSlug[] = Array.isArray(workspace.permissions)
+    ? workspace.permissions.filter((permission): permission is PermissionSlug => typeof permission === 'string')
+    : [];
+
+  if (userRole === 'owner') {
+    grantOwnerAbilities(can);
     return build();
   }
 
-  // Admin permissions
   if (userRole === 'admin') {
-    can('read', 'Publication');
-    can('create', 'Publication');
-    can('update', 'Publication');
-    can('delete', 'Publication');
-    can('approve', 'ApprovalRequest');
-    can('reject', 'ApprovalRequest');
-    can('publish', 'Publication'); // Puede publicar solo si no hay workflow o si está aprobado
-    can('submit_for_approval', 'Publication'); // Puede enviar a revisión cuando hay workflow
-    can('manage', 'Campaign');
-    can('manage', 'MediaFile');
+    grantAdminAbilities(can);
   }
 
-  // Editor permissions
-  if (permissions.includes('manage-content')) {
-    can('read', 'Publication');
-    can('create', 'Publication');
-    can('update', 'Publication', { user_id: user.id }); // Own content only
-    can('submit_for_approval', 'Publication'); // Editores PUEDEN enviar a revisión
-    can('read', 'Campaign');
-    can('read', 'MediaFile');
-  }
-
-  // Approve permission (explicit approve permission)
-  if (permissions.includes('approve')) {
-    can('approve', 'ApprovalRequest');
-    can('reject', 'ApprovalRequest');
-  }
-
-  // Publish permission (Publisher role)
-  // Usuarios con permiso "publish" pueden publicar directamente Y enviar a revisión
-  if (permissions.includes('publish')) {
-    can('publish', 'Publication'); // Puede publicar solo si no hay workflow o si está aprobado
-    can('submit_for_approval', 'Publication'); // También pueden enviar a revisión
-  }
-
-  // Viewer permissions
-  if (permissions.includes('view-content')) {
-    can('read', 'Publication');
-    can('read', 'Campaign');
-    can('read', 'MediaFile');
-  }
+  grantPermissionRules(can, permissions, user);
 
   return build();
 }
 
 /**
- * Check if user can perform an action on a subject
- *
- * @param ability - The ability instance
- * @param action - The action to check
- * @param subject - The subject to check
- * @param field - Optional field to check
- * @returns boolean
+ * Check if user can perform an action on a subject.
  */
 export function checkAbility(
   ability: AppAbility,
