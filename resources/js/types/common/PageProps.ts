@@ -1,4 +1,4 @@
-import type { User } from './User';
+import type { User } from '@/types/common/User';
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {

@@ -2,8 +2,8 @@ import { useTheme } from '@/Hooks/Layout/useTheme';
 import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import { Users, MapPin } from 'lucide-react';
-import Skeleton from '../common/ui/Skeleton';
-import EmptyState from '../common/ui/EmptyState';
+import Skeleton from '@/Components/common/ui/Skeleton';
+import EmptyState from '@/Components/common/ui/EmptyState';
 
 interface DemographicData {
   age: { name: string; value: number }[];

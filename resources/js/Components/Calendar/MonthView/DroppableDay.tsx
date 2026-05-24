@@ -4,8 +4,8 @@ import { useDroppable } from '@dnd-kit/core';
 import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
 import React from 'react';
-import { DraggableEvent } from './DraggableEvent';
-import type { DroppableDayProps } from './types';
+import { DraggableEvent } from '@/Components/Calendar/MonthView/DraggableEvent';
+import type { DroppableDayProps } from '@/Components/Calendar/MonthView/types';
 
 export const DroppableDay: React.FC<DroppableDayProps> = ({
   day,

@@ -1,5 +1,5 @@
 import i18n from 'i18next';
-import { getUserTimezone } from './date';
+import { getUserTimezone } from '@/Utils/formatters/date';
 
 export function formatSpeed(bytesPerSecond: number): string {
   if (bytesPerSecond === 0) return '0 B/s';

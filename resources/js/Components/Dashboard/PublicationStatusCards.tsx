@@ -4,7 +4,7 @@ import { animate, motion, useMotionValue } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PublicationStatusCard } from './PublicationStatusCard';
+import { PublicationStatusCard } from '@/Components/Dashboard/PublicationStatusCard';
 
 interface PublicationStatusCardsProps {
   stats: Record<string, number>;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { OfflineIndicator } from './OfflineIndicator';
-import { PendingOperationsList } from './PendingOperationsList';
-import { OfflineDisabledWrapper } from './OfflineDisabledWrapper';
+import { OfflineIndicator } from '@/Components/Offline/OfflineIndicator';
+import { PendingOperationsList } from '@/Components/Offline/PendingOperationsList';
+import { OfflineDisabledWrapper } from '@/Components/Offline/OfflineDisabledWrapper';
 import { useOfflineDisable } from '@/Hooks/Offline/useOfflineDisable';
 import { X } from 'lucide-react';
 

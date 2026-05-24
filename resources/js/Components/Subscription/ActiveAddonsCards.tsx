@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useActiveAddons } from '@/Hooks/Addons/useActiveAddons';
 import { CarouselPagination, CarouselDots } from '@/Components/common/CarouselPagination';
-import { AddonCard } from './AddonCard';
+import { AddonCard } from '@/Components/Subscription/AddonCard';
 import { formatCurrency } from '@/Utils/formatters/number';
 
 interface ActiveAddonsCardsProps {

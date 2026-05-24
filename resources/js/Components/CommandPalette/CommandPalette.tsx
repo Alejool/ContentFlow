@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Command, Search } from 'lucide-react';
 import { Fragment, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CATEGORY_LABELS, COMMAND_PALETTE_COMMANDS } from './commandPaletteCommands';
+import { CATEGORY_LABELS, COMMAND_PALETTE_COMMANDS } from '@/Components/CommandPalette/commandPaletteCommands';
 
 export default function CommandPalette() {
   const { t } = useTranslation();

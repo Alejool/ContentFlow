@@ -22,7 +22,7 @@ import {
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import PlanUsageSection from './PlanUsageSection';
+import PlanUsageSection from '@/Components/Layout/PlanUsageSection';
 
 interface ProfileDropdownProps {
   user: {

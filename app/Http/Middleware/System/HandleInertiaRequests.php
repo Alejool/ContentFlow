@@ -8,6 +8,7 @@ use Tighten\Ziggy\Ziggy;
 
 use Illuminate\Support\Facades\Log;
 
+use App\Models\Auth\Permission;
 use App\Models\Auth\Role;
 use App\Models\Publications\PublicationTemplate;
 
@@ -96,6 +97,7 @@ class HandleInertiaRequests extends Middleware
           }
         },
         'roles' => fn() => Role::all(),
+        'permission_definitions' => fn() => Permission::getAllPermissionDefinitions(),
         'current_workspace' => function () use ($request) {
           try {
             // Force fresh user to avoid stale state in Octane/Swoole
@@ -172,18 +174,22 @@ class HandleInertiaRequests extends Middleware
 
               if ($isOwner) {
                 // Hardcoded permissions for Owner ensuring access even if DB is empty
-                $currentWorkspace->permissions = [
-                  'publish',
-                  'approve',
-                  'view-analytics',
-                  'manage-accounts',
-                  'manage-team',
-                  'manage-content',
-                  'manage-campaigns',
-                  'view-content'
-                ];
+                $currentWorkspace->permissions = array_values(array_unique(array_merge(
+                  Permission::allPermissionSlugs(),
+                  [
+                    'approve',
+                    'view-analytics',
+                    'manage-accounts',
+                    'manage-team',
+                    'manage-campaigns',
+                  ]
+                )));
               } else {
-                $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
+                $currentWorkspace->permissions = $role ? $role->permissions
+                  ->map(fn ($permission) => Permission::canonicalSlug($permission->slug))
+                  ->unique()
+                  ->values()
+                  ->toArray() : [];
               }
 
               $currentWorkspace->plan = $currentWorkspace->getPlanName();

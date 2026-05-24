@@ -16,7 +16,7 @@ import Button from '@/Components/common/Modern/Button';
 import { toAddEventDateTime } from '@/Utils/Calendar/dayAddEventDate';
 import React, { useState } from 'react';
 
-import type { DraggableWeekEventProps, WeekViewProps } from './viewTypes';
+import type { DraggableWeekEventProps, WeekViewProps } from '@/Components/Calendar/viewTypes';
 
 const DraggableWeekEvent: React.FC<DraggableWeekEventProps> = ({
   event,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Tooltip } from './Tooltip';
+import { Tooltip } from '@/Components/Onboarding/Tooltip';
 import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
 import type { TooltipDefinition } from '@/types/Onboarding/onboarding';
 

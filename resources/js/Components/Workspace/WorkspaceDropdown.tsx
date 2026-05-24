@@ -2,7 +2,7 @@ import { Popover } from '@/Components/common/Modern/Popover';
 import { Link } from '@inertiajs/react';
 import { Check, ChevronDown, Plus, Settings, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { WorkspaceLogo } from './WorkspaceLogo';
+import { WorkspaceLogo } from '@/Components/Workspace/WorkspaceLogo';
 
 interface WorkspaceDropdownProps {
   workspaces: any[];

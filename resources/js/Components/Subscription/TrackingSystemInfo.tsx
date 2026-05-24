@@ -1,5 +1,5 @@
-import { ExtensionAddonsInfoBanner } from './ExtensionAddonsInfoBanner';
-import { PlanTrackingInfoBanner } from './PlanTrackingInfoBanner';
+import { ExtensionAddonsInfoBanner } from '@/Components/Subscription/ExtensionAddonsInfoBanner';
+import { PlanTrackingInfoBanner } from '@/Components/Subscription/PlanTrackingInfoBanner';
 
 interface TrackingSystemInfoProps {
   startDate?: string;

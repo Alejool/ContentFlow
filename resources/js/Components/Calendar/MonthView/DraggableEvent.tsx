@@ -1,8 +1,8 @@
 import { EventCard } from '@/Components/Calendar/EventCard';
 import { useDraggable } from '@dnd-kit/core';
 import React from 'react';
-import { monthViewDefaultT } from './types';
-import type { DraggableEventProps } from './types';
+import { monthViewDefaultT } from '@/Components/Calendar/MonthView/types';
+import type { DraggableEventProps } from '@/Components/Calendar/MonthView/types';
 
 export const DraggableEvent: React.FC<DraggableEventProps> = ({
   event,

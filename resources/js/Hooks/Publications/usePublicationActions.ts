@@ -3,7 +3,7 @@ import type { Publication } from '@/types/Publications/Publication';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { usePublicationPermissions } from './usePublicationPermissions';
+import { usePublicationPermissions } from '@/Hooks/Publications/usePublicationPermissions';
 
 interface UsePublicationActionsProps {
   onEdit?: (item: Publication) => void;

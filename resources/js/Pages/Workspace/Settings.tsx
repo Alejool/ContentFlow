@@ -22,8 +22,8 @@ import {
   resolvePlanId,
   resolveUserRole,
   saveTabOrder,
-} from './settings.helpers';
-import type { SettingsTab, WorkspaceSettingsProps } from './settings.types';
+} from '@/Pages/Workspace/settings.helpers';
+import type { SettingsTab, WorkspaceSettingsProps } from '@/Pages/Workspace/settings.types';
 
 const EMPTY_ROLES: NonNullable<WorkspaceSettingsProps['roles']> = [];
 const EMPTY_PERMISSIONS: NonNullable<WorkspaceSettingsProps['permissions']> = [];

@@ -1,4 +1,4 @@
-import { useOffline } from './useOffline';
+import { useOffline } from '@/Hooks/Offline/useOffline';
 
 /**
  * Options for useOfflineDisable hook

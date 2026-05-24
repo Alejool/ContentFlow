@@ -1,4 +1,4 @@
-import type { Publication } from './Publication';
+import type { Publication } from '@/types/Campaign/Publication';
 
 export type Campaign = {
   id: number;

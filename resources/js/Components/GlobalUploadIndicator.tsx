@@ -18,8 +18,8 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { ProgressDisplay } from './Upload/ProgressDisplay';
-import { PublicationItem } from './Upload/PublicationItem';
+import { ProgressDisplay } from '@/Components/Upload/ProgressDisplay';
+import { PublicationItem } from '@/Components/Upload/PublicationItem';
 
 type Tab = 'uploads' | 'processing' | 'publications';
 

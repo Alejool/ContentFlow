@@ -1,11 +1,11 @@
 import { useAddonsSummary } from '@/Hooks/Addons/useAddonsSummary';
 import { formatDateString } from '@/Utils/formatters';
 import { useTranslation } from 'react-i18next';
-import AddonExtensionInfo from './AddonExtensionInfo';
-import AddonsSummaryEmpty from './AddonsSummaryEmpty';
-import AddonsSummaryHeader from './AddonsSummaryHeader';
-import AddonTrackingInfo from './AddonTrackingInfo';
-import AddonUsageDisplay from './AddonUsageDisplay';
+import AddonExtensionInfo from '@/Components/Addons/AddonExtensionInfo';
+import AddonsSummaryEmpty from '@/Components/Addons/AddonsSummaryEmpty';
+import AddonsSummaryHeader from '@/Components/Addons/AddonsSummaryHeader';
+import AddonTrackingInfo from '@/Components/Addons/AddonTrackingInfo';
+import AddonUsageDisplay from '@/Components/Addons/AddonUsageDisplay';
 
 export default function AddonsSummary() {
   const { t } = useTranslation();

@@ -2,7 +2,7 @@ import type { OptimisticOptions } from '@/types/common/optimistic';
 import { getInertiaPageComponent, isInertiaPage } from '@/Utils/common/inertiaOptimisticSync';
 import { usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
-import { useOptimistic } from './useOptimistic';
+import { useOptimistic } from '@/Hooks/common/useOptimistic';
 
 /**
  * useInertiaOptimistic Hook - Inertia.js aware optimistic updates

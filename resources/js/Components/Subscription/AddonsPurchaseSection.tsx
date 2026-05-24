@@ -7,7 +7,7 @@ import { formatCurrency } from '@/Utils/formatters/number';
 import { FileText, HardDrive, Info, Sparkles, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddonPriceDisplay } from './AddonPriceDisplay';
+import { AddonPriceDisplay } from '@/Components/Subscription/AddonPriceDisplay';
 
 interface AddonPackage {
   sku: string;

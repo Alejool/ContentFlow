@@ -1,12 +1,12 @@
 // Tracking System Components
-export { ExtensionAddonsInfoBanner } from './ExtensionAddonsInfoBanner';
-export { PlanTrackingInfoBanner } from './PlanTrackingInfoBanner';
-export { TrackingSystemInfo } from './TrackingSystemInfo';
+export { ExtensionAddonsInfoBanner } from '@/Components/Subscription/ExtensionAddonsInfoBanner';
+export { PlanTrackingInfoBanner } from '@/Components/Subscription/PlanTrackingInfoBanner';
+export { TrackingSystemInfo } from '@/Components/Subscription/TrackingSystemInfo';
 
 // Existing Components
-export { ActiveAddonsCards } from './ActiveAddonsCards';
-export { AddonsInfoBanner } from './AddonsInfoBanner';
-export { AddonsPurchaseSection } from './AddonsPurchaseSection';
-export { PlanUsageCards } from './PlanUsageCards';
-export { UsageCard } from './UsageCard';
+export { ActiveAddonsCards } from '@/Components/Subscription/ActiveAddonsCards';
+export { AddonsInfoBanner } from '@/Components/Subscription/AddonsInfoBanner';
+export { AddonsPurchaseSection } from '@/Components/Subscription/AddonsPurchaseSection';
+export { PlanUsageCards } from '@/Components/Subscription/PlanUsageCards';
+export { UsageCard } from '@/Components/Subscription/UsageCard';
 

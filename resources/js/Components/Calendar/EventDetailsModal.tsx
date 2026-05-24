@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DateTimePicker } from './DateTimePicker';
+import { DateTimePicker } from '@/Components/Calendar/DateTimePicker';
 
 interface EventDetailsModalProps {
   event: CalendarEvent | null;

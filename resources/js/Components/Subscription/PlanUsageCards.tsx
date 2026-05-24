@@ -1,8 +1,8 @@
 import { CarouselPagination } from '@/Components/common/CarouselPagination';
 import AnimatedPagination from '@/Components/common/ui/AnimatedPagination';
 import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
-import type { SystemAddons, UsageCardProps, VisibleUsageMetrics } from './planUsage.types';
-import { UsageCard } from './UsageCard';
+import type { SystemAddons, UsageCardProps, VisibleUsageMetrics } from '@/Components/Subscription/planUsage.types';
+import { UsageCard } from '@/Components/Subscription/UsageCard';
 import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';

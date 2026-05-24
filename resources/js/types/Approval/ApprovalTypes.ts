@@ -1,8 +1,8 @@
 // Tipos para el nuevo sistema de aprobaciones simplificado
 
-import type { Publication } from './Publication';
-import type { Role } from './Role';
-import type { User } from './User';
+import type { Publication } from '@/types/Approval/Publication';
+import type { Role } from '@/types/Approval/Role';
+import type { User } from '@/types/Approval/User';
 
 export interface ApprovalRequest {
   id: number;

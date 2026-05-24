@@ -12,8 +12,8 @@
  * Requirements: 2.1, 2.2, 2.4
  */
 
-import { localStorageThemeManager } from './LocalStorageThemeManager';
-import { themeAPIClient } from './ThemeAPIClient';
+import { localStorageThemeManager } from '@/Utils/common/LocalStorageThemeManager';
+import { themeAPIClient } from '@/Utils/common/ThemeAPIClient';
 
 export type ThemePreference = 'light' | 'dark' | 'system';
 

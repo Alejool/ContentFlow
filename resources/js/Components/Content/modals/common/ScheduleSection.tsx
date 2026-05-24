@@ -1,6 +1,6 @@
 import { parseISO } from 'date-fns';
 import React, { useMemo, useState } from 'react';
-import { RecurrenceSection } from './RecurrenceSection';
+import { RecurrenceSection } from '@/Components/Content/modals/common/RecurrenceSection';
 
 interface ScheduleSectionProps {
   scheduledAt?: string | undefined;

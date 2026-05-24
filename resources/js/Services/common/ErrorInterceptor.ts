@@ -1,5 +1,5 @@
 import axios, { type AxiosError } from 'axios';
-import { ToastService } from './ToastService';
+import { ToastService } from '@/Services/common/ToastService';
 
 interface ErrorResponse {
   message?: string;

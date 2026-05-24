@@ -5,7 +5,7 @@ import type { PublicationTemplate } from '@/types/Onboarding/onboarding';
 import { Search, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import TemplateCard from './TemplateCard';
+import TemplateCard from '@/Components/Onboarding/TemplateCard';
 
 interface TemplateGalleryProps {
   templates: PublicationTemplate[];

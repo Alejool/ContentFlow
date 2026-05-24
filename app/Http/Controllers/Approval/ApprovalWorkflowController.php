@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\System\ApiResponse;
 use App\Models\Publications\Publication;
 use App\Models\Approval\ApprovalRequest;
+use App\Models\Auth\Role;
 use App\Services\Approval\ApprovalWorkflowEngine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,12 +49,40 @@ class ApprovalWorkflowController extends Controller
                 return $this->errorResponse('No authenticated user found.', 401);
             }
 
+            $workspaceId = $publication->workspace_id;
+            $workspaceUser = $user->workspaces()->where('workspaces.id', $workspaceId)->first();
+            $roleSlug = null;
+            if ($workspaceUser && $workspaceUser->pivot->role_id) {
+                $roleSlug = Role::find($workspaceUser->pivot->role_id)?->slug;
+            }
+
+            $hasManageContent = $user->hasPermission('manage-content', $workspaceId);
+            $hasPublishPermission = $user->hasPermission('publish', $workspaceId);
+            $publicationStatus = $publication->status;
+
             \Log::info('Approval submit attempt', [
                 'publication_id' => $publication->id,
                 'user_id' => $user->id,
-                'workspace_id' => $publication->workspace_id,
+                'workspace_id' => $workspaceId,
                 'current_workspace_id' => $user->current_workspace_id,
+                'role_slug' => $roleSlug,
+                'has_manage_content' => $hasManageContent,
+                'has_publish_permission' => $hasPublishPermission,
+                'publication_status' => $publicationStatus,
             ]);
+
+            $canSubmit = Gate::forUser($user)->allows('submitForApproval', $publication);
+            if (!$canSubmit) {
+                \Log::warning('Approval submit denied', [
+                    'publication_id' => $publication->id,
+                    'user_id' => $user->id,
+                    'workspace_id' => $workspaceId,
+                    'role_slug' => $roleSlug,
+                    'has_manage_content' => $hasManageContent,
+                    'has_publish_permission' => $hasPublishPermission,
+                    'publication_status' => $publicationStatus,
+                ]);
+            }
 
             // Authorize explicitly with the current user
             Gate::forUser($user)->authorize('submitForApproval', $publication);
@@ -131,6 +160,14 @@ class ApprovalWorkflowController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->errorResponse('Validation failed', 422, $e->errors());
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            $status = isset($publication) ? $publication->status : null;
+            if ($status && !in_array($status, ['draft', 'rejected', 'failed'])) {
+                return $this->errorResponse(
+                    "Cannot submit publication with status '{$status}'. Only draft, rejected or failed items can be submitted for approval.",
+                    403,
+                );
+            }
+
             return $this->errorResponse('You do not have permission to submit this publication for approval.', 403);
         } catch (\Throwable $e) {
             return $this->errorResponse('Failed to submit for approval: ' . $e->getMessage(), 500);

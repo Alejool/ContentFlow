@@ -280,13 +280,7 @@ class RoleService
     {
         // Check if user is workspace owner (has all permissions)
         if ($workspace->created_by === $user->id) {
-            return [
-                Permission::VIEW_CONTENT,
-                Permission::CREATE_CONTENT,
-                Permission::MANAGE_CONTENT,
-                Permission::PUBLISH_CONTENT,
-                Permission::MANAGE_WORKSPACE,
-            ];
+            return Permission::allPermissionSlugs();
         }
 
         // Get user's role in the workspace
@@ -307,17 +301,13 @@ class RoleService
 
         // Owner role has all permissions
         if ($role->slug === Role::OWNER) {
-            return [
-                Permission::VIEW_CONTENT,
-                Permission::CREATE_CONTENT,
-                Permission::MANAGE_CONTENT,
-                Permission::PUBLISH_CONTENT,
-                Permission::MANAGE_WORKSPACE,
-            ];
+            return Permission::allPermissionSlugs();
         }
 
-        // Return role's permissions
-        return $role->permissions->pluck('name')->toArray();
+        // Return role's permissions using canonical slugs
+        return $role->permissions
+            ->map(fn ($permission) => Permission::canonicalSlug($permission->slug))
+            ->toArray();
     }
 
     /**
@@ -331,6 +321,8 @@ class RoleService
      */
     private function getPermissionCacheKey(User $user, Workspace $workspace, string $permission): string
     {
+        $permission = Permission::canonicalSlug($permission);
+
         return "permission:user:{$user->id}:workspace:{$workspace->id}:permission:{$permission}";
     }
 
@@ -361,16 +353,8 @@ class RoleService
         $allPermissionsKey = $this->getUserPermissionsCacheKey($user, $workspace);
         Redis::del($allPermissionsKey);
 
-        // Clear individual permission caches
-        $permissions = [
-            Permission::VIEW_CONTENT,
-            Permission::CREATE_CONTENT,
-            Permission::MANAGE_CONTENT,
-            Permission::PUBLISH_CONTENT,
-            Permission::MANAGE_WORKSPACE,
-        ];
-
-        foreach ($permissions as $permission) {
+        // Clear individual permission caches using canonical slugs
+        foreach (Permission::allPermissionSlugs() as $permission) {
             $key = $this->getPermissionCacheKey($user, $workspace, $permission);
             Redis::del($key);
         }

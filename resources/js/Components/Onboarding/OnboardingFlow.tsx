@@ -16,9 +16,9 @@ import type { PublicationTemplate, SocialPlatform, TourStep } from '@/types/Onbo
 import { Building2, ChevronDown, ChevronUp, Gem, Link2, Target } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
-import type { OnboardingStage } from './hooks/useOnboardingStage';
-import { useOnboardingStage } from './hooks/useOnboardingStage';
+import { OnboardingErrorBoundary } from '@/Components/Onboarding/OnboardingErrorBoundary';
+import type { OnboardingStage } from '@/Components/Onboarding/hooks/useOnboardingStage';
+import { useOnboardingStage } from '@/Components/Onboarding/hooks/useOnboardingStage';
 
 // Lazy-loaded step components
 const BusinessInfoStep = lazy(() => import('./BusinessInfoStep'));

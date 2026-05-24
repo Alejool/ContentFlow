@@ -1,7 +1,7 @@
 import { formatPublicationDate } from '@/Utils/Publications/publicationHelpers';
 import { useTranslation } from 'react-i18next';
-import CampaignInfoGrid from './CampaignInfoGrid';
-import PublishedPostsSection from './PublishedPostsSection';
+import CampaignInfoGrid from '@/Components/Content/modals/ViewPublicationModal/CampaignInfoGrid';
+import PublishedPostsSection from '@/Components/Content/modals/ViewPublicationModal/PublishedPostsSection';
 
 interface CampaignOverviewTabProps {
   item: any;

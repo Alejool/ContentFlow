@@ -151,11 +151,12 @@ class WorkspaceController extends Controller
 
     // Get all permissions
     $permissions = \App\Models\Auth\Permission::all()->map(function ($permission) {
-      $translationKey = "permissions.{$permission->slug}";
+      $permissionSlug = \App\Models\Auth\Permission::canonicalSlug($permission->slug);
+      $translationKey = "permissions.{$permissionSlug}";
       
       return [
         'id' => $permission->id,
-        'slug' => $permission->slug,
+        'slug' => $permissionSlug,
         'name' => __("{$translationKey}.name", [], app()->getLocale()) ?: $permission->name,
         'display_name' => __("{$translationKey}.name", [], app()->getLocale()) ?: $permission->name,
         'description' => __("{$translationKey}.description", [], app()->getLocale()) ?: $permission->description,

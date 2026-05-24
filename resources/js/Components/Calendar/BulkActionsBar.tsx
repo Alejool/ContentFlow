@@ -1,10 +1,10 @@
 import { useBulkActions } from '@/Hooks/Calendar/useBulkActions';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
-import { ActionButtons } from './BulkActions/ActionButtons';
-import { DeleteModal } from './BulkActions/DeleteModal';
-import { MoveModal } from './BulkActions/MoveModal';
-import { SelectionInfo } from './BulkActions/SelectionInfo';
+import { ActionButtons } from '@/Components/Calendar/BulkActions/ActionButtons';
+import { DeleteModal } from '@/Components/Calendar/BulkActions/DeleteModal';
+import { MoveModal } from '@/Components/Calendar/BulkActions/MoveModal';
+import { SelectionInfo } from '@/Components/Calendar/BulkActions/SelectionInfo';
 
 interface BulkActionsBarProps {
   selectedCount: number;

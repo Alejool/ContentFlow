@@ -4,7 +4,7 @@ import type { SocialPlatform } from '@/types/Onboarding/onboarding';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PlatformCard from './PlatformCard';
+import PlatformCard from '@/Components/Onboarding/PlatformCard';
 
 interface SetupWizardProps {
   availablePlatforms?: SocialPlatform[];

@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Sparkles, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { UsageCardProps } from './planUsage.types';
+import type { UsageCardProps } from '@/Components/Subscription/planUsage.types';
 
 // ── Accent colour maps ────────────────────────────────────────────
 const ACCENT_ICON: Record<string, string> = {

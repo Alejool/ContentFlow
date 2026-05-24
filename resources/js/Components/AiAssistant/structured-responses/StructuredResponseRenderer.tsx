@@ -1,11 +1,11 @@
 import { AIResponse } from '@/Hooks/useAIChat';
-import QuickTipResponse from './QuickTipResponse';
-import InstructionsResponse from './InstructionsResponse';
-import DataResponse from './DataResponse';
-import AnalysisResponse from './AnalysisResponse';
-import ContentResponse from './ContentResponse';
-import RecommendationResponse from './RecommendationResponse';
-import GenericResponse from './GenericResponse';
+import QuickTipResponse from '@/Components/AiAssistant/structured-responses/QuickTipResponse';
+import InstructionsResponse from '@/Components/AiAssistant/structured-responses/InstructionsResponse';
+import DataResponse from '@/Components/AiAssistant/structured-responses/DataResponse';
+import AnalysisResponse from '@/Components/AiAssistant/structured-responses/AnalysisResponse';
+import ContentResponse from '@/Components/AiAssistant/structured-responses/ContentResponse';
+import RecommendationResponse from '@/Components/AiAssistant/structured-responses/RecommendationResponse';
+import GenericResponse from '@/Components/AiAssistant/structured-responses/GenericResponse';
 
 interface StructuredResponseRendererProps {
   aiResponse: AIResponse;

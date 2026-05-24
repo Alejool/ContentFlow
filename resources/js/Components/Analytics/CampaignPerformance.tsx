@@ -3,8 +3,8 @@ import Input from '@/Components/common/Modern/Input';
 import { Search, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PerformanceDetailModal from './PerformanceDetailModal';
-import type { CampaignStat } from './PerformanceTable';
+import PerformanceDetailModal from '@/Components/Analytics/PerformanceDetailModal';
+import type { CampaignStat } from '@/Components/Analytics/PerformanceTable';
 
 interface CampaignPerformanceProps {
   campaigns: CampaignStat[];

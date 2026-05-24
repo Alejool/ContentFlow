@@ -21,9 +21,9 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import NotificationButton from './NotificationButton';
-import ProfileDropdown from './ProfileDropdown';
-import SearchButton from './SearchButton';
+import NotificationButton from '@/Components/Layout/NotificationButton';
+import ProfileDropdown from '@/Components/Layout/ProfileDropdown';
+import SearchButton from '@/Components/Layout/SearchButton';
 
 function NavLogo({
   src,

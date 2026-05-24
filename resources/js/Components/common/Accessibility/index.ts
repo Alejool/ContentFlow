@@ -4,7 +4,7 @@
  * Centralized exports for all accessibility components
  */
 
-export { SkipLink } from './SkipLink';
-export { VisuallyHidden } from './VisuallyHidden';
-export { LiveRegion, useAnnounce } from './LiveRegion';
-export { useFocusVisible } from './FocusVisibleManager';
+export { SkipLink } from '@/Components/common/Accessibility/SkipLink';
+export { VisuallyHidden } from '@/Components/common/Accessibility/VisuallyHidden';
+export { LiveRegion, useAnnounce } from '@/Components/common/Accessibility/LiveRegion';
+export { useFocusVisible } from '@/Components/common/Accessibility/FocusVisibleManager';

@@ -1,4 +1,5 @@
 import type { Publication } from '@/types/Publications/Publication';
+import { PERMISSION_SLUGS } from '@/Constants/permissions';
 
 /**
  * Verifica si un usuario puede publicar directamente una publicación
@@ -12,7 +13,7 @@ export function canUserPublishDirectly(
   if (!publication || !currentUserId) return false;
 
   // 1. Si tiene permiso "publish", puede publicar siempre
-  const hasPublishPermission = permissions.includes('publish');
+  const hasPublishPermission = permissions.includes(PERMISSION_SLUGS.publishContent);
   if (hasPublishPermission) return true;
 
   // 2. Verificar si el usuario actual tiene una aprobación activa
@@ -42,7 +43,7 @@ export function shouldShowRequestApproval(
   if (!publication || !currentUserId) return false;
 
   // No mostrar si tiene permiso de publicar
-  if (permissions.includes('publish')) return false;
+  if (permissions.includes(PERMISSION_SLUGS.publishContent)) return false;
 
   // No mostrar si puede publicar directamente
   if (canUserPublishDirectly(publication, currentUserId, permissions)) return false;

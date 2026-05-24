@@ -3,7 +3,7 @@ import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { parseISO } from 'date-fns';
 import { X } from 'lucide-react';
 import { memo } from 'react';
-import type { SocialAccount } from './types';
+import type { SocialAccount } from '@/Components/Content/Publication/common/add/SocialAccounts/types';
 
 interface SchedulePopoverContentProps {
   account: SocialAccount;

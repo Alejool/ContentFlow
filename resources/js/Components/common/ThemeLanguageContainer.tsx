@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from './Modern/Button';
+import Button from '@/Components/common/Modern/Button';
 
 interface ThemeLanguageContainerProps {
   isWelcome?: boolean;

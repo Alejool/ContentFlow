@@ -1,7 +1,7 @@
 import { Check, Target } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
-import SocialAccountItem from './SocialAccounts/SocialAccountItem';
-import type { SocialAccountsSectionProps } from './SocialAccounts/types';
+import SocialAccountItem from '@/Components/Content/Publication/common/add/SocialAccounts/SocialAccountItem';
+import type { SocialAccountsSectionProps } from '@/Components/Content/Publication/common/add/SocialAccounts/types';
 
 const SocialAccountsSection = memo(
   ({

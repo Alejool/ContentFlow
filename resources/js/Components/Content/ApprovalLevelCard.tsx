@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Check, CheckCircle, Clock, Info, User, X, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import RejectionReasonModal from './modals/RejectionReasonModal';
+import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 
 interface ApprovalLevelCardProps {
   level: {

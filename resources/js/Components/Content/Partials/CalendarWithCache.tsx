@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useCalendarEvents } from '@/hooks/useCalendarEvents';
-import ModernCalendar from './ModernCalendar';
-import { CalendarSkeleton, LoadingOverlay } from './CalendarSkeleton';
+import ModernCalendar from '@/Components/Content/Partials/ModernCalendar';
+import { CalendarSkeleton, LoadingOverlay } from '@/Components/Content/Partials/CalendarSkeleton';
 
 interface CalendarWithCacheProps {
   onEventClick: (event: any) => void;

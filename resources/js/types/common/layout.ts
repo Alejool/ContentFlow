@@ -5,8 +5,8 @@
  * Import `User` and `PageProps` from `@/types` — do NOT redeclare them here.
  */
 
-import type { PageProps } from './PageProps';
-import type { User } from './User';
+import type { PageProps } from '@/types/common/PageProps';
+import type { User } from '@/types/common/User';
 import type { OnboardingState, PublicationTemplate, SocialPlatform, TourStep } from '@/types/Onboarding/onboarding';
 import type { ReactNode } from 'react';
 

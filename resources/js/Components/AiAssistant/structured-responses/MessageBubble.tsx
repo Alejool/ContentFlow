@@ -1,6 +1,6 @@
 import { AIMessage } from '@/Hooks/useAIChat';
 import { Bot } from 'lucide-react';
-import StructuredResponseRenderer from './StructuredResponseRenderer';
+import StructuredResponseRenderer from '@/Components/AiAssistant/structured-responses/StructuredResponseRenderer';
 import { formatTimeString } from '@/Utils/formatters';
 
 interface MessageBubbleProps {

@@ -5,9 +5,9 @@ import { formatDateTimeStyled } from '@/Utils/formatters';
 import { validateVideoDuration } from '@/Utils/common/validationUtils';
 import { AlertTriangle, Check, ChevronDown, Clock, Info, X } from 'lucide-react';
 import React, { memo } from 'react';
-import { isPlatformCompatible } from './helpers';
-import ScheduleButton from './ScheduleButton';
-import type { SocialAccountItemProps } from './types';
+import { isPlatformCompatible } from '@/Components/Content/Publication/common/add/SocialAccounts/helpers';
+import ScheduleButton from '@/Components/Content/Publication/common/add/SocialAccounts/ScheduleButton';
+import type { SocialAccountItemProps } from '@/Components/Content/Publication/common/add/SocialAccounts/types';
 
 const SocialAccountItem = memo(
   ({

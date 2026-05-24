@@ -1,7 +1,7 @@
 import type { Publication } from '@/types/Publications/Publication';
 import { AlertTriangle, CheckCircle2, Loader2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PlatformProgress } from './PlatformProgress';
+import { PlatformProgress } from '@/Components/Upload/PlatformProgress';
 
 interface PublicationItemProps {
   publication: Publication;

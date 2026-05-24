@@ -7,8 +7,8 @@ import type { Publication } from '@/types/Publications/Publication';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PlatformConfigCard from './PlatformConfigCard';
-import ValidationLimitsCard from './ValidationLimitsCard';
+import PlatformConfigCard from '@/Components/Publications/PlatformConfigCard';
+import ValidationLimitsCard from '@/Components/Publications/ValidationLimitsCard';
 
 interface MediaInfo {
   duration?: number;

@@ -13,7 +13,7 @@ import '../css/app.css';
 
 // ─── Importación síncrona de i18n ─────────────────────────────────────────────
 // i18n debe cargarse ANTES del render para que las traducciones estén disponibles
-import i18n from './i18n';
+import i18n from '@/i18n';
 
 // ─── Carga diferida de módulos pesados ────────────────────────────────────────
 // bootstrap (Echo + Pusher) se carga después del primer render,

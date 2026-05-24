@@ -3,10 +3,10 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 import { z } from 'zod';
-import { makeZodErrorMap } from './Utils/common/zodErrorMap';
+import { makeZodErrorMap } from '@/Utils/common/zodErrorMap';
 
-import en from './locales/en';
-import es from './locales/es';
+import en from '@/locales/en/index';
+import es from '@/locales/es/index';
 
 // Configuración mejorada de detección de idioma
 const languageDetectorOptions = {

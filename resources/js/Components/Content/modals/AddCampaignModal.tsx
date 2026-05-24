@@ -20,7 +20,7 @@ import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 
 import { DollarSign, FileText } from 'lucide-react';
-import ModalFooter from './common/ModalFooter';
+import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 
 interface AddCampaignModalProps {
   isOpen: boolean;

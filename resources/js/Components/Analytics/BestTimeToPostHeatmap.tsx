@@ -9,8 +9,8 @@ import {
   ZAxis,
   Tooltip as RechartsTooltip,
 } from 'recharts';
-import Skeleton from '../common/ui/Skeleton';
-import EmptyState from '../common/ui/EmptyState';
+import Skeleton from '@/Components/common/ui/Skeleton';
+import EmptyState from '@/Components/common/ui/EmptyState';
 
 interface HeatmapData {
   day: string;

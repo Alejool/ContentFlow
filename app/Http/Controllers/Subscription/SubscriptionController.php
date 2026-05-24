@@ -11,6 +11,7 @@ use App\Models\Workspace\Workspace;
 use App\Models\Subscription\Subscription;
 use App\Services\Usage\UsageTrackingService;
 use App\Services\Subscription\SubscriptionTrackingService;
+use App\Services\Workspace\WorkspaceUsageService;
 use Inertia\Inertia;
 
 class SubscriptionController extends Controller
@@ -194,7 +195,7 @@ class SubscriptionController extends Controller
             return response()->json(['error' => 'No workspace found'], 404);
         }
 
-        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService = app(WorkspaceUsageService::class);
         $usageSummary = $usageService->getUsageSummary($workspace);
 
         // Agregar información de permisos

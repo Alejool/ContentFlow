@@ -1,7 +1,7 @@
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import Skeleton from '../common/ui/Skeleton';
+import Skeleton from '@/Components/common/ui/Skeleton';
 
 interface FormatData {
   format: string;

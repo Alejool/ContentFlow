@@ -112,7 +112,7 @@ export default function InviteMemberModal({
     <Modal show={isOpen} onClose={onClose} maxWidth="md">
       <div className="overflow-x-hidden p-4 md:p-6">
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="w-fit shrink-0 rounded-lg bg-primary-100 p-2 dark:bg-primary-900/30">
+          <div className="w-fit shrink-0 rounded-lg">
             <UserPlus className="h-6 w-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div className="min-w-0">
@@ -130,6 +130,7 @@ export default function InviteMemberModal({
             id="email"
             label={t('workspace.invite_modal.email_label')}
             type="email"
+            sizeType="lg"
             placeholder={t('workspace.invite_modal.email_placeholder')}
             register={register}
             error={errors.email?.message}
@@ -144,6 +145,7 @@ export default function InviteMemberModal({
             <Select
               id="role_id"
               options={roleOptions}
+              size="lg"
               value={watch('role_id')}
               onChange={(val) => setValue('role_id', Number(val), { shouldValidate: true })}
               placeholder={t('workspace.invite_modal.role_placeholder')}

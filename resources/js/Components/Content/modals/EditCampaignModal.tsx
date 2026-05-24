@@ -15,7 +15,7 @@ import { usePublicationsForCampaignEdit } from '@/Hooks/Campaign/usePublications
 import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 import { usePage } from '@inertiajs/react';
-import ModalFooter from './common/ModalFooter';
+import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 
 interface EditCampaignModalProps {
   isOpen: boolean;

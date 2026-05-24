@@ -2,7 +2,7 @@ import type { ContentType } from '@/Constants/Content/contentTypes';
 import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
 import { AlertCircle } from 'lucide-react';
 import { useMemo } from 'react';
-import ContentTypeIconSelector from './ContentTypeIconSelector';
+import ContentTypeIconSelector from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 
 interface ContentTypeSelectorBarProps {
   selectedType: ContentType;

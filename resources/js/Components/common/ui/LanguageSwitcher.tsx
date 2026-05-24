@@ -5,7 +5,7 @@ import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import OptimizedImage from './OptimizedImage';
+import OptimizedImage from '@/Components/common/ui/OptimizedImage';
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();

@@ -1,6 +1,6 @@
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
-import { SOCIAL_PLATFORMS as SOCIAL_PLATFORMS_DATA } from './socialPlatformsConfig';
+import { SOCIAL_PLATFORMS as SOCIAL_PLATFORMS_DATA } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 
 export interface SocialPlatformConfig {
   id: number;

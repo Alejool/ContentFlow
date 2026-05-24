@@ -9,9 +9,9 @@ import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import type { SyncError } from '@/types/common/errors';
 import { validateDate } from '@/Utils/common/dateValidation';
 import React, { useState } from 'react';
-import { CalendarErrorBoundary } from './CalendarErrorBoundary';
-import { ConflictResolutionModal } from './ConflictResolutionModal';
-import { SyncErrorList } from './SyncErrorDisplay';
+import { CalendarErrorBoundary } from '@/Components/Calendar/CalendarErrorBoundary';
+import { ConflictResolutionModal } from '@/Components/Calendar/ConflictResolutionModal';
+import { SyncErrorList } from '@/Components/Calendar/SyncErrorDisplay';
 
 export const CalendarWithErrorHandling: React.FC = () => {
   const { events, conflict, setConflict, resolveConflict, updateEvent } = useCalendarStore();

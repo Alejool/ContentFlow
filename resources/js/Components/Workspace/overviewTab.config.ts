@@ -1,5 +1,5 @@
-import type { QuickAction, StatItem, WorkspaceTab } from './overviewTab.types';
-import type { OverviewWorkspace } from './overviewTab.types';
+import type { QuickAction, StatItem, WorkspaceTab } from '@/Components/Workspace/overviewTab.types';
+import type { OverviewWorkspace } from '@/Components/Workspace/overviewTab.types';
 import { Activity, SettingsIcon, Share2, UserPlus, Users, Zap } from 'lucide-react';
 
 // ── Quick actions ─────────────────────────────────────────────────
