@@ -37,6 +37,7 @@ function buildRoleOptions(roles: MemberRole[]): RoleOption[] {
     value: String(r.id),
     label: r.name,
     roleId: r.id,
+    slug: r.slug,
   }));
 }
 

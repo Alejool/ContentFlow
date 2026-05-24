@@ -44,4 +44,6 @@ export interface RoleOption {
   value: string;
   label: string;
   roleId: number;
+  /** Role slug — used to look up icon and colours from roleHelpers */
+  slug: string;
 }

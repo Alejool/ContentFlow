@@ -1,5 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
+import RoleBadge from '@/Components/Workspace/Members/RoleBadge';
+import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import type { MemberRole, RoleOption, WorkspaceMember } from '@/types/Workspace/MembersManagement';
 import { UserCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -27,8 +29,22 @@ export default function MemberRow({
 
   const currentRoleId = member.pivot?.role_id;
   const currentRoleSlug = member.pivot?.role?.slug ?? member.role?.slug ?? '';
+  const currentRoleName = member.pivot?.role?.name ?? member.role?.name ?? '';
   const isSelf = member.id === authUserId;
   const isOwner = currentRoleSlug === 'owner';
+
+  // Build options for the system Select — each option gets an icon from roleHelpers
+  const selectOptions = roleOptions
+    .filter((opt) => opt.slug !== 'owner') // owners cannot be re-assigned via dropdown
+    .map((opt) => {
+      const config = getRoleConfig(opt.slug);
+      const Icon = config.icon;
+      return {
+        value: opt.roleId,
+        label: opt.label,
+        icon: <Icon className={`h-3.5 w-3.5 ${config.iconColor}`} />,
+      };
+    });
 
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3">
@@ -60,31 +76,40 @@ export default function MemberRow({
 
       {/* Role selector + remove */}
       <div className="flex shrink-0 items-center gap-2">
-        {canManageMembers && !isOwner && !isSelf ? (
-          <Select
-            id={`role-select-${member.id}`}
-            size="sm"
-            value={currentRoleId ?? ''}
-            onChange={(val) => onRoleChange(member.id, Number(val))}
-            options={roleOptions.map((opt) => ({ value: opt.roleId, label: opt.label }))}
-            usePortal={false}
+        {/* Owner: always show a rich badge — no selector, no remove */}
+        {isOwner ? (
+          <RoleBadge
+            role={{ slug: currentRoleSlug, name: currentRoleName || 'Owner' }}
+            showIcon
+            size="md"
           />
+        ) : canManageMembers && !isSelf ? (
+          <>
+            <Select
+              id={`role-select-${member.id}`}
+              size="sm"
+              value={currentRoleId ?? ''}
+              onChange={(val) => onRoleChange(member.id, Number(val))}
+              options={selectOptions}
+              usePortal={false}
+            />
+            <Button
+              variant="danger"
+              buttonStyle="icon"
+              onClick={() => onRemoveMember(member.id)}
+              title={t('workspace.remove_member', { defaultValue: 'Remove member' })}
+              icon={X}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </>
         ) : (
-          <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-600 dark:bg-neutral-700 dark:text-neutral-300">
-            {currentRoleSlug || t('workspace.roles.member', { defaultValue: 'Member' })}
-          </span>
-        )}
-
-        {canManageMembers && !isOwner && !isSelf && (
-          <Button
-            variant="danger"
-            buttonStyle="icon"
-            onClick={() => onRemoveMember(member.id)}
-            title={t('workspace.remove_member', { defaultValue: 'Remove member' })}
-            icon={X}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          /* Non-owner viewing their own row or no manage permission */
+          <RoleBadge
+            role={{ slug: currentRoleSlug, name: currentRoleName }}
+            showIcon
+            size="md"
+          />
         )}
       </div>
     </div>
