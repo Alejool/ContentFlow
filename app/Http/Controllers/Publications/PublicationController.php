@@ -433,7 +433,7 @@ class PublicationController extends Controller
         })->toArray(),
         'status_info' => [
           'current_status' => $publication->status,
-          'can_submit_for_approval' => in_array($publication->status, ['draft', 'rejected', 'failed']),
+          'can_submit_for_approval' => Auth::check() && Gate::forUser(Auth::user())->allows('submitForApproval', $publication),
           'is_pending_review' => $publication->status === 'pending_review',
           'is_approved' => $publication->status === 'approved',
           'is_rejected' => $publication->status === 'rejected',

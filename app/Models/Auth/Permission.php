@@ -30,6 +30,81 @@ class Permission extends Model
     public const SUBMIT_FOR_APPROVAL_SLUG = 'submit-for-approval';
     public const MANAGE_WORKSPACE_SLUG = 'manage-workspace';
 
+    private const PERMISSION_DEFINITIONS = [
+        self::VIEW_CONTENT_SLUG => [
+            'slug' => self::VIEW_CONTENT_SLUG,
+            'label' => 'Ver contenido',
+            'description' => 'Permite leer publicaciones, campañas y métricas del workspace sin editarlas.',
+            'category' => 'content',
+        ],
+        self::CREATE_CONTENT_SLUG => [
+            'slug' => self::CREATE_CONTENT_SLUG,
+            'label' => 'Crear contenido',
+            'description' => 'Permite crear publicaciones, borradores y campañas nuevas.',
+            'category' => 'content',
+        ],
+        self::MANAGE_CONTENT_SLUG => [
+            'slug' => self::MANAGE_CONTENT_SLUG,
+            'label' => 'Gestionar contenido',
+            'description' => 'Permite editar y eliminar publicaciones existentes, así como administrar borradores.',
+            'category' => 'content',
+        ],
+        self::PUBLISH_CONTENT_SLUG => [
+            'slug' => self::PUBLISH_CONTENT_SLUG,
+            'label' => 'Publicar contenido',
+            'description' => 'Permite enviar contenido al flujo de publicación o directamente a plataformas según el workflow.',
+            'category' => 'approval',
+        ],
+        self::SUBMIT_FOR_APPROVAL_SLUG => [
+            'slug' => self::SUBMIT_FOR_APPROVAL_SLUG,
+            'label' => 'Enviar a aprobación',
+            'description' => 'Permite enviar contenido al proceso de aprobación cuando se usa workflow.',
+            'category' => 'approval',
+        ],
+        'approve' => [
+            'slug' => 'approve',
+            'label' => 'Aprobar contenido',
+            'description' => 'Permite aprobar publicaciones para que continúen en el proceso de publicación.',
+            'category' => 'approval',
+        ],
+        'reject' => [
+            'slug' => 'reject',
+            'label' => 'Rechazar contenido',
+            'description' => 'Permite rechazar publicaciones y devolverlas para corrección.',
+            'category' => 'approval',
+        ],
+        'view-analytics' => [
+            'slug' => 'view-analytics',
+            'label' => 'Ver analíticas',
+            'description' => 'Permite ver métricas del workspace, campañas y publicaciones.',
+            'category' => 'analytics',
+        ],
+        'manage-accounts' => [
+            'slug' => 'manage-accounts',
+            'label' => 'Gestionar cuentas',
+            'description' => 'Permite conectar, editar y eliminar cuentas sociales del workspace.',
+            'category' => 'workspace',
+        ],
+        'manage-team' => [
+            'slug' => 'manage-team',
+            'label' => 'Gestionar equipo',
+            'description' => 'Permite invitar, eliminar o cambiar roles del equipo del workspace.',
+            'category' => 'team',
+        ],
+        'manage-campaigns' => [
+            'slug' => 'manage-campaigns',
+            'label' => 'Gestionar campañas',
+            'description' => 'Permite crear, editar y eliminar campañas dentro del workspace.',
+            'category' => 'campaigns',
+        ],
+        self::MANAGE_WORKSPACE_SLUG => [
+            'slug' => self::MANAGE_WORKSPACE_SLUG,
+            'label' => 'Gestionar workspace',
+            'description' => 'Permite cambiar configuraciones del workspace y tareas administrativas generales.',
+            'category' => 'workspace',
+        ],
+    ];
+
     private const IDENTIFIER_ALIASES = [
         'publish' => ['publish', 'publish_content', 'publish-content'],
         'publish_content' => ['publish', 'publish_content', 'publish-content'],
@@ -131,14 +206,27 @@ class Permission extends Model
      */
     public static function allPermissionSlugs(): array
     {
-        return [
-            self::VIEW_CONTENT_SLUG,
-            self::CREATE_CONTENT_SLUG,
-            self::MANAGE_CONTENT_SLUG,
-            self::PUBLISH_CONTENT_SLUG,
-            self::SUBMIT_FOR_APPROVAL_SLUG,
-            self::MANAGE_WORKSPACE_SLUG,
-        ];
+        return array_keys(self::PERMISSION_DEFINITIONS);
+    }
+
+    /**
+     * Return static permission definitions for backend validation and role generation.
+     */
+    public static function permissionDefinitions(): array
+    {
+        return self::PERMISSION_DEFINITIONS;
+    }
+
+    public static function getPermissionDefinition(string $slug): ?array
+    {
+        $slug = self::canonicalSlug($slug);
+
+        return self::PERMISSION_DEFINITIONS[$slug] ?? null;
+    }
+
+    public static function isValidPermissionSlug(string $slug): bool
+    {
+        return isset(self::PERMISSION_DEFINITIONS[self::canonicalSlug($slug)]);
     }
 
     /**
