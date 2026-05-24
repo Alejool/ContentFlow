@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SkipLinkProps {
   href?: string;
@@ -14,8 +15,9 @@ interface SkipLinkProps {
 
 export const SkipLink: React.FC<SkipLinkProps> = ({
   href = '#main-content',
-  children = 'Saltar al contenido principal',
+  children,
 }) => {
+  const { t } = useTranslation();
   return (
     <a
       href={href}
@@ -29,7 +31,7 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
         }
       }}
     >
-      {children}
+      {children || t('common.skipToMainContent', 'Saltar al contenido principal')}
     </a>
   );
 };

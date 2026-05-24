@@ -18,6 +18,7 @@ import { shouldDisplayOnboarding } from '@/Utils/Onboarding/onboardingHelpers';
 import { usePage } from '@inertiajs/react';
 import { lazy, Suspense, useState } from 'react';
 import { Avatar } from '@/Components/common/Avatar';
+import { useTranslation } from 'react-i18next';
 
 // ─── Lazy: componentes pesados no críticos para el render inicial ─────────────
 const CommandPalette = lazy(() => import('@/Components/CommandPalette/CommandPalette'));
@@ -41,6 +42,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
   const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useSidebarState(true);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
+  const { t } = useTranslation();
 
   useTheme();
   useWorkspaceLocks();
@@ -71,11 +73,11 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-lg focus:bg-primary-600 focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-white focus:shadow-xl"
         >
-          Saltar al contenido principal
+          {t('common.skipToMainContent', 'Saltar al contenido principal')}
         </a>
 
         <div className="flex w-full max-w-full flex-col overflow-hidden">
-          <div className="flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden">
+          <div className="flex min-h-0 w-full max-w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
             <div className="absolute inset-0 bg-white dark:bg-theme-bg-secondary overflow-hidden pointer-events-none">
               <img 
                 src="/assets/mascot-watermark.png" 
