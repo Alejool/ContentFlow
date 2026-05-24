@@ -1,3 +1,5 @@
+import Button from '@/Components/common/Modern/Button';
+import Select from '@/Components/common/Modern/Select';
 import type { MemberRole, RoleOption, WorkspaceMember } from '@/types/Workspace/MembersManagement';
 import { UserCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -59,17 +61,14 @@ export default function MemberRow({
       {/* Role selector + remove */}
       <div className="flex shrink-0 items-center gap-2">
         {canManageMembers && !isOwner && !isSelf ? (
-          <select
+          <Select
+            id={`role-select-${member.id}`}
+            size="sm"
             value={currentRoleId ?? ''}
-            onChange={(e) => onRoleChange(member.id, Number(e.target.value))}
-            className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-300 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:border-neutral-600"
-          >
-            {roleOptions.map((opt) => (
-              <option key={opt.roleId} value={opt.roleId}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => onRoleChange(member.id, Number(val))}
+            options={roleOptions.map((opt) => ({ value: opt.roleId, label: opt.label }))}
+            usePortal={false}
+          />
         ) : (
           <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-600 dark:bg-neutral-700 dark:text-neutral-300">
             {currentRoleSlug || t('workspace.roles.member', { defaultValue: 'Member' })}
@@ -77,14 +76,15 @@ export default function MemberRow({
         )}
 
         {canManageMembers && !isOwner && !isSelf && (
-          <button
-            type="button"
+          <Button
+            variant="danger"
+            buttonStyle="icon"
             onClick={() => onRemoveMember(member.id)}
             title={t('workspace.remove_member', { defaultValue: 'Remove member' })}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+            icon={X}
           >
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
     </div>
