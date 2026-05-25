@@ -30,6 +30,7 @@ class MediaFile extends Model
         'user_id',
         'file_name',
         'file_path',
+        's3_key',
         'file_type',
         'youtube_type',
         'duration',
@@ -68,9 +69,26 @@ class MediaFile extends Model
         return $this->hasMany(MediaDerivative::class);
     }
 
+    /**
+     * IMPORTANTE: Este accessor NO genera URLs directas de S3
+     * El bucket es privado - solo devolvemos la ruta/key
+     * El frontend debe usar usePresignedUrl hook para obtener URLs temporales
+     * 
+     * Si el valor ya es una URL completa (http), la devolvemos tal cual
+     * Si es una ruta S3 key, la devolvemos sin procesar
+     */
     public function getFilePathAttribute($value)
     {
-        return $value ? (str_starts_with($value, 'http') ? $value : Storage::disk('s3')->url($value)) : null;
+        return $value;
+    }
+
+    /**
+     * Accessor for s3_key.
+     * Fallback to file_path for older records where s3_key is not populated.
+     */
+    public function getS3KeyAttribute($value)
+    {
+        return $value ?: $this->file_path;
     }
 
 

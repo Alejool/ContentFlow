@@ -62,8 +62,16 @@ class MediaDerivative extends Model
 
 
     // Accessors
+    /**
+     * IMPORTANTE: Este accessor NO genera URLs directas de S3
+     * El bucket es privado - solo devolvemos la ruta/key
+     * El frontend debe usar usePresignedUrl hook para obtener URLs temporales
+     * 
+     * Si el valor ya es una URL completa (http), la devolvemos tal cual
+     * Si es una ruta S3 key, la devolvemos sin procesar
+     */
     public function getFilePathAttribute($value)
     {
-        return $value ? (str_starts_with($value, 'http') ? $value : Storage::disk('s3')->url($value)) : null;
+        return $value;
     }
 }

@@ -31,11 +31,18 @@ class MediaProcessingService
         'duration' => $durations[$index] ?? null,
       ]);
 
-      PublicationMedia::create([
-        'publication_id' => $publication->id,
-        'media_file_id' => $mediaFile->id,
-        'order' => $currentMaxOrder + 1 + $index,
-      ]);
+      // Only create the pivot record if it doesn't already exist
+      $alreadyAttached = $publication->mediaFiles()
+        ->where('media_files.id', $mediaFile->id)
+        ->exists();
+
+      if (!$alreadyAttached) {
+        PublicationMedia::create([
+          'publication_id' => $publication->id,
+          'media_file_id' => $mediaFile->id,
+          'order' => $currentMaxOrder + 1 + $index,
+        ]);
+      }
 
       $thumbFile = $thumbnails[$index] ?? $thumbnails["new_{$index}"] ?? null;
       if ($thumbFile) {
@@ -50,7 +57,9 @@ class MediaProcessingService
         // Should we always update? If drag-drop multiple, the last one might win or first?
         // Let's assume index 0 of new files is intended main if it's an image.
         if ($index === 0 || !$publication->image) {
-          $publication->update(['image' => \Illuminate\Support\Facades\Storage::url($mediaFile->getRawOriginal('file_path'))]);
+          // Guardar solo la S3 key (no URL directa)
+          // El frontend debe usar usePresignedUrl hook para obtener presigned URLs
+          $publication->update(['image' => $mediaFile->getRawOriginal('file_path')]);
         }
       }
     }
@@ -100,6 +109,27 @@ class MediaProcessingService
       $originalName = $file['filename'];
       $isLargeFile = false; // Already uploaded to S3, no need to treat as "large upload" locally
       $filename = basename($path);
+
+      // If a MediaFile already exists for this S3 key (created by attachMedia during direct upload),
+      // return it directly without creating a duplicate or dispatching another job.
+      $existing = MediaFile::where('s3_key', $path)
+        ->orWhere('file_path', $path)
+        ->first();
+
+      if ($existing) {
+        Log::info('MediaProcessingService: MediaFile already exists for S3 key, skipping duplicate creation', [
+          'media_file_id' => $existing->id,
+          'path' => $path,
+          'publication_id' => $publication->id,
+        ]);
+
+        // Ensure it is linked to this publication
+        if ($existing->publication_id !== $publication->id) {
+          $existing->update(['publication_id' => $publication->id]);
+        }
+
+        return $existing;
+      }
     }
 
     $isBackgroundCandidate = $fileType === 'video' || ($file instanceof UploadedFile && $isLargeFile);

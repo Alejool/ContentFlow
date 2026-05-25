@@ -71,8 +71,8 @@ class ProcessBackgroundUpload implements ShouldQueue
 
           $found = false;
           $attempts = 0;
-          $maxAttempts = 3; // Reduced from 5 to prevent hanging
-          $timeout = 30; // 30 second total timeout
+          $maxAttempts = 10; // More retries to handle S3 propagation delay
+          $timeout = 120; // 2 minute total timeout
           $startTime = time();
 
           while (!$found && $attempts < $maxAttempts && (time() - $startTime) < $timeout) {
@@ -86,8 +86,8 @@ class ProcessBackgroundUpload implements ShouldQueue
                 $attempts++;
                 if ($attempts < $maxAttempts && (time() - $startTime) < $timeout) {
                   Log::warning("ProcessBackgroundUpload: File not found yet in S3 ($path). Retrying ($attempts/$maxAttempts)...");
-                  $this->broadcastProgress(20 + ($attempts * 10), "Verifying file existence (attempt $attempts)...");
-                  sleep(1); // Reduced from 2 seconds
+                  $this->broadcastProgress(20 + ($attempts * 5), "Verifying file existence (attempt $attempts)...");
+                  sleep(3); // Wait 3 seconds between retries
                 }
               }
             } catch (\Exception $s3Error) {
@@ -98,7 +98,7 @@ class ProcessBackgroundUpload implements ShouldQueue
               ]);
               $attempts++;
               if ($attempts < $maxAttempts && (time() - $startTime) < $timeout) {
-                sleep(1);
+                sleep(3);
               }
             }
           }
@@ -173,7 +173,9 @@ class ProcessBackgroundUpload implements ShouldQueue
 
         // Update publication image if this was the main image
         if ($this->mediaFile->file_type === 'image' && !$this->publication->image) {
-          $this->publication->update(['image' => Storage::url($this->mediaFile->getRawOriginal('file_path'))]);
+          // Guardar solo la S3 key (no la URL directa)
+          // El frontend debe usar usePresignedUrl hook para obtener presigned URLs
+          $this->publication->update(['image' => $this->mediaFile->getRawOriginal('file_path')]);
         }
 
         $this->broadcastProgress(100, 'Processing completed successfully');
@@ -189,6 +191,10 @@ class ProcessBackgroundUpload implements ShouldQueue
             // Restore status based on schedule
             $newStatus = $this->publication->scheduled_at ? 'scheduled' : 'draft';
             $this->publication->update(['status' => $newStatus]);
+            Log::info('✅ Publication status restored after processing', [
+              'publication_id' => $this->publication->id,
+              'new_status' => $newStatus,
+            ]);
           }
         }
 

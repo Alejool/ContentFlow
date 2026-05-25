@@ -109,7 +109,7 @@ class VideoProcessingService
         $thumbnails[] = [
           'timestamp' => $timestamp,
           's3_key' => $s3Key,
-          'url' => Storage::disk('s3')->url($s3Key),
+          'url' => Storage::temporaryUrl($s3Key, now()->addMinutes(60)),
         ];
         
         // Cleanup local file
@@ -190,7 +190,7 @@ class VideoProcessingService
 
       LogHelper::upload('video.s3_uploaded', [
         's3_key' => $s3Key,
-        'url' => Storage::disk('s3')->url($s3Key),
+        'url' => Storage::temporaryUrl($s3Key, now()->addMinutes(60)),
       ]);
 
       return $s3Key;
