@@ -941,10 +941,11 @@ class PlatformPublishService
   }
   /**
    * Resolve file path for local or remote storage
+   * Para archivos privados en S3, retorna una presigned URL temporal
    */
   private function resolveFilePath(string $path): string
   {
-    // If it's already a URL, return it as is
+    // Si ya es una URL, retornarla tal cual
     if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
       return $path;
     }
@@ -955,11 +956,30 @@ class PlatformPublishService
       return Storage::path($path);
     }
 
-    // For S3 or other remote drivers
+    // Para S3 o drivers remotos
+    // IMPORTANTE: Generar presigned URL temporal (1 hora)
     try {
+      // Usar temporaryUrl que genera presigned URLs
       return Storage::temporaryUrl($path, now()->addMinutes(60));
     } catch (\Exception $e) {
-      return Storage::url($path);
+      // Fallback si temporaryUrl falla - también genera presigned URL
+      try {
+        $client = Storage::disk('s3')->getClient();
+        $bucket = config('filesystems.disks.s3.bucket');
+        $cmd = $client->getCommand('GetObject', [
+          'Bucket' => $bucket,
+          'Key' => $path,
+        ]);
+        $request = $client->createPresignedRequest($cmd, '+60 minutes');
+        return (string)$request->getUri();
+      } catch (\Exception $fallbackError) {
+        Log::error('Failed to generate presigned URL', [
+          'path' => $path,
+          'error' => $fallbackError->getMessage(),
+        ]);
+        // Como último recurso, retornar la ruta sin convertir
+        return $path;
+      }
     }
   }
 }

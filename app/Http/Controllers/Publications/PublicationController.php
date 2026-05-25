@@ -2003,6 +2003,8 @@ class PublicationController extends Controller
       ]);
 
       // Verify S3 file exists before creating database record
+      // We do a best-effort check but do NOT block if S3 hasn't propagated yet —
+      // ProcessBackgroundUpload will retry with more patience.
       $path = $request->key;
       $pathTrimmed = ltrim($path, '/');
 
@@ -2015,24 +2017,22 @@ class PublicationController extends Controller
           $path = $pathTrimmed;
         }
       } catch (\Exception $s3Error) {
-        Log::error('❌ S3 connection error in attachMedia', [
+        Log::warning('⚠️ S3 check failed in attachMedia (will let job retry)', [
           'error' => $s3Error->getMessage(),
           'path' => $path,
           'publication_id' => $publication->id
         ]);
-        return $this->errorResponse('Failed to verify file in storage: ' . $s3Error->getMessage(), 500);
+        // Don't block — the job will verify with retries
       }
 
-      if (!$fileExists) {
-        Log::warning('⚠️ File not found in S3', [
+      if ($fileExists) {
+        Log::info('✅ S3 file verified immediately', ['path' => $path]);
+      } else {
+        Log::info('⏳ S3 file not yet visible, ProcessBackgroundUpload will verify with retries', [
           'path' => $path,
-          'pathTrimmed' => $pathTrimmed,
           'publication_id' => $publication->id
         ]);
-        return $this->errorResponse('File not found in storage. Please try uploading again.', 404);
       }
-
-      Log::info('✅ S3 file verified', ['path' => $path]);
 
       // Calculate next order
       // Using generic DB query to avoid loading all models if possible, or use relationship
@@ -2041,7 +2041,7 @@ class PublicationController extends Controller
 
       Log::info("📊 Calculated order", ['max_order' => $maxOrder, 'next_order' => $nextOrder]);
 
-      // Create MediaFile record explicitly
+      // Create or update MediaFile record
       $metadata = [];
       if ($request->has('duration')) {
         $metadata['duration'] = $request->duration;
@@ -2056,18 +2056,31 @@ class PublicationController extends Controller
         $metadata['aspect_ratio'] = $request->aspect_ratio;
       }
 
-      $mediaFile = MediaFile::create([
-        'workspace_id' => $publication->workspace_id,
-        'publication_id' => $publication->id, // Redundant if pivot used, but good for direct belonging
-        'file_path' => $path,
-        'file_name' => $request->filename,
-        'file_type' => str_starts_with($request->mime_type, 'video') ? 'video' : 'image',
-        'mime_type' => $request->mime_type,
-        'size' => $request->size,
-        'status' => 'processing',
-        'user_id' => Auth::id(), // Ensure user ownership
-        'metadata' => $metadata,
-      ]);
+      $mediaFile = MediaFile::where('s3_key', $path)
+        ->orWhere('file_path', $path)
+        ->first();
+
+      if ($mediaFile) {
+        $mediaFile->update([
+          'publication_id' => $publication->id,
+          'metadata' => !empty($metadata) ? array_merge($mediaFile->metadata ?? [], $metadata) : $mediaFile->metadata,
+          's3_key' => $path,
+        ]);
+      } else {
+        $mediaFile = MediaFile::create([
+          'workspace_id' => $publication->workspace_id,
+          'publication_id' => $publication->id,
+          'file_path' => $path,
+          's3_key' => $path,
+          'file_name' => $request->filename,
+          'file_type' => str_starts_with($request->mime_type, 'video') ? 'video' : 'image',
+          'mime_type' => $request->mime_type,
+          'size' => $request->size,
+          'status' => 'processing',
+          'user_id' => Auth::id(),
+          'metadata' => $metadata,
+        ]);
+      }
 
       Log::info('✅ MediaFile created', ['id' => $mediaFile->id, 'status' => $mediaFile->status]);
 
@@ -2075,6 +2088,16 @@ class PublicationController extends Controller
       $publication->mediaFiles()->attach($mediaFile->id, ['order' => $nextOrder]);
 
       Log::info('🔗 Media attached to publication', ['media_id' => $mediaFile->id, 'publication_id' => $publication->id, 'order' => $nextOrder]);
+
+      // For video files, set publication status to 'processing' so the frontend
+      // knows to wait and the job can transition it back to draft/scheduled when done.
+      if ($mediaFile->file_type === 'video' && !in_array($publication->status, ['processing', 'publishing', 'published'])) {
+        $publication->update(['status' => 'processing']);
+        Log::info('📹 Publication status set to processing for video upload', [
+          'publication_id' => $publication->id,
+          'media_file_id' => $mediaFile->id,
+        ]);
+      }
 
       // Dispatch job to verify S3 file and generate thumbnails if needed
       // Passing null as tempPath indicates it's already on S3 (Direct Upload)
@@ -2114,7 +2137,10 @@ class PublicationController extends Controller
       // Broadcast to other users in the workspace
       event(new PublicationUpdated($publication));
 
-      return $this->successResponse(['publication' => $publication], 'Media attached successfully.');
+      return $this->successResponse([
+        'publication' => $publication,
+        'media_file' => $mediaFile,
+      ], 'Media attached successfully.');
     } catch (\Exception $e) {
       Log::error('❌ Failed to attach media', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
       return $this->errorResponse('Failed to attach media: ' . $e->getMessage(), 500);

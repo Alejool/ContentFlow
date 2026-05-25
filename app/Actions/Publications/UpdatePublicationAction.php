@@ -293,19 +293,21 @@ class UpdatePublicationAction
       }
 
       // Check for video uploads to set processing status (only if not already processing)
+      // IMPORTANT: Only set 'processing' for actual UploadedFile objects (server-side uploads).
+      // S3 direct uploads (metadata arrays with 'key') are already handled by attachMedia,
+      // which dispatches ProcessBackgroundUpload. Setting 'processing' here for those would
+      // leave the publication stuck if the job already completed before the form was saved.
       if ($currentStatus !== 'processing') {
         foreach ($newFiles as $file) {
-          $isVideo = false;
           if ($file instanceof UploadedFile) {
-            $isVideo = str_starts_with($file->getMimeType(), 'video/');
-          } elseif (is_array($file)) {
-            $isVideo = str_starts_with($file['mime_type'] ?? '', 'video/');
+            // Only server-side uploaded files trigger processing status
+            if (str_starts_with($file->getMimeType(), 'video/')) {
+              $newStatus = 'processing';
+              break;
+            }
           }
-
-          if ($isVideo) {
-            $newStatus = 'processing';
-            break;
-          }
+          // S3 direct uploads (arrays with 'key') do NOT set processing status here —
+          // ProcessBackgroundUpload was already dispatched by attachMedia.
         }
       }
 

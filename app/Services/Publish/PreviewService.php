@@ -142,18 +142,34 @@ class PreviewService
             return null;
         }
 
-        // Si ya tiene miniatura, usarla
+        // Si ya tiene miniatura, generar presigned URL
         if ($mediaFile->thumbnail_path) {
-            return Storage::url($mediaFile->thumbnail_path);
+            try {
+                return Storage::temporaryUrl($mediaFile->thumbnail_path, now()->addMinutes(60));
+            } catch (\Exception $e) {
+                Log::warning('Failed to generate presigned thumbnail URL', [
+                    'path' => $mediaFile->thumbnail_path,
+                    'error' => $e->getMessage()
+                ]);
+                return null;
+            }
         }
 
         // Generar miniatura si es video
-        if ($mediaFile->type === 'video') {
+        if ($mediaFile->file_type === 'video') {
             return $this->extractVideoThumbnail($mediaFile);
         }
 
-        // Si es imagen, usar la imagen misma
-        return Storage::url($mediaFile->path);
+        // Si es imagen, generar presigned URL
+        try {
+            return Storage::temporaryUrl($mediaFile->file_path, now()->addMinutes(60));
+        } catch (\Exception $e) {
+            Log::warning('Failed to generate presigned image URL', [
+                'path' => $mediaFile->file_path,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
 
     /**
@@ -172,8 +188,8 @@ class PreviewService
     protected function extractVideoThumbnail($mediaFile): ?string
     {
         try {
-            $videoPath = Storage::path($mediaFile->path);
-            $thumbnailPath = 'thumbnails/' . pathinfo($mediaFile->filename, PATHINFO_FILENAME) . '.jpg';
+            $videoPath = Storage::path($mediaFile->file_path);
+            $thumbnailPath = 'thumbnails/' . pathinfo($mediaFile->file_name, PATHINFO_FILENAME) . '.jpg';
             $fullThumbnailPath = Storage::path($thumbnailPath);
 
             // Crear directorio si no existe
@@ -192,7 +208,15 @@ class PreviewService
             exec($command, $output, $returnCode);
 
             if ($returnCode === 0 && file_exists($fullThumbnailPath)) {
-                return Storage::url($thumbnailPath);
+                try {
+                    return Storage::temporaryUrl($thumbnailPath, now()->addMinutes(60));
+                } catch (\Exception $e) {
+                    Log::warning('Failed to generate presigned thumbnail URL', [
+                        'path' => $thumbnailPath,
+                        'error' => $e->getMessage()
+                    ]);
+                    return null;
+                }
             }
 
             return null;
