@@ -14,11 +14,13 @@ use App\Http\Controllers\Workspace\WorkspaceController;
 use App\Http\Controllers\Workspace\ApiTokenController;
 use App\Http\Controllers\Workspace\InvitationController;
 use App\Http\Controllers\Api\ExternalCalendarController;
+use App\Http\Controllers\Subscription\AddonsController;
+use App\Http\Controllers\Subscription\AddonPurchaseController;
 
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Schema; 
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Auth\Role;
 use App\Models\Workspace\Workspace;
@@ -26,9 +28,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\SystemNotificationController;
 use App\Http\Controllers\Publications\ClientPortalController;
 use App\Http\Controllers\StripeCheckoutController;
-use App\Http\Controllers\Subscription\PricingController;
-use App\Http\Controllers\Subscription\UsageMetricsController;
-use App\Http\Controllers\Subscription\AddonsController;
 
 use App\Services\Common\SystemConfigService;
 
@@ -141,8 +140,8 @@ Route::middleware('auth')->group(function () {
     // Add-ons routes
     Route::get('/addons', [AddonsController::class, 'index'])->name('addons');
     Route::post('/addons/purchase', [AddonsController::class, 'purchase'])->middleware('purchases.enabled')->name('addons.purchase');
-    Route::get('/addons/success', [\App\Http\Controllers\Subscription\AddonPurchaseController::class, 'success'])->name('addons.success');
-    Route::get('/addons/cancelled', [\App\Http\Controllers\Subscription\AddonPurchaseController::class, 'cancelled'])->name('addons.cancelled');
+    Route::get('/addons/success', [AddonPurchaseController::class, 'success'])->name('addons.success');
+    Route::get('/addons/cancelled', [AddonPurchaseController::class, 'cancelled'])->name('addons.cancelled');
   });
 
 

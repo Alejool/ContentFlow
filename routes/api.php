@@ -85,7 +85,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('processing')->name('processing.')->group(function () {
       require __DIR__ . '/api/v1/processing.php';
     });
-    require __DIR__ . '/api/v1/reels.php';
+    Route::prefix('reels')->name('reels.')->group(function () {
+      require __DIR__ . '/api/v1/reels.php';
+    });
+    Route::prefix('media')->name('media.')->group(function () {
+      require __DIR__ . '/api/v1/media.php';
+    });
+    require __DIR__ . '/api/v1/files.php';
     require __DIR__ . '/api/v1/excel-import.php';
   });
 
