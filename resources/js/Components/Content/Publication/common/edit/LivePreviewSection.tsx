@@ -11,6 +11,7 @@ import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsC
 import { AtSign, Facebook, Instagram, Linkedin, Music2, Twitter, Youtube } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePresignedUrlsByKey } from '@/Hooks/Upload/usePresignedUrl';
 
 const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -148,6 +149,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
 interface LivePreviewSectionProps {
   content: string;
   mediaUrls: string[];
+  mediaTypes?: string[]; // Array of media types ('image' | 'video') to properly detect videos with blob URLs
   user?: {
     name: string;
     username: string;
@@ -176,6 +178,7 @@ type Platform =
 export const LivePreviewSection = ({
   content,
   mediaUrls,
+  mediaTypes,
   user,
   publishedLinks,
   className,
@@ -262,6 +265,24 @@ export const LivePreviewSection = ({
     }
   }, [tabs, activePlatform]);
 
+  // Resolve S3 keys to presigned URLs
+  const safeMediaUrls = useMemo(() => (Array.isArray(mediaUrls) ? mediaUrls : []), [mediaUrls]);
+
+  const s3KeysToResolve = useMemo(() => {
+    return safeMediaUrls.filter(url => url && !url.startsWith('http') && !url.startsWith('/storage') && !url.startsWith('blob:') && !url.startsWith('data:'));
+  }, [safeMediaUrls]);
+
+  const { urlsByKey } = usePresignedUrlsByKey(s3KeysToResolve);
+
+  const resolvedMediaUrls = useMemo(() => {
+    return safeMediaUrls.map(url => {
+      if (url && !url.startsWith('http') && !url.startsWith('/storage') && !url.startsWith('blob:') && !url.startsWith('data:')) {
+        return urlsByKey[url] || url; // Fallback to original if not yet resolved
+      }
+      return url;
+    });
+  }, [safeMediaUrls, urlsByKey]);
+
   return (
     <div className={`space-y-4 ${className || ''}`}>
       <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-theme-bg-secondary">
@@ -332,7 +353,8 @@ export const LivePreviewSection = ({
             {activePlatform === 'twitter' && (
               <TwitterPreview
                 content={content}
-                mediaUrls={mediaUrls}
+                mediaUrls={resolvedMediaUrls}
+                mediaTypes={mediaTypes}
                 user={user}
                 contentType={contentType}
                 pollOptions={pollOptions}
@@ -340,18 +362,19 @@ export const LivePreviewSection = ({
               />
             )}
             {activePlatform === 'instagram' && (
-              <InstagramPreview content={content} mediaUrls={mediaUrls} user={user} />
+              <InstagramPreview content={content} mediaUrls={resolvedMediaUrls} mediaTypes={mediaTypes} user={user} />
             )}
             {activePlatform === 'threads' && (
-              <ThreadsPreview content={content} mediaUrls={mediaUrls} user={user} />
+              <ThreadsPreview content={content} mediaUrls={resolvedMediaUrls} mediaTypes={mediaTypes} user={user} />
             )}
             {activePlatform === 'linkedin' && (
-              <LinkedInPreview content={content} mediaUrls={mediaUrls} user={user} />
+              <LinkedInPreview content={content} mediaUrls={resolvedMediaUrls} mediaTypes={mediaTypes} user={user} />
             )}
             {activePlatform === 'facebook' && (
               <FacebookPreview
                 content={content}
-                mediaUrls={mediaUrls}
+                mediaUrls={resolvedMediaUrls}
+                mediaTypes={mediaTypes}
                 user={user}
                 publishedAt={publishedAt}
                 contentType={contentType}
@@ -360,12 +383,13 @@ export const LivePreviewSection = ({
               />
             )}
             {activePlatform === 'tiktok' && (
-              <TikTokPreview content={content} mediaUrls={mediaUrls} user={user} />
+              <TikTokPreview content={content} mediaUrls={resolvedMediaUrls} mediaTypes={mediaTypes} user={user} />
             )}
             {activePlatform === 'youtube' && (
               <YouTubePreview
                 content={content}
-                mediaUrls={mediaUrls}
+                mediaUrls={resolvedMediaUrls}
+                mediaTypes={mediaTypes}
                 user={user}
                 title={title}
                 publishedAt={publishedAt}

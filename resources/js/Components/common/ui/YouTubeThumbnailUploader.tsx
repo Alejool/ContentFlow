@@ -1,10 +1,12 @@
 import { Play, Trash2, Upload, X, ZoomIn } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useFileAccess } from '@/Hooks/Upload/useSignedUrls';
 
 interface YouTubeThumbnailUploaderProps {
   videoId: number;
   videoFileName?: string;
+  mediaFileId?: number;
   videoPreviewUrl?: string;
   existingThumbnail?: {
     url: string;
@@ -17,19 +19,37 @@ interface YouTubeThumbnailUploaderProps {
 const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
   videoId,
   videoFileName,
+  mediaFileId,
   videoPreviewUrl,
   existingThumbnail,
   onThumbnailChange,
   onThumbnailDelete,
 }: YouTubeThumbnailUploaderProps) {
   const { t } = useTranslation();
+  const { getAccessUrl } = useFileAccess();
   const [preview, setPreview] = useState<string | null>(existingThumbnail?.url || null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(videoPreviewUrl || null);
   const [showFullSize, setShowFullSize] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Fetch signed URL for video preview if mediaFileId is provided
+  useEffect(() => {
+    if (mediaFileId && !videoPreviewUrl) {
+      getAccessUrl(mediaFileId)
+        .then((url) => {
+          setVideoUrl(url);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch video URL:', err);
+        });
+    } else if (videoPreviewUrl) {
+      setVideoUrl(videoPreviewUrl);
+    }
+  }, [mediaFileId, videoPreviewUrl, getAccessUrl]);
 
   useEffect(() => {
     setPreview(existingThumbnail?.url || null);
@@ -146,7 +166,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
   return (
     <div className="space-y-3">
       {/* Video Preview */}
-      {videoPreviewUrl && (
+      {videoUrl && (
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex items-center gap-3">
             <div className="group relative shrink-0 cursor-pointer" onClick={handleShowVideoModal}>
@@ -288,7 +308,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       )}
 
       {/* Video Preview Modal */}
-      {showVideoModal && videoPreviewUrl && (
+      {showVideoModal && videoUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           onClick={handleCloseVideoModal}
@@ -302,7 +322,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
             </button>
             <video
               ref={videoRef}
-              src={videoPreviewUrl}
+              src={videoUrl}
               className="max-h-[80vh] w-full rounded-lg"
               controls
               autoPlay
@@ -327,7 +347,8 @@ const arePropsEqual = (
   if (
     prevProps.videoId !== nextProps.videoId ||
     prevProps.videoFileName !== nextProps.videoFileName ||
-    prevProps.videoPreviewUrl !== nextProps.videoPreviewUrl
+    prevProps.videoPreviewUrl !== nextProps.videoPreviewUrl ||
+    prevProps.mediaFileId !== nextProps.mediaFileId
   ) {
     return false;
   }

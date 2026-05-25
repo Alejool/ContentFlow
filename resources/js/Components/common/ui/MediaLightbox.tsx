@@ -1,7 +1,64 @@
 import Button from '@/Components/common/Modern/Button';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { usePresignedUrlByKey } from '@/Hooks/Upload/usePresignedUrl';
+import { ChevronLeft, ChevronRight, X, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+
+function LightboxMediaElement({ 
+  media, 
+  isThumbnail = false, 
+  onVideoError 
+}: { 
+  media: MediaItem, 
+  isThumbnail?: boolean,
+  onVideoError?: (e: React.SyntheticEvent<HTMLVideoElement, Event>) => void
+}) {
+  const urlStr = typeof media.url === 'string' ? media.url : '';
+  const isS3Key = !!urlStr && !urlStr.startsWith('http') && !urlStr.startsWith('/storage') && !urlStr.startsWith('blob:') && !urlStr.startsWith('data:');
+  
+  const { data, isLoading } = usePresignedUrlByKey(
+    isS3Key ? urlStr : null,
+    { mediaType: media.type }
+  );
+
+  const finalUrl = isS3Key ? (data?.preview_url ?? '') : urlStr;
+
+  if (isS3Key && isLoading) {
+    return (
+      <div className={`flex h-full w-full items-center justify-center bg-gray-900 ${!isThumbnail && 'min-h-[200px] min-w-[200px]'}`}>
+        <Loader2 className="h-6 w-6 animate-spin text-white" />
+      </div>
+    );
+  }
+
+  if (media.type === 'video') {
+    return (
+      <video
+        src={finalUrl}
+        className={isThumbnail ? "h-full w-full object-cover" : "max-h-full max-w-full rounded-lg bg-black shadow-[0_0_50px_rgba(0,0,0,0.5)]"}
+        controls={!isThumbnail}
+        autoPlay={!isThumbnail}
+        muted={isThumbnail}
+        loop={isThumbnail}
+        playsInline={isThumbnail}
+        onError={onVideoError}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={finalUrl}
+      alt={media.title || 'Media preview'}
+      className={isThumbnail ? "h-full w-full object-cover" : "max-h-full max-w-full rounded-lg object-contain shadow-[0_0_50px_rgba(0,0,0,0.5)]"}
+      onError={(e) => {
+        if (isThumbnail) {
+          e.currentTarget.src = 'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
+        }
+      }}
+    />
+  );
+}
 
 interface MediaItem {
   url: string;
@@ -109,20 +166,7 @@ export default function MediaLightbox({
           key={currentIndex}
           className={`absolute inset-0 flex items-center justify-center p-4 transition-all duration-300 ease-out ${isAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}
         >
-          {currentMedia.type === 'video' ? (
-            <video
-              src={currentMedia.url}
-              className="max-h-full max-w-full rounded-lg bg-black shadow-[0_0_50px_rgba(0,0,0,0.5)]"
-              controls
-              autoPlay
-            />
-          ) : (
-            <img
-              src={currentMedia.url}
-              alt={currentMedia.title || 'Media preview'}
-              className="max-h-full max-w-full rounded-lg object-contain shadow-[0_0_50px_rgba(0,0,0,0.5)]"
-            />
-          )}
+          <LightboxMediaElement media={currentMedia} />
         </div>
 
         {mediaArray.length > 1 && (
@@ -144,39 +188,23 @@ export default function MediaLightbox({
                     : 'border-transparent hover:border-gray-400'
                 }`}
               >
-                {media.type === 'video' ? (
-                  <video
-                    src={media.url}
-                    className="h-full w-full object-cover"
-                    muted
-                    loop
-                    playsInline
-                    onError={(e) => {
-                      // Fallback to icon if video fails to load
-                      e.currentTarget.style.display = 'none';
-                      const parent = e.currentTarget.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `
-                          <div class="flex h-full w-full items-center justify-center bg-gray-800">
-                            <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-                            </svg>
-                          </div>
-                        `;
-                      }
-                    }}
-                  />
-                ) : (
-                  <img
-                    src={media.url}
-                    alt={`Thumbnail ${idx + 1}`}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        'https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80';
-                    }}
-                  />
-                )}
+                <LightboxMediaElement 
+                  media={media} 
+                  isThumbnail={true} 
+                  onVideoError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <div class="flex h-full w-full items-center justify-center bg-gray-800">
+                          <svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
+                          </svg>
+                        </div>
+                      `;
+                    }
+                  }} 
+                />
               </button>
             ))}
           </div>

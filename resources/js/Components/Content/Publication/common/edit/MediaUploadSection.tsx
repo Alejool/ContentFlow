@@ -2,6 +2,7 @@ import Label from '@/Components/common/Modern/Label';
 import { getMediaRulesForContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import type { ContentType } from '@/Components/Content/Publication/common/ContentTypeSelector';
 import { AlertTriangle, FileImage, Info, Loader2, Upload, Video, X } from 'lucide-react';
+import { usePresignedUrlByKey } from '@/Hooks/Upload/usePresignedUrl';
 import React, { memo, useMemo, useRef } from 'react';
 
 interface MediaUploadSectionProps {
@@ -337,6 +338,25 @@ const MediaPreviewItem = memo(
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const isVideo = preview.type.includes('video');
+    const isS3Key = preview.url && !preview.url.startsWith('http') && !preview.url.startsWith('/storage') && !preview.url.startsWith('blob:') && !preview.url.startsWith('data:');
+    const { data: presignedData, isLoading: presignedLoading } = usePresignedUrlByKey(
+      isS3Key ? preview.url : null,
+      { mediaType: isVideo ? 'video' : 'image' }
+    );
+    // While the presigned URL is loading, keep finalUrl as undefined so we don't
+    // render a <video src=""> that causes a 404 request to the current page URL.
+    const finalUrl = isS3Key
+      ? (presignedLoading ? undefined : presignedData?.preview_url)
+      : preview.url;
+
+    const isThumbS3Key = preview.thumbnailUrl && !preview.thumbnailUrl.startsWith('http') && !preview.thumbnailUrl.startsWith('/storage') && !preview.thumbnailUrl.startsWith('blob:') && !preview.thumbnailUrl.startsWith('data:');
+    const { data: presignedThumbData } = usePresignedUrlByKey(
+      isThumbS3Key ? preview.thumbnailUrl : null,
+      { mediaType: 'image' }
+    );
+    const finalThumbUrl = isThumbS3Key ? (presignedThumbData?.preview_url ?? '') : preview.thumbnailUrl;
+
     const formatETA = (seconds?: number) => {
       if (!seconds || typeof seconds !== 'number' || isNaN(seconds)) return '';
       const roundedSeconds = Math.round(seconds);
@@ -352,6 +372,8 @@ const MediaPreviewItem = memo(
       isExternalProcessing;
     const isUploading =
       !error && (preview.status === 'uploading' || (progress !== undefined && progress < 100));
+    // Show a loading skeleton while waiting for the presigned URL
+    const isResolvingUrl = isS3Key && presignedLoading;
 
     return (
       <div
@@ -363,7 +385,7 @@ const MediaPreviewItem = memo(
         {isProcessing || isUploading ? (
           <div className="flex h-full w-full flex-col items-center justify-center bg-gray-800 p-4 text-white">
             <div className="mb-2 rounded-full bg-white/10 p-3">
-              {preview.type.includes('video') ? (
+              {isVideo ? (
                 <Video className="h-8 w-8 text-white/50" />
               ) : (
                 <FileImage className="h-8 w-8 text-white/50" />
@@ -373,9 +395,15 @@ const MediaPreviewItem = memo(
               {isUploading ? 'Uploading...' : 'Processing...'}
             </span>
           </div>
-        ) : preview.type.includes('video') ? (
+        ) : isResolvingUrl ? (
+          <div className="flex h-full w-full items-center justify-center bg-gray-800">
+            <Loader2 className="h-8 w-8 animate-spin text-white/40" />
+          </div>
+        ) : isVideo ? (
           <VideoPreview
             preview={preview}
+            finalUrl={finalUrl ?? ''}
+            finalThumbUrl={finalThumbUrl}
             thumbnail={thumbnail}
             onSetThumbnail={onSetThumbnail}
             onClearThumbnail={onClearThumbnail}
@@ -384,7 +412,7 @@ const MediaPreviewItem = memo(
             duration={metadata?.duration}
           />
         ) : (
-          <img src={preview.url} className="h-full w-full object-cover" alt="Media preview" />
+          <img src={finalUrl ?? ''} className="h-full w-full object-cover" alt="Media preview" />
         )}
 
         {/* Upload Overlay (Matching Outside Style) */}
@@ -434,6 +462,8 @@ const MediaPreviewItem = memo(
 const VideoPreview = memo(
   ({
     preview,
+    finalUrl,
+    finalThumbUrl,
     thumbnail,
     onSetThumbnail,
     onClearThumbnail,
@@ -442,6 +472,8 @@ const VideoPreview = memo(
     duration,
   }: {
     preview: any;
+    finalUrl: string;
+    finalThumbUrl?: string;
     thumbnail?: File;
     onSetThumbnail: (file: File) => void;
     onClearThumbnail: () => void;
@@ -450,7 +482,7 @@ const VideoPreview = memo(
     duration?: number;
   }) => (
     <>
-      <video src={preview.url} className="h-full w-full object-cover opacity-80" />
+      <video src={finalUrl} className="h-full w-full object-cover opacity-80" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
         <span className="rounded bg-black/50 px-2 py-1 text-xs font-medium text-white/80">
           {duration
@@ -490,10 +522,10 @@ const VideoPreview = memo(
           )}
         </div>
       </div>
-      {(thumbnail || preview.thumbnailUrl) && (
+      {(thumbnail || finalThumbUrl) && (
         <div className="absolute left-2 top-2 z-10 h-8 w-8 overflow-hidden rounded border border-white/30 shadow-lg">
           <img
-            src={thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl}
+            src={thumbnail ? URL.createObjectURL(thumbnail) : finalThumbUrl}
             className="h-full w-full object-cover"
             alt="Video thumbnail"
           />

@@ -112,14 +112,16 @@ const handleProgress = (
 };
 
 const uploadSingle = async (file: File, id: string, startTime: number, context?: string) => {
+  // Generar signed PUT URL del nuevo endpoint
+  const uploadType = context === 'profile' ? 'avatar' : context === 'workspace' ? 'document' : 'publication';
+  
   const { data: signData } = await axios.post(
-    route('api.v1.uploads.sign'),
+    `/api/v1/files/upload-url`,
     {
-      filename: file.name,
-      content_type: file.type,
-      file_size: file.size,
-      pending_bytes: calculatePendingBytes(id),
-      context: context || 'publication', // default to publication
+      fileName: file.name,
+      mimeType: file.type,
+      size: file.size,
+      uploadType: uploadType,
     },
     { timeout: 30_000 },
   );
@@ -127,7 +129,8 @@ const uploadSingle = async (file: File, id: string, startTime: number, context?:
   const abortController = useUploadQueue.getState().queue[id]?.abortController;
   const uploadTimeout = Math.max(60_000, Math.ceil(file.size / (10 * 1024 * 1024)) * 30_000);
 
-  await axios.put(signData.upload_url, file, {
+  // Subir directamente a S3 usando la signed URL
+  await axios.put(signData.uploadUrl, file, {
     headers: { 'Content-Type': file.type },
     withCredentials: false,
     signal: abortController?.signal,
@@ -135,7 +138,19 @@ const uploadSingle = async (file: File, id: string, startTime: number, context?:
     onUploadProgress: (p) => handleProgress(p, id, startTime, 0, file.size),
   });
 
-  return { key: signData.key, filename: file.name, mime_type: file.type, size: file.size };
+  // Confirmar el upload en el backend
+  const { data: confirmData } = await axios.post(
+    `/api/v1/files/confirm-upload`,
+    {
+      s3Key: signData.s3Key,
+      fileName: file.name,
+      mimeType: file.type,
+      size: file.size,
+    },
+    { timeout: 30_000 },
+  );
+
+  return { key: signData.s3Key, filename: file.name, mime_type: file.type, size: file.size, mediaFileId: confirmData.mediaFileId };
 };
 
 const uploadMultipart = async (file: File, id: string, startTime: number, context?: string) => {
@@ -250,6 +265,7 @@ interface UploadResult {
   filename: string;
   mime_type: string;
   size: number;
+  mediaFileId?: number;
 }
 
 const performUpload = async ({ file, tempId, context }: UploadInput): Promise<UploadResult> => {
@@ -282,10 +298,11 @@ const performUpload = async ({ file, tempId, context }: UploadInput): Promise<Up
     updateUpload(tempId, { status: 'completed', progress: 100, s3Key: result.key });
     useMediaStore.getState().updateFile(tempId, {
       status: 'completed',
-      file: { key: result.key, filename: file.name, mime_type: file.type, size: file.size } as any,
+      file: { key: result.key, filename: file.name, mime_type: file.type, size: file.size, id: result.mediaFileId } as any,
     });
 
-    // Auto-attach to publication if linked
+    // Attach media to publication if linked.
+    // We always send key+filename+mime_type+size so the backend can find or create the MediaFile.
     const currentUpload = useUploadQueue.getState().queue[tempId];
     if (currentUpload?.publicationId) {
       try {
@@ -305,6 +322,7 @@ const performUpload = async ({ file, tempId, context }: UploadInput): Promise<Up
           }
         }
 
+        // Asociar media file a la publicación usando key + metadata
         const { data } = await axios.post(
           route('api.v1.publications.attach-media', currentUpload.publicationId),
           {
@@ -316,7 +334,15 @@ const performUpload = async ({ file, tempId, context }: UploadInput): Promise<Up
           },
         );
 
-        if (data.media_file?.id) {
+        if (data.publication?.media_files) {
+          // Find the newly attached media file by key
+          const attached = data.publication.media_files.find(
+            (mf: any) => mf.file_path === result.key || mf.s3_key === result.key
+          );
+          if (attached?.id) {
+            useMediaStore.getState().updateFile(tempId, { id: attached.id, isNew: false });
+          }
+        } else if (data.media_file?.id) {
           useMediaStore.getState().updateFile(tempId, { id: data.media_file.id, isNew: false });
         }
       } catch (attachErr) {
