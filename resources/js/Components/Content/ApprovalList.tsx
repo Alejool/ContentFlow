@@ -5,6 +5,7 @@ import Button from '@/Components/common/Modern/Button';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import { VirtualList } from '@/Components/common/ui/VirtualList';
+import { usePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
 import { getDateFnsLocale } from '@/Utils/common/dateLocales';
 import { formatDateTimeString } from '@/Utils/formatters';
 import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
@@ -15,7 +16,7 @@ import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import type { Locale } from 'date-fns';
 import { formatDistanceToNow } from 'date-fns';
-import { Check, Clock, Eye, FileText, Layers, User, X } from 'lucide-react';
+import { Check, Clock, Eye, FileText, Layers, Loader2, User, X } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +52,45 @@ function ApprovalRequestItem({
 
   // Get media preview
   const firstMedia = publication.media_files?.[0];
-  const mediaPreview = firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
+  const mediaId = firstMedia?.thumbnail?.id || firstMedia?.id;
+
+  return (
+    <ApprovalCard
+      request={request}
+      publication={publication}
+      mediaId={mediaId}
+      onViewDetail={onViewDetail}
+      onApprove={onApprove}
+      onReject={onReject}
+      getStatusColor={getStatusColor}
+      t={t}
+      locale={locale}
+    />
+  );
+}
+
+function ApprovalCard({
+  request,
+  publication,
+  mediaId,
+  onViewDetail,
+  onApprove,
+  onReject,
+  getStatusColor,
+  t,
+  locale,
+}: {
+  request: ApprovalRequest;
+  publication: Publication;
+  mediaId?: number;
+  onViewDetail: (publication: Publication) => void;
+  onApprove: (request: ApprovalRequest) => void;
+  onReject: (request: ApprovalRequest) => void;
+  getStatusColor: (status?: string) => string;
+  t: any;
+  locale: Locale;
+}) {
+  const { data, isLoading } = usePresignedUrl(mediaId, { mediaType: 'image' });
 
   return (
     <div className="group hover:border-primary-400 dark:hover:border-primary-600 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary">
@@ -93,15 +132,27 @@ function ApprovalRequestItem({
       <div className="p-6">
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Media Preview */}
-          {mediaPreview && (
+          {mediaId && (
             <div className="shrink-0">
               <div className="relative h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-md transition-shadow group-hover:shadow-lg lg:w-40 dark:from-neutral-900 dark:to-neutral-800">
-                <img
-                  src={mediaPreview}
-                  alt={publication.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                {isLoading ? (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
+                  </div>
+                ) : data?.preview_url ? (
+                  <>
+                    <img
+                      src={data.preview_url}
+                      alt={publication.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  </>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-gray-300">
+                    <FileText className="h-8 w-8 text-gray-600" />
+                  </div>
+                )}
               </div>
             </div>
           )}

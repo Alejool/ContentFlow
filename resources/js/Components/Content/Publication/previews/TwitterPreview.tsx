@@ -5,6 +5,7 @@ import { Heart, MessageCircle, Repeat, Share } from 'lucide-react';
 interface TwitterPreviewProps {
   content: string;
   mediaUrls: string[];
+  mediaTypes?: string[];
   user?: {
     name: string;
     username: string;
@@ -20,6 +21,7 @@ interface TwitterPreviewProps {
 export const TwitterPreview = ({
   content,
   mediaUrls,
+  mediaTypes,
   user,
   date = new Date(),
   className = '',
@@ -66,8 +68,8 @@ export const TwitterPreview = ({
             >
               {mediaUrls.slice(0, 4).map((url, index) => (
                 <div key={index} className="relative aspect-[16/9] bg-gray-100 dark:bg-gray-900">
-                  {/* Simple check for video extension, otherwise assume image */}
-                  {url.match(/\.(mp4|mov|webm)$/i) ? (
+                  {/* Use mediaTypes array if available, otherwise fallback to URL extension detection */}
+                  {(mediaTypes?.[index] === 'video' || (!mediaTypes && url.match(/\.(mp4|mov|webm)$/i))) ? (
                     <video src={url} className="h-full w-full object-cover" controls={false} />
                   ) : (
                     <img src={url} alt="Post media" className="h-full w-full object-cover" />

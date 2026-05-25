@@ -4,7 +4,8 @@ import {
   isProcessing,
   prepareMediaForPreview,
 } from '@/Utils/Publications/publicationHelpers';
-import { Calendar, Clock, Image as ImageIcon, Video } from 'lucide-react';
+import { usePresignedUrlByKey } from '@/Hooks/Upload/usePresignedUrl';
+import { Calendar, Clock, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -52,6 +53,16 @@ export default function PublicationThumbnailCard({
   const isUserEvent = (publication as Publication & { type?: string }).type === 'user_event';
   const itemHasMedia = hasMedia(publication);
 
+  // Determine if mediaUrl is an S3 key (doesn't start with http or /storage)
+  const isS3Key = mediaUrl && !mediaUrl.startsWith('http') && !mediaUrl.startsWith('/storage') && !mediaUrl.startsWith('blob:');
+  
+  const { data: presignedData, isLoading } = usePresignedUrlByKey(
+    isS3Key ? mediaUrl : null,
+    { mediaType: isVideo ? 'video' : 'image' }
+  );
+
+  const finalMediaUrl = isS3Key ? presignedData?.preview_url : mediaUrl;
+
   const handleClick = (e: React.MouseEvent) => {
     // NO hacer stopPropagation aquí para que el click funcione en tablas
 
@@ -83,29 +94,29 @@ export default function PublicationThumbnailCard({
           <div className="from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 flex h-full w-full items-center justify-center bg-gradient-to-br">
             <Calendar className="text-primary-600 dark:text-primary-400 h-10 w-10" />
           </div>
-        ) : itemIsProcessing ? (
+        ) : itemIsProcessing || isLoading ? (
           <div className="flex h-full w-full animate-pulse flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
             <div className="mb-2 flex items-center justify-center rounded-lg bg-blue-100 p-3 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-              <Clock className="h-6 w-6 animate-spin" />
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Clock className="h-6 w-6 animate-spin" />}
             </div>
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-              {t('common.processing')}...
+              {isLoading ? t('common.loading') : t('common.processing')}...
             </span>
           </div>
-        ) : isVideo && !imageError && mediaUrl ? (
+        ) : isVideo && !imageError && finalMediaUrl ? (
           // Mostrar video real
           <video
-            src={mediaUrl}
+            src={finalMediaUrl}
             className="h-full w-full object-cover"
             muted
             loop
             playsInline
             onError={() => setImageError(true)}
           />
-        ) : !imageError && mediaUrl ? (
+        ) : !imageError && finalMediaUrl ? (
           // Mostrar imagen
           <img
-            src={mediaUrl}
+            src={finalMediaUrl}
             alt={publication.title || 'Media'}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"

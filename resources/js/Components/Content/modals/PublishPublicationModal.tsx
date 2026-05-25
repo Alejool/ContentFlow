@@ -431,14 +431,13 @@ export default function PublishPublicationModal({
     return videoFiles.map((video) => {
       const videoId = video.id;
       const existingThumbnail = existingThumbnails[videoId];
-      const videoPreviewUrl = video.file_path?.startsWith('http')
-        ? video.file_path
-        : `/storage/${video.file_path}`;
+      // NEW: Store mediaFileId instead of constructing URL
+      // The viewer component will request signed URL on-demand via useFileAccess
 
       return {
         videoId,
         videoFileName: video.file_name,
-        videoPreviewUrl,
+        mediaFileId: video.id, // Use this to fetch signed URL later
         // Crear un nuevo objeto solo si el contenido cambió
         existingThumbnail: existingThumbnail
           ? { url: existingThumbnail.url, id: existingThumbnail.id }
@@ -885,7 +884,7 @@ export default function PublishPublicationModal({
                               key={data.videoId}
                               videoId={data.videoId}
                               videoFileName={data.videoFileName}
-                              videoPreviewUrl={data.videoPreviewUrl}
+                              mediaFileId={data.mediaFileId}
                               existingThumbnail={data.existingThumbnail}
                               onThumbnailChange={handleThumbnailChange}
                               onThumbnailDelete={handleThumbnailDelete}

@@ -906,6 +906,7 @@ const EditPublicationModal = ({
                     <LivePreviewSection
                       content={previewContent}
                       mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                      mediaTypes={stabilizedMediaPreviews.map((m) => m.type || '')}
                       user={{
                         name: auth.user.name,
                         username: 'username',
@@ -1101,6 +1102,7 @@ const EditPublicationModal = ({
                     <LivePreviewSection
                       content={previewContent}
                       mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                      mediaTypes={stabilizedMediaPreviews.map((m) => m.type || '')}
                       user={{
                         name: auth.user.name,
                         username: 'username',

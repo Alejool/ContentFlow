@@ -1,4 +1,5 @@
 import type { Publication } from '@/types/Publications/Publication';
+import { usePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
 import { File, Loader2, PlayCircle, Video } from 'lucide-react';
 import { memo } from 'react';
 
@@ -26,29 +27,16 @@ const PublicationThumbnail = memo(function PublicationThumbnail({
       </div>
     );
   } else {
-    // Optimize: Check specifically for image or video thumbnail
     const firstMedia = mediaFiles[0];
-    const thumbnailFile =
-      firstMedia?.thumbnail?.file_path ||
-      (firstMedia?.file_type?.includes('image') ? firstMedia.file_path : null);
+    const thumbnailFileId = firstMedia?.thumbnail?.id;
+    const imageDirect = firstMedia?.file_type?.includes('image') ? firstMedia.id : null;
+    const mediaIdToFetch = thumbnailFileId || imageDirect;
 
-    if (thumbnailFile) {
-      let url = thumbnailFile;
-      if (!url.startsWith('http') && !url.startsWith('/storage/')) {
-        url = `/storage/${url}`;
-      }
-
+    if (mediaIdToFetch) {
       content = (
-        <img
-          src={url}
-          className="h-full w-full object-cover"
-          alt={publication.title || 'Thumbnail'}
-          loading="lazy"
-          decoding="async"
-        />
+        <ThumbnailImage mediaFileId={mediaIdToFetch} title={publication.title} />
       );
     } else {
-      // If no thumbnail but has video, return video placeholder
       const hasVideo = mediaFiles.some((f) => f && f.file_type && f.file_type.includes('video'));
       if (hasVideo) {
         content = (
@@ -76,5 +64,25 @@ const PublicationThumbnail = memo(function PublicationThumbnail({
     </div>
   );
 });
+
+function ThumbnailImage({ mediaFileId, title }: { mediaFileId: number; title?: string }) {
+  const { data, isLoading } = usePresignedUrl(mediaFileId, { mediaType: 'image' });
+
+  if (isLoading || !data?.preview_url) {
+    return (
+      <div className="h-full w-full bg-gray-200 animate-pulse" />
+    );
+  }
+
+  return (
+    <img
+      src={data.preview_url}
+      className="h-full w-full object-cover"
+      alt={title || 'Thumbnail'}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
 
 export default PublicationThumbnail;
