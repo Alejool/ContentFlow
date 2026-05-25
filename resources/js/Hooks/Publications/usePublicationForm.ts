@@ -445,7 +445,9 @@ export const usePublicationForm = ({
 
               let url = media.file_path || media.url;
               if (url && !url.startsWith('http') && !url.startsWith('blob:')) {
-                if (url.startsWith('/storage/')) {
+                if (url.startsWith('workspaces/') || url.startsWith('avatars/') || url.startsWith('reels/')) {
+                  // It's an S3 key, do not prepend /storage/
+                } else if (url.startsWith('/storage/')) {
                   // Already has leading slash and storage
                 } else if (url.startsWith('storage/')) {
                   url = `/${url}`;
@@ -463,7 +465,9 @@ export const usePublicationForm = ({
                 !thumbnailUrl.startsWith('http') &&
                 !thumbnailUrl.startsWith('blob:')
               ) {
-                if (thumbnailUrl.startsWith('/storage/')) {
+                if (thumbnailUrl.startsWith('workspaces/') || thumbnailUrl.startsWith('avatars/') || thumbnailUrl.startsWith('reels/')) {
+                  // S3 key, do not prepend
+                } else if (thumbnailUrl.startsWith('/storage/')) {
                 } else if (thumbnailUrl.startsWith('storage/')) {
                   thumbnailUrl = `/${thumbnailUrl}`;
                 } else if (!thumbnailUrl.startsWith('/')) {
@@ -485,7 +489,10 @@ export const usePublicationForm = ({
                 thumbnailUrl: thumbnailUrl,
                 type: isVideo ? 'video' : 'image',
                 isNew: false,
-                status: media.status || 'completed',
+                // Existing files already in S3 are always 'completed' from the UI perspective.
+                // The backend 'processing' status refers to server-side video processing, not an
+                // active upload — so we should never block the UI based on it.
+                status: 'completed' as const,
                 file_name: media.file_name,
                 size: media.size,
               };
@@ -519,7 +526,9 @@ export const usePublicationForm = ({
         if (existingMedia.length === 0 && publication.image) {
           let url = publication.image;
           if (url && !url.startsWith('http') && !url.startsWith('/storage/')) {
-            url = `/storage/${url}`;
+            if (!url.startsWith('workspaces/') && !url.startsWith('avatars/') && !url.startsWith('reels/')) {
+              url = `/storage/${url}`;
+            }
           }
           existingMedia.push({
             id: undefined,
@@ -1507,8 +1516,11 @@ export const usePublicationForm = ({
         }
 
         if (attachedImmediately) {
-          // Refresh the page to show updated media
-          window.location.reload();
+          // Invalidate publications cache so the list refreshes with the new media
+          queryClient.invalidateQueries({ queryKey: queryKeys.publications.lists() });
+          if (publication?.id) {
+            queryClient.invalidateQueries({ queryKey: queryKeys.publications.detail(publication.id) });
+          }
         }
       };
 
@@ -1711,23 +1723,39 @@ export const usePublicationForm = ({
       mediaFiles.some((m) => {
         // Check if file is in mediaStore with uploading/processing status
         if (m.status === 'uploading' || m.status === 'processing') {
-          // Double-check with uploadQueue to see if it's actually cancelled or has an error
+          // Double-check with uploadQueue — if the queue already finished or had an error/cancel, don't block
           const queueItem = useUploadQueue.getState().queue[m.tempId];
-          if (queueItem && (queueItem.status === 'cancelled' || queueItem.status === 'error')) {
-            return false; // Ignore cancelled or errored uploads
+          if (
+            queueItem &&
+            (queueItem.status === 'cancelled' ||
+              queueItem.status === 'error' ||
+              queueItem.status === 'completed')
+          ) {
+            return false;
           }
           return true;
         }
         return uploadingFiles.has(m.tempId) && !m.id;
       }) ||
-      (publication?.status as string) === 'processing' ||
+      // Only block on publication.status === 'processing' if there are actually files
+      // still uploading/processing in the store. The backend may leave this status stale
+      // after a background job finishes, which would permanently block the UI.
+      (
+        (publication?.status as string) === 'processing' &&
+        mediaFiles.some((m) => m.status === 'uploading' || m.status === 'processing')
+      ) ||
       (!!publication?.media_locked_by && (publication.media_locked_by as any).id !== user?.id),
     isS3Uploading: mediaFiles.some((m) => {
       if (m.status === 'uploading') {
-        // Double-check with uploadQueue to see if it's actually cancelled or has an error
+        // Double-check with uploadQueue — if the queue already finished or had an error/cancel, don't block
         const queueItem = useUploadQueue.getState().queue[m.tempId];
-        if (queueItem && (queueItem.status === 'cancelled' || queueItem.status === 'error')) {
-          return false; // Ignore cancelled or errored uploads
+        if (
+          queueItem &&
+          (queueItem.status === 'cancelled' ||
+            queueItem.status === 'error' ||
+            queueItem.status === 'completed')
+        ) {
+          return false;
         }
         return true;
       }

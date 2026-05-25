@@ -1,6 +1,7 @@
 import Loader from '@/Components/common/Loader';
 import SearchableSelector from '@/Components/common/Modern/SearchableSelector';
-import { Check } from 'lucide-react';
+import { usePresignedUrlByKey } from '@/Hooks/Upload/usePresignedUrl';
+import { Check, Loader2 } from 'lucide-react';
 import React from 'react';
 
 interface PublicationSelectorProps {
@@ -114,8 +115,25 @@ const PublicationThumbnail: React.FC<{
 }> = ({ thumbnail }) => {
   if (!thumbnail) return null;
 
-  if (thumbnail.type === 'image' && thumbnail.url) {
-    return <img src={thumbnail.url} className="h-8 w-8 rounded object-cover" alt="Thumbnail" />;
+  const isS3Key = thumbnail.url && !thumbnail.url.startsWith('http') && !thumbnail.url.startsWith('/storage') && !thumbnail.url.startsWith('blob:') && !thumbnail.url.startsWith('data:');
+  
+  const { data, isLoading } = usePresignedUrlByKey(
+    isS3Key ? thumbnail.url : null,
+    { mediaType: 'image' }
+  );
+
+  const finalUrl = isS3Key ? data?.preview_url : thumbnail.url;
+
+  if (isS3Key && isLoading) {
+    return (
+      <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 dark:bg-gray-700">
+        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (thumbnail.type === 'image' && finalUrl) {
+    return <img src={finalUrl} className="h-8 w-8 rounded object-cover" alt="Thumbnail" />;
   }
 
   if (thumbnail.type === 'video') {

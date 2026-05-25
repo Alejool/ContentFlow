@@ -82,14 +82,18 @@ export function prepareMediaForPreview(publication: Publication) {
         mediaUrl = media.file_path;
       }
 
+      // If it's a full URL, blob, or already a storage path, keep it.
+      // Otherwise, assume it's an S3 key and keep it raw so Lightbox can fetch a presigned URL
+      const resolveUrl = (path: string) => {
+        if (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('/storage/')) {
+          return path;
+        }
+        // Return raw path (S3 key)
+        return path;
+      };
+
       return {
-        url: isVideo
-          ? media.file_path.startsWith('http')
-            ? media.file_path
-            : `/storage/${media.file_path}`
-          : mediaUrl.startsWith('http')
-            ? mediaUrl
-            : `/storage/${mediaUrl}`,
+        url: isVideo ? resolveUrl(media.file_path) : resolveUrl(mediaUrl),
         type: (isVideo ? 'video' : 'image') as 'image' | 'video',
         title: publication.title,
       };

@@ -43,9 +43,13 @@ export const usePublicationsForCampaignEdit = (isOpen: boolean, campaignId?: num
 
     const firstImage = pub.media_files.find((f: any) => f.file_type.includes('image'));
     if (firstImage) {
-      const url = firstImage.file_path.startsWith('http')
-        ? firstImage.file_path
-        : `/storage/${firstImage.file_path}`;
+      const resolveUrl = (path: string) => {
+        if (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('/storage/')) {
+          return path;
+        }
+        return path;
+      };
+      const url = resolveUrl(firstImage.file_path);
       return { url, type: 'image' };
     }
 
