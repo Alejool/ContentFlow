@@ -1,5 +1,6 @@
+import { usePresignedUrl, useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
 import axios from 'axios';
-import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +25,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
   const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
+  const downloadMutation = useGeneratePresignedUrl('download');
 
   // Early return after all hooks
   if (reels.length === 0) return null;
@@ -56,17 +58,33 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
     return colors[platform || ''] || 'from-purple-500 to-purple-600';
   };
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = currentReel.file_path;
-    link.download = currentReel.file_name || `reel-${currentReel.metadata?.platform}.mp4`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async () => {
+    try {
+      const response = await downloadMutation.mutateAsync(currentReel.id);
+      const url = response.data?.download_url;
+      if (url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = currentReel.file_name || `reel-${currentReel.metadata?.platform}.mp4`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch {
+      toast.error(t('common.downloadError'));
+    }
   };
 
-  const handleOpenInNewTab = () => {
-    window.open(currentReel.file_path, '_blank');
+  const handleOpenInNewTab = async () => {
+    try {
+      const response = await downloadMutation.mutateAsync(currentReel.id);
+      const url = response.data?.download_url;
+      if (url) {
+        window.open(url, '_blank');
+      }
+    } catch {
+      toast.error(t('common.error'));
+    }
   };
 
   const handleDeleteReel = async () => {
@@ -96,15 +114,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
     <div className="space-y-4">
       {/* Main Video Player */}
       <div className="relative mx-auto aspect-[9/16] max-h-[600px] overflow-hidden rounded-lg bg-black">
-        <video
-          key={currentReel.id}
-          src={currentReel.file_path}
-          className="h-full w-full object-contain"
-          controls
-          autoPlay
-          loop
-          playsInline
-        />
+        <VideoPlayer reelId={currentReel.id} />
 
         {/* Platform Badge */}
         <div
@@ -154,17 +164,27 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
           </button>
           <button
             onClick={handleDownload}
-            className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20"
+            disabled={downloadMutation.isPending}
+            className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20 disabled:opacity-50"
             title={t('common.download')}
           >
-            <Download className="h-5 w-5" />
+            {downloadMutation.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Download className="h-5 w-5" />
+            )}
           </button>
           <button
             onClick={handleOpenInNewTab}
-            className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20"
+            disabled={downloadMutation.isPending}
+            className="rounded-full bg-white/10 p-2.5 text-white backdrop-blur-sm transition-all hover:bg-white/20 disabled:opacity-50"
             title={t('common.openInNewTab')}
           >
-            <ExternalLink className="h-5 w-5" />
+            {downloadMutation.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <ExternalLink className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
@@ -173,26 +193,15 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
       {reels.length > 1 && (
         <div className="flex gap-3 overflow-x-auto px-1 pb-2">
           {reels.map((reel, index) => (
-            <button
+            <ReelThumbnail
               key={reel.id}
+              reelId={reel.id}
+              index={index}
+              currentIndex={currentIndex}
+              platform={reel.metadata?.platform}
               onClick={() => setCurrentIndex(index)}
-              className={`relative h-28 w-20 shrink-0 overflow-hidden rounded-lg transition-all ${
-                index === currentIndex
-                  ? 'scale-105 ring-4 ring-purple-500'
-                  : 'opacity-60 hover:opacity-100'
-              }`}
-            >
-              <video src={reel.file_path} className="h-full w-full object-cover" muted />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute right-1 bottom-1 left-1 text-center">
-                <span className="text-xs font-medium text-white">
-                  {getPlatformIcon(reel.metadata?.platform)}
-                </span>
-              </div>
-              {index === currentIndex && (
-                <div className="absolute inset-0 rounded-lg border-2 border-purple-500" />
-              )}
-            </button>
+              getPlatformIcon={getPlatformIcon}
+            />
           ))}
         </div>
       )}
@@ -204,5 +213,69 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
         </div>
       )}
     </div>
+  );
+}
+
+function VideoPlayer({ reelId }: { reelId: number }) {
+  const { data, isLoading } = usePresignedUrl(reelId, { mediaType: 'video' });
+
+  if (isLoading || !data?.preview_url) {
+    return (
+      <div className="h-full w-full bg-gray-900 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      </div>
+    );
+  }
+
+  return (
+    <video
+      key={reelId}
+      src={data.preview_url}
+      className="h-full w-full object-contain"
+      controls
+      autoPlay
+      loop
+      playsInline
+    />
+  );
+}
+
+function ReelThumbnail({
+  reelId,
+  index,
+  currentIndex,
+  platform,
+  onClick,
+  getPlatformIcon,
+}: {
+  reelId: number;
+  index: number;
+  currentIndex: number;
+  platform?: string;
+  onClick: () => void;
+  getPlatformIcon: (platform?: string) => string;
+}) {
+  const { data, isLoading } = usePresignedUrl(reelId, { mediaType: 'video' });
+
+  return (
+    <button
+      onClick={onClick}
+      className={`relative h-28 w-20 shrink-0 overflow-hidden rounded-lg transition-all ${
+        index === currentIndex ? 'scale-105 ring-4 ring-purple-500' : 'opacity-60 hover:opacity-100'
+      }`}
+    >
+      {isLoading ? (
+        <div className="h-full w-full bg-gray-900 flex items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
+        </div>
+      ) : (
+        <video src={data?.preview_url} className="h-full w-full object-cover" muted />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="absolute right-1 bottom-1 left-1 text-center">
+        <span className="text-xs font-medium text-white">{getPlatformIcon(platform)}</span>
+      </div>
+      {index === currentIndex && <div className="absolute inset-0 rounded-lg border-2 border-purple-500" />}
+    </button>
   );
 }

@@ -1,5 +1,8 @@
 import Button from '@/Components/common/Modern/Button';
 import Label from '@/Components/common/Modern/Label';
+import { useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
+import { useFileAccess } from '@/Hooks/Upload/useSignedUrls';
+import { ReelVideoThumbnail } from '@/Components/Content/ReelVideoThumbnail';
 import axios from 'axios';
 import { Download, ExternalLink, Film, Loader2, Play, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -37,6 +40,8 @@ export default function ReelsSection({
   const [generating, setGenerating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const downloadMutation = useGeneratePresignedUrl('download');
+  const { getAccessUrl } = useFileAccess();
 
   // Filter reels generated from the current video
   const generatedReels = videoFile
@@ -81,17 +86,33 @@ export default function ReelsSection({
     }
   };
 
-  const handleDownload = (reel: MediaFile) => {
-    const link = document.createElement('a');
-    link.href = reel.file_path;
-    link.download = reel.file_name || `reel-${reel.metadata?.platform}.mp4`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async (reel: MediaFile) => {
+    try {
+      const response = await downloadMutation.mutateAsync(reel.id);
+      const url = response.data?.download_url;
+      if (url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = reel.file_name || `reel-${reel.metadata?.platform}.mp4`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch {
+      toast.error(t('common.downloadError'));
+    }
   };
 
-  const handleOpenInNewTab = (reel: MediaFile) => {
-    window.open(reel.file_path, '_blank');
+  const handleOpenInNewTab = async (reel: MediaFile) => {
+    try {
+      const response = await downloadMutation.mutateAsync(reel.id);
+      const url = response.data?.download_url;
+      if (url) {
+        window.open(url, '_blank');
+      }
+    } catch {
+      toast.error(t('common.error'));
+    }
   };
 
   const handleGenerate = async () => {
@@ -226,7 +247,10 @@ export default function ReelsSection({
               >
                 {/* Video Thumbnail */}
                 <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-black">
-                  <video src={reel.file_path} className="h-full w-full object-cover" muted />
+                  <ReelVideoThumbnail
+                    mediaFileId={reel.id}
+                    className="h-full w-full object-cover"
+                  />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
                     <Play className="h-6 w-6 text-white" fill="white" />
                   </div>
@@ -328,6 +352,144 @@ export default function ReelsSection({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function ReelListItem({
+  reel,
+  getPlatformIcon,
+  getPlatformColor,
+  onOpenInNewTab,
+  onDownload,
+  onDelete,
+  deleting,
+  deletingId,
+  t,
+}: {
+  reel: MediaFile;
+  getPlatformIcon: (platform?: string) => string;
+  getPlatformColor: (platform?: string) => string;
+  onOpenInNewTab: (reel: MediaFile) => Promise<void>;
+  onDownload: (reel: MediaFile) => Promise<void>;
+  onDelete: (reelId: number) => Promise<void>;
+  deleting: boolean;
+  deletingId: number | null;
+  t: any;
+}) {
+  const { usePresignedUrl } = require('@/Hooks/Upload/usePresignedUrl');
+  const { data, isLoading } = usePresignedUrl(reel.id, { mediaType: 'video' });
+  const [opening, setOpening] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleOpen = async () => {
+    setOpening(true);
+    try {
+      await onOpenInNewTab(reel);
+    } finally {
+      setOpening(false);
+    }
+  };
+
+  const handleDownloadClick = async () => {
+    setDownloading(true);
+    try {
+      await onDownload(reel);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <div className="group hover:border-primary-300 dark:hover:border-primary-600 relative flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all dark:border-neutral-700 dark:bg-theme-bg-secondary">
+      {/* Video Thumbnail */}
+      <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-black">
+        {isLoading ? (
+          <div className="h-full w-full flex items-center justify-center">
+            <Loader2 className="h-4 w-4 animate-spin text-white" />
+          </div>
+        ) : data?.preview_url ? (
+          <>
+            <video src={data.preview_url} className="h-full w-full object-cover" muted />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+              <Play className="h-6 w-6 text-white" fill="white" />
+            </div>
+          </>
+        ) : (
+          <div className="h-full w-full flex items-center justify-center">
+            <Film className="h-6 w-6 text-white/50" />
+          </div>
+        )}
+        {/* Platform Badge on thumbnail */}
+        <div
+          className={`absolute top-1 left-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-[10px] font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
+        >
+          {getPlatformIcon(reel.metadata?.platform)}
+        </div>
+      </div>
+
+      {/* Reel Info */}
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-sm font-semibold text-gray-900 capitalize dark:text-white">
+            {reel.metadata?.platform || 'Reel'}
+          </span>
+          <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+            Reel
+          </span>
+        </div>
+        <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+          {reel.metadata?.duration && (
+            <span className="flex items-center gap-1">
+              <Film className="h-3 w-3" />
+              {Math.floor(reel.metadata.duration)}s
+            </span>
+          )}
+          <span className="capitalize">
+            {reel.status === 'completed' ? '✓ Listo' : reel.status}
+          </span>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1">
+        <button
+          onClick={handleOpen}
+          disabled={opening}
+          className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400 disabled:opacity-50"
+          title={t('common.openInNewTab')}
+        >
+          {opening ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ExternalLink className="h-4 w-4" />
+          )}
+        </button>
+        <button
+          onClick={handleDownloadClick}
+          disabled={downloading}
+          className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400 disabled:opacity-50"
+          title={t('common.download')}
+        >
+          {downloading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+        </button>
+        <button
+          onClick={() => onDelete(reel.id)}
+          disabled={deletingId === reel.id}
+          className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
+          title={t('reels.actions.delete')}
+        >
+          {deletingId === reel.id ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

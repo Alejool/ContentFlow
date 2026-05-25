@@ -1,4 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
+import { useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
 import axios from 'axios';
 import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
@@ -35,6 +36,7 @@ export default function VideoReelButton({
   const { t } = useTranslation();
   const [generating, setGenerating] = useState(false);
   const [showReels, setShowReels] = useState(true);
+  const generatePresignedUrl = useGeneratePresignedUrl('download');
 
   // Filter reels generated from this video
   const generatedReels = allMediaFiles.filter(
@@ -78,6 +80,18 @@ export default function VideoReelButton({
       }
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleOpenReel = async (reelId: number) => {
+    try {
+      const response = await generatePresignedUrl.mutateAsync(reelId);
+      const url = response.data?.download_url;
+      if (url) {
+        window.open(url, '_blank');
+      }
+    } catch {
+      toast.error(t('reels.messages.error'));
     }
   };
 
@@ -154,16 +168,16 @@ export default function VideoReelButton({
                       <>
                         <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
                         <button
-                          onClick={() => {
-                            const url = reel.file_path.startsWith('http')
-                              ? reel.file_path
-                              : `/storage/${reel.file_path}`;
-                            window.open(url, '_blank');
-                          }}
-                          className="rounded p-1 transition-colors hover:bg-purple-200"
+                          onClick={() => handleOpenReel(reel.id)}
+                          disabled={generatePresignedUrl.isPending}
+                          className="rounded p-1 transition-colors hover:bg-purple-200 disabled:opacity-50"
                           title="Ver reel"
                         >
-                          <ExternalLink className="h-3.5 w-3.5 text-purple-600" />
+                          {generatePresignedUrl.isPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-600" />
+                          ) : (
+                            <ExternalLink className="h-3.5 w-3.5 text-purple-600" />
+                          )}
                         </button>
                       </>
                     )}
