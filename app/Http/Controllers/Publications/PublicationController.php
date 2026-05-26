@@ -587,18 +587,102 @@ class PublicationController extends Controller
       );
     }
 
-    // Check permissions using Policy (respects approval workflow)
-    try {
-      \Illuminate\Support\Facades\Gate::authorize('publish', $publication);
-      \Log::info('=== GATE AUTHORIZED ===', ['publication_id' => $publication->id]);
-    } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-      \Log::warning('=== GATE DENIED ===', [
-        'publication_id' => $publication->id,
-        'error' => $e->getMessage()
+    // Check permissions inline — bypasses Gate/Policy resolution issues
+    // with the Publication global scope and workspace context.
+    $authUser = auth()->user();
+    $pubWorkspaceId = $publication->workspace_id;
+
+    // 1. Get user's role via direct DB query (no ORM scope interference)
+    $rolePivot = \Illuminate\Support\Facades\DB::table('role_user')
+      ->where('user_id', $authUser->id)
+      ->where('workspace_id', $pubWorkspaceId)
+      ->first();
+
+    $userRole = $rolePivot ? \App\Models\Auth\Role::find($rolePivot->role_id) : null;
+
+    // Fallback: workspace creator = owner even without pivot entry
+    if (!$userRole) {
+      $wsCreatedBy = \Illuminate\Support\Facades\DB::table('workspaces')
+        ->where('id', $pubWorkspaceId)
+        ->value('created_by');
+      if ($wsCreatedBy == $authUser->id) {
+        $userRole = \App\Models\Auth\Role::where('slug', \App\Models\Auth\Role::OWNER)->first();
+      }
+    }
+
+    \Log::info('=== PUBLISH PERMISSION CHECK ===', [
+      'publication_id'   => $publication->id,
+      'user_id'          => $authUser->id,
+      'workspace_id'     => $pubWorkspaceId,
+      'role_slug'        => $userRole?->slug ?? 'NULL',
+      'publication_status' => $publication->status,
+    ]);
+
+    if (!$userRole) {
+      \Log::warning('=== PUBLISH DENIED — no role in workspace ===', [
+        'user_id'      => $authUser->id,
+        'workspace_id' => $pubWorkspaceId,
       ]);
-      // If authorization failed, return error
-      // Note: The Policy already handles workflow and owner checks
-      return $this->errorResponse('You do not have permission to publish this content.', 403);
+      return $this->errorResponse('No tienes permiso para publicar este contenido.', 403);
+    }
+
+    // 2. Owner / Admin always bypass everything
+    $isAdminOrOwner = in_array($userRole->slug, [
+      \App\Models\Auth\Role::OWNER,
+      \App\Models\Auth\Role::ADMIN,
+      'admin-owner',
+    ]);
+
+    if (!$isAdminOrOwner) {
+      // 3. Check if role has explicit 'publish' permission
+      $hasPublishPermission = $userRole->permissions()
+        ->where(function ($q) {
+          $q->whereIn('slug', ['publish', 'publish-content', 'publish_content'])
+            ->orWhereIn('name', ['publish', 'publish_content', 'Publish_Content']);
+        })
+        ->exists();
+
+      if (!$hasPublishPermission) {
+        // 4. No publish permission — check if workflow is active AND plan supports it
+        $ws = $publication->workspace;
+        $planFeatures = $ws?->getPlanFeatures() ?? [];
+        $planSupportsWorkflow = ($planFeatures['approval_workflows'] ?? false) !== false;
+
+        $workflow = $ws?->approvalWorkflow;
+        $workflowActive = $planSupportsWorkflow
+          && $workflow
+          && $workflow->is_enabled
+          && $workflow->is_active;
+
+        if ($workflowActive) {
+          \Log::info('=== PUBLISH DENIED — workflow active, role lacks publish permission ===', [
+            'user_id'     => $authUser->id,
+            'role'        => $userRole->slug,
+            'workflow_id' => $workflow->id,
+          ]);
+          return $this->errorResponse(
+            'Este contenido debe pasar por el flujo de aprobación. Envíalo a revisión para continuar.',
+            422,
+            ['reason' => 'workflow_required', 'workflow_id' => $workflow->id]
+          );
+        }
+
+        \Log::warning('=== PUBLISH DENIED — no publish permission ===', [
+          'user_id' => $authUser->id,
+          'role'    => $userRole->slug,
+        ]);
+        return $this->errorResponse('No tienes permiso para publicar este contenido.', 403);
+      }
+
+      \Log::info('=== PUBLISH ALLOWED — role has publish permission ===', [
+        'user_id' => $authUser->id,
+        'role'    => $userRole->slug,
+      ]);
+    } else {
+      \Log::info('=== PUBLISH ALLOWED — owner/admin bypass ===', [
+        'user_id' => $authUser->id,
+        'role'    => $userRole->slug,
+      ]);
     }
 
     // Validar límites de contenido según estado de verificación de cuentas
@@ -622,33 +706,23 @@ class PublicationController extends Controller
       }
     }
 
-    // Check if user is owner (can bypass workflow)
-    $isOwner = false;
-    $role = null;
-    $userRole = auth()->user()->workspaces()
-      ->where('workspaces.id', $publication->workspace_id)
-      ->first();
-    
-    if ($userRole && $userRole->pivot->role_id) {
-      $role = \App\Models\Auth\Role::find($userRole->pivot->role_id);
-      $isOwner = $role && $role->slug === \App\Models\Auth\Role::OWNER;
-    }
-
+    // $isAdminOrOwner already determined above in the permission check block.
+    // Reuse it for canBePublished() status check.
     \Log::info('PublicationController::publish - Checking canBePublished', [
-      'publication_id' => $publication->id,
+      'publication_id'     => $publication->id,
       'publication_status' => $publication->status,
-      'isOwner' => $isOwner,
-      'user_id' => auth()->id(),
-      'role_slug' => $role ? $role->slug : 'NULL',
+      'isAdminOrOwner'     => $isAdminOrOwner,
+      'user_id'            => $authUser->id,
+      'role_slug'          => $userRole?->slug ?? 'NULL',
     ]);
 
     // Verify publication status allows publishing
-    $canPublish = $publication->canBePublished($isOwner);
-    
+    $canPublish = $publication->canBePublished($isAdminOrOwner);
+
     \Log::info('PublicationController::publish - canBePublished result', [
       'publication_id' => $publication->id,
-      'canPublish' => $canPublish,
-      'isOwner' => $isOwner,
+      'canPublish'     => $canPublish,
+      'isAdminOrOwner' => $isAdminOrOwner,
     ]);
 
     if (!$canPublish) {
@@ -708,9 +782,9 @@ class PublicationController extends Controller
       if (!in_array($publication->status, ['publishing', 'retrying'])) {
         \Log::warning('PublicationController::publish - Blocking publication', [
           'publication_id' => $publication->id,
-          'status' => $publication->status,
-          'isOwner' => $isOwner,
-          'canPublish' => $canPublish,
+          'status'         => $publication->status,
+          'isAdminOrOwner' => $isAdminOrOwner,
+          'canPublish'     => $canPublish,
         ]);
         
         return $this->errorResponse(
