@@ -9,6 +9,7 @@ use App\Models\Workspace\Workspace;
 use App\Models\Auth\Role;
 use App\Services\Roles\RoleService;
 use App\Services\Approval\ApprovalWorkflowService;
+use Illuminate\Support\Facades\DB;
 
 class PublicationPolicy
 {
@@ -168,90 +169,97 @@ class PublicationPolicy
 
     /**
      * Determine if the user can publish content.
-     * 
-     * CRITICAL RULES:
-     * - When NO workflow: Admin and Owner can publish directly
-     * - When workflow IS active: ONLY Owner can publish directly (Admin must use workflow)
-     * - If approval workflow is enabled and content is approved:
-     *   - User must be the one who submitted for approval
-     * - All other roles must send to review
-     * 
-     * @param User $user
-     * @param Publication $publication
-     * @return bool
+     *
+     * REGLAS:
+     * 1. Owner / Admin / admin-owner → bypass total, siempre pueden publicar.
+     * 2. Plan SIN soporte de workflows (approval_workflows = false):
+     *    → El rol puede publicar si tiene el permiso 'publish'. No hay workflow que bloquee.
+     * 3. Plan CON soporte de workflows PERO sin workflow activo en el workspace:
+     *    → Igual que caso 2: el rol puede publicar si tiene el permiso 'publish'.
+     * 4. Plan CON soporte de workflows Y workflow activo:
+     *    → Nadie más que Owner/Admin puede publicar directamente.
+     *    → Retorna false. El controller detecta este caso y muestra mensaje informativo
+     *      (no es un error de permisos, es una restricción del flujo).
      */
     public function publish(User $user, Publication $publication): bool
     {
         $workspace = $publication->workspace;
 
-        // Get user's role in workspace first
+        if (!$workspace) {
+            \Log::warning('PublicationPolicy::publish - Workspace not found', [
+                'user_id'        => $user->id,
+                'publication_id' => $publication->id,
+            ]);
+            return false;
+        }
+
         $userRole = $this->getUserRoleInWorkspace($user, $workspace);
-        
-        \Log::info('PublicationPolicy::publish - Debug', [
-            'user_id' => $user->id,
-            'publication_id' => $publication->id,
-            'workspace_id' => $workspace->id,
-            'user_role_name' => $userRole ? $userRole->name : 'NULL',
-            'user_role_slug' => $userRole ? $userRole->slug : 'NULL',
+
+        \Log::info('PublicationPolicy::publish', [
+            'user_id'            => $user->id,
+            'publication_id'     => $publication->id,
+            'workspace_id'       => $workspace->id,
+            'role_slug'          => $userRole?->slug ?? 'NULL',
             'publication_status' => $publication->status,
-            'publication_user_id' => $publication->user_id,
-            'is_creator' => $user->id === $publication->user_id,
         ]);
-        
+
         if (!$userRole) {
-            \Log::warning('PublicationPolicy::publish - No role found for user');
-            return false;
-        }
-
-        // Check if approval workflow is enabled
-        $workflow = $workspace->approvalWorkflow;
-        $workflowEnabled = $workflow && $workflow->is_enabled;
-        
-        if ($workflowEnabled) {
-            // When workflow is ENABLED: ONLY Owner can bypass ALL requirements
-            if ($userRole->slug === Role::OWNER) {
-                \Log::info('PublicationPolicy::publish - User is OWNER with workflow enabled, allowing publish');
-                return true;
-            }
-            
-            // Admin and everyone else must have approved content
-            if ($publication->status !== 'approved') {
-                \Log::info('PublicationPolicy::publish - Content not approved', [
-                    'status' => $publication->status
-                ]);
-                return false;
-            }
-
-            // Only the person who submitted for approval can publish
-            $approvalRequest = $publication->approvalRequest;
-            $submitterId = $approvalRequest?->submitted_by ?? $publication->user_id;
-            $canPublish = $user->id === $submitterId;
-            
-            \Log::info('PublicationPolicy::publish - Workflow enabled, checking if user submitted for approval', [
-                'user_id' => $user->id,
-                'submitter_id' => $submitterId,
-                'publication_user_id' => $publication->user_id,
-                'approval_request_id' => $approvalRequest?->id,
-                'approval_request_submitted_by' => $approvalRequest?->submitted_by,
-                'can_publish' => $canPublish
-            ]);
-
-            return $canPublish;
-        } else {
-            // When NO workflow: Both Admin and Owner can bypass ALL requirements
-            $isAdminOrOwner = in_array($userRole->slug, [Role::OWNER, Role::ADMIN]);
-            if ($isAdminOrOwner) {
-                \Log::info('PublicationPolicy::publish - User is OWNER or ADMIN without workflow, allowing publish');
-                return true;
-            }
-            
-            // All other roles cannot publish directly when no workflow
-            \Log::info('PublicationPolicy::publish - No workflow active, only Admin/Owner can publish directly', [
-                'user_role' => $userRole->slug,
-                'can_publish' => false
+            \Log::warning('PublicationPolicy::publish - No role found', [
+                'user_id'      => $user->id,
+                'workspace_id' => $workspace->id,
             ]);
             return false;
         }
+
+        // ── Regla 1: Owner / Admin siempre pueden publicar ────────────────────
+        if (in_array($userRole->slug, [Role::OWNER, Role::ADMIN, 'admin-owner'])) {
+            \Log::info('PublicationPolicy::publish - Owner/Admin bypass granted', [
+                'role' => $userRole->slug,
+            ]);
+            return true;
+        }
+
+        // ── Verificar permiso 'publish' del rol ───────────────────────────────
+        // Si el rol tiene este permiso, puede publicar directo siempre,
+        // independientemente de si hay workflow activo o no.
+        $hasPublishPermission = $this->roleService->userHasPermission(
+            $user,
+            $workspace,
+            Permission::PUBLISH_CONTENT_SLUG
+        );
+
+        if ($hasPublishPermission) {
+            \Log::info('PublicationPolicy::publish - Role has publish permission, granting', [
+                'role' => $userRole->slug,
+            ]);
+            return true;
+        }
+
+        // ── El rol NO tiene permiso 'publish': verificar si hay workflow activo ─
+        // Solo en ese caso se bloquea con mensaje de "envía a revisión".
+        $planFeatures         = $workspace->getPlanFeatures();
+        $planSupportsWorkflow = ($planFeatures['approval_workflows'] ?? false) !== false;
+
+        $workflow       = $workspace->approvalWorkflow;
+        $workflowActive = $planSupportsWorkflow
+            && $workflow
+            && $workflow->is_enabled
+            && $workflow->is_active;
+
+        \Log::info('PublicationPolicy::publish - No publish permission, checking workflow', [
+            'role'                   => $userRole->slug,
+            'plan_supports_workflow' => $planSupportsWorkflow,
+            'workflow_active'        => $workflowActive,
+        ]);
+
+        // Hay workflow activo y el rol no puede publicar directo → debe ir a revisión
+        // Retorna false; el controller mostrará el mensaje informativo correcto.
+        if ($workflowActive) {
+            return false;
+        }
+
+        // Sin workflow activo y sin permiso → denegado
+        return false;
     }
 
     /**
@@ -349,65 +357,63 @@ class PublicationPolicy
     /**
      * Determine the appropriate action for a user when creating/editing content.
      * Returns 'publish' if user can publish directly, 'review' if must go through approval.
-     * 
+     *
      * CRITICAL RULES:
-     * - When NO workflow is active: Admin and Owner can publish directly
-     * - When workflow IS active: ONLY Owner can publish directly (Admin must use workflow)
-     * - All other roles must always send to review
-     * 
+     * - Owner and Admin can ALWAYS publish directly, regardless of workflow state.
+     * - All other roles must always send to review.
+     *
      * @param User $user
      * @param Workspace $workspace
      * @return string 'publish' or 'review'
      */
     public function getPublicationAction(User $user, Workspace $workspace): string
     {
-        // Get user's role in workspace
         $userRole = $this->getUserRoleInWorkspace($user, $workspace);
-        
+
         if (!$userRole) {
             return 'review';
         }
 
-        // Check if approval workflow is enabled
-        $workflow = $workspace->approvalWorkflow;
-        $workflowEnabled = $workflow && $workflow->is_enabled;
-
-        if ($workflowEnabled) {
-            // When workflow is ENABLED: ONLY Owner-like roles can publish directly
-            // Admin and everyone else must go through the workflow
-            if (in_array($userRole->slug, [Role::OWNER, 'admin-owner'])) {
-                return 'publish';
-            }
-            return 'review';
-        } else {
-            // When NO workflow: Both Admin and Owner can publish directly
-            // Everyone else must send to review
-            $isAdminOrOwner = in_array($userRole->slug, [Role::ADMIN, Role::OWNER, 'admin-owner']);
-            if ($isAdminOrOwner) {
-                return 'publish';
-            }
-            return 'review';
+        // Owner and Admin can always publish directly.
+        if (in_array($userRole->slug, [Role::OWNER, Role::ADMIN, 'admin-owner'])) {
+            return 'publish';
         }
+
+        return 'review';
     }
 
     /**
      * Get the user's role in a workspace.
+     *
+     * Looks up the role via the role_user pivot table directly to avoid issues
+     * with the Publication global scope or a stale current_workspace_id on the user.
      */
     private function getUserRoleInWorkspace(User $user, Workspace $workspace): ?Role
     {
-        $workspaceUser = $user->workspaces()
-            ->where('workspaces.id', $workspace->id)
+        // Query the pivot table directly to avoid any global scope interference.
+        $pivot = \Illuminate\Support\Facades\DB::table('role_user')
+            ->where('user_id', $user->id)
+            ->where('workspace_id', $workspace->id)
             ->first();
 
-        if (!$workspaceUser || !$workspaceUser->pivot->role_id) {
-            // Workspace owner may not always have an explicit pivot role entry,
-            // especially for legacy or auto-created workspaces.
-            if ($workspace->created_by === $user->id) {
-                return Role::where('slug', Role::OWNER)->first();
+        if ($pivot && $pivot->role_id) {
+            $role = Role::find($pivot->role_id);
+            if ($role) {
+                return $role;
             }
-            return null;
         }
 
-        return Role::find($workspaceUser->pivot->role_id);
+        // Fallback: if the user is the workspace creator, treat them as owner
+        // even if no explicit pivot entry exists (legacy / auto-created workspaces).
+        if ($workspace->created_by === $user->id) {
+            return Role::where('slug', Role::OWNER)->first();
+        }
+
+        \Log::warning('PublicationPolicy::getUserRoleInWorkspace - No role found', [
+            'user_id' => $user->id,
+            'workspace_id' => $workspace->id,
+        ]);
+
+        return null;
     }
 }
