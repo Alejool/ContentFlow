@@ -171,7 +171,13 @@ class ContentValidator
             $hasVideo = false;
             $hasImage = false;
 
-            foreach ($publication->mediaFiles ?? [] as $media) {
+            // Normalize mediaFiles to plain array once
+            $mediaFiles = $publication->mediaFiles ?? [];
+            if ($mediaFiles instanceof \Illuminate\Support\Collection) {
+                $mediaFiles = $mediaFiles->all();
+            }
+
+            foreach ($mediaFiles as $media) {
                 if ($media->file_type === 'video') {
                     $hasVideo = true;
                 } elseif ($media->file_type === 'image') {
@@ -180,7 +186,7 @@ class ContentValidator
             }
 
             // Validar si se permiten múltiples videos
-            if ($hasVideo && count(array_filter($publication->mediaFiles ?? [], fn($m) => $m->file_type === 'video')) > 1) {
+            if ($hasVideo && count(array_filter($mediaFiles, fn($m) => $m->file_type === 'video')) > 1) {
                 if (!($rules['media']['multiple_videos_allowed'] ?? false)) {
                     $errors[] = 'Multiple videos are not allowed';
                 }

@@ -26,6 +26,10 @@ class MediaValidator
         $warnings = [];
 
         $mediaFiles = $publication->mediaFiles ?? [];
+        // Normalize to plain array so native PHP array functions work correctly
+        if ($mediaFiles instanceof \Illuminate\Support\Collection) {
+            $mediaFiles = $mediaFiles->all();
+        }
         if (empty($mediaFiles)) {
             return ['errors' => $errors, 'warnings' => $warnings];
         }
