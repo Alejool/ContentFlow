@@ -16,6 +16,8 @@ use App\Http\Controllers\Workspace\InvitationController;
 use App\Http\Controllers\Api\ExternalCalendarController;
 use App\Http\Controllers\Subscription\AddonsController;
 use App\Http\Controllers\Subscription\AddonPurchaseController;
+use App\Http\Controllers\Subscription\PricingController;
+use App\Http\Controllers\Subscription\UsageMetricsController;
 
 use Illuminate\Http\Request;
 
