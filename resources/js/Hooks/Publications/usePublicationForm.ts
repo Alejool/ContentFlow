@@ -1705,6 +1705,22 @@ export const usePublicationForm = ({
     trigger,
     control,
     uploadFile,
+
+    handleFileUpdate: async (tempId: string, file: File, publicationId?: number, publicationTitle?: string) => {
+      const localUrl = URL.createObjectURL(file);
+      updateFile(tempId, { file, url: localUrl, status: 'uploading', isNew: true });
+      try {
+        const result = await uploadFile(file, tempId);
+        if (publicationId) {
+          const { linkUploadToPublication } = useUploadQueue.getState();
+          linkUploadToPublication(tempId, publicationId, publicationTitle ?? '');
+        }
+        return result;
+      } catch {
+        return undefined;
+      }
+    },
+
     i18n,
 
     // Data loading state

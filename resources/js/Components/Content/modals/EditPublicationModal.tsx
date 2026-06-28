@@ -30,7 +30,6 @@ import toast from '@/Utils/common/toast';
 import { maskIpAddress, parseUserAgent } from '@/Utils/formatters';
 import { queryKeys } from '@/lib/common/queryKeys';
 import { useCampaignStore } from '@/stores/Campaign/campaignStore';
-import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -108,15 +107,13 @@ const EditPublicationModal = ({
     isAnyMediaProcessing,
     remoteLock,
     durationErrors,
-    updateFile: baseUpdateFile,
-    uploadFile,
+    handleFileUpdate,
     i18n,
   } = usePublicationForm({
     publication,
     onClose,
     onSubmitSuccess: async (success) => {
       if (success) {
-        // Remove TanStack Query cache to force a completely fresh fetch and avoid stale placeholder data.
         queryClient.removeQueries({ queryKey: queryKeys.publications.all });
         queryClient.invalidateQueries({ queryKey: queryKeys.calendar.all });
       }
@@ -124,30 +121,6 @@ const EditPublicationModal = ({
     },
     isOpen,
   });
-
-  const updateFile = async (tempId: string, file: File) => {
-    // 1. Update the store immediately with the new local URL for preview
-    const localUrl = URL.createObjectURL(file);
-    baseUpdateFile(tempId, {
-      file,
-      url: localUrl,
-      status: 'uploading',
-      isNew: true,
-    });
-
-    // 2. Trigger the S3 upload
-    try {
-      const result = await uploadFile(file, tempId);
-      // If it's an existing publication, ensure it's linked
-      if (publication?.id) {
-        const { linkUploadToPublication } = useUploadQueue.getState();
-        linkUploadToPublication(tempId, publication.id, publication.title);
-      }
-      return result;
-    } catch (err) {
-      return undefined;
-    }
-  };
 
   // Delete reels when video is removed
   const handleRemoveMediaWithReels = async (tempId: string) => {
@@ -167,8 +140,7 @@ const EditPublicationModal = ({
         try {
           await Promise.all(reelsToDelete.map((reel) => publicationService.deleteMedia(reel.id)));
           toast.success(t('reels.messages.deletedWithVideo'));
-        } catch (error) {
-          console.error('Failed to delete associated reels', error);
+        } catch {
         }
       }
     }
@@ -249,10 +221,6 @@ const EditPublicationModal = ({
         }
       });
 
-      console.log('Auto-deselected incompatible platforms:', {
-        incompatibleAccounts,
-        reasons: incompatibleReasons,
-      });
     }
   }, [capabilities, capabilitiesLoading, isOpen, publication?.id]);
 
@@ -547,8 +515,6 @@ const EditPublicationModal = ({
           <form
             id="edit-publication-form"
             onSubmit={(e) => {
-              console.log('=== Form submit event triggered ===');
-              console.log('Event:', e);
               handleSubmit(e);
             }}
           >
@@ -761,7 +727,7 @@ const EditPublicationModal = ({
                         onRemoveMedia={handleRemoveMediaWithReels}
                         onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
                         onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                        onUpdateFile={updateFile}
+                        onUpdateFile={(tempId, file) => handleFileUpdate(tempId, file, publication?.id, publication?.title)}
                         onDragOver={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -809,7 +775,7 @@ const EditPublicationModal = ({
                       })()}
                       onValidationComplete={(valid: boolean, results: any) => {
                         // Opcional: puedes usar esto para mostrar errores
-                        console.log('Video validation:', valid, results);
+                        // video validation callback
                       }}
                     />
                   )}

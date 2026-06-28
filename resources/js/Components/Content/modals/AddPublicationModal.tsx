@@ -18,7 +18,6 @@ import { useCampaigns } from '@/Hooks/Campaign/useCampaigns';
 import { useContentType } from '@/Hooks/Publications/useContentType';
 import { usePublicationForm } from '@/Hooks/Publications/usePublicationForm';
 import { useConfirm } from '@/Hooks/common/useConfirm';
-import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
 import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
 import { ToastService } from '@/Services/common/ToastService';
@@ -95,35 +94,18 @@ export default function AddPublicationModal({
     publishingAccountIds,
     publishedAccountIds,
     publication,
-    updateFile: baseUpdateFile,
+    uploadFile,
+    handleFileUpdate,
+    uploadProgress,
+    uploadErrors,
+    isS3Uploading: uploading,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
 
-  const updateFile = async (tempId: string, file: File) => {
-    // 1. Update the store immediately with the new local URL for preview
-    const localUrl = URL.createObjectURL(file);
-    baseUpdateFile(tempId, {
-      file,
-      url: localUrl,
-      status: 'uploading',
-      isNew: true,
-    });
-
-    // 2. Trigger the S3 upload
-    try {
-      const result = await uploadFile(file, tempId);
-      return result;
-    } catch (err) {
-      return undefined;
-    }
-  };
-
   const { confirm, ConfirmDialog } = useConfirm();
-
-  const { uploadFile, uploading, progress: uploadProgress, errors: uploadErrors } = useS3Upload(); // Use hook
 
   // Custom submit handler to intercept fields and upload first
   const handleFormSubmit = async (e: FormEvent) => {
@@ -233,9 +215,8 @@ export default function AddPublicationModal({
           filesToUpload.map(async (m) => {
             try {
               await uploadFile(m.file!, m.tempId);
-            } catch (err) {
-              console.error(`Upload failed for ${m.tempId}`, err);
-              // We don't throw here, the UI already reflects the error via updateFile(tempId, {status: 'failed'})
+            } catch {
+              // UI reflects error via store status update
             }
           }),
         );
@@ -245,8 +226,7 @@ export default function AddPublicationModal({
 
         // Proceed with normal submit
         handleSubmit(e);
-      } catch (err) {
-        console.error('Critical error in handleUploadAndSubmit', err);
+      } catch {
         handleSubmit(e); // Proceed anyway if possible, usePublicationForm will handle missing keys
       }
     } else {
@@ -417,7 +397,7 @@ export default function AddPublicationModal({
                         handleFileChange(e.dataTransfer.files);
                       }}
                       lockedBy={remoteLock}
-                      onUpdateFile={updateFile}
+                      onUpdateFile={handleFileUpdate}
                       uploadProgress={uploadProgress}
                       uploadErrors={uploadErrors}
                     />
@@ -440,7 +420,7 @@ export default function AddPublicationModal({
                       return videoFile?.file?.size ? videoFile.file.size / (1024 * 1024) : 0;
                     })()}
                     onValidationComplete={(valid: boolean, results: any) => {
-                      console.log('Video validation:', valid, results);
+                      // video validation callback
                     }}
                   />
                 )}
