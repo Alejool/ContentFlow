@@ -27,6 +27,9 @@
     "approvalSuccessMessage": "La publicación ha sido aprobada exitosamente y está lista para ser publicada.",
     "approvedBy": "Aprobado por",
     "rejectedBy": "Rechazado por",
+    "submittedBy": "Enviado por",
+    "cancelledBy": "Cancelado por",
+    "reassignedBy": "Reasignado por",
     "publicationRejected": "Publicación Rechazada",
     "rejectionMessage": "Tu publicación ha sido rechazada. Revisa los comentarios y realiza los ajustes necesarios.",
     "noReasonProvided": "No se proporcionó una razón.",
@@ -51,7 +54,11 @@
       "rejected": "Rechazado",
       "draft": "Borrador",
       "pending_review": "En Revisión",
-      "ready_to_submit": "Listo para Enviar"
+      "ready_to_submit": "Listo para Enviar",
+      "submitted": "Enviado a revisión",
+      "cancelled": "Cancelado",
+      "reassigned": "Reasignado",
+      "auto_advanced": "Avanzado automáticamente"
     },
     "historyTable": {
       "publication": "Publicación",
@@ -84,6 +91,7 @@
     },
     "workflow_progress": "Progreso del Flujo",
     "workflow_flow": "Flujo de Aprobación",
+    "workflow_status": "Estado del Flujo",
     "progress": "Progreso",
     "in_progress": "En Proceso",
     "rejected_here": "Rechazado Aquí",

@@ -72,6 +72,12 @@ export default function ApprovalHistorySection({
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'rejected':
         return <XCircle className="h-5 w-5 text-rose-500" />;
+      case 'cancelled':
+        return <XCircle className="h-5 w-5 text-gray-400" />;
+      case 'reassigned':
+        return <Clock className="h-5 w-5 text-blue-500" />;
+      case 'auto_advanced':
+        return <CheckCircle className="h-5 w-5 text-purple-500" />;
       default:
         return <Clock className="h-5 w-5 text-amber-500" />;
     }
@@ -83,9 +89,35 @@ export default function ApprovalHistorySection({
         return 'bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20';
       case 'rejected':
         return 'bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20';
+      case 'cancelled':
+        return 'bg-gray-50 dark:bg-gray-900/10 border-gray-200 dark:border-gray-700/30';
+      case 'reassigned':
+        return 'bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20';
+      case 'auto_advanced':
+        return 'bg-purple-50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-900/20';
       default:
         return 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20';
     }
+  };
+
+  const getActionLabel = (action: string | null) => {
+    switch (action) {
+      case 'approved': return t('approvals.status.approved');
+      case 'rejected': return t('approvals.status.rejected');
+      case 'submitted': return t('approvals.status.submitted');
+      case 'cancelled': return t('approvals.status.cancelled');
+      case 'reassigned': return t('approvals.status.reassigned');
+      case 'auto_advanced': return t('approvals.status.auto_advanced');
+      default: return t('approvals.status.pending');
+    }
+  };
+
+  const getByLabel = (action: string | null) => {
+    if (action === 'approved') return t('approvals.approvedBy');
+    if (action === 'rejected') return t('approvals.rejectedBy');
+    if (action === 'reassigned') return t('approvals.reassignedBy');
+    if (action === 'cancelled') return t('approvals.cancelledBy');
+    return t('approvals.submittedBy');
   };
 
   // Normalizar steps/levels - el backend puede devolver 'levels' o 'steps'
@@ -98,9 +130,9 @@ export default function ApprovalHistorySection({
     }));
   }, [workflow]);
 
-  // Filtrar solo logs de acciones completadas (approved, rejected)
+  // Filtrar logs de acciones completadas (todas excepto null/undefined)
   const completedLogs = useMemo(
-    () => logs.filter((log) => log.action === 'approved' || log.action === 'rejected'),
+    () => logs.filter((log) => log.action !== null && log.action !== undefined),
     [logs],
   );
 
@@ -251,15 +283,11 @@ export default function ApprovalHistorySection({
                     <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                          {log.action === 'approved'
-                            ? t('approvals.status.approved') || 'Aprobado'
-                            : log.action === 'rejected'
-                              ? t('approvals.status.rejected') || 'Rechazado'
-                              : t('approvals.status.pending') || 'Pendiente'}
+                          {getActionLabel(log.action)}
                         </span>
                         {log.approvalStep && (
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span className="font-medium">{t('approvals.step') || 'Nivel'} {log.approvalStep.level_number}:</span>{' '}
+                            <span className="font-medium">{t('approvals.step')} {log.approvalStep.level_number}:</span>{' '}
                             {log.approvalStep.level_name}
                             {log.approvalStep.role && (
                               <span className="ml-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
@@ -280,12 +308,7 @@ export default function ApprovalHistorySection({
                       {log.user && (
                         <div className="flex items-center gap-1.5">
                           <User className="h-3.5 w-3.5 opacity-70" />
-                          <span>
-                            {log.action === 'approved'
-                              ? t('approvals.approvedBy') || 'Aprobado por'
-                              : t('approvals.rejectedBy') || 'Rechazado por'}
-                            :
-                          </span>
+                          <span>{getByLabel(log.action)}:</span>
                           <span className="font-bold text-gray-700 dark:text-gray-300">
                             {log.user.name}
                           </span>
@@ -293,7 +316,7 @@ export default function ApprovalHistorySection({
                       )}
                     </div>
 
-                    {log.action === 'rejected' && log.comment && (
+                    {(log.action === 'rejected' || log.action === 'cancelled') && log.comment && (
                       <div className="mt-2 rounded border border-rose-200 bg-white/50 p-2 dark:border-rose-900/30 dark:bg-theme-bg-secondary">
                         <div className="mb-1 flex items-center gap-2">
                           <MessageSquare className="h-3 w-3 text-rose-500" />

@@ -1,6 +1,6 @@
 import type { ApprovalHistorySectionProps } from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
-import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Shield } from 'lucide-react';
+import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ApprovalHistoryCompactoProps extends ApprovalHistorySectionProps {
@@ -40,28 +40,36 @@ const ApprovalHistoryCompacto = ({
   const latestLog = getLatestApprovalStatus();
   const totalLogs = logs.length;
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (action: string) => {
     const colors: Record<string, string> = {
       approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
       rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+      submitted: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
       pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+      cancelled: 'bg-gray-100 text-gray-600 dark:bg-gray-700/40 dark:text-gray-400',
+      reassigned: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+      auto_advanced: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    return colors[action] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
-  const getStatusText = (status: string) => {
-    const texts: Record<string, string> = {
-      approved: 'Aprobado',
-      rejected: 'Rechazado',
-      pending: 'Pendiente',
+  const getStatusText = (action: string) => {
+    const map: Record<string, string> = {
+      approved: t('approvals.status.approved'),
+      rejected: t('approvals.status.rejected'),
+      submitted: t('approvals.status.submitted'),
+      pending: t('approvals.status.pending'),
+      cancelled: t('approvals.status.cancelled'),
+      reassigned: t('approvals.status.reassigned'),
+      auto_advanced: t('approvals.status.auto_advanced'),
     };
-    return texts[status] || status;
+    return map[action] ?? action;
   };
 
-  const getStatusIcon = (status: string) => {
-    if (status === 'approved') return <CheckCircle className="h-4 w-4" />;
-    if (status === 'rejected') return <AlertCircle className="h-4 w-4" />;
-    return <Shield className="h-4 w-4" />;
+  const getStatusIcon = (action: string) => {
+    if (action === 'approved') return <CheckCircle className="h-4 w-4" />;
+    if (action === 'rejected') return <AlertCircle className="h-4 w-4" />;
+    return <Clock className="h-4 w-4" />;
   };
 
   if (totalLogs === 0) return null;
