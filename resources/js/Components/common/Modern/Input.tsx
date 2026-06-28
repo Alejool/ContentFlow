@@ -110,7 +110,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
         : 'focus:ring-primary-500/20 dark:focus:ring-primary-500/30';
 
       if (error) {
-        return `${base} border-primary-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+        return `${base} border-red-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white focus:ring-red-500/20 dark:focus:ring-red-500/30`;
       }
       if (success) {
         return `${base} border-green-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white focus:ring-green-500/20 dark:focus:ring-green-500/30`;
@@ -126,8 +126,8 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
 
     const getMessageStyles = (type: 'error' | 'success') => {
       return type === 'error'
-        ? 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-primary-600'
-        : 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600';
+        ? 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-red-600 dark:text-red-400'
+        : 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600 dark:text-green-400';
     };
 
     const { value: propValue, onChange: propOnChange, ...restProps } = props as any;
@@ -181,7 +181,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                 isSolidActive
                   ? 'text-white'
                   : error
-                    ? 'text-primary-500 dark:text-primary-400'
+                    ? 'text-red-500 dark:text-red-400'
                     : success
                       ? 'text-green-500 dark:text-green-400'
                       : 'text-gray-400 dark:text-gray-400'

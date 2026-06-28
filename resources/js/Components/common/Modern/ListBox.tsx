@@ -197,7 +197,7 @@ export default function ListBox({
 
       {/* Error Message */}
       {error && (
-        <div className="text-primary-600 mt-2 flex items-start gap-2 text-sm" role="alert">
+        <div className="mt-2 flex items-start gap-2 text-sm text-red-600 dark:text-red-400" role="alert">
           <TriangleAlert className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>

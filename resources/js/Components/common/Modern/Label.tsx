@@ -227,7 +227,7 @@ export default function Label({
             {children}
 
             {required && (
-              <span className={theme === 'dark' ? 'text-primary-400' : 'text-primary-500'}>*</span>
+              <span className="text-red-500 dark:text-red-400">*</span>
             )}
           </span>
 

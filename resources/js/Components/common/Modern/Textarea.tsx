@@ -64,8 +64,8 @@ export default function Textarea<T extends FieldValues>({
 
   const getMessageStyles = (type: 'error' | 'success') => {
     return type === 'error'
-      ? 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-primary-600'
-      : 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600';
+      ? 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-red-600 dark:text-red-400'
+      : 'flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600 dark:text-green-400';
   };
 
   const getTextareaStyles = () => {
@@ -79,7 +79,7 @@ export default function Textarea<T extends FieldValues>({
     `;
 
     if (error)
-      return `${base} border-primary-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
+      return `${base} border-red-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
     if (success)
       return `${base} border-green-500 bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white`;
     if (variant === 'outlined')

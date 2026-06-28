@@ -336,7 +336,7 @@ export default function Select<T extends FieldValues>({
     `;
 
     if (error) {
-      return `${base} bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+      return `${base} bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-red-500 focus:ring-red-500/20 dark:focus:ring-red-500/30`;
     }
     if (success) {
       return `${base} bg-white dark:bg-theme-bg-secondary text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30`;
@@ -375,8 +375,8 @@ export default function Select<T extends FieldValues>({
     const base = 'flex items-start gap-2 px-3 py-2 rounded-lg mt-1';
 
     return type === 'error'
-      ? `${base} text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30`
-      : `${base} text-green-600 dark:text-green-300 bg-green-50 dark:bg-green-900/30`;
+      ? `${base} text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20`
+      : `${base} text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20`;
   };
 
   const fieldName = name || (id as Path<T>);
