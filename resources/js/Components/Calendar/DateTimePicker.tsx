@@ -1,4 +1,4 @@
-import { validateDate } from '@/Utils/common/dateValidation';
+﻿import { validateDate } from '@/Utils/common/dateValidation';
 import { formatDateTimeString } from '@/Utils/formatters';
 import { CalendarDate } from '@internationalized/date';
 import { AlertTriangle } from 'lucide-react';
@@ -69,7 +69,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     <I18nProvider locale={locale}>
       <div className={`space-y-3 ${className}`}>
         <div className="flex justify-center">
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
             <AriaCalendar
               value={dateToCalendarDate(selectedDate)}
               onChange={handleCalendarChange}
@@ -127,7 +127,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                   setHours(e.target.value.padStart(2, '0'));
                   applyTime(e.target.value, minutes);
                 }}
-                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
+                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-neutral-900 dark:text-white"
               />
               <span className="text-xl font-bold text-gray-600 dark:text-gray-300">:</span>
               <input
@@ -139,7 +139,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                   setMinutes(e.target.value.padStart(2, '0'));
                   applyTime(hours, e.target.value);
                 }}
-                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
+                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-neutral-900 dark:text-white"
               />
             </div>
           </div>

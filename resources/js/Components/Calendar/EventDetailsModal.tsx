@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { formatTimeString } from '@/Utils/formatters';
@@ -38,7 +38,7 @@ interface EventDetailsModalProps {
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
   scheduled:   { label: 'Programado',      bg: 'bg-blue-100 dark:bg-blue-900/30',    text: 'text-blue-700 dark:text-blue-300',   dot: 'bg-blue-500' },
   published:   { label: 'Publicado',        bg: 'bg-green-100 dark:bg-green-900/30',  text: 'text-green-700 dark:text-green-300', dot: 'bg-green-500' },
-  draft:       { label: 'Borrador',         bg: 'bg-gray-100 dark:bg-theme-bg-tertiary',       text: 'text-gray-600 dark:text-gray-400',   dot: 'bg-gray-400' },
+  draft:       { label: 'Borrador',         bg: 'bg-gray-100 dark:bg-neutral-900',       text: 'text-gray-600 dark:text-gray-400',   dot: 'bg-gray-400' },
   failed:      { label: 'Fallido',          bg: 'bg-red-100 dark:bg-red-900/30',      text: 'text-red-700 dark:text-red-300',     dot: 'bg-red-500' },
   pending:     { label: 'Pendiente',        bg: 'bg-yellow-100 dark:bg-yellow-900/30',text: 'text-yellow-700 dark:text-yellow-300',dot: 'bg-yellow-500' },
   approved:    { label: 'Aprobado',         bg: 'bg-emerald-100 dark:bg-emerald-900/30',text: 'text-emerald-700 dark:text-emerald-300',dot: 'bg-emerald-500' },
@@ -186,7 +186,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Reschedule section */}
         {canEdit && onUpdateDate && (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                 <CalendarClock className="h-4 w-4 text-primary-500" />
@@ -239,7 +239,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Description */}
         {event.extendedProps?.description && (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
               Descripción
             </p>
@@ -251,7 +251,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Campaign */}
         {event.campaign && (
-          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <Megaphone className="h-5 w-5 shrink-0 text-primary-500" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
@@ -264,7 +264,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Creator */}
         {(event.user?.name || event.extendedProps?.user_name) && (
-          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <User className="h-5 w-5 shrink-0 text-gray-400" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">

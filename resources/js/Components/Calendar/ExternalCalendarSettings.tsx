@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import {
   useConnectCalendar,
@@ -74,7 +74,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     disconnected: {
       icon: AlertCircle,
       text: t('calendar.external.disconnected'),
-      className: 'bg-gray-100 text-gray-800 dark:bg-theme-bg-tertiary dark:text-gray-300',
+      className: 'bg-gray-100 text-gray-800 dark:bg-neutral-900 dark:text-gray-300',
     },
   };
 
@@ -227,10 +227,10 @@ const CalendarConnectionCard = ({
   const { t } = useTranslation();
 
   return (
-    <div className="hover:border-primary-500 dark:hover:border-primary-500 rounded-lg border border-gray-200 bg-white p-4 transition-all dark:border-neutral-800 dark:bg-theme-bg-secondary">
+    <div className="hover:border-primary-500 dark:hover:border-primary-500 rounded-lg border border-gray-200 bg-white p-4 transition-all dark:border-neutral-800 dark:bg-neutral-900">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-theme-bg-tertiary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-neutral-900">
             {icon}
           </div>
           <div>

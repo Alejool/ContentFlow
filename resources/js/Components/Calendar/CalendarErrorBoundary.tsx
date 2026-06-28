@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+﻿import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -102,7 +102,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
 
   return (
     <div className="flex min-h-[400px] items-center justify-center p-8">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg dark:bg-theme-bg-elevated">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg dark:bg-neutral-800">
         <div className="mb-4 flex justify-center">
           <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
             <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
@@ -121,7 +121,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
         </p>
 
         {error && import.meta.env.DEV && (
-          <div className="mb-4 rounded bg-gray-100 p-3 text-left dark:bg-theme-bg-tertiary">
+          <div className="mb-4 rounded bg-gray-100 p-3 text-left dark:bg-neutral-900">
             <p className="break-all font-mono text-xs text-gray-700 dark:text-gray-300">
               {error.message}
             </p>

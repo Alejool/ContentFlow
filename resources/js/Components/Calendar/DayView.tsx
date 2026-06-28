@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import Switch from '@/Components/common/Modern/Switch';
 import { isDarkColor } from '@/Utils/Calendar/colorHelpers';
 import { formatTimeString } from '@/Utils/formatters';
@@ -136,7 +136,7 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
       }`}
     >
       {/* Time label — clicking it also opens the add modal */}
-      <div className="hover:bg-primary-50 dark:hover:bg-primary-900/20 relative w-20 shrink-0 border-r border-gray-100 bg-gray-50 px-3 py-3 text-right transition-colors dark:border-neutral-800 dark:bg-theme-bg-secondary/50">
+      <div className="hover:bg-primary-50 dark:hover:bg-primary-900/20 relative w-20 shrink-0 border-r border-gray-100 bg-gray-50 px-3 py-3 text-right transition-colors dark:border-neutral-800 dark:bg-neutral-900/50">
         <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
           {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
         </span>
@@ -240,7 +240,7 @@ export const DayView: React.FC<DayViewProps> = ({
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         {/* ── Header ── */}
         <div
           role="button"
@@ -284,7 +284,7 @@ export const DayView: React.FC<DayViewProps> = ({
       {/* Drag overlay */}
       <DragOverlay>
         {activeEvent ? (
-          <div className="border-primary-400 w-64 cursor-grabbing rounded-xl border bg-white p-3 opacity-90 shadow-2xl dark:bg-theme-bg-elevated">
+          <div className="border-primary-400 w-64 cursor-grabbing rounded-xl border bg-white p-3 opacity-90 shadow-2xl dark:bg-neutral-800">
             <div className="flex items-center gap-2">
               {activeEvent.title}
             </div>

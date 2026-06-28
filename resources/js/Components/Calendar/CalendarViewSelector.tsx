@@ -1,4 +1,4 @@
-import type { CalendarView } from '@/types/Calendar/calendar';
+﻿import type { CalendarView } from '@/types/Calendar/calendar';
 import { Calendar, CalendarDays, CalendarRange } from 'lucide-react';
 import React, { useEffect } from 'react';
 
@@ -47,15 +47,15 @@ export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
   ];
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-neutral-800 dark:bg-theme-bg-tertiary">
+    <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-neutral-800 dark:bg-neutral-900">
       {views.map((view) => (
         <button
           key={view.value}
           onClick={() => handleViewChange(view.value)}
           className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
             currentView === view.value
-              ? 'bg-white text-primary-600 shadow dark:bg-theme-bg-elevated dark:text-primary-400'
-              : 'text-gray-600 hover:bg-white/50 dark:text-gray-300 dark:hover:bg-theme-bg-elevated/50'
+              ? 'bg-white text-primary-600 shadow dark:bg-neutral-800 dark:text-primary-400'
+              : 'text-gray-600 hover:bg-white/50 dark:text-gray-300 dark:hover:bg-neutral-800/50'
           } `}
           aria-label={`Vista ${view.label}`}
           aria-pressed={currentView === view.value}

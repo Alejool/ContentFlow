@@ -1,4 +1,4 @@
-import { EventCard } from '@/Components/Calendar/EventCard';
+﻿import { EventCard } from '@/Components/Calendar/EventCard';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -77,14 +77,14 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <WeekdayHeaderRow />
 
         <div className="grid min-h-[700px] auto-rows-fr grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
           {startingEmptySlots.map((_, i) => (
             <div
               key={`empty-${i}`}
-              className="hidden border-b border-r border-gray-200 bg-gray-50 dark:border-neutral-800 dark:bg-theme-bg-secondary/50 lg:block"
+              className="hidden border-b border-r border-gray-200 bg-gray-50 dark:border-neutral-800 dark:bg-neutral-900/50 lg:block"
             />
           ))}
 

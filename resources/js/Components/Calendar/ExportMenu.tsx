@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import axios from 'axios';
 import { Calendar as CalendarIcon, Download } from 'lucide-react';
 import React, { useState } from 'react';
@@ -70,7 +70,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-theme-bg-elevated">
+          <div className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-800">
             <div className="border-b border-gray-200 p-3 dark:border-neutral-800">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                 Exportar calendario
@@ -84,7 +84,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
               <button
                 onClick={() => handleExport('google')}
                 disabled={isExporting}
-                className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-theme-bg-tertiary"
+                className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-neutral-900"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30">
                   <FaGoogle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -102,7 +102,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
               <button
                 onClick={() => handleExport('outlook')}
                 disabled={isExporting}
-                className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-theme-bg-tertiary"
+                className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-100 disabled:opacity-50 dark:hover:bg-neutral-900"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
                   <FaMicrosoft className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -117,7 +117,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
                 </div>
               </button>
 
-              <div className="mt-2 rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-secondary/50">
+              <div className="mt-2 rounded-lg bg-gray-50 p-3 dark:bg-neutral-900/50">
                 <div className="flex items-start gap-2">
                   <CalendarIcon className="mt-0.5 h-4 w-4 text-gray-400" />
                   <p className="text-xs text-gray-600 dark:text-gray-400">

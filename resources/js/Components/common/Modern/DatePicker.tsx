@@ -161,8 +161,8 @@ const CustomTimeSelector = ({
   };
 
   return (
-    <div className="flex w-full shrink-0 flex-col border-t border-gray-100 bg-white pb-14 md:w-[220px] md:border-t-0 md:border-l dark:border-neutral-800 dark:bg-theme-bg-secondary">
-      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 md:h-16 md:gap-2 md:px-4 md:text-sm dark:border-neutral-800 dark:bg-theme-bg-secondary dark:text-gray-300">
+    <div className="flex w-full shrink-0 flex-col border-t border-gray-100 bg-white md:w-[220px] md:border-t-0 md:border-l dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 md:h-16 md:gap-2 md:px-4 md:text-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-gray-300">
         <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
         <span>{currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}</span>
       </div>
@@ -425,10 +425,10 @@ const DatePickerModern = <T extends FieldValues>({
   };
 
   const pickerContent = (
-    <div className="flex max-w-full flex-col justify-center overflow-auto md:flex-row">
-      <div className="">
+    <div className="flex max-w-full flex-col md:flex-row">
+      <div className="flex flex-col">
         <div
-          className="flex h-16 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 dark:border-neutral-800 dark:bg-theme-bg-secondary"
+          className="flex h-16 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-900"
           style={{
             borderTopLeftRadius: '0.75rem',
             borderTopRightRadius: showTimeSelect ? 0 : '0.75rem',
@@ -569,13 +569,7 @@ const DatePickerModern = <T extends FieldValues>({
         </AriaCalendar>
 
         {/* Footer */}
-        <div
-          className="absolute right-0 bottom-0 left-0 flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-theme-bg-secondary"
-          style={{
-            borderBottomLeftRadius: '0.75rem',
-            borderBottomRightRadius: showTimeSelect ? 0 : '0.75rem',
-          }}
-        >
+        <div className="flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <Calendar className="h-4 w-4 shrink-0 text-gray-400" />
             <span className="truncate">{formatDisplayDate(displayDate)}</span>
@@ -636,7 +630,7 @@ const DatePickerModern = <T extends FieldValues>({
   if (inline) {
     return (
       <I18nProvider locale={currentLocale === 'es' ? 'es-ES' : 'en-US'}>
-        <div className={`border-primary-100 relative z-10 w-full overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-theme-bg-secondary ${containerClassName}`}>
+        <div className={`border-primary-100 relative z-10 w-full overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-neutral-900 ${containerClassName}`}>
           {pickerContent}
         </div>
       </I18nProvider>
@@ -684,7 +678,7 @@ const DatePickerModern = <T extends FieldValues>({
               className="fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[2px]"
               onClick={() => setIsOpen(false)}
             />
-            <div className="border-primary-100 fixed top-1/2 left-1/2 z-[9999] max-h-[90vh] w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-theme-bg-secondary">
+            <div className="border-primary-100 fixed top-1/2 left-1/2 z-[9999] max-h-[90vh] w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-2 bg-white shadow-xl sm:max-w-fit dark:border-neutral-800 dark:bg-neutral-900">
               {pickerContent}
             </div>
           </>

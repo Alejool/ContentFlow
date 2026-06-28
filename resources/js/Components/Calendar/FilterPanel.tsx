@@ -1,4 +1,4 @@
-import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
+﻿import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import type { Campaign } from '@/stores/Campaign/campaignStore';
 import type { CalendarFilters, Platform, PublicationStatus } from '@/types/Calendar/calendar';
 import React, { useState } from 'react';
@@ -107,7 +107,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-neutral-800">
         <div className="flex items-center gap-3">
@@ -160,19 +160,27 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
               {t('calendar.filter_by_platform', 'Platform')}
             </h4>
             <div className="flex flex-wrap gap-2">
-              {platforms.map((platform) => (
-                <button
-                  key={platform.id}
-                  onClick={() => handlePlatformToggle(platform.id)}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                    filters.platforms.includes(platform.id)
-                      ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-500 dark:bg-blue-900/30 dark:text-blue-400'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-300 dark:hover:bg-theme-bg-elevated'
-                  } `}
-                >
-                  {platform.name}
-                </button>
-              ))}
+              {platforms.map((platform) => {
+                const pCfg = SOCIAL_PLATFORMS[platform.id as keyof typeof SOCIAL_PLATFORMS];
+                const isActive = filters.platforms.includes(platform.id);
+                const ringClass = pCfg?.color?.replace('bg-', 'ring-') ?? 'ring-primary-500';
+                const activeClass = pCfg
+                  ? `${pCfg.bgClass} ${pCfg.textColor} ring-2 ${ringClass} ${pCfg.darkColor} ${pCfg.darkTextColor}`
+                  : 'bg-primary-50 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/20 dark:text-primary-400';
+                return (
+                  <button
+                    key={platform.id}
+                    onClick={() => handlePlatformToggle(platform.id)}
+                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                      isActive
+                        ? activeClass
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    {platform.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -190,7 +198,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                       filters.campaigns.includes(campaign.id.toString())
                         ? 'bg-purple-100 text-purple-800 ring-2 ring-purple-500 dark:bg-purple-900/30 dark:text-purple-400'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-300 dark:hover:bg-theme-bg-elevated'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-900 dark:text-gray-300 dark:hover:bg-neutral-800'
                     } `}
                   >
                     {campaign.name || campaign.title}
@@ -213,7 +221,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                     filters.statuses.includes(status)
                       ? `${getStatusColor(status)} ring-2 ring-current`
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-300 dark:hover:bg-theme-bg-elevated'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-900 dark:text-gray-300 dark:hover:bg-neutral-800'
                   } `}
                 >
                   {getStatusLabel(status)}

@@ -1,4 +1,4 @@
-import Switch from '@/Components/common/Modern/Switch';
+﻿import Switch from '@/Components/common/Modern/Switch';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { isDarkColor } from '@/Utils/Calendar/colorHelpers';
 import { formatTimeString } from '@/Utils/formatters';
@@ -74,9 +74,9 @@ export const EventCard: React.FC<EventCardProps> = ({
 
   const getBackgroundColor = () => {
     if (hasNoPlatforms) return 'bg-orange-50 dark:bg-orange-900/10';
-    if (eventColor) return 'bg-white dark:bg-theme-bg-secondary';
+    if (eventColor) return 'bg-white dark:bg-neutral-900';
     if (platformConfig) return `${platformConfig.bgClass} ${platformConfig.darkColor}`;
-    return 'bg-white dark:bg-theme-bg-secondary';
+    return 'bg-white dark:bg-neutral-900';
   };
 
   const getAccentColor = () => {

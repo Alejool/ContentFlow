@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import { useDayAddEventClick } from '@/Hooks/calendar/useDayAddEventClick';
 import { useDroppable } from '@dnd-kit/core';
 import { format } from 'date-fns';
@@ -41,7 +41,7 @@ export const DroppableDay: React.FC<DroppableDayProps> = ({
           onDaySelect?.(day);
         }
       }}
-      className={`group relative min-h-[140px] cursor-pointer border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary' : 'border-gray-100 bg-gray-50 dark:border-neutral-800/50 dark:bg-theme-bg-secondary/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isSelected ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-300 dark:bg-primary-900/10' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-theme-bg-tertiary/50`}
+      className={`group relative min-h-[140px] cursor-pointer border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900' : 'border-gray-100 bg-gray-50 dark:border-neutral-800/50 dark:bg-neutral-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isSelected ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-300 dark:bg-primary-900/10' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-neutral-900/50`}
     >
       <div className="mb-2.5 flex items-start justify-between">
         <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export const DroppableDay: React.FC<DroppableDayProps> = ({
               isTodayDay
                 ? 'scale-110 bg-primary-600 text-white shadow-lg shadow-primary-500/30'
                 : isCurrentMonth
-                  ? 'text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-theme-bg-tertiary'
+                  ? 'text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-neutral-900'
                   : 'text-gray-400 dark:text-gray-600'
             } `}
           >

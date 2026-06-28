@@ -1,4 +1,4 @@
-import { useCalendar } from '@/Hooks/Calendar/useCalendar';
+﻿import { useCalendar } from '@/Hooks/Calendar/useCalendar';
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import { formatTimeString } from '@/Utils/formatters';
 import {
@@ -175,7 +175,7 @@ export default function EditorialCalendar() {
       {renderHeader()}
       <div className="relative">
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm dark:bg-theme-bg-secondary">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm dark:bg-neutral-900">
             <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
           </div>
         )}

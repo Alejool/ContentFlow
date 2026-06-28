@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+﻿import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, CheckCheck } from 'lucide-react';
 import React from 'react';
 import { formatDateString } from '@/Utils/formatters';
@@ -64,10 +64,10 @@ export const SelectionMenu: React.FC<SelectionMenuProps> = ({
               left: position.x,
               top: position.y,
             }}
-            className="z-[101] min-w-[220px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-theme-bg-elevated"
+            className="z-[101] min-w-[220px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-800"
           >
             {/* Header */}
-            <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-theme-bg-tertiary/50">
+            <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/50">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Opciones de selección
               </p>

@@ -1,4 +1,4 @@
-import type { CalendarEvent, DataConflict } from '@/types/Calendar/calendar';
+﻿import type { CalendarEvent, DataConflict } from '@/types/Calendar/calendar';
 import { AlertTriangle, Clock, User } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
         ></div>
 
         {/* Modal panel */}
-        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle dark:bg-theme-bg-elevated">
+        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle dark:bg-neutral-800">
           {/* Header */}
           <div className="border-b border-amber-200 bg-amber-50 px-6 py-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
           {/* Content */}
           <div className="px-6 py-4">
             {event && (
-              <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-tertiary">
+              <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-neutral-900">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {t('calendar.conflict.event', 'Event')}: {event.title}
                 </p>
@@ -154,7 +154,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                       <span>{conflict.localUser}</span>
                     </div>
                   )}
-                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-theme-bg-elevated">
+                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-800">
                     <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.localValue)}
                     </pre>
@@ -207,7 +207,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                       <span>{conflict.serverUser}</span>
                     </div>
                   )}
-                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-theme-bg-elevated">
+                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-800">
                     <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.serverValue)}
                     </pre>
@@ -227,7 +227,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 bg-gray-50 px-6 py-4 dark:bg-theme-bg-tertiary">
+          <div className="flex items-center justify-end gap-3 bg-gray-50 px-6 py-4 dark:bg-neutral-900">
             <button
               type="button"
               onClick={onCancel}

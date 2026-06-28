@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { formatSelectedDate, normalizeToStartOfDay } from '@/Utils/Calendar/bulkActionsHelpers';
@@ -90,7 +90,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
             size="lg"
           />
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-neutral-800 dark:bg-theme-bg-secondary/50">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900/50">
             <p className="mb-2 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
               {t('calendar.selected_date')}
             </p>

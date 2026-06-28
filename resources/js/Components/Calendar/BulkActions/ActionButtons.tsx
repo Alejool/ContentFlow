@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import { cn } from '@/lib/common/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, CheckCheck, CheckSquare, Trash2, Undo2 } from 'lucide-react';
@@ -124,10 +124,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                   minWidth: 280,
                   zIndex: 99999,
                 }}
-                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-theme-bg-elevated"
+                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-800"
               >
                 {/* Header */}
-                <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-theme-bg-tertiary/60">
+                <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/60">
                   <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
                     {t('calendar.selectOptions') || 'Opciones de selección'}
                   </p>
@@ -170,9 +170,9 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                     onSelectAll();
                     setOpen(false);
                   }}
-                  className="group flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-theme-bg-tertiary/50"
+                  className="group flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50"
                 >
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors group-hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-400 dark:group-hover:bg-theme-bg-elevated">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors group-hover:bg-gray-200 dark:bg-neutral-900 dark:text-gray-400 dark:group-hover:bg-neutral-800">
                     <CheckSquare className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -206,7 +206,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             variant="ghost"
             size="md"
             onClick={onUndo}
-            className="rounded-full bg-white whitespace-nowrap shadow-lg dark:bg-theme-bg-elevated"
+            className="rounded-full bg-white whitespace-nowrap shadow-lg dark:bg-neutral-800"
             title={t('calendar.undoLastOperation')}
             icon={Undo2}
           >

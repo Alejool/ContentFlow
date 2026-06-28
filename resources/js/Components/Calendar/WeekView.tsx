@@ -1,4 +1,4 @@
-import { EventCard } from '@/Components/Calendar/EventCard';
+﻿import { EventCard } from '@/Components/Calendar/EventCard';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
@@ -176,7 +176,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
         <div className="min-w-[640px]">
 
           {/* ── Day headers ── */}
-          <div className="sticky top-0 z-10 grid border-b border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary"
+          <div className="sticky top-0 z-10 grid border-b border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900"
             style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
           >
             {/* Time column label */}
@@ -199,7 +199,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
                 className={`group relative flex flex-col items-center justify-center border-r border-gray-200 px-2 py-4 last:border-r-0 transition-all hover:bg-gray-50/80 dark:border-neutral-800 dark:hover:bg-gray-900/30 ${
                   isToday(day)
                     ? 'bg-primary-50/50 dark:bg-primary-900/10'
-                    : 'bg-white dark:bg-theme-bg-secondary'
+                    : 'bg-white dark:bg-neutral-900'
                 }`}
               >
                 {isToday(day) && (
@@ -247,11 +247,11 @@ export const WeekView: React.FC<WeekViewProps> = ({
             {hours.map((hour) => (
               <div
                 key={hour}
-                className={`grid border-b border-gray-100 dark:border-neutral-800 ${hour % 2 === 0 ? 'bg-white dark:bg-theme-bg-secondary' : 'bg-gray-50/30 dark:bg-theme-bg-primary/50'}`}
+                className={`grid border-b border-gray-100 dark:border-neutral-800 ${hour % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-gray-50/30 dark:bg-neutral-950/50'}`}
                 style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
               >
                 {/* Hour label */}
-                <div className="border-r border-gray-100 bg-gray-50 px-2 py-1 text-right text-xs font-medium text-gray-400 dark:border-neutral-800 dark:bg-theme-bg-secondary/50">
+                <div className="border-r border-gray-100 bg-gray-50 px-2 py-1 text-right text-xs font-medium text-gray-400 dark:border-neutral-800 dark:bg-neutral-900/50">
                   {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
                 </div>
 

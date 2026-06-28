@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -69,10 +69,10 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-theme-bg-secondary/50"
+          className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-theme-bg-tertiary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-neutral-900">
               <span className="text-lg font-bold text-gray-700 dark:text-gray-300">
                 {selectedCount}
               </span>
