@@ -40,7 +40,7 @@ export function useApiSettings(
   const [scopeGroups, setScopeGroups] = useState<ApiScopeGroups>({});
 
   useEffect(() => {
-    axios.get(route('workspaces.api-tokens.scopes')).then((r) => {
+    axios.get(route('api-tokens.scopes')).then((r) => {
       setScopeGroups(r.data?.data?.scopes ?? r.data?.scopes ?? {});
     }).catch(() => {});
   }, []);

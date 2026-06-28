@@ -111,6 +111,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
 // Ruta de pricing (pública, accesible sin autenticación)
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 
+// Public: returns all available API token scopes. No auth required.
+// Used by the frontend to build the scope selector UI.
+Route::get('/api-token-scopes', [ApiTokenController::class, 'scopes'])->name('api-tokens.scopes');
+
 Route::middleware('auth')->group(function () {
 
   Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
@@ -163,8 +167,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('{workspace}/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
     // Enterprise API Documentation Downloads
     Route::get('{workspace}/api-docs/download', [ApiTokenController::class, 'downloadDocs'])->name('api-docs.download');
-    // Public: available token scopes (no auth required)
-    Route::get('api-token-scopes', [ApiTokenController::class, 'scopes'])->name('api-tokens.scopes')->withoutMiddleware(['auth']);
   });
 
 Route::prefix('content')->name('content.')->group(function () {
