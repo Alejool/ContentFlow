@@ -57,7 +57,7 @@ services:
     container_name: contentflow_pgsql_dev
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     env_file:
       - .env.docker
     environment:
@@ -96,7 +96,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: contentflow_queue_dev
     restart: unless-stopped
-    command: php artisan queue:work --tries=3
+    command: php artisan queue:work --queue=publishing,default --tries=3 --sleep=3 --timeout=2100 --verbose
     volumes:
       - ./:/var/www/html
       - cf_vendor_v2:/var/www/html/vendor

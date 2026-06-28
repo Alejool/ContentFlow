@@ -175,6 +175,28 @@ for i in {1..60}; do
 done
 
 # =====================================================
+# 13. VERIFY QUEUE WORKER
+# =====================================================
+echo "🔍 verificando queue worker..."
+
+for i in {1..15}; do
+  QUEUE_STATUS=$(docker inspect --format='{{.State.Status}}' contentflow_queue_dev 2>/dev/null || echo "missing")
+
+  if [ "$QUEUE_STATUS" = "running" ]; then
+    echo "✅ queue worker corriendo"
+    break
+  fi
+
+  echo "⏳ intento $i → queue status: $QUEUE_STATUS"
+  sleep 2
+done
+
+if [ "$QUEUE_STATUS" != "running" ]; then
+  echo "⚠️  queue worker no levantó — revisando logs:"
+  docker logs contentflow_queue_dev --tail=20 || true
+fi
+
+# =====================================================
 # DONE
 # =====================================================
 echo ""
@@ -182,7 +204,11 @@ echo "🎉 ==============================="
 echo "   DEV ENV READY (STABLE)"
 echo "🎉 ==============================="
 echo ""
-echo "🌐 App:    http://localhost"
-echo "⚡ Octane: http://localhost:8080"
-echo "⚡ Vite:   http://localhost:5173"
+echo "🌐 App:      http://localhost"
+echo "⚡ Octane:   http://localhost:8080"
+echo "⚡ Vite:     http://localhost:5173"
+echo "📋 Queue:    $(docker inspect --format='{{.State.Status}}' contentflow_queue_dev 2>/dev/null || echo 'unknown')"
+echo ""
+echo "📌 Logs del worker:"
+echo "   docker logs contentflow_queue_dev -f"
 echo ""
