@@ -90,7 +90,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
             size="lg"
           />
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800/50">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-neutral-800 dark:bg-theme-bg-secondary/50">
             <p className="mb-2 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
               {t('calendar.selected_date')}
             </p>
@@ -110,7 +110,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="flex justify-end gap-3 border-t border-gray-200 pt-5 dark:border-gray-700"
+          className="flex justify-end gap-3 border-t border-gray-200 pt-5 dark:border-neutral-800"
         >
           <Button
             variant="ghost"

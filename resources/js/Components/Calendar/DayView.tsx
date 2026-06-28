@@ -131,12 +131,12 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`group flex min-h-[90px] border-b border-gray-100 transition-colors dark:border-gray-800 ${
+      className={`group flex min-h-[90px] border-b border-gray-100 transition-colors dark:border-neutral-800 ${
         isOver ? 'bg-primary-50 dark:bg-primary-900/20' : ''
       }`}
     >
       {/* Time label — clicking it also opens the add modal */}
-      <div className="hover:bg-primary-50 dark:hover:bg-primary-900/20 relative w-20 shrink-0 border-r border-gray-100 bg-gray-50 px-3 py-3 text-right transition-colors dark:border-gray-800 dark:bg-gray-900/50">
+      <div className="hover:bg-primary-50 dark:hover:bg-primary-900/20 relative w-20 shrink-0 border-r border-gray-100 bg-gray-50 px-3 py-3 text-right transition-colors dark:border-neutral-800 dark:bg-theme-bg-secondary/50">
         <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
           {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
         </span>
@@ -240,12 +240,12 @@ export const DayView: React.FC<DayViewProps> = ({
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary">
         {/* ── Header ── */}
         <div
           role="button"
           tabIndex={0}
-          className="from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 flex cursor-pointer items-center justify-between border-b border-gray-200 bg-linear-to-r px-6 py-4 transition-colors hover:bg-gray-100/50 dark:border-gray-700"
+          className="from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 flex cursor-pointer items-center justify-between border-b border-gray-200 bg-linear-to-r px-6 py-4 transition-colors hover:bg-gray-100/50 dark:border-neutral-800"
           onClick={() => onDaySelect?.(currentDate)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -284,7 +284,7 @@ export const DayView: React.FC<DayViewProps> = ({
       {/* Drag overlay */}
       <DragOverlay>
         {activeEvent ? (
-          <div className="border-primary-400 w-64 cursor-grabbing rounded-xl border bg-white p-3 opacity-90 shadow-2xl dark:bg-gray-800">
+          <div className="border-primary-400 w-64 cursor-grabbing rounded-xl border bg-white p-3 opacity-90 shadow-2xl dark:bg-theme-bg-elevated">
             <div className="flex items-center gap-2">
               {activeEvent.title}
             </div>

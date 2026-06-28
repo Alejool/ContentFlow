@@ -67,16 +67,16 @@ export const EventCard: React.FC<EventCardProps> = ({
   // Get border and background colors
   const getBorderColor = () => {
     if (hasNoPlatforms) return 'border-orange-300 dark:border-orange-600';
-    if (eventColor) return 'border-gray-200 dark:border-gray-700';
+    if (eventColor) return 'border-gray-200 dark:border-neutral-800';
     if (platformConfig) return `${platformConfig.borderColor} ${platformConfig.darkBorderColor}`;
-    return 'border-gray-200 dark:border-gray-700';
+    return 'border-gray-200 dark:border-neutral-800';
   };
 
   const getBackgroundColor = () => {
     if (hasNoPlatforms) return 'bg-orange-50 dark:bg-orange-900/10';
-    if (eventColor) return 'bg-white dark:bg-gray-800';
+    if (eventColor) return 'bg-white dark:bg-theme-bg-secondary';
     if (platformConfig) return `${platformConfig.bgClass} ${platformConfig.darkColor}`;
-    return 'bg-white dark:bg-gray-800';
+    return 'bg-white dark:bg-theme-bg-secondary';
   };
 
   const getAccentColor = () => {

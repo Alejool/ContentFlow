@@ -89,7 +89,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
 
         {/* Month/Year Picker Dropdown */}
         {showMonthPicker && (
-          <div className="absolute top-full left-0 z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-black">
+          <div className="absolute top-full left-0 z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-neutral-800 dark:bg-theme-bg-elevated">
             <div className="mb-4 grid grid-cols-3 gap-2">
               {Array.from({ length: 12 }, (_, i) => (
                 <Button
@@ -101,7 +101,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
                   className={`text-sm ${
                     currentDate.getMonth() === i
                       ? ''
-                      : 'border-none! text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                      : 'border-none! text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-theme-bg-tertiary'
                   }`}
                 >
                   {formatDate(new Date(2024, i, 1), 'monthShort')}
@@ -136,7 +136,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
       </div>
 
       {/* Navigation Controls */}
-      <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-gray-700 dark:bg-gray-800">
+      <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 dark:border-neutral-800 dark:bg-theme-bg-tertiary">
         <Button
           onClick={onNavigatePrevious}
           buttonStyle="icon"
@@ -144,7 +144,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           size="sm"
           rounded="lg"
           shadow="sm"
-          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-gray-700!"
+          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-theme-bg-elevated!"
           title={t('calendar.navigation.previous') || 'Anterior'}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -160,7 +160,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           className={`relative font-semibold transition-all hover:shadow ${
             isCurrentDay(currentDate)
               ? 'bg-primary-100! text-primary-700! dark:bg-primary-900! dark:text-primary-300!'
-              : 'text-gray-700! hover:bg-white! dark:text-gray-200! dark:hover:bg-gray-700!'
+              : 'text-gray-700! hover:bg-white! dark:text-gray-200! dark:hover:bg-theme-bg-elevated!'
           }`}
           title={t('calendar.navigation.today') || 'Hoy'}
         >
@@ -177,7 +177,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           size="sm"
           rounded="lg"
           shadow="sm"
-          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-gray-700!"
+          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-theme-bg-elevated!"
           title={t('calendar.navigation.next') || 'Siguiente'}
           icon={<ChevronRight className="h-5 w-5" />}
         >
@@ -192,7 +192,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
             size="sm"
             rounded="lg"
             shadow="sm"
-            className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-gray-700!"
+            className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-theme-bg-elevated!"
             title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
             icon={<CalendarIcon className="h-5 w-5" />}
           >

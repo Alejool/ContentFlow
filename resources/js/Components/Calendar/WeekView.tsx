@@ -95,12 +95,12 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
           onAddEvent(toAddEventDateTime(day, hour));
         }
       }}
-      className={`group relative min-h-[80px] cursor-pointer border-r border-gray-100 transition-colors hover:bg-primary-50/20 dark:border-gray-800 dark:hover:bg-primary-900/10 ${
+      className={`group relative min-h-[80px] cursor-pointer border-r border-gray-100 transition-colors hover:bg-primary-50/20 dark:border-neutral-800 dark:hover:bg-primary-900/10 ${
         isOver ? 'bg-primary-100/50 ring-1 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''
       } ${isToday(day) ? 'bg-primary-50/20 dark:bg-primary-900/5' : ''} ${isSelectedDay ? 'bg-gray-50/40 dark:bg-white/5' : ''}`}
     >
       {/* Línea de media hora decorativa */}
-      <div className="absolute top-1/2 left-0 h-[1px] w-full border-t border-dashed border-gray-100 dark:border-gray-800/50" />
+      <div className="absolute top-1/2 left-0 h-[1px] w-full border-t border-dashed border-gray-100 dark:border-neutral-800/50" />
       {events.map((event) => (
         <DraggableWeekEvent
           key={event.id}
@@ -172,15 +172,15 @@ export const WeekView: React.FC<WeekViewProps> = ({
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       {/* Outer wrapper: horizontal scroll on small screens */}
-      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-neutral-800">
         <div className="min-w-[640px]">
 
           {/* ── Day headers ── */}
-          <div className="sticky top-0 z-10 grid border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-black"
+          <div className="sticky top-0 z-10 grid border-b border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary"
             style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
           >
             {/* Time column label */}
-            <div className="border-r border-gray-200 p-3 text-center text-xs font-bold text-gray-400 dark:border-gray-700">
+            <div className="border-r border-gray-200 p-3 text-center text-xs font-bold text-gray-400 dark:border-neutral-800">
               Hora
             </div>
 
@@ -196,10 +196,10 @@ export const WeekView: React.FC<WeekViewProps> = ({
                     onDaySelect?.(day);
                   }
                 }}
-                className={`group relative flex flex-col items-center justify-center border-r border-gray-200 px-2 py-4 last:border-r-0 transition-all hover:bg-gray-50/80 dark:border-gray-700 dark:hover:bg-gray-900/30 ${
+                className={`group relative flex flex-col items-center justify-center border-r border-gray-200 px-2 py-4 last:border-r-0 transition-all hover:bg-gray-50/80 dark:border-neutral-800 dark:hover:bg-gray-900/30 ${
                   isToday(day)
                     ? 'bg-primary-50/50 dark:bg-primary-900/10'
-                    : 'bg-white dark:bg-black'
+                    : 'bg-white dark:bg-theme-bg-secondary'
                 }`}
               >
                 {isToday(day) && (
@@ -247,11 +247,11 @@ export const WeekView: React.FC<WeekViewProps> = ({
             {hours.map((hour) => (
               <div
                 key={hour}
-                className={`grid border-b border-gray-100 dark:border-gray-800 ${hour % 2 === 0 ? 'bg-white dark:bg-black' : 'bg-gray-50/30 dark:bg-gray-900/10'}`}
+                className={`grid border-b border-gray-100 dark:border-neutral-800 ${hour % 2 === 0 ? 'bg-white dark:bg-theme-bg-secondary' : 'bg-gray-50/30 dark:bg-theme-bg-primary/50'}`}
                 style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}
               >
                 {/* Hour label */}
-                <div className="border-r border-gray-100 bg-gray-50 px-2 py-1 text-right text-xs font-medium text-gray-400 dark:border-gray-800 dark:bg-gray-900/50">
+                <div className="border-r border-gray-100 bg-gray-50 px-2 py-1 text-right text-xs font-medium text-gray-400 dark:border-neutral-800 dark:bg-theme-bg-secondary/50">
                   {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
                 </div>
 

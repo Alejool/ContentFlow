@@ -64,10 +64,10 @@ export const SelectionMenu: React.FC<SelectionMenuProps> = ({
               left: position.x,
               top: position.y,
             }}
-            className="z-[101] min-w-[220px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800"
+            className="z-[101] min-w-[220px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-theme-bg-elevated"
           >
             {/* Header */}
-            <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-gray-700 dark:bg-gray-900/50">
+            <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-theme-bg-tertiary/50">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Opciones de selección
               </p>

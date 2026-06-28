@@ -585,25 +585,40 @@ const DatePickerModern = <T extends FieldValues>({
               </span>
             )}
           </div>
-          {isClearable && displayDate && (
-            <Button
-              type="button"
-              buttonStyle="ghost"
-              variant="ghost"
-              size="sm"
-              rounded="lg"
-              shadow="none"
-              className="!gap-1.5"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDateChange(null);
-                setIsOpen(false);
-              }}
-              icon={X}
-            >
-              {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {isClearable && displayDate && (
+              <Button
+                type="button"
+                buttonStyle="ghost"
+                variant="ghost"
+                size="sm"
+                rounded="lg"
+                shadow="none"
+                className="!gap-1.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDateChange(null);
+                  setIsOpen(false);
+                }}
+                icon={X}
+              >
+                {currentLocale === 'es' ? 'Limpiar' : 'Clear'}
+              </Button>
+            )}
+            {showTimeSelect && (
+              <Button
+                type="button"
+                buttonStyle="solid"
+                variant="primary"
+                size="sm"
+                rounded="lg"
+                shadow="none"
+                onClick={() => setIsOpen(false)}
+              >
+                {currentLocale === 'es' ? 'Confirmar' : 'Done'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

@@ -38,7 +38,7 @@ interface EventDetailsModalProps {
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
   scheduled:   { label: 'Programado',      bg: 'bg-blue-100 dark:bg-blue-900/30',    text: 'text-blue-700 dark:text-blue-300',   dot: 'bg-blue-500' },
   published:   { label: 'Publicado',        bg: 'bg-green-100 dark:bg-green-900/30',  text: 'text-green-700 dark:text-green-300', dot: 'bg-green-500' },
-  draft:       { label: 'Borrador',         bg: 'bg-gray-100 dark:bg-gray-800',       text: 'text-gray-600 dark:text-gray-400',   dot: 'bg-gray-400' },
+  draft:       { label: 'Borrador',         bg: 'bg-gray-100 dark:bg-theme-bg-tertiary',       text: 'text-gray-600 dark:text-gray-400',   dot: 'bg-gray-400' },
   failed:      { label: 'Fallido',          bg: 'bg-red-100 dark:bg-red-900/30',      text: 'text-red-700 dark:text-red-300',     dot: 'bg-red-500' },
   pending:     { label: 'Pendiente',        bg: 'bg-yellow-100 dark:bg-yellow-900/30',text: 'text-yellow-700 dark:text-yellow-300',dot: 'bg-yellow-500' },
   approved:    { label: 'Aprobado',         bg: 'bg-emerald-100 dark:bg-emerald-900/30',text: 'text-emerald-700 dark:text-emerald-300',dot: 'bg-emerald-500' },

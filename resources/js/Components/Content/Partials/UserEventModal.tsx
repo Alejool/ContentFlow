@@ -1,5 +1,6 @@
 import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
+import ColorPicker from '@/Components/common/Modern/ColorPicker';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
 import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
@@ -9,9 +10,7 @@ import { cn } from '@/lib/common/utils';
 import {
   CALENDAR_COLORS,
   findColorOption,
-  getColorPreviewGlow,
   getGradientStyle,
-  getSwatchSelectionShadow,
 } from '@/Utils/Calendar/colorHelpers';
 import { AlignLeft, Bell, Calendar as CalendarIcon, Globe, Lock, Type } from 'lucide-react';
 import { Controller } from 'react-hook-form';
@@ -80,7 +79,7 @@ export default function UserEventModal({
         </div>
 
         <div
-          className="custom-scrollbar flex-1 overflow-y-auto bg-gray-50 transition-colors duration-200 ease-out dark:bg-gray-950"
+          className="custom-scrollbar flex-1 overflow-y-auto bg-gray-50 transition-colors duration-200 ease-out dark:bg-theme-bg-primary"
           style={{
             backgroundImage: `linear-gradient(180deg, ${selectedColor}24 0%, transparent 42%)`,
           }}
@@ -252,82 +251,17 @@ export default function UserEventModal({
               </p>
             </div>
 
-            {/* Selector de color: acento fuerte al tono elegido, sin animaciones pesadas */}
-            <div
-              className={cn(
-                'overflow-hidden rounded-lg border-2 bg-white transition-[border-color,box-shadow] duration-200 ease-out dark:bg-theme-bg-secondary',
-                isReadOnly && 'pointer-events-none opacity-70',
-              )}
-              style={{
-                borderColor: `${selectedColor}66`,
-                boxShadow: `0 0 0 1px ${selectedColor}22, 0 16px 48px -12px ${selectedColor}40`,
-                backgroundImage: `linear-gradient(125deg, ${selectedColor}38 0%, ${selectedColor}16 36%, transparent 58%)`,
-              }}
-            >
-              <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-stretch sm:gap-6">
-                  <div className="flex shrink-0 flex-col items-center gap-2 sm:items-start">
-                    <div
-                      className="h-14 w-14 shrink-0 rounded-lg ring-2 ring-white/90 dark:ring-white/15"
-                      style={{
-                        backgroundColor: selectedColor,
-                        boxShadow: getColorPreviewGlow(selectedColor),
-                      }}
-                      aria-hidden
-                    />
-                    <span className="max-w-28 text-center text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400 sm:text-left">
-                      {currentColor.name}
-                    </span>
-                  </div>
-
-                  <div className="min-w-0 flex-1 space-y-4">
-                    <div className="flex flex-wrap items-end justify-between gap-3">
-                      <label className="block text-sm font-bold text-gray-900 dark:text-gray-100">
-                        {t('calendar.userEvents.modal.fields.color')}
-                      </label>
-                      <code
-                        className="rounded-lg border px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wide text-gray-800 transition-colors duration-200 dark:text-gray-100"
-                        style={{
-                          backgroundColor: `${selectedColor}22`,
-                          borderColor: `${selectedColor}55`,
-                          color: selectedColor,
-                        }}
-                      >
-                        {selectedColor}
-                      </code>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2.5">
-                      {CALENDAR_COLORS.map((color) => {
-                        const isSel = selectedColor === color.value;
-                        return (
-                          <button
-                            key={color.value}
-                            type="button"
-                            onClick={() => {
-                              setValue('color', color.value);
-                              setSelectedColor(color.value);
-                            }}
-                            className={cn(
-                              'h-10 w-10 rounded-full border-2 transition-transform duration-150 ease-out',
-                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900',
-                              isSel
-                                ? 'scale-105 border-white/90 dark:border-neutral-800'
-                                : 'border-transparent opacity-90 hover:scale-105 hover:opacity-100',
-                            )}
-                            style={{
-                              backgroundColor: color.value,
-                              boxShadow: isSel ? getSwatchSelectionShadow(color.value) : '0 2px 10px rgba(0,0,0,0.18)',
-                            }}
-                            title={`${color.name} (${color.value})`}
-                            aria-label={`Seleccionar color ${color.name}`}
-                            aria-pressed={isSel}
-                            disabled={isReadOnly}
-                          />
-                        );
-                      })}
-                  </div>
-                </div>
-              </div>
+            <div className={cn(isReadOnly && 'pointer-events-none opacity-70')}>
+              <ColorPicker
+                value={selectedColor}
+                onChange={(hex) => {
+                  setValue('color', hex);
+                  setSelectedColor(hex);
+                }}
+                label={t('calendar.userEvents.modal.fields.color')}
+                presets={CALENDAR_COLORS.map((c) => c.value)}
+                disabled={isReadOnly}
+              />
             </div>
 
             <div

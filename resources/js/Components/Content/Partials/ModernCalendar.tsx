@@ -241,7 +241,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <CalendarErrorBoundary>
-      <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="p-6">
 
           {/* ── Toolbar superior ────────────────────────────────────────────── */}

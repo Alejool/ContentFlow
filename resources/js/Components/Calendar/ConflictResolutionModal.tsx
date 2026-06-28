@@ -70,7 +70,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
         ></div>
 
         {/* Modal panel */}
-        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle dark:bg-gray-800">
+        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:align-middle dark:bg-theme-bg-elevated">
           {/* Header */}
           <div className="border-b border-amber-200 bg-amber-50 px-6 py-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
           {/* Content */}
           <div className="px-6 py-4">
             {event && (
-              <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+              <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-tertiary">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {t('calendar.conflict.event', 'Event')}: {event.title}
                 </p>
@@ -114,7 +114,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                 className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
                   selectedResolution === 'local'
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
+                    : 'border-gray-200 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-gray-600'
                 }`}
                 onClick={() => setSelectedResolution('local')}
                 role="button"
@@ -154,7 +154,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                       <span>{conflict.localUser}</span>
                     </div>
                   )}
-                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
+                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-theme-bg-elevated">
                     <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.localValue)}
                     </pre>
@@ -167,7 +167,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                 className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
                   selectedResolution === 'server'
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
+                    : 'border-gray-200 hover:border-gray-300 dark:border-neutral-800 dark:hover:border-gray-600'
                 }`}
                 onClick={() => setSelectedResolution('server')}
                 role="button"
@@ -207,7 +207,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                       <span>{conflict.serverUser}</span>
                     </div>
                   )}
-                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
+                  <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-theme-bg-elevated">
                     <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
                       {formatValue(conflict.serverValue)}
                     </pre>
@@ -227,7 +227,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 bg-gray-50 px-6 py-4 dark:bg-gray-700">
+          <div className="flex items-center justify-end gap-3 bg-gray-50 px-6 py-4 dark:bg-theme-bg-tertiary">
             <button
               type="button"
               onClick={onCancel}

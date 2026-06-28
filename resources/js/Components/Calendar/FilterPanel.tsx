@@ -107,9 +107,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700">
+      <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-neutral-800">
         <div className="flex items-center gap-3">
           <FaFilter className="text-gray-500 dark:text-gray-400" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -141,7 +141,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
       {/* Results Counter */}
       {hasActiveFilters && (
-        <div className="border-b border-gray-200 bg-blue-50 px-4 py-2 dark:border-gray-700 dark:bg-blue-900/10">
+        <div className="border-b border-gray-200 bg-blue-50 px-4 py-2 dark:border-neutral-800 dark:bg-blue-900/10">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             {t('calendar.showing_filtered', 'Showing {{count}} of {{total}} events', {
               count: filteredCount,
@@ -167,7 +167,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                     filters.platforms.includes(platform.id)
                       ? 'bg-blue-100 text-blue-800 ring-2 ring-blue-500 dark:bg-blue-900/30 dark:text-blue-400'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-300 dark:hover:bg-theme-bg-elevated'
                   } `}
                 >
                   {platform.name}
@@ -190,7 +190,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                       filters.campaigns.includes(campaign.id.toString())
                         ? 'bg-purple-100 text-purple-800 ring-2 ring-purple-500 dark:bg-purple-900/30 dark:text-purple-400'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-300 dark:hover:bg-theme-bg-elevated'
                     } `}
                   >
                     {campaign.name || campaign.title}
@@ -213,7 +213,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                     filters.statuses.includes(status)
                       ? `${getStatusColor(status)} ring-2 ring-current`
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-theme-bg-tertiary dark:text-gray-300 dark:hover:bg-theme-bg-elevated'
                   } `}
                 >
                   {getStatusLabel(status)}

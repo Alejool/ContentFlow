@@ -73,7 +73,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
           <motion.div
             initial={{ boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
             animate={{ boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
-            className="relative rounded-2xl border border-gray-200 bg-white backdrop-blur-xl dark:border-gray-700 dark:bg-gray-800/95"
+            className="relative rounded-2xl border border-gray-200 bg-white backdrop-blur-xl dark:border-neutral-800 dark:bg-theme-bg-elevated/95"
             style={{ overflow: 'visible' }}
           >
             {/* Top accent gradient */}
