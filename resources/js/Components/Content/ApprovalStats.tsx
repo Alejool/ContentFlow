@@ -1,15 +1,6 @@
-import axios from 'axios';
+import { useApprovalStats } from '@/Hooks/approval/useApprovalStats';
 import { CheckCircle, Clock, Timer, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-interface ApprovalStats {
-  pending_requests: number;
-  pending_for_me: number;
-  approved_today: number;
-  rejected_today: number;
-  avg_approval_time_hours: number;
-}
 
 interface ApprovalStatsProps {
   refreshTrigger?: number;
@@ -17,26 +8,7 @@ interface ApprovalStatsProps {
 
 export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
   const { t } = useTranslation();
-  const [stats, setStats] = useState<ApprovalStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchStats();
-  }, [refreshTrigger]);
-
-  const fetchStats = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get('/api/v1/approvals/stats');
-      const json = response.data;
-      if (json.success) {
-        setStats(json);
-      }
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: stats, isLoading } = useApprovalStats(refreshTrigger);
 
   if (isLoading) {
     return (

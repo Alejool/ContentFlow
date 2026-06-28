@@ -2,9 +2,9 @@ import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
-import axios from 'axios';
+import { useApprovalWorkflow } from '@/Hooks/approval/useApprovalWorkflow';
 import { AlertTriangle, ChevronRight, Plus, Save, Settings, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'ziggy-js';
@@ -50,14 +50,26 @@ export default function ApprovalWorkflowConfiguration({
 }: ApprovalWorkflowConfigurationProps) {
   const { t } = useTranslation();
 
+  const {
+    workflow: remoteWorkflow,
+    isLoading,
+    toggle,
+    isToggling,
+    configure,
+    isSaving,
+  } = useApprovalWorkflow(workspace.id);
+
   const [workflow, setWorkflow] = useState<ApprovalWorkflow>({
     workspace_id: workspace.id as number,
     is_enabled: false,
     is_multi_level: false,
     levels: [],
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+
+  // Sync remote workflow into local state for editing
+  if (remoteWorkflow && remoteWorkflow.id !== workflow.id) {
+    setWorkflow(remoteWorkflow);
+  }
 
   // Filter roles that can participate in approvals
   const approvalRoles = roles.filter(
@@ -66,31 +78,6 @@ export default function ApprovalWorkflowConfiguration({
 
   // If no approval roles found, use all roles as fallback (for development/testing)
   const availableRoles = approvalRoles.length > 0 ? approvalRoles : roles;
-
-  const fetchWorkflow = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        route('api.v1.workspaces.approval-workflow.show', {
-          idOrSlug: workspace.id,
-        }),
-      );
-      if (response.data.data) {
-        setWorkflow(response.data.data);
-      }
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { status?: number } };
-      if (axiosError.response?.status !== 404) {
-        toast.error(t('approval.errors.fetch_failed'));
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [workspace.id, t]);
-
-  useEffect(() => {
-    fetchWorkflow();
-  }, [fetchWorkflow]);
 
   // Check if workspace has access to approval workflows (after all hooks)
   if (!hasBasicAccess) {
@@ -124,28 +111,13 @@ export default function ApprovalWorkflowConfiguration({
       toast.error(t('approval.errors.insufficient_permissions'));
       return;
     }
-
     try {
-      setIsSaving(true);
-      const endpoint = workflow.is_enabled
-        ? route('api.v1.workspaces.approval-workflow.disable', {
-            idOrSlug: workspace.id,
-          })
-        : route('api.v1.workspaces.approval-workflow.enable', {
-            idOrSlug: workspace.id,
-          });
-
-      await axios.post(endpoint);
-
+      await toggle(!workflow.is_enabled);
       setWorkflow({ ...workflow, is_enabled: !workflow.is_enabled });
-      toast.success(
-        workflow.is_enabled ? t('approval.success.disabled') : t('approval.success.enabled'),
-      );
+      toast.success(workflow.is_enabled ? t('approval.success.disabled') : t('approval.success.enabled'));
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(axiosError.response?.data?.message || t('approval.errors.toggle_failed'));
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -290,15 +262,8 @@ export default function ApprovalWorkflowConfiguration({
 
       console.log('🔍 Sending payload:', payload); // Debug log
 
-      await axios.put(
-        route('api.v1.workspaces.approval-workflow.configure', {
-          idOrSlug: workspace.id,
-        }),
-        payload,
-      );
-
+      await configure(payload);
       toast.success(t('approval.success.configured'));
-      fetchWorkflow();
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
       console.error('❌ Save error:', axiosError.response?.data);

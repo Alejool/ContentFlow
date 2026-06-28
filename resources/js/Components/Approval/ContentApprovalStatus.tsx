@@ -1,6 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
-import axios from 'axios';
+import { useApprovalActions } from '@/Hooks/approval/useApprovalActions';
 import { AlertCircle, CheckCircle, Clock, Send, ThumbsDown, ThumbsUp, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -38,7 +38,8 @@ export default function ContentApprovalStatus({
   onStatusChange,
 }: ContentApprovalStatusProps) {
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { submitForApproval, approveContent, rejectContent } = useApprovalActions();
+  const isSubmitting = submitForApproval.isPending || approveContent.isPending || rejectContent.isPending;
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [comment, setComment] = useState('');
@@ -125,62 +126,30 @@ export default function ContentApprovalStatus({
 
   const handleSubmitForApproval = async () => {
     try {
-      setIsSubmitting(true);
-      const response = await axios.post(
-        route('api.content.submit-for-approval', content.id),
-        {},
-        { skipErrorHandler: true },
-      );
-
-      // Update stores with fresh data
-      const publication = response.data?.data?.content || response.data?.data?.publication;
+      const response = await submitForApproval.mutateAsync(content.id);
+      const publication = (response as { data?: { content?: unknown; publication?: unknown } })?.data?.content
+        || (response as { data?: { publication?: unknown } })?.data?.publication;
       if (publication) {
         const publicationStoreModule = await import('@/stores/Publications/publicationStore');
         const manageContentUIStoreModule = await import('@/stores/Content/manageContentUIStore');
-
-        // CRITICAL: Update immediately with new status
-        publicationStoreModule.usePublicationStore.getState().updatePublication(content.id, {
-          status: publication.status,
-          current_approval_step_id: publication.current_approval_step_id,
-          currentApprovalStep: publication.currentApprovalStep,
-          approval_logs: publication.approval_logs,
-          approvalLogs: publication.approval_logs,
-          submitted_for_approval_at: publication.submitted_for_approval_at,
-          ...publication,
-        });
-
-        // Also update selectedItem if this publication is currently open in a modal
-        const selectedItem =
-          manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
+        const pub = publication as Record<string, unknown>;
+        publicationStoreModule.usePublicationStore.getState().updatePublication(content.id, pub);
+        const selectedItem = manageContentUIStoreModule.useManageContentUIStore.getState().selectedItem;
         if (selectedItem?.id === content.id) {
-          manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem({
-            status: publication.status,
-            current_approval_step_id: publication.current_approval_step_id,
-            currentApprovalStep: publication.currentApprovalStep,
-            approval_logs: publication.approval_logs,
-            approvalLogs: publication.approval_logs,
-            submitted_for_approval_at: publication.submitted_for_approval_at,
-            ...publication,
-          });
+          manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem(pub);
         }
       }
-
       toast.success(t('approval.success.submitted'));
       onStatusChange?.();
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(axiosError.response?.data?.message || t('approval.errors.submit_failed'));
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const handleApprove = async () => {
     try {
-      setIsSubmitting(true);
-      await axios.post(route('api.content.approve', content.id), {
-        comment: comment || undefined,
-      });
+      await approveContent.mutateAsync({ id: content.id, comment: comment || undefined });
       toast.success(t('approval.success.approved'));
       setShowApproveModal(false);
       setComment('');
@@ -188,8 +157,6 @@ export default function ContentApprovalStatus({
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(axiosError.response?.data?.message || t('approval.errors.approve_failed'));
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -200,10 +167,7 @@ export default function ContentApprovalStatus({
     }
 
     try {
-      setIsSubmitting(true);
-      await axios.post(route('api.content.reject', content.id), {
-        reason: rejectionReason,
-      });
+      await rejectContent.mutateAsync({ id: content.id, reason: rejectionReason });
       toast.success(t('approval.success.rejected'));
       setShowRejectModal(false);
       setRejectionReason('');
@@ -211,8 +175,6 @@ export default function ContentApprovalStatus({
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(axiosError.response?.data?.message || t('approval.errors.reject_failed'));
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

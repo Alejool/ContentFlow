@@ -13,7 +13,7 @@ import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { useApprovalActions } from '@/Hooks/approval/useApprovalActions';
 import type { Locale } from 'date-fns';
 import { formatDistanceToNow } from 'date-fns';
 import { Check, Clock, Eye, FileText, Layers, Loader2, User, X } from 'lucide-react';
@@ -282,6 +282,7 @@ export default function ApprovalList({
 }: ApprovalListProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
+  const { approveRequest, rejectRequest } = useApprovalActions();
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<ApprovalRequest | null>(null);
@@ -305,42 +306,32 @@ export default function ApprovalList({
 
   const handleApprove = async (request: ApprovalRequest) => {
     try {
-      const response = await axios.post(route('api.v1.approvals.approve', request.id), {
-        comment: null, // Opcional: agregar modal para comentario
-      });
+      const updatedRequest = await approveRequest.mutateAsync({ id: request.id }) as ApprovalRequest & {
+        publication?: unknown;
+        publication_id?: number;
+        completedBy?: { name?: string };
+        completed_at?: string;
+        currentStep?: { level_name?: string };
+      };
 
-      if (response.data.success) {
-        const updatedRequest = response.data.request;
-
+      if (updatedRequest) {
         if (updatedRequest.status === 'approved') {
-          // Aprobación final
           toast.success(t('approvals.approvedSuccess'));
           setSelectedRequest(updatedRequest);
           setApprovalData({
             approverName: updatedRequest.completedBy?.name || auth.user.name,
-            approvedAt: updatedRequest.completed_at,
+            approvedAt: updatedRequest.completed_at || '',
           });
           setApprovalModalOpen(true);
         } else {
-          // Aprobación parcial - avanzó al siguiente nivel
-          toast.success(
-            t('approvals.levelApproved', {
-              level: updatedRequest.currentStep?.level_name || 'Siguiente nivel',
-            }),
-          );
-
-          // Actualizar publicación en el store
-          if (updatedRequest.publication) {
-            updatePublication(updatedRequest.publication_id, updatedRequest.publication);
+          toast.success(t('approvals.levelApproved', { level: updatedRequest.currentStep?.level_name || 'Siguiente nivel' }));
+          if (updatedRequest.publication && updatedRequest.publication_id) {
+            updatePublication(updatedRequest.publication_id, updatedRequest.publication as Record<string, unknown>);
           }
-
-          // Actualizar item seleccionado si está abierto
           if (selectedItem?.id === updatedRequest.publication_id) {
-            updateSelectedItem(updatedRequest.publication);
+            updateSelectedItem(updatedRequest.publication as Record<string, unknown>);
           }
         }
-
-        // Refrescar lista
         onRefresh();
       }
     } catch (error: any) {
@@ -355,26 +346,15 @@ export default function ApprovalList({
 
   const handleRejectSubmit = async (reason: string) => {
     if (!selectedRequest) return;
-
     try {
-      const response = await axios.post(route('api.v1.approvals.reject', selectedRequest.id), {
-        reason: reason,
-      });
-
-      if (response.data.success) {
-        toast.success(t('approvals.rejectedSuccess') || 'Request rejected');
-        setRejectionModalOpen(false);
-        setSelectedRequest(null);
-
-        // Refrescar lista
-        onRefresh();
-      }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.errors?.reason?.[0] ||
-        t('approvals.errors.rejectFailed');
-      toast.error(errorMessage);
+      await rejectRequest.mutateAsync({ id: selectedRequest.id, reason });
+      toast.success(t('approvals.rejectedSuccess') || 'Request rejected');
+      setRejectionModalOpen(false);
+      setSelectedRequest(null);
+      onRefresh();
+    } catch (error: unknown) {
+      const e = error as { response?: { data?: { message?: string; errors?: { reason?: string[] } } } };
+      toast.error(e.response?.data?.message || e.response?.data?.errors?.reason?.[0] || t('approvals.errors.rejectFailed'));
     }
   };
 

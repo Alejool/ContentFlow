@@ -1,39 +1,14 @@
 import Button from '@/Components/common/Modern/Button';
 import BarChart from '@/Components/Statistics/BarChart';
 import PieChart from '@/Components/Statistics/PieChart';
+import { useApprovalAnalytics } from '@/Hooks/approval/useApprovalAnalytics';
 import { useTheme } from '@/Hooks/Layout/useTheme';
-import axios from 'axios';
+import { approvalService } from '@/Services/Approval/approvalService';
 import { AlertCircle, BarChart3, Clock, Download, FileText, TrendingUp, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { formatDateString } from '@/Utils/formatters';
-import { route } from 'ziggy-js';
-
-interface AnalyticsData {
-  average_approval_times: Record<number, number>;
-  approval_rates_by_role: Array<{
-    role: string;
-    approval_rate: number;
-    rejection_rate: number;
-    total_actions: number;
-  }>;
-  pending_content_by_level: Record<number, number>;
-  stale_pending_content: Array<{
-    id: number;
-    title: string;
-    submitted_at: string;
-    days_pending: number;
-    current_level: number;
-  }>;
-  approver_workload: Array<{
-    user_id: number;
-    user_name: string;
-    role: string;
-    pending_count: number;
-  }>;
-  average_publication_time: number;
-}
 
 interface ApprovalAnalyticsDashboardProps {
   workspace: { id: number | string };
@@ -46,50 +21,18 @@ export default function ApprovalAnalyticsDashboard({
 }: ApprovalAnalyticsDashboardProps) {
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
 
-  useEffect(() => {
-    if (canViewAnalytics) {
-      fetchAnalytics();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspace.id, canViewAnalytics]);
-
-  const fetchAnalytics = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        route('api.v1.workspaces.approval-analytics.index', {
-          idOrSlug: workspace.id,
-        }),
-      );
-      setAnalytics(response.data.data);
-    } catch {
-      toast.error(t('approval.analytics.errors.fetch_failed'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: analytics, isLoading } = useApprovalAnalytics(workspace.id, canViewAnalytics);
 
   const handleExport = async (format: 'csv' | 'json') => {
     try {
       setIsExporting(true);
-      const response = await axios.get(
-        route('api.v1.workspaces.approval-analytics.export', {
-          idOrSlug: workspace.id,
-        }),
-        {
-          params: { format },
-          responseType: 'blob',
-        },
-      );
-
-      const blob = new Blob([response.data], {
+      const blob = await approvalService.exportAnalytics(workspace.id, format);
+      const blobObj = new Blob([blob], {
         type: format === 'csv' ? 'text/csv' : 'application/json',
       });
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(blobObj);
       const link = document.createElement('a');
       link.href = url;
       link.download = `approval-analytics-${workspace.id}-${new Date().toISOString().split('T')[0]}.${format}`;
@@ -97,7 +40,6 @@ export default function ApprovalAnalyticsDashboard({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-
       toast.success(t('approval.analytics.success.exported'));
     } catch {
       toast.error(t('approval.analytics.errors.export_failed'));

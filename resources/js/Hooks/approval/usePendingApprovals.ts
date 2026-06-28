@@ -1,13 +1,8 @@
+import { approvalService } from '@/Services/Approval/approvalService';
 import { queryKeys } from '@/lib/common/queryKeys';
 import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { useEffect } from 'react';
-
-async function fetchPendingApprovalsFn(type = 'to_approve'): Promise<ApprovalRequest[]> {
-  const response = await axios.get(route('api.v1.approvals.pending'), { params: { type } });
-  return response.data.requests ?? [];
-}
 
 /**
  * Fetch pending approval requests.
@@ -18,7 +13,7 @@ export function usePendingApprovals(refreshTrigger?: number) {
 
   const query = useQuery({
     queryKey: queryKeys.approvals.pending('to_approve'),
-    queryFn: () => fetchPendingApprovalsFn('to_approve'),
+    queryFn: () => approvalService.getPendingApprovals('to_approve') as Promise<ApprovalRequest[]>,
     staleTime: 60 * 1000, // 1 min
   });
 

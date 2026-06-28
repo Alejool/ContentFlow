@@ -1,6 +1,7 @@
+import { useApprovalActions } from '@/Hooks/approval/useApprovalActions';
+import { approvalService } from '@/Services/Approval/approvalService';
 import type { ApprovalLog, ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import type { Publication } from '@/types/Publications/Publication';
-import axios from 'axios';
 import { CheckCircle, Clock, Loader2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -17,13 +18,14 @@ export default function ApprovalFlowVisualization({
   onRefresh,
 }: ApprovalFlowVisualizationProps) {
   const { t } = useTranslation();
+  const { approveRequest, rejectRequest } = useApprovalActions();
   const [approvalRequest, setApprovalRequest] = useState<ApprovalRequest | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [comment, setComment] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectInput, setShowRejectInput] = useState(false);
-  const [isActing, setIsActing] = useState(false);
+  const isActing = approveRequest.isPending || rejectRequest.isPending;
 
   useEffect(() => {
     fetchApprovalStatus();
@@ -33,19 +35,12 @@ export default function ApprovalFlowVisualization({
     try {
       setIsLoading(true);
       setError(null);
-
-      const response = await axios.get(
-        route('api.v1.approvals.publication.history', publication.id),
-      );
-
-      if (response.data.success) {
-        // Tomar la solicitud más reciente (pending o la última)
-        const history: ApprovalRequest[] = response.data.history || [];
-        const active = history.find((r) => r.status === 'pending') || history[0] || null;
-        setApprovalRequest(active);
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cargar el estado de aprobación');
+      const history = await approvalService.getPublicationHistory(publication.id) as ApprovalRequest[];
+      const active = history.find((r) => r.status === 'pending') || history[0] || null;
+      setApprovalRequest(active);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      setError(e.response?.data?.message || 'Error al cargar el estado de aprobación');
     } finally {
       setIsLoading(false);
     }
@@ -54,30 +49,22 @@ export default function ApprovalFlowVisualization({
   const handleApprove = async () => {
     if (!approvalRequest) return;
     try {
-      setIsActing(true);
-      const response = await axios.post(route('api.v1.approvals.approve', approvalRequest.id), {
-        comment: comment || undefined,
-      });
+      const updated = await approveRequest.mutateAsync({
+        id: approvalRequest.id,
+        payload: { comment: comment || undefined },
+      }) as ApprovalRequest;
 
-      if (response.data.success) {
-        const updated: ApprovalRequest = response.data.request;
-        if (updated.status === 'approved') {
-          toast.success(t('approvals.messages.finalApproval') || 'Aprobación final completada.');
-        } else {
-          toast.success(
-            t('approvals.messages.levelApproved', {
-              level: updated.currentStep?.level_name || 'Siguiente nivel',
-            }) || 'Nivel aprobado. Avanzando al siguiente.',
-          );
-        }
-        setComment('');
-        await fetchApprovalStatus();
-        onRefresh?.();
+      if (updated?.status === 'approved') {
+        toast.success(t('approvals.messages.finalApproval') || 'Aprobación final completada.');
+      } else {
+        toast.success(t('approvals.messages.levelApproved', { level: updated?.currentStep?.level_name || 'Siguiente nivel' }) || 'Nivel aprobado.');
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Error al aprobar');
-    } finally {
-      setIsActing(false);
+      setComment('');
+      await fetchApprovalStatus();
+      onRefresh?.();
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(e.response?.data?.message || 'Error al aprobar');
     }
   };
 
@@ -87,22 +74,15 @@ export default function ApprovalFlowVisualization({
       return;
     }
     try {
-      setIsActing(true);
-      const response = await axios.post(route('api.v1.approvals.reject', approvalRequest.id), {
-        reason: rejectionReason,
-      });
-
-      if (response.data.success) {
-        toast.success(t('approvals.rejectedSuccess') || 'Solicitud rechazada.');
-        setRejectionReason('');
-        setShowRejectInput(false);
-        await fetchApprovalStatus();
-        onRefresh?.();
-      }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Error al rechazar');
-    } finally {
-      setIsActing(false);
+      await rejectRequest.mutateAsync({ id: approvalRequest.id, reason: rejectionReason });
+      toast.success(t('approvals.rejectedSuccess') || 'Solicitud rechazada.');
+      setRejectionReason('');
+      setShowRejectInput(false);
+      await fetchApprovalStatus();
+      onRefresh?.();
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(e.response?.data?.message || 'Error al rechazar');
     }
   };
 
