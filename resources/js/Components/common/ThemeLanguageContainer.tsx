@@ -1,5 +1,5 @@
-import LanguageSwitcher from '@/Components/common/ui/LanguageSwitcher';
-import ThemeSwitcher from '@/Components/common/ui/ThemeSwitcher';
+﻿import LanguageSwitcher from '@/Components/common/LanguageSwitcher';
+import ThemeSwitcher from '@/Components/common/ThemeSwitcher';
 import { Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
