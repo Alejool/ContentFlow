@@ -48,7 +48,10 @@ class PayUGateway implements PaymentGatewayInterface
         }
 
         try {
-            $referenceCode = "SUB_{$workspace->id}_{$plan}_" . time();
+            // Deterministic within 1-hour window — prevents duplicate charges on retry.
+            $referenceCode = "SUB_{$workspace->id}_{$plan}_" . substr(
+                hash('sha256', "payu_sub:{$workspace->id}:{$plan}:" . now()->format('YmdH')), 0, 12
+            );
             $amount = $this->convertUsdToLocal($planConfig['price'], 'CO');
 
             // Crear formulario de pago con PayU
@@ -106,7 +109,11 @@ class PayUGateway implements PaymentGatewayInterface
         array $metadata = []
     ): array {
         try {
-            $referenceCode = "ADDON_{$workspace->id}_{$addonData['sku']}_" . time();
+            // Deterministic within 1-hour window
+            $quantity = $metadata['quantity'] ?? 1;
+            $referenceCode = "ADDON_{$workspace->id}_{$addonData['sku']}_" . substr(
+                hash('sha256', "payu_addon:{$workspace->id}:{$addonData['sku']}:{$quantity}:" . now()->format('YmdH')), 0, 12
+            );
             $amount = $this->convertUsdToLocal($addonData['price'], 'CO');
 
             $signature = $this->generateSignature($referenceCode, $amount, 'COP');

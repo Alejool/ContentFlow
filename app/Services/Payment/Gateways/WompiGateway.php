@@ -51,8 +51,11 @@ class WompiGateway implements PaymentGatewayInterface
         // Calcular precio en centavos (Wompi usa centavos)
         $amountInCents = $this->convertToWompiAmount($planConfig['price']);
 
-        // Crear referencia única
-        $reference = 'SUB-' . $workspace->id . '-' . time();
+        // Deterministic reference — same workspace+plan within the same hour
+        // produces the same reference, preventing duplicate payment links.
+        $reference = 'SUB-' . $workspace->id . '-' . substr(
+            hash('sha256', "wompi_sub:{$workspace->id}:{$plan}:" . now()->format('YmdH')), 0, 12
+        );
 
         // Crear Payment Link (checkout hosted)
         $response = Http::withHeaders([
@@ -103,8 +106,11 @@ class WompiGateway implements PaymentGatewayInterface
         // Calcular precio en centavos
         $amountInCents = $this->convertToWompiAmount($addonData['price']);
 
-        // Crear referencia única
-        $reference = 'ADDON-' . $workspace->id . '-' . $addonData['sku'] . '-' . time();
+        // Deterministic reference scoped to workspace + sku + quantity + hour
+        $quantity = $metadata['quantity'] ?? 1;
+        $reference = 'ADDON-' . $workspace->id . '-' . substr(
+            hash('sha256', "wompi_addon:{$workspace->id}:{$addonData['sku']}:{$quantity}:" . now()->format('YmdH')), 0, 12
+        );
 
         // Crear Payment Link
         $response = Http::withHeaders([

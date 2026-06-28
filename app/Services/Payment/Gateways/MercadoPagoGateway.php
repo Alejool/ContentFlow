@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
+use MercadoPago\Net\MPRequestOptions;
 
 /**
  * Gateway de Mercado Pago usando SDK oficial v3
@@ -42,6 +43,13 @@ class MercadoPagoGateway implements PaymentGatewayInterface
         try {
             $client = new PreferenceClient();
 
+            // Idempotency key scoped to workspace + plan + hour.
+            // MP API uses this to return the same preference on retry
+            // instead of creating a duplicate charge.
+            $idempotencyKey = hash('sha256', "mp_sub:{$workspace->id}:{$plan}:" . now()->format('YmdH'));
+            $requestOptions = new MPRequestOptions();
+            $requestOptions->setCustomHeaders(['X-Idempotency-Key: ' . $idempotencyKey]);
+
             $preference = $client->create([
                 'items' => [
                     [
@@ -70,7 +78,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface
                     'name' => $user->name,
                 ],
                 'notification_url' => url('/api/webhooks/mercadopago'),
-            ]);
+            ], $requestOptions);
 
             return [
                 'url' => $preference->init_point,
@@ -105,12 +113,17 @@ class MercadoPagoGateway implements PaymentGatewayInterface
         try {
             $client = new PreferenceClient();
 
+            $quantity = $metadata['quantity'] ?? 1;
+            $addonIdempotencyKey = hash('sha256', "mp_addon:{$workspace->id}:{$addonData['sku']}:{$quantity}:" . now()->format('YmdH'));
+            $addonRequestOptions = new MPRequestOptions();
+            $addonRequestOptions->setCustomHeaders(['X-Idempotency-Key: ' . $addonIdempotencyKey]);
+
             $preference = $client->create([
                 'items' => [
                     [
                         'title' => $addonData['name'],
                         'description' => "Addon: {$addonData['amount']} {$addonData['unit']}",
-                        'quantity' => $metadata['quantity'] ?? 1,
+                        'quantity' => $quantity,
                         'currency_id' => 'COP',
                         'unit_price' => $this->convertUsdToCop($addonData['price']),
                     ]
@@ -135,7 +148,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface
                     'name' => $user->name,
                 ],
                 'notification_url' => url('/api/webhooks/mercadopago'),
-            ]);
+            ], $addonRequestOptions);
 
             return [
                 'url' => $preference->init_point,

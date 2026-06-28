@@ -100,7 +100,7 @@ class MercadoPagoManualGateway implements PaymentGatewayInterface
                 'failure' => $failureUrl,
                 'pending' => $pendingUrl,
             ],
-            'external_reference' => "workspace_{$workspace->id}_addon_{$addonData['sku']}_" . time(),
+            'external_reference' => "workspace_{$workspace->id}_addon_{$addonData['sku']}_{$quantity}",
             'metadata' => [
                 'addon_sku' => $addonData['sku'],
                 'addon_amount' => (string) $addonData['amount'],
@@ -126,18 +126,14 @@ class MercadoPagoManualGateway implements PaymentGatewayInterface
     private function createPreference(array $data, Workspace $workspace, string $reference): array
     {
         try {
-            Log::info('MercadoPago Manual: Creating preference', [
-                'workspace_id' => $workspace->id,
-                'reference' => $reference,
-                'access_token_length' => strlen($this->accessToken),
-                'api_url' => $this->apiUrl,
-                'back_urls' => $data['back_urls'] ?? 'not set',
-                'auto_return' => $data['auto_return'] ?? 'not set',
-            ]);
+            // Idempotency key: same external_reference + hour → same key.
+            // MP returns the existing preference instead of creating a duplicate.
+            $idempotencyKey = hash('sha256', "mp_manual_pref:{$workspace->id}:{$reference}:" . now()->format('YmdH'));
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->accessToken,
                 'Content-Type' => 'application/json',
+                'X-Idempotency-Key' => $idempotencyKey,
             ])->post("{$this->apiUrl}/checkout/preferences", $data);
 
             Log::info('MercadoPago Manual: API Response', [

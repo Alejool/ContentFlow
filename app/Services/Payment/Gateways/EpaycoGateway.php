@@ -51,6 +51,13 @@ class EpaycoGateway implements PaymentGatewayInterface
             throw new \Exception('Invalid plan configuration');
         }
 
+        // ePayco does not support native idempotency keys. We embed a
+        // deterministic idempotency token in extra5 so our webhook handler
+        // can detect and reject duplicate fulfillments for the same request.
+        $idempotencyToken = substr(
+            hash('sha256', "epayco_sub:{$workspace->id}:{$plan}:" . now()->format('YmdH')), 0, 32
+        );
+
         try {
             $payment = $this->epayco->charge->create([
                 'name' => "Plan {$planConfig['name']} - Intellipost",
@@ -66,6 +73,7 @@ class EpaycoGateway implements PaymentGatewayInterface
                 'extra2' => (string)$user->id,
                 'extra3' => $plan,
                 'extra4' => 'subscription',
+                'extra5' => $idempotencyToken,
                 'confirmation' => url('/api/webhooks/epayco'),
                 'response' => url('/subscription/success') . '?gateway=epayco&plan=' . $plan,
                 'test' => $this->testMode ? 'true' : 'false',
@@ -99,6 +107,11 @@ class EpaycoGateway implements PaymentGatewayInterface
         array $addonData,
         array $metadata = []
     ): array {
+        $quantity = $metadata['quantity'] ?? 1;
+        $addonIdempotencyToken = substr(
+            hash('sha256', "epayco_addon:{$workspace->id}:{$addonData['sku']}:{$quantity}:" . now()->format('YmdH')), 0, 32
+        );
+
         try {
             $payment = $this->epayco->charge->create([
                 'name' => $addonData['name'],
@@ -114,6 +127,7 @@ class EpaycoGateway implements PaymentGatewayInterface
                 'extra2' => (string)$user->id,
                 'extra3' => $addonData['sku'],
                 'extra4' => 'addon',
+                'extra5' => $addonIdempotencyToken,
                 'confirmation' => url('/api/webhooks/epayco'),
                 'response' => url('/subscription/addons') . '?success=true&gateway=epayco',
                 'test' => $this->testMode ? 'true' : 'false',
