@@ -34,7 +34,7 @@ function QuickActionCard({ action }: { action: QuickAction }) {
         <p className="truncate text-xs text-gray-500 dark:text-neutral-400">{action.description}</p>
       </div>
 
-      <ArrowRight className="h-4 w-4 shrink-0 text-gray-300 transition-colors duration-200 group-hover:text-gray-500 dark:text-neutral-600 dark:group-hover:text-neutral-400" />
+      <ArrowRight className="h-4 w-4 shrink-0 text-gray-300 transition-colors duration-200 group-hover:text-primary-500 dark:text-neutral-600 dark:group-hover:text-primary-400" />
     </motion.button>
   );
 }
