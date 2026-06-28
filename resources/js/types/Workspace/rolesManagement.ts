@@ -18,8 +18,12 @@ export interface Role {
   id: number;
   name: string;
   slug: string;
+  display_name?: string | null;
   description?: string | null;
+  color_hex?: string | null;
+  icon_slug?: string | null;
   is_system_role?: boolean | null;
+  approval_participant?: boolean | null;
   permissions?: Permission[];
 }
 

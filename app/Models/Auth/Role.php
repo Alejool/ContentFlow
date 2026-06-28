@@ -19,6 +19,8 @@ class Role extends Model
         'display_name',
         'description',
         'approval_participant',
+        'color_hex',
+        'icon_slug',
     ];
 
     protected $casts = [

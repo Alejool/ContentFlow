@@ -3,6 +3,7 @@
 use App\Http\Controllers\Workspace\WorkspaceController;
 use App\Http\Controllers\Workspace\WorkspaceApprovalWorkflowController;
 use App\Http\Controllers\Workspace\RoleController;
+use App\Http\Controllers\Integrations\IntegrationSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('workspaces')->name('workspaces.')->group(function () {
@@ -27,6 +28,16 @@ Route::middleware('auth:sanctum')->prefix('workspaces')->name('workspaces.')->gr
   Route::delete('/{idOrSlug}/roles/revoke', [RoleController::class, 'revoke'])->name('roles.revoke');
   Route::get('/{idOrSlug}/roles', [RoleController::class, 'index'])->name('roles.index');
   Route::get('/{idOrSlug}/users/{user}/permissions', [RoleController::class, 'permissions'])->name('users.permissions');
+
+  // Integration event subscriptions
+  Route::prefix('/{idOrSlug}/integrations')->name('integrations.')->group(function () {
+    Route::get('/subscriptions', [IntegrationSubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions', [IntegrationSubscriptionController::class, 'store'])->name('subscriptions.store');
+    Route::put('/subscriptions/{id}', [IntegrationSubscriptionController::class, 'update'])->name('subscriptions.update');
+    Route::delete('/subscriptions/{id}', [IntegrationSubscriptionController::class, 'destroy'])->name('subscriptions.destroy');
+    Route::post('/subscriptions/{id}/test', [IntegrationSubscriptionController::class, 'test'])->name('subscriptions.test');
+    Route::get('/logs', [IntegrationSubscriptionController::class, 'logs'])->name('logs');
+  });
 
   // Legacy approval workflows (old schema)
   Route::get('/{idOrSlug}/approval-workflows', [WorkspaceApprovalWorkflowController::class, 'index'])->name('approval-workflows.index');

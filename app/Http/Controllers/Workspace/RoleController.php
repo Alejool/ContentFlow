@@ -173,6 +173,8 @@ class RoleController extends Controller
                         'name' => $role->name,
                         'display_name' => $role->display_name,
                         'description' => $role->description,
+                        'color_hex'   => $role->color_hex,
+                        'icon_slug'   => $role->icon_slug,
                         'is_system_role' => $role->is_system_role,
                         'approval_participant' => $role->approval_participant,
                         'permissions' => $role->permissions->map(function ($permission) {
@@ -236,9 +238,31 @@ class RoleController extends Controller
         $validated = request()->validate([
             'permission_ids' => 'required|array',
             'permission_ids.*' => 'exists:permissions,id',
+            'name'        => 'sometimes|string|max:64',
+            'description' => 'sometimes|nullable|string|max:255',
+            'color_hex'   => ['sometimes', 'nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'icon_slug'   => 'sometimes|nullable|string|max:64',
         ]);
 
         try {
+            // Update editable role fields (non-system roles only)
+            $updateFields = array_filter([
+                'name'        => $validated['name'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'color_hex'   => $validated['color_hex'] ?? null,
+                'icon_slug'   => $validated['icon_slug'] ?? null,
+            ], fn ($v) => $v !== null);
+
+            if (!empty($updateFields) && !$role->is_system_role) {
+                $role->update($updateFields);
+            } elseif (!empty($updateFields)) {
+                // System roles can update color/icon but not name/description
+                $visualFields = array_intersect_key($updateFields, array_flip(['color_hex', 'icon_slug']));
+                if (!empty($visualFields)) {
+                    $role->update($visualFields);
+                }
+            }
+
             // Sync permissions
             $role->permissions()->sync($validated['permission_ids']);
 
@@ -265,6 +289,8 @@ class RoleController extends Controller
                         'name' => $role->name,
                         'display_name' => $role->display_name,
                         'description' => $role->description,
+                        'color_hex'   => $role->color_hex,
+                        'icon_slug'   => $role->icon_slug,
                         'permissions' => $role->permissions->map(function ($permission) {
                             return [
                                 'id' => $permission->id,
