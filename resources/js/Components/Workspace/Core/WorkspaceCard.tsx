@@ -145,25 +145,15 @@ const WorkspaceCard = ({ workspace, roles, currentWorkspaceId }: WorkspaceCardPr
           <div className="relative">
             <ContextMenu
               trigger={
-                <button
-                  className={`rounded-lg p-2.5 outline-none transition-all duration-200 ${
-                    ['owner', 'admin'].includes(userRoleSlug)
-                      ? 'text-gray-600 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 hover:text-primary-600 hover:shadow-sm dark:text-neutral-400 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 dark:hover:text-primary-400'
-                      : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-gray-300'
-                  }`}
-                  aria-label={
-                    ['owner', 'admin'].includes(userRoleSlug)
-                      ? t('workspace.tooltips.manage')
-                      : t('workspace.tooltips.view')
-                  }
-                >
-                  {['owner', 'admin'].includes(userRoleSlug) ? (
-                    <SettingsIcon className="h-5 w-5" />
-                  ) : (
-                    <Info className="h-5 w-5" />
-                  )}
-                </button>
+                ['owner', 'admin'].includes(userRoleSlug)
+                  ? <SettingsIcon className="h-5 w-5" />
+                  : <Info className="h-5 w-5" />
               }
+              triggerClassName={`rounded-lg p-2.5 outline-none transition-all duration-200 ${
+                ['owner', 'admin'].includes(userRoleSlug)
+                  ? 'text-gray-600 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 hover:text-primary-600 hover:shadow-sm dark:text-neutral-400 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 dark:hover:text-primary-400'
+                  : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-gray-300'
+              }`}
               sections={[
                 {
                   items: [

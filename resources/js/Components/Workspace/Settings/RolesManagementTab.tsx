@@ -315,18 +315,29 @@ export default function RolesManagementTab({
     if (!editingRole) return;
     setIsLoading(true);
     try {
-      await axios.put(route('api.v1.workspaces.roles.update', { idOrSlug: workspace.id, role: editingRole.id }), {
+      const res = await axios.put(route('api.v1.workspaces.roles.update', { idOrSlug: workspace.id, role: editingRole.id }), {
         permission_ids: selectedPermissions,
         color_hex: editColor,
       });
-      toast.success(t('roles.success.updated'));
+
+      const colorSaved: boolean = res.data?.data?.color_saved ?? false;
+
+      if (!colorSaved && editColor !== (editingRole.color_hex ?? '#6366f1')) {
+        // color_hex DB column missing (migration pending) — warn user
+        toast.success(t('roles.success.updated'));
+        toast.error('Color not saved — run php artisan migrate in Docker to enable role colors.', { duration: 6000 });
+      } else {
+        toast.success(t('roles.success.updated'));
+      }
+
       router.reload({ only: ['roles'] });
       closeEditModal();
     } catch (err: unknown) {
       const msg = axios.isAxiosError(err) ? (err.response?.data as { message?: string })?.message : undefined;
       toast.error(msg ?? t('roles.errors.update_failed'));
     } finally {
-      setIsLoading(false); }
+      setIsLoading(false);
+    }
   };
 
   const confirmDeleteRole = async () => {
@@ -412,7 +423,7 @@ export default function RolesManagementTab({
           <ColorPicker
             value={editColor}
             onChange={setEditColor}
-            label={t('roles.role_color')}
+            label={t('roles.role_color', 'Role color')}
           />
 
           {/* Permissions section */}
@@ -424,12 +435,12 @@ export default function RolesManagementTab({
               <div className="flex gap-2">
                 <button type="button" onClick={() => setSelectedPermissions(permissions.map((p) => p.id))}
                   className="text-xs text-primary-600 hover:underline dark:text-primary-400">
-                  {t('roles.select_all')}
+                  {t('roles.select_all', 'All')}
                 </button>
                 <span className="text-gray-300">·</span>
                 <button type="button" onClick={() => setSelectedPermissions([])}
                   className="text-xs text-gray-500 hover:underline dark:text-neutral-400">
-                  {t('roles.deselect_all')}
+                  {t('roles.deselect_all', 'None')}
                 </button>
               </div>
             </div>
@@ -442,7 +453,7 @@ export default function RolesManagementTab({
                 sizeType="sm"
                 value={permSearch}
                 onChange={(e) => setPermSearch(e.target.value)}
-                placeholder={t('roles.search_permissions')}
+                placeholder={t('roles.search_permissions', 'Search permissions…')}
                 icon={Search}
               />
             </div>
@@ -461,7 +472,7 @@ export default function RolesManagementTab({
                 />
               ))}
               {filteredPermissions.length === 0 && (
-                <p className="py-4 text-center text-sm text-gray-400">{t('roles.no_permissions_found')}</p>
+                <p className="py-4 text-center text-sm text-gray-400">{t('roles.no_permissions_found', 'No permissions match your search')}</p>
               )}
             </div>
           </div>

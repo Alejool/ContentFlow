@@ -244,8 +244,13 @@ class RoleController extends Controller
             'icon_slug'   => 'sometimes|nullable|string|max:64',
         ]);
 
+        // Track whether the color was actually saved (column may not exist yet)
+        $colorSaved = false;
+
         try {
-            // Update editable role fields (non-system roles only)
+            // Update editable role fields.
+            // Color/icon update is isolated in its own try/catch so a missing DB
+            // column (migration pending) never blocks permission sync.
             $updateFields = array_filter([
                 'name'        => $validated['name'] ?? null,
                 'description' => $validated['description'] ?? null,
@@ -253,17 +258,28 @@ class RoleController extends Controller
                 'icon_slug'   => $validated['icon_slug'] ?? null,
             ], fn ($v) => $v !== null);
 
-            if (!empty($updateFields) && !$role->is_system_role) {
-                $role->update($updateFields);
-            } elseif (!empty($updateFields)) {
-                // System roles can update color/icon but not name/description
-                $visualFields = array_intersect_key($updateFields, array_flip(['color_hex', 'icon_slug']));
-                if (!empty($visualFields)) {
-                    $role->update($visualFields);
+            if (!empty($updateFields)) {
+                $fieldsToApply = $role->is_system_role
+                    ? array_intersect_key($updateFields, array_flip(['color_hex', 'icon_slug']))
+                    : $updateFields;
+
+                if (!empty($fieldsToApply)) {
+                    try {
+                        $role->update($fieldsToApply);
+                        $colorSaved = isset($fieldsToApply['color_hex']);
+                    } catch (\Throwable $colorErr) {
+                        // Column probably doesn't exist yet (migration pending).
+                        // Log and continue — permissions sync must not be blocked.
+                        \Illuminate\Support\Facades\Log::warning('Role visual fields update skipped (column missing?)', [
+                            'role_id' => $role->id,
+                            'fields'  => array_keys($fieldsToApply),
+                            'error'   => $colorErr->getMessage(),
+                        ]);
+                    }
                 }
             }
 
-            // Sync permissions
+            // Sync permissions (always runs, even if color update failed)
             $role->permissions()->sync($validated['permission_ids']);
 
             // Clear role cache
@@ -300,6 +316,7 @@ class RoleController extends Controller
                             ];
                         }),
                     ],
+                    'color_saved' => $colorSaved,
                 ],
                 'Role updated successfully.',
                 200

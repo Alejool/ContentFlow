@@ -15,6 +15,7 @@ interface MenuSection {
 
 interface ContextMenuProps {
   trigger: ReactNode;
+  triggerClassName?: string;
   sections: MenuSection[];
   placement?: 'bottom' | 'bottom start' | 'bottom end' | 'top' | 'top start' | 'top end';
 }
@@ -47,9 +48,9 @@ interface ContextMenuProps {
  *   ]}
  * />
  */
-export function ContextMenu({ trigger, sections, placement = 'bottom end' }: ContextMenuProps) {
+export function ContextMenu({ trigger, triggerClassName, sections, placement = 'bottom end' }: ContextMenuProps) {
   return (
-    <Popover trigger={trigger} placement={placement} className="min-w-[200px]">
+    <Popover trigger={trigger} triggerClassName={triggerClassName} placement={placement} className="min-w-[200px]">
       <div className="py-1">
         {sections.map((section, sectionIndex) => (
           <div key={sectionIndex}>
