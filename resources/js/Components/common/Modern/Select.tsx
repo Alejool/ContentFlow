@@ -21,53 +21,60 @@ function DropdownPortal({
   usePortal = true,
 }: DropdownPortalProps) {
   const [mounted, setMounted] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // Ref on the inner content div so we can measure scrollHeight without
+  // passing ref to motion.div (which causes the framer-motion PopChild
+  // "ref is not a prop" warning in React 18+).
+  const contentRef = useRef<HTMLDivElement>(null);
+  // Computed portal position driven by state — avoids direct DOM style mutation
+  // on the animated element.
+  const [portalPosition, setPortalPosition] = useState<React.CSSProperties>({});
 
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
   }, []);
 
-  // Position the portal-rendered dropdown relative to the trigger button
   useEffect(() => {
-    if (usePortal && isOpen && selectRect && dropdownRef.current) {
-      const dropdown = dropdownRef.current;
-      const viewportHeight = window.innerHeight;
-      const dropdownHeight = Math.min(dropdown.scrollHeight, 240);
+    if (!usePortal || !isOpen || !selectRect) return;
 
-      dropdown.style.minWidth = `${selectRect.width}px`;
-      dropdown.style.width = 'auto';
-      dropdown.style.left = `${selectRect.left}px`;
+    const viewportHeight = window.innerHeight;
+    // Use measured scrollHeight when available, fall back to maxHeight (240).
+    const dropdownHeight = contentRef.current
+      ? Math.min(contentRef.current.scrollHeight, 240)
+      : 240;
 
-      if (dropdownDirection === 'up') {
-        const topPosition = selectRect.top - dropdownHeight - 4;
-        dropdown.style.top = topPosition > 0
-          ? `${topPosition}px`
-          : `${selectRect.bottom + 4}px`;
-        dropdown.style.bottom = 'auto';
-      } else {
-        const bottomPosition = viewportHeight - (selectRect.bottom + 4 + dropdownHeight);
-        dropdown.style.top = bottomPosition > 0
-          ? `${selectRect.bottom + 4}px`
-          : `${selectRect.top - dropdownHeight - 4}px`;
-        dropdown.style.bottom = 'auto';
-      }
+    const next: React.CSSProperties = {
+      left: selectRect.left,
+      minWidth: selectRect.width,
+      width: 'auto',
+    };
+
+    if (dropdownDirection === 'up') {
+      const topPosition = selectRect.top - dropdownHeight - 4;
+      next.top = topPosition > 0 ? topPosition : selectRect.bottom + 4;
+      next.bottom = 'auto';
+    } else {
+      const fitsBelow = viewportHeight - (selectRect.bottom + 4 + dropdownHeight);
+      next.top = fitsBelow > 0
+        ? selectRect.bottom + 4
+        : selectRect.top - dropdownHeight - 4;
+      next.bottom = 'auto';
     }
+
+    setPortalPosition(next);
   }, [isOpen, selectRect, dropdownDirection, usePortal]);
 
-  // For portal mode we need the DOM to be mounted
   if (usePortal && !mounted) return null;
 
-  const portalStyles: React.CSSProperties = {
+  const baseStyles: React.CSSProperties = {
     position: usePortal ? 'fixed' : 'absolute',
     zIndex: 9999,
     maxHeight: '240px',
-    width: '100%',
-    minWidth: '120px',
     overflowY: 'auto',
     borderRadius: '0.5rem',
     borderWidth: '1px',
     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    ...(usePortal ? portalPosition : { width: '100%', minWidth: '120px' }),
   };
 
   const motionVariants = {
@@ -94,8 +101,8 @@ function DropdownPortal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          ref={dropdownRef}
-          style={portalStyles}
+          // No ref here — avoids framer-motion PopChild passing ref as prop
+          style={baseStyles}
           variants={motionVariants}
           initial="hidden"
           animate="visible"
@@ -108,7 +115,7 @@ function DropdownPortal({
               : ''
           }`}
         >
-          {children}
+          <div ref={contentRef}>{children}</div>
         </motion.div>
       )}
     </AnimatePresence>
