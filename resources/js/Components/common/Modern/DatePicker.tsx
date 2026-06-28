@@ -300,7 +300,27 @@ const DatePickerModern = <T extends FieldValues>({
     return selected;
   }, [selected, useUTC]);
 
+  const formatInputDate = (d: Date | null): string => {
+    if (!d) return '';
+    try {
+      return showTimeSelect
+        ? formatDateTimeString(d, { dateStyle: 'medium', timeStyle: 'short' })
+        : formatDateString(d, { dateStyle: 'medium' });
+    } catch {
+      return '';
+    }
+  };
+
+  // Local state for the trigger input — updates immediately on selection
+  // so the input never waits for the parent to propagate the new `selected` prop.
+  const [inputText, setInputText] = useState(() => formatInputDate(displayDate));
+
+  useEffect(() => {
+    setInputText(formatInputDate(displayDate));
+  }, [displayDate, showTimeSelect]);
+
   const handleDateChange = (date: Date | null) => {
+    setInputText(formatInputDate(date));
     if (!date) {
       onChange(null);
       return;
@@ -337,12 +357,6 @@ const DatePickerModern = <T extends FieldValues>({
     : minDate
       ? dateToCalendarDate(minDate)
       : dateToCalendarDate(new Date());
-
-  const formattedValue = displayDate
-    ? showTimeSelect
-      ? formatDateTimeString(displayDate, { dateStyle: 'medium', timeStyle: 'short' })
-      : formatDateString(displayDate, { dateStyle: 'medium' })
-    : '';
 
   const [navDate, setNavDate] = useState<Date>(displayDate ?? new Date());
   const [focusedValue, setFocusedValue] = useState<CalendarDate>(
@@ -653,7 +667,7 @@ const DatePickerModern = <T extends FieldValues>({
         >
           <Input
             id={id ?? name ?? 'datepicker-input'}
-            value={formattedValue}
+            value={inputText}
             onChange={() => {}}
             label={label ?? ''}
             error={error ?? ''}
