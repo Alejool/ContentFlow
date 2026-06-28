@@ -11,7 +11,7 @@ import {
   isProtectedRole,
 } from '@/Utils/Workspace/rolesManagement.helpers';
 import type { Permission, Role, RolesManagementTabProps } from '@/types/Workspace/rolesManagement';
-import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
+import { getRoleConfig, getRoleLabel } from '@/Utils/Roles/roleHelpers';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
@@ -23,29 +23,30 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 // ── Permission category map (frontend-side) ───────────────────────────────────
-const PERMISSION_GROUPS: Record<string, { label: string; slugs: string[] }> = {
+// labelKey maps to roles.groups.* in the locale files
+const PERMISSION_GROUPS: Record<string, { labelKey: string; slugs: string[] }> = {
   content: {
-    label: 'Content',
+    labelKey: 'roles.groups.content',
     slugs: ['view-content', 'create-content', 'manage-content'],
   },
   publishing: {
-    label: 'Publishing & Approval',
+    labelKey: 'roles.groups.publishing',
     slugs: ['publish', 'submit-for-approval', 'approve', 'reject'],
   },
   team: {
-    label: 'Team Management',
+    labelKey: 'roles.groups.team',
     slugs: ['manage-team', 'manage-accounts'],
   },
   workspace: {
-    label: 'Workspace',
+    labelKey: 'roles.groups.workspace',
     slugs: ['manage-workspace'],
   },
   analytics: {
-    label: 'Analytics',
+    labelKey: 'roles.groups.analytics',
     slugs: ['view-analytics'],
   },
   campaigns: {
-    label: 'Campaigns',
+    labelKey: 'roles.groups.campaigns',
     slugs: ['manage-campaigns'],
   },
 };
@@ -83,11 +84,19 @@ function RoleCard({
 }: {
   role: Role; isCurrentRole: boolean; memberCount: number;
   canManageWorkspace: boolean;
-  onEdit: () => void; onDelete: () => void; t: (k: string, o?: object) => string;
+  onEdit: () => void; onDelete: () => void;
+  t: (k: string, opts?: object | string) => string;
 }) {
   const config = getRoleConfig(role.slug);
   const RoleIcon = config.icon;
   const styles = buildRoleColorStyles(role.color_hex);
+
+  // Use i18n label (respects current language) — never show DB string
+  const roleLabel = getRoleLabel(role.slug, t as any);
+  // Use i18n description for system roles; fall back to DB value for custom roles
+  const roleDescription = role.is_system_role
+    ? t(`roles.descriptions.${role.slug}`, role.description ?? '')
+    : (role.description ?? '');
 
   return (
     <div
@@ -112,7 +121,7 @@ function RoleCard({
             </div>
             <div>
               <h4 className="flex flex-wrap items-center gap-2 font-bold text-gray-900 dark:text-white">
-                {role.display_name ?? role.name}
+                {roleLabel}
                 {isCurrentRole && (
                   <span
                     className="rounded-full px-2 py-0.5 text-xs font-bold"
@@ -152,7 +161,7 @@ function RoleCard({
 
         {/* Description */}
         <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
-          {role.description ?? t('workspace.no_description')}
+          {roleDescription || t('workspace.no_description')}
         </p>
 
         {/* Slug */}
@@ -216,33 +225,7 @@ function PermissionGroup({
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-neutral-700">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-neutral-800/50"
-      >
-        <div className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={allSelected}
-            ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
-            onChange={toggleAll}
-            onClick={(e) => e.stopPropagation()}
-            className="h-4 w-4 rounded"
-            style={{ accentColor: roleColorHex ?? '#6366f1' }}
-          />
-          <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-            {label}
-          </span>
-          <span
-            className="rounded-full px-1.5 py-0.5 text-[10px] font-medium"
-            style={styles.badge}
-          >
-            {perms.filter((p) => selected.includes(p.id)).length}/{perms.length}
-          </span>
-        </div>
-        {open ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
-      </button>
+     
 
       {open && (
         <div className="divide-y divide-gray-100 dark:divide-neutral-800">
@@ -414,7 +397,7 @@ export default function RolesManagementTab({
       <DynamicModal
         isOpen={isEditModalOpen}
         onClose={closeEditModal}
-        title={editingRole ? `${t('roles.edit_role')} — ${editingRole.display_name ?? editingRole.name}` : ''}
+        title={editingRole ? `${t('roles.edit_role')} — ${getRoleLabel(editingRole.slug, t as any)}` : ''}
         size="2xl"
       >
         <div className="flex flex-col gap-6">
@@ -464,7 +447,7 @@ export default function RolesManagementTab({
                 <PermissionGroup
                   key={key}
                   groupKey={key}
-                  label={PERMISSION_GROUPS[key]?.label ?? key}
+                  label={t(PERMISSION_GROUPS[key]?.labelKey ?? key, key)}
                   perms={perms}
                   selected={selectedPermissions}
                   onToggle={togglePermission}
@@ -498,7 +481,7 @@ export default function RolesManagementTab({
               <h4 className="mb-1 text-sm font-bold text-red-900 dark:text-red-200">{t('roles.delete_confirmation_title')}</h4>
               <p className="text-sm text-red-800 dark:text-red-300">
                 {t('roles.delete_confirmation_message')}{' '}
-                <span className="font-bold">{deletingRole?.display_name ?? deletingRole?.name}</span>{' '}
+                <span className="font-bold">{deletingRole ? getRoleLabel(deletingRole.slug, t as any) : ''}</span>{' '}
                 {t('roles.will_be_deleted')}.
               </p>
             </div>

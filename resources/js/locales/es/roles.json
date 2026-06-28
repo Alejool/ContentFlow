@@ -11,9 +11,25 @@
     "deselect_all": "Ninguno",
     "search_permissions": "Buscar permisos…",
     "no_permissions_found": "Ningún permiso coincide con la búsqueda",
+    "groups": {
+      "content":    "Contenido",
+      "publishing": "Publicación y Aprobación",
+      "team":       "Gestión de Equipo",
+      "workspace":  "Workspace",
+      "analytics":  "Analíticas",
+      "campaigns":  "Campañas",
+      "other":      "Otros"
+    },
     "editor_publish_info": "Al publicar, el contenido se enviará a revisión si no eres Admin. En workspaces con flujo multinivel, debe pasar por todas las etapas de aprobación configuradas.",
     "admin_publish_info": "Puede publicar directamente sin revisión y aprobar contenido de otros usuarios.",
     "owner_info": "Control total del workspace. Este rol no puede ser editado ni eliminado.",
+    "descriptions": {
+      "owner":  "Control total del workspace. Gestiona ajustes, miembros y facturación.",
+      "admin":  "Administrador de confianza. Gestiona contenido, miembros y flujos de aprobación.",
+      "editor": "Creador de contenido. Puede crear, editar y enviar publicaciones a revisión.",
+      "member": "Colaborador estándar. Puede ver e interactuar con el contenido.",
+      "viewer": "Solo lectura. Puede ver el contenido sin realizar cambios."
+    },
     "delete_role": "Eliminar Rol",
     "delete_confirmation_title": "¿Estás seguro?",
     "delete_confirmation_message": "Esta acción no se puede deshacer. El rol",
