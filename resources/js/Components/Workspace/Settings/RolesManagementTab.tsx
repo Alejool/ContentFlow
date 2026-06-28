@@ -1,4 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
+import ColorPicker from '@/Components/common/Modern/ColorPicker';
 import Input from '@/Components/common/Modern/Input';
 import Switch from '@/Components/common/Modern/Switch';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
@@ -14,8 +15,8 @@ import { getRoleConfig } from '@/Utils/Roles/roleHelpers';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
-  AlertCircle, ChevronDown, ChevronUp, Edit2, Info,
-  Palette, Search, Shield, ShieldAlert, ShieldCheck, Trash2, Users,
+  AlertCircle, ChevronDown, ChevronUp, Edit2,
+  Search, Shield, ShieldAlert, Trash2, Users,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -407,32 +408,12 @@ export default function RolesManagementTab({
       >
         <div className="flex flex-col gap-6">
 
-          {/* Color picker row */}
-          <div className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
-            <div
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow"
-              style={{ backgroundColor: editColor }}
-            >
-              <Palette className="h-5 w-5" style={{ color: getRoleTextOnColor(editColor) }} />
-            </div>
-            <div className="flex-1">
-              <label className="mb-1 block text-xs font-semibold text-gray-600 dark:text-neutral-300">
-                {t('roles.role_color')}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={editColor}
-                  onChange={(e) => setEditColor(e.target.value)}
-                  className="h-8 w-16 cursor-pointer rounded border border-gray-300 p-0.5 dark:border-neutral-600"
-                />
-                <code className="rounded bg-gray-100 px-2 py-1 text-xs dark:bg-neutral-800 dark:text-neutral-300">
-                  {editColor}
-                </code>
-                <p className="text-xs text-gray-400 dark:text-neutral-500">{t('roles.color_hint')}</p>
-              </div>
-            </div>
-          </div>
+          {/* Color picker */}
+          <ColorPicker
+            value={editColor}
+            onChange={setEditColor}
+            label={t('roles.role_color')}
+          />
 
           {/* Permissions section */}
           <div>

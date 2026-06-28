@@ -2,7 +2,7 @@ import { validateDate } from '@/Utils/common/dateValidation';
 import { formatDateTimeString } from '@/Utils/formatters';
 import { CalendarDate } from '@internationalized/date';
 import { AlertTriangle } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     Calendar as AriaCalendar,
     CalendarCell,
@@ -36,8 +36,15 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const locale = i18n.language.startsWith('es') ? 'es-ES' : 'en-US';
   const validation = useMemo(() => validateDate(selectedDate), [selectedDate]);
 
-  const [hours, setHours] = useState(selectedDate.getHours().toString().padStart(2, '0'));
-  const [minutes, setMinutes] = useState(selectedDate.getMinutes().toString().padStart(2, '0'));
+  const [hours, setHours] = useState(() => selectedDate.getHours().toString().padStart(2, '0'));
+  const [minutes, setMinutes] = useState(() => selectedDate.getMinutes().toString().padStart(2, '0'));
+
+  // Sync local time state when selectedDate changes externally
+  // (e.g. parent resets the date or navigates to a different publication)
+  useEffect(() => {
+    setHours(selectedDate.getHours().toString().padStart(2, '0'));
+    setMinutes(selectedDate.getMinutes().toString().padStart(2, '0'));
+  }, [selectedDate]);
 
   const handleCalendarChange = (val: CalendarDate | null) => {
     if (!val) return;
@@ -93,12 +100,12 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                         [
                           'flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-all',
                           isSelected
-                            ? 'scale-105 bg-blue-500 font-bold text-white shadow'
+                            ? 'scale-105 bg-primary-500 font-bold text-white shadow'
                             : isToday
-                              ? 'border-2 border-blue-500 bg-blue-50 font-bold text-blue-500 dark:bg-blue-900/20'
+                              ? 'border-2 border-primary-500 bg-primary-50 font-bold text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
                               : isDisabled
                                 ? 'cursor-not-allowed opacity-30'
-                                : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-neutral-700',
+                                : 'text-gray-700 hover:bg-primary-50 hover:text-primary-600 dark:text-gray-200 dark:hover:bg-neutral-700 dark:hover:text-primary-400',
                         ].join(' ')
                       }
                     >
@@ -120,7 +127,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                   setHours(e.target.value.padStart(2, '0'));
                   applyTime(e.target.value, minutes);
                 }}
-                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
+                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
               />
               <span className="text-xl font-bold text-gray-600 dark:text-gray-300">:</span>
               <input
@@ -132,14 +139,14 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                   setMinutes(e.target.value.padStart(2, '0'));
                   applyTime(hours, e.target.value);
                 }}
-                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
+                className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
               />
             </div>
           </div>
         </div>
 
         {!validation.isValid && validation.error && (
-          <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+          <div role="alert" className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
             <div className="flex-1">
               <p className="text-sm font-medium text-red-800 dark:text-red-200">
