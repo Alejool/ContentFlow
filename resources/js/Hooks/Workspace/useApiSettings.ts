@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import type { ApiToken, ApiTokenForm, ApiScopeGroups, ApiScopeKey } from '@/types/Workspace/apiSettings';
+import { createApiTokenSchema } from '@/schemas/Workspace/apiToken';
 
 // Ziggy route helper is declared globally in this project
 declare const route: (name: string, params?: unknown) => string;
@@ -33,6 +34,7 @@ export function useApiSettings(
   const [perPage, setPerPage] = useState(10);
 
   const { data, setData, reset } = useForm<ApiTokenForm>({ name: '', abilities: [] });
+  const [nameError, setNameError] = useState<string | null>(null);
 
   // — Scope groups (loaded once)
   const [scopeGroups, setScopeGroups] = useState<ApiScopeGroups>({});
@@ -96,7 +98,16 @@ export function useApiSettings(
   // ─── Token creation ───────────────────────────────────────────────────────
   const createTokenDirectly = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!data.name || isCreating || !canManageWorkspace) return;
+    if (isCreating || !canManageWorkspace) return;
+
+    // Validate with Zod before hitting the server
+    const result = createApiTokenSchema.safeParse({ name: data.name, abilities: data.abilities });
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      setNameError(t(firstError.message));
+      return;
+    }
+    setNameError(null);
 
     try {
       setIsCreating(true);
@@ -105,11 +116,12 @@ export function useApiSettings(
         abilities: data.abilities.length > 0 ? data.abilities : ['*'],
       });
       setGeneratedToken(response.data.token || response.data.data?.token);
-      toast.success('API token creado exitosamente');
+      toast.success(t('workspace.api.create_success'));
       reset('name');
+      setData('abilities', []);
       fetchTokens();
     } catch (error) {
-      let message = 'Error al crear el token';
+      let message = t('workspace.api.create_error');
       if (axios.isAxiosError(error) && error.response?.data?.message) {
         message = error.response.data.message;
       }
@@ -172,6 +184,9 @@ export function useApiSettings(
     createTokenDirectly,
     handleRevokeToken,
     confirmRevocation,
+    // Form validation
+    nameError,
+    setNameError,
     // Scope management
     scopeGroups,
     toggleAbility,

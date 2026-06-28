@@ -330,9 +330,27 @@
         "api_refresh": "API · Refresh",
         "api_refresh_description": "30 días, para renovar access tokens"
       },
+      "saved_token": "Lo guardé, cerrar este mensaje",
+      "full_access": "Acceso completo",
+      "revoke_irreversible": "Esta acción es irreversible. El sistema o aplicación que use este token perderá el acceso al instante.",
+      "scopes": {
+        "label": "Permisos del token",
+        "toggle_hint_full": "Acceso completo — clic para limitar por sección",
+        "toggle_hint_count_one": "{{count}} permiso seleccionado",
+        "toggle_hint_count_other": "{{count}} permisos seleccionados",
+        "select_all": "Todos",
+        "select_none": "Ninguno"
+      },
+      "expiry": {
+        "permanent": "Permanente",
+        "expired": "Expirado",
+        "expires_in_days": "en {{count}}d",
+        "expires_in_hours": "en {{count}}h",
+        "expires_soon": "pronto"
+      },
       "table": {
         "refresh_list": "Actualizar lista",
-        "name": "Nombre",
+        "name": "Nombre / Permisos",
         "type": "Tipo",
         "last_used": "Último uso",
         "expires_status": "Expira / Estado",

@@ -21,6 +21,9 @@
       "failed": "These credentials do not match our records.",
       "password": "The provided password is incorrect.",
       "throttle": "Too many login attempts. Try again in {{seconds}} seconds."
-    }
+    },
+    "api_token_name_min": "Token name must be at least 2 characters.",
+    "api_token_name_max": "Token name must not exceed 255 characters.",
+    "api_token_name_chars": "Token name may only contain letters, numbers, spaces, hyphens, underscores and dots."
   }
 }

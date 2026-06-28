@@ -20,6 +20,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Input from '@/Components/common/Modern/Input';
 import Button from '@/Components/common/Modern/Button';
@@ -56,6 +57,8 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
     handleRevokeToken,
     confirmRevocation,
     copyToClipboard,
+    nameError,
+    setNameError,
     scopeGroups,
     toggleAbility,
     toggleGroup,
@@ -68,8 +71,8 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
     if (!token.expires_at) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-          Permanente
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          {t('workspace.api.expiry.permanent')}
         </span>
       );
     }
@@ -79,15 +82,19 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-400">
           <XCircle className="h-3 w-3" />
-          Expirado — {formatDateString(date)}
+          {t('workspace.api.expiry.expired')} — {formatDateString(date)}
         </span>
       );
     }
-    // eslint-disable-next-line react-hooks/purity
     const diffMs = date.getTime() - Date.now();
     const diffH = Math.floor(diffMs / 3_600_000);
     const diffD = Math.floor(diffH / 24);
-    const relative = diffD > 0 ? `en ${diffD}d` : diffH > 0 ? `en ${diffH}h` : 'pronto';
+    const relative =
+      diffD > 0
+        ? t('workspace.api.expiry.expires_in_days', { count: diffD })
+        : diffH > 0
+          ? t('workspace.api.expiry.expires_in_hours', { count: diffH })
+          : t('workspace.api.expiry.expires_soon');
     return (
       <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
         <Clock className="h-3 w-3" />
@@ -96,6 +103,12 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
     );
   };
 
+  const abilitiesCount = data.abilities.length;
+  const scopeToggleLabel =
+    abilitiesCount === 0
+      ? t('workspace.api.scopes.toggle_hint_full')
+      : t('workspace.api.scopes.toggle_hint_count_other', { count: abilitiesCount });
+
   return (
     <div className="space-y-6">
       {/* ── Generated Token Alert ─────────────────────────────── */}
@@ -103,10 +116,17 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
         <div className="animate-in fade-in slide-in-from-top-4 space-y-4 rounded-lg border border-green-200 bg-green-50 p-6 duration-500 dark:border-green-800 dark:bg-green-900/30">
           <div className="flex items-center gap-3 text-green-800 dark:text-green-300">
             <CheckCircle2 className="h-6 w-6" />
-            <h3 className="text-lg font-bold">Token generado exitosamente</h3>
+            <h3 className="text-lg font-bold">{t('workspace.api.token_generated')}</h3>
           </div>
           <p className="text-sm text-green-700 dark:text-green-400">
-            Copia este token ahora. Por seguridad, <strong>no se mostrará de nuevo</strong>.
+            {t('workspace.api.token_warning').split('<strong>').map((part, i) =>
+              i === 0
+                ? part
+                : <>
+                    <strong key={i}>{part.split('</strong>')[0]}</strong>
+                    {part.split('</strong>')[1]}
+                  </>
+            )}
           </p>
           <div className="flex items-center gap-2">
             <div className="flex flex-1 select-all items-center justify-between break-all rounded-md border border-green-300 bg-white p-3 font-mono text-sm dark:border-green-700 dark:bg-theme-bg-secondary">
@@ -132,7 +152,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               icon={<Copy className="h-5 w-5" />}
               className="p-3"
             >
-              <span className="sr-only">Copiar</span>
+              <span className="sr-only">{t('common.copy')}</span>
             </Button>
           </div>
           <Button
@@ -145,7 +165,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             size="sm"
             className="text-sm font-medium text-green-800 hover:text-green-950 dark:text-green-300 dark:hover:text-green-100 border-green-800 dark:border-green-300"
           >
-            Lo guardé, cerrar este mensaje
+            {t('workspace.api.saved_token')}
           </Button>
         </div>
       )}
@@ -153,80 +173,102 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       {/* ── Token Table Card ──────────────────────────────────── */}
       <div className="border border-neutral-200 bg-white shadow dark:border-neutral-700 dark:bg-theme-bg-secondary sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
+
           {/* Header */}
-          <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-start">
             <div className="flex items-center gap-3">
               <div className="rounded-lg p-2">
                 <Key className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                  {t('workspace.api.title') || 'API Access Tokens'}
+                  {t('workspace.api.title')}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
-                  {t('workspace.api.description') ||
-                    'Gestiona todos los tokens de acceso a la API de Intellipost.'}
+                  {t('workspace.api.description')}
                 </p>
               </div>
             </div>
 
             {canManageWorkspace && !generatedToken && (
-              <form onSubmit={createTokenDirectly} className="w-full md:w-auto">
+              <form onSubmit={createTokenDirectly} className="w-full md:w-auto md:min-w-[300px]">
                 <div className="flex flex-col gap-3">
-                  <div className="flex gap-2">
+
+                  {/* Token name input */}
+                  <div>
                     <Input
-                      id="name"
+                      id="api-token-name"
                       type="text"
                       sizeType="md"
                       value={data.name}
-                      onChange={(e) => setData('name', e.target.value)}
-                      placeholder={t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'}
-                      className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-theme-bg-secondary sm:w-64"
-                      required
+                      onChange={(e) => {
+                        setData('name', e.target.value);
+                        if (nameError) setNameError(null);
+                      }}
+                      placeholder={t('workspace.api.token_name_placeholder')}
+                      className="block w-full"
+                      error={nameError ?? undefined}
                     />
-
                   </div>
 
-                  {/* ── Scope selector toggle ────────────────────────────── */}
+                  {/* Scope selector toggle */}
                   <button
                     type="button"
                     onClick={() => setShowScopeSelector((v) => !v)}
-                    className="text-left text-xs text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 flex items-center gap-1"
+                    className="flex items-center gap-1.5 text-left text-xs text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200"
                   >
-                    <Key className="h-3 w-3" />
-                    {data.abilities.length === 0
-                      ? 'Acceso completo — clic para limitar por sección'
-                      : `${data.abilities.length} permiso${data.abilities.length !== 1 ? 's' : ''} seleccionado${data.abilities.length !== 1 ? 's' : ''}`}
+                    <Key className="h-3 w-3 shrink-0" />
+                    <span>{scopeToggleLabel}</span>
                   </button>
 
+                  {/* Scope selector panel */}
                   {showScopeSelector && Object.keys(scopeGroups).length > 0 && (
                     <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
                       <div className="mb-3 flex items-center justify-between">
                         <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                          Permisos del token
+                          {t('workspace.api.scopes.label')}
                         </span>
                         <div className="flex gap-2">
-                          <button type="button" onClick={selectAll} className="text-xs text-primary-600 hover:underline dark:text-primary-400">Todos</button>
+                          <button
+                            type="button"
+                            onClick={selectAll}
+                            className="text-xs text-primary-600 hover:underline dark:text-primary-400"
+                          >
+                            {t('workspace.api.scopes.select_all')}
+                          </button>
                           <span className="text-neutral-400">·</span>
-                          <button type="button" onClick={clearAll} className="text-xs text-neutral-500 hover:underline dark:text-neutral-400">Ninguno</button>
+                          <button
+                            type="button"
+                            onClick={clearAll}
+                            className="text-xs text-neutral-500 hover:underline dark:text-neutral-400"
+                          >
+                            {t('workspace.api.scopes.select_none')}
+                          </button>
                         </div>
                       </div>
-                      <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="grid gap-3 sm:grid-cols-2">
                         {Object.entries(scopeGroups).map(([groupKey, group]) => {
                           const scopeKeys = Object.keys(group.scopes);
                           const allSelected = scopeKeys.every((k) => data.abilities.includes(k as any));
                           const someSelected = scopeKeys.some((k) => data.abilities.includes(k as any));
                           return (
-                            <div key={groupKey} className="rounded-md border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800">
+                            <div
+                              key={groupKey}
+                              className="rounded-md border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+                            >
                               <label className="mb-2 flex cursor-pointer items-center gap-2">
                                 <input
                                   type="checkbox"
                                   checked={allSelected}
-                                  ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
+                                  ref={(el) => {
+                                    if (el) el.indeterminate = !allSelected && someSelected;
+                                  }}
                                   onChange={() => toggleGroup(group.scopes)}
                                   className="h-3.5 w-3.5 rounded border-neutral-300 text-primary-600"
                                 />
-                                <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{group.label}</span>
+                                <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                                  {group.label}
+                                </span>
                               </label>
                               <div className="ml-5 space-y-1.5">
                                 {Object.entries(group.scopes).map(([scopeKey, desc]) => (
@@ -238,8 +280,12 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                                       className="mt-0.5 h-3 w-3 rounded border-neutral-300 text-primary-600"
                                     />
                                     <div>
-                                      <span className="block text-[10px] font-mono text-neutral-500 dark:text-neutral-400">{scopeKey}</span>
-                                      <span className="block text-xs text-neutral-700 dark:text-neutral-300">{desc}</span>
+                                      <span className="block text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
+                                        {scopeKey}
+                                      </span>
+                                      <span className="block text-xs text-neutral-700 dark:text-neutral-300">
+                                        {desc as string}
+                                      </span>
                                     </div>
                                   </label>
                                 ))}
@@ -256,10 +302,14 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                     disabled={isCreating || !data.name}
                     variant="primary"
                     size="md"
-                    className="inline-flex items-center whitespace-nowrap self-start"
-                    icon={isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+                    className="self-start"
+                    icon={
+                      isCreating
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Plus className="mr-2 h-4 w-4" />
+                    }
                   >
-                    {t('workspace.api.generate') || 'Generar token'}
+                    {t('workspace.api.generate')}
                   </Button>
                 </div>
               </form>
@@ -274,60 +324,48 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
           ) : tokens.length === 0 ? (
             <div className="rounded-lg border-2 border-dashed border-neutral-200 bg-neutral-50 py-12 text-center dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <Key className="mx-auto mb-4 h-12 w-12 text-neutral-300 dark:text-neutral-600" />
-              <p className="text-gray-500 dark:text-neutral-400">
-                {t('workspace.api.no_tokens') || 'No hay tokens generados aún.'}
-              </p>
+              <p className="text-gray-500 dark:text-neutral-400">{t('workspace.api.no_tokens')}</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Info box */}
+              {/* Usage info */}
               <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/30">
                 <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
                 <div className="text-sm text-blue-800 dark:text-blue-300">
                   <p className="mb-1 font-semibold">{t('workspace.api.usage_info.title')}</p>
                   <p
                     className="mb-2"
-                    dangerouslySetInnerHTML={{
-                      __html: t('workspace.api.usage_info.description'),
-                    }}
+                    dangerouslySetInnerHTML={{ __html: t('workspace.api.usage_info.description') }}
                   />
                   <div className="overflow-x-auto rounded border border-blue-200/50 bg-white/50 p-2 font-mono text-xs dark:border-blue-800/50 dark:bg-black/20">
                     curl -X GET &quot;https://tu-dominio.com/api/v1/endpoint&quot; \<br />
-                    &nbsp;&nbsp;-H &quot;Authorization: Bearer TU_TOKEN_API&quot; \<br />
+                    &nbsp;&nbsp;-H &quot;Authorization: Bearer YOUR_API_TOKEN&quot; \<br />
                     &nbsp;&nbsp;-H &quot;Accept: application/json&quot;
                   </div>
                   <p
                     className="mt-2 text-xs text-blue-600 dark:text-blue-400"
-                    dangerouslySetInnerHTML={{
-                      __html: t('workspace.api.usage_info.refresh_token_help'),
-                    }}
+                    dangerouslySetInnerHTML={{ __html: t('workspace.api.usage_info.refresh_token_help') }}
                   />
                 </div>
               </div>
 
               {/* Legend */}
               <div className="flex flex-wrap gap-3 text-xs">
-                <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
-                  <span className="rounded bg-neutral-100 px-1.5 py-0.5 font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
-                    {t('workspace.api.token_types.dashboard')}
+                {[
+                  { key: 'dashboard', color: 'bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300' },
+                  { key: 'api_access', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' },
+                  { key: 'api_refresh', color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300' },
+                ].map(({ key, color }) => (
+                  <span key={key} className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
+                    <span className={`rounded px-1.5 py-0.5 font-medium ${color}`}>
+                      {t(`workspace.api.token_types.${key}`)}
+                    </span>
+                    — {t(`workspace.api.token_types.${key}_description`)}
                   </span>
-                  — {t('workspace.api.token_types.dashboard_description')}
-                </span>
-                <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
-                  <span className="rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                    {t('workspace.api.token_types.api_access')}
-                  </span>
-                  — {t('workspace.api.token_types.api_access_description')}
-                </span>
-                <span className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
-                  <span className="rounded bg-violet-100 px-1.5 py-0.5 font-medium text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                    {t('workspace.api.token_types.api_refresh')}
-                  </span>
-                  — {t('workspace.api.token_types.api_refresh_description')}
-                </span>
+                ))}
               </div>
 
-              {/* Refresh list button */}
+              {/* Refresh */}
               <div className="flex justify-end">
                 <Button
                   onClick={fetchTokens}
@@ -347,21 +385,20 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                     <thead className="bg-neutral-50 dark:bg-theme-bg-secondary">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t('workspace.api.table.name')} / Permisos
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t('workspace.api.table.type')}
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t('workspace.api.table.last_used')}
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t('workspace.api.table.expires_status')}
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t('workspace.api.table.created')}
-                        </th>
+                        {[
+                          'table.name',
+                          'table.type',
+                          'table.last_used',
+                          'table.expires_status',
+                          'table.created',
+                        ].map((key) => (
+                          <th
+                            key={key}
+                            className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400"
+                          >
+                            {t(`workspace.api.${key}`)}
+                          </th>
+                        ))}
                         <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                           {t('workspace.api.table.actions')}
                         </th>
@@ -382,29 +419,34 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                               </span>
                               {token.abilities && (
                                 <div className="mt-1 flex flex-wrap gap-1">
-                                  {(token.abilities.includes('*') || token.abilities.length === 0) ? (
+                                  {token.abilities.includes('*') || token.abilities.length === 0 ? (
                                     <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                                      Acceso completo
+                                      {t('workspace.api.full_access')}
                                     </span>
-                                  ) : token.abilities.slice(0, 3).map((a) => (
-                                    <span key={a} className="inline-flex rounded-full bg-primary-50 px-1.5 py-0.5 text-[10px] font-mono text-primary-700 dark:bg-primary-900/20 dark:text-primary-300">
-                                      {a}
-                                    </span>
-                                  ))}
-                                  {!token.abilities.includes('*') && token.abilities.length > 3 && (
-                                    <span className="inline-flex rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
-                                      +{token.abilities.length - 3}
-                                    </span>
+                                  ) : (
+                                    <>
+                                      {token.abilities.slice(0, 3).map((a) => (
+                                        <span
+                                          key={a}
+                                          className="inline-flex rounded-full bg-primary-50 px-1.5 py-0.5 text-[10px] font-mono text-primary-700 dark:bg-primary-900/20 dark:text-primary-300"
+                                        >
+                                          {a}
+                                        </span>
+                                      ))}
+                                      {token.abilities.length > 3 && (
+                                        <span className="inline-flex rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
+                                          +{token.abilities.length - 3}
+                                        </span>
+                                      )}
+                                    </>
                                   )}
                                 </div>
                               )}
                             </td>
 
-                            {/* Type badge */}
+                            {/* Type */}
                             <td className="whitespace-nowrap px-4 py-3">
-                              <span
-                                className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${meta.labelColor}`}
-                              >
+                              <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${meta.labelColor}`}>
                                 {meta.label}
                               </span>
                             </td>
@@ -421,7 +463,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                               {renderExpiry(token)}
                             </td>
 
-                            {/* Created at */}
+                            {/* Created */}
                             <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-neutral-400">
                               {formatDateTimeStyled(token.created_at, 'short', 'short')}
                             </td>
@@ -436,7 +478,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                                   size="sm"
                                   title={t('workspace.api.table.revoke_token')}
                                   icon={<Trash2 className="h-4 w-4" />}
-                                  className="!border-0 !bg-transparent text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
+                                  className="!border-0 !bg-transparent text-red-500 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                                 >
                                   <span className="sr-only">{t('workspace.api.table.revoke_token')}</span>
                                 </Button>
@@ -449,7 +491,6 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                   </table>
                 </div>
 
-                {/* Pagination */}
                 {totalTokens > (PER_PAGE_OPTIONS[0] ?? 5) && (
                   <AdvancedPagination
                     currentPage={currentPage}
@@ -457,10 +498,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                     total={totalTokens}
                     perPage={perPage || 12}
                     onPageChange={(p) => setCurrentPage(p)}
-                    onPerPageChange={(pp) => {
-                      setPerPage(pp);
-                      setCurrentPage(1);
-                    }}
+                    onPerPageChange={(pp) => { setPerPage(pp); setCurrentPage(1); }}
                     t={t}
                   />
                 )}
@@ -488,7 +526,6 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {/* Markdown Guide */}
             <a
               href={route('workspaces.api-docs.download', [workspace.slug, { type: 'markdown' }])}
               target="_blank"
@@ -514,7 +551,6 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               </div>
             </a>
 
-            {/* OpenAPI JSON */}
             <a
               href={route('workspaces.api-docs.download', [workspace.slug, { type: 'openapi' }])}
               target="_blank"
@@ -550,31 +586,24 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
       {/* ── Security Notice ───────────────────────────────────── */}
       <AlertCard
         type="warning"
-        title={t('workspace.api.security_notice') || 'Aviso de Seguridad'}
-        message={
-          t('workspace.api.security_help') ||
-          'Los tokens API otorgan acceso completo a este workspace. Nunca los compartas ni los incluyas en repositorios públicos.'
-        }
+        title={t('workspace.api.security_notice')}
+        message={t('workspace.api.security_help')}
       />
 
       {/* ── Revoke Confirmation Modal ─────────────────────────── */}
       <DynamicModal
         isOpen={isRevokeModalOpen}
         onClose={() => setIsRevokeModalOpen(false)}
-        title={t('common.deleteConfirmTitle') || 'Confirmar eliminación'}
+        title={t('common.deleteConfirmTitle')}
         size="md"
       >
         <div className="space-y-4">
           <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-6 w-6" />
-            <p className="font-medium">
-              {t('workspace.api.revoke_confirm') ||
-                '¿Estás seguro de que quieres revocar este token? Dejará de funcionar inmediatamente.'}
-            </p>
+            <p className="font-medium">{t('workspace.api.revoke_confirm')}</p>
           </div>
           <p className="text-sm text-gray-500 dark:text-neutral-400">
-            Esta acción es irreversible. El sistema o aplicación que use este token perderá el
-            acceso al instante.
+            {t('workspace.api.revoke_irreversible')}
           </p>
           <div className="mt-6 flex justify-end gap-3">
             <Button
@@ -583,19 +612,19 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               buttonStyle="ghost"
               size="md"
             >
-              {t('common.cancel') || 'Cancelar'}
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={confirmRevocation}
               disabled={revoking}
               loading={revoking}
-              loadingText={t('common.deleting') || 'Eliminando...'}
+              loadingText={t('common.deleting')}
               variant="danger"
               buttonStyle="solid"
               size="md"
               icon={<Trash2 className="h-4 w-4" />}
             >
-              {t('common.delete') || 'Eliminar'}
+              {t('common.delete')}
             </Button>
           </div>
         </div>
