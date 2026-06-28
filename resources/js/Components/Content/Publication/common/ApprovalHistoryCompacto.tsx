@@ -1,5 +1,6 @@
 import type { ApprovalHistorySectionProps } from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
+import { getApprovalColor } from '@/lib/common/designTokens';
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -40,18 +41,7 @@ const ApprovalHistoryCompacto = ({
   const latestLog = getLatestApprovalStatus();
   const totalLogs = logs.length;
 
-  const getStatusColor = (action: string) => {
-    const colors: Record<string, string> = {
-      approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-      submitted: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-      cancelled: 'bg-gray-100 text-gray-600 dark:bg-gray-700/40 dark:text-gray-400',
-      reassigned: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-      auto_advanced: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-    };
-    return colors[action] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-  };
+  const getStatusColor = (action: string) => getApprovalColor(action);
 
   const getStatusText = (action: string) => {
     const map: Record<string, string> = {

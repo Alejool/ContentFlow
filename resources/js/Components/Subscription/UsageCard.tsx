@@ -3,37 +3,44 @@ import { Sparkles, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { UsageCardProps } from '@/types/Subscription/planUsage';
 
-// ── Accent colour maps ────────────────────────────────────────────
+// ── Accent colour maps — all use primary variants ─────────────────
+// Legacy keys (violet, amber, teal, pink) → primary. Keep keys for
+// backwards compat with callers that pass accent="violet" etc.
+const PRIMARY_ICON    = 'text-primary-500 dark:text-primary-400';
+const PRIMARY_ICON_BG = 'bg-primary-50 dark:bg-primary-500/10';
+const PRIMARY_BAR     = 'bg-primary-500';
+const PRIMARY_TEXT    = 'text-primary-600 dark:text-primary-400';
+
 const ACCENT_ICON: Record<string, string> = {
-  primary: 'text-primary-500 dark:text-primary-400',
-  violet: 'text-violet-500 dark:text-violet-400',
-  amber: 'text-amber-500 dark:text-amber-400',
-  teal: 'text-teal-500 dark:text-teal-400',
-  pink: 'text-pink-500 dark:text-pink-400',
+  primary: PRIMARY_ICON,
+  violet:  PRIMARY_ICON,
+  amber:   PRIMARY_ICON,
+  teal:    PRIMARY_ICON,
+  pink:    PRIMARY_ICON,
 };
 
 const ACCENT_ICON_BG: Record<string, string> = {
-  primary: 'bg-primary-50 dark:bg-primary-500/10',
-  violet: 'bg-violet-50 dark:bg-violet-500/10',
-  amber: 'bg-amber-50 dark:bg-amber-500/10',
-  teal: 'bg-teal-50 dark:bg-teal-500/10',
-  pink: 'bg-pink-50 dark:bg-pink-500/10',
+  primary: PRIMARY_ICON_BG,
+  violet:  PRIMARY_ICON_BG,
+  amber:   PRIMARY_ICON_BG,
+  teal:    PRIMARY_ICON_BG,
+  pink:    PRIMARY_ICON_BG,
 };
 
 const ACCENT_BAR_OK: Record<string, string> = {
-  primary: 'bg-primary-500',
-  violet: 'bg-violet-500',
-  amber: 'bg-amber-400',
-  teal: 'bg-teal-500',
-  pink: 'bg-pink-500',
+  primary: PRIMARY_BAR,
+  violet:  PRIMARY_BAR,
+  amber:   PRIMARY_BAR,
+  teal:    PRIMARY_BAR,
+  pink:    PRIMARY_BAR,
 };
 
 const ACCENT_TEXT: Record<string, string> = {
-  primary: 'text-primary-600 dark:text-primary-400',
-  violet: 'text-violet-600 dark:text-violet-400',
-  amber: 'text-amber-600 dark:text-amber-400',
-  teal: 'text-teal-600 dark:text-teal-400',
-  pink: 'text-pink-600 dark:text-pink-400',
+  primary: PRIMARY_TEXT,
+  violet:  PRIMARY_TEXT,
+  amber:   PRIMARY_TEXT,
+  teal:    PRIMARY_TEXT,
+  pink:    PRIMARY_TEXT,
 };
 
 // ── Status helpers ────────────────────────────────────────────────

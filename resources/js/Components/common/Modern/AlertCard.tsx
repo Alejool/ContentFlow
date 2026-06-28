@@ -1,4 +1,5 @@
 import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { SEMANTIC } from '@/lib/common/designTokens';
 import { cn } from '@/lib/common/utils';
 import { AlertCircle, AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 import React from 'react';
@@ -60,12 +61,13 @@ export default function AlertCard({ type = 'info', title, message, className }: 
       titleColor: 'text-amber-700 dark:text-amber-300',
     },
     info: {
+      // info = primary (NOT blue — blue is not in our design palette)
       icon: Info,
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-      borderColor: 'border-blue-200 dark:border-blue-800',
-      iconColor: 'text-blue-600 dark:text-blue-400',
-      textColor: 'text-blue-800 dark:text-blue-300',
-      titleColor: 'text-blue-900 dark:text-blue-200',
+      bgColor:     SEMANTIC.info.bg,
+      borderColor: SEMANTIC.info.border,
+      iconColor:   SEMANTIC.info.icon,
+      textColor:   SEMANTIC.info.text,
+      titleColor:  SEMANTIC.info.title,
     },
     success: {
       icon: CheckCircle,

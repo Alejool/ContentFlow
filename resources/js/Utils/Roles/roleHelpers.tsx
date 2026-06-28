@@ -15,6 +15,7 @@
 import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Crown, Eye, PencilLine, Shield, ShieldCheck, User, UserCog } from 'lucide-react';
+import { ROLE_COLORS } from '@/lib/common/designTokens';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -71,56 +72,52 @@ export const ROLE_CONFIGS: RoleConfig[] = [
       'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30',
   },
   {
-    // ── Admin — sky blue: trusted, elevated but not owner
+    // ── Admin — primary: trusted, elevated. Follows design system primary color.
     slug: 'admin',
     label: 'Admin',
     i18nKey: 'workspace.admins',
     icon: ShieldCheck,
-    gradient: 'from-sky-500 to-blue-600',
-    iconBg: 'bg-sky-50 dark:bg-sky-500/10',
-    iconColor: 'text-sky-600 dark:text-sky-400',
-    textColor: 'text-sky-700 dark:text-sky-400',
-    badgeClass:
-      'bg-sky-50 text-sky-800 border border-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/30',
+    gradient: 'from-primary-500 to-primary-600',
+    iconBg:    ROLE_COLORS.admin.iconBg,
+    iconColor: ROLE_COLORS.admin.iconColor,
+    textColor: ROLE_COLORS.admin.textColor,
+    badgeClass: ROLE_COLORS.admin.badge,
   },
   {
-    // ── Editor — violet/indigo: creative, content-focused
+    // ── Editor — primary muted: content creators, within the primary palette
     slug: 'editor',
     label: 'Editor',
     i18nKey: 'workspace.editors',
     icon: PencilLine,
-    gradient: 'from-violet-500 to-indigo-600',
-    iconBg: 'bg-violet-50 dark:bg-violet-500/10',
-    iconColor: 'text-violet-600 dark:text-violet-400',
-    textColor: 'text-violet-700 dark:text-violet-400',
-    badgeClass:
-      'bg-violet-50 text-violet-800 border border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/30',
+    gradient: 'from-primary-400 to-primary-500',
+    iconBg:    ROLE_COLORS.editor.iconBg,
+    iconColor: ROLE_COLORS.editor.iconColor,
+    textColor: ROLE_COLORS.editor.textColor,
+    badgeClass: ROLE_COLORS.editor.badge,
   },
   {
-    // ── Member — emerald: standard collaborator
+    // ── Member — primary muted: standard collaborator
     slug: 'member',
     label: 'Member',
     i18nKey: 'workspace.member',
     icon: User,
-    gradient: 'from-emerald-500 to-teal-600',
-    iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
-    iconColor: 'text-emerald-600 dark:text-emerald-400',
-    textColor: 'text-emerald-700 dark:text-emerald-400',
-    badgeClass:
-      'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30',
+    gradient: 'from-primary-400 to-primary-500',
+    iconBg:    ROLE_COLORS.editor.iconBg,
+    iconColor: ROLE_COLORS.editor.iconColor,
+    textColor: ROLE_COLORS.editor.textColor,
+    badgeClass: ROLE_COLORS.editor.badge,
   },
   {
-    // ── Viewer — neutral slate: read-only, minimal prominence
+    // ── Viewer — neutral: read-only, minimal prominence
     slug: 'viewer',
     label: 'Viewer',
     i18nKey: 'workspace.viewers',
     icon: Eye,
-    gradient: 'from-slate-400 to-gray-500',
-    iconBg: 'bg-slate-50 dark:bg-slate-500/10',
-    iconColor: 'text-slate-500 dark:text-slate-400',
-    textColor: 'text-slate-600 dark:text-slate-400',
-    badgeClass:
-      'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/30',
+    gradient: 'from-neutral-400 to-neutral-500',
+    iconBg:    ROLE_COLORS.viewer.iconBg,
+    iconColor: ROLE_COLORS.viewer.iconColor,
+    textColor: ROLE_COLORS.viewer.textColor,
+    badgeClass: ROLE_COLORS.viewer.badge,
   },
 ];
 
@@ -130,12 +127,11 @@ const FALLBACK_CONFIG: RoleConfig = {
   label: 'Member',
   i18nKey: 'workspace.member',
   icon: UserCog,
-  gradient: 'from-gray-400 to-slate-400',
-  iconBg: 'bg-gray-50 dark:bg-gray-500/10',
-  iconColor: 'text-gray-500 dark:text-gray-400',
-  textColor: 'text-gray-600 dark:text-gray-400',
-  badgeClass:
-    'bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/30',
+  gradient: 'from-neutral-400 to-neutral-500',
+  iconBg:    ROLE_COLORS.default.iconBg,
+  iconColor: ROLE_COLORS.default.iconColor,
+  textColor: ROLE_COLORS.default.textColor,
+  badgeClass: ROLE_COLORS.default.badge,
 };
 
 // ─── Core helpers ─────────────────────────────────────────────────────────────

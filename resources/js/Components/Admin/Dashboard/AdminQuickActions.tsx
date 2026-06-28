@@ -13,16 +13,16 @@ export default function AdminQuickActions() {
       description: t('admin.system_settings.page_description'),
       icon: Settings,
       href: '/admin/system-settings',
-      iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-      iconColor: 'text-blue-600 dark:text-blue-400',
+      iconBg: 'bg-primary-100 dark:bg-primary-500/15',
+      iconColor: 'text-primary-700 dark:text-primary-300',
     },
     {
       title: t('admin.navigation.system_notifications'),
       description: t('admin.system_notifications.page_subtitle'),
       icon: Bell,
       href: '/admin/system-notifications',
-      iconBg: 'bg-purple-100 dark:bg-purple-900/30',
-      iconColor: 'text-purple-600 dark:text-purple-400',
+      iconBg: 'bg-primary-50 dark:bg-primary-500/10',
+      iconColor: 'text-primary-600 dark:text-primary-400',
     },
   ];
 
