@@ -1,4 +1,4 @@
-import { VirtualList } from '@/Components/common/ui/VirtualList';
+﻿import { VirtualList } from '@/Components/common/VirtualList';
 import NotificationItem from '@/Components/Notifications/NotificationItem';
 import { useNotifications } from '@/Hooks/Notifications/useNotifications';
 import { useTheme } from '@/Hooks/Layout/useTheme';

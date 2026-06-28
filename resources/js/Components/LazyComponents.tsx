@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+﻿import { lazy } from 'react';
 import { createLazyComponent } from '@/Components/common/ui/LazyLoadWrapper';
 
 // Componentes pesados con lazy loading
@@ -23,7 +23,7 @@ export const LazyPerformanceTable = createLazyComponent(
 );
 
 export const LazyMediaLightbox = createLazyComponent(
-  () => import('@/Components/common/ui/MediaLightbox'),
+  () => import('@/Components/common/MediaLightbox'),
 );
 
 export const LazyPublishPreviewModal = createLazyComponent(

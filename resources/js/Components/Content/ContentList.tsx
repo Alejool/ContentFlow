@@ -1,4 +1,4 @@
-import CampaignTable from '@/Components/Content/Campaign/CampaignTable';
+﻿import CampaignTable from '@/Components/Content/Campaign/CampaignTable';
 import ContentCard from '@/Components/Content/ContentCard';
 import ContentCardSkeleton from '@/Components/Content/ContentCardSkeleton';
 import PublicationTable from '@/Components/Content/Publication/PublicationTable';
@@ -6,13 +6,13 @@ import FilterSection from '@/Components/Content/common/FilterSection';
 import Button from '@/Components/common/Modern/Button';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
-import { VirtualGrid } from '@/Components/common/ui/VirtualList';
+import { VirtualGrid } from '@/Components/common/VirtualList';
 import { useLockStore } from '@/stores/Publications/lockStore';
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from 'lucide-react';
 import React, { useEffect, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import MediaLightbox from '@/Components/common/ui/MediaLightbox';
+import MediaLightbox from '@/Components/common/MediaLightbox';
 
 // Componente extraído fuera para evitar recreación en cada render
 interface ContentGridItemProps {

@@ -1,8 +1,8 @@
-import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
+﻿import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import PlatformCard from '@/Components/Content/modals/publish/PlatformCard';
 import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValidationAlert';
 import Button from '@/Components/common/Modern/Button';
-import YouTubeThumbnailUploader from '@/Components/common/ui/YouTubeThumbnailUploader';
+import YouTubeThumbnailUploader from '@/Components/common/YouTubeThumbnailUploader';
 import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
 import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';

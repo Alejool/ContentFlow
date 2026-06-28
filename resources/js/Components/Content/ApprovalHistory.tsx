@@ -1,7 +1,7 @@
-import ApprovalHistorySkeleton from '@/Components/Content/ApprovalHistorySkeleton';
+﻿import ApprovalHistorySkeleton from '@/Components/Content/ApprovalHistorySkeleton';
 import FilterSection from '@/Components/Content/common/FilterSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
-import TableContainer from '@/Components/common/ui/TableContainer';
+import TableContainer from '@/Components/common/TableContainer';
 import {
   useApprovalHistory,
   usePublicationApprovalHistory,

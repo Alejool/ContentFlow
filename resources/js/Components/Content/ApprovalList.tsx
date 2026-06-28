@@ -1,10 +1,10 @@
-import ApprovalSuccessModal from '@/Components/Content/modals/ApprovalSuccessModal';
+﻿import ApprovalSuccessModal from '@/Components/Content/modals/ApprovalSuccessModal';
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
-import { VirtualList } from '@/Components/common/ui/VirtualList';
+import { VirtualList } from '@/Components/common/VirtualList';
 import { usePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
 import { getDateFnsLocale } from '@/Utils/common/dateLocales';
 import { formatDateTimeString } from '@/Utils/formatters';

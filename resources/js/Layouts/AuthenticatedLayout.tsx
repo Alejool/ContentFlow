@@ -1,4 +1,4 @@
-import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
+﻿import { TimezoneInitializer } from '@/Components/common/TimezoneInitializer';
 import ActiveWorkspace from '@/Components/Layout/ActiveWorkspace';
 import MobileNavbar from '@/Components/Layout/MobileNavbar';
 import NotificationButton from '@/Components/Layout/NotificationButton';
@@ -31,7 +31,7 @@ const ResumeUploadsPrompt = lazy(() =>
     default: m.ResumeUploadsPrompt,
   })),
 );
-const KeyboardShortcutsModal = lazy(() => import('@/Components/common/ui/KeyboardShortcutsModal'));
+const KeyboardShortcutsModal = lazy(() => import('@/Components/common/KeyboardShortcutsModal'));
 
 export default function AuthenticatedLayout({ header, children }: AuthenticatedLayoutProps) {
   const { props } = usePage<AuthPageProps>();

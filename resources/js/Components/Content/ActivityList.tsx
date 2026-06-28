@@ -1,5 +1,5 @@
-import { Avatar } from '@/Components/common/Avatar';
-import { VirtualList } from '@/Components/common/ui/VirtualList';
+﻿import { Avatar } from '@/Components/common/Avatar';
+import { VirtualList } from '@/Components/common/VirtualList';
 import { getDateFnsLocale } from '@/Utils/common/dateLocales';
 import { format } from 'date-fns';
 import {

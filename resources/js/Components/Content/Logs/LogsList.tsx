@@ -1,8 +1,8 @@
-import ExpandableText from '@/Components/Content/common/ExpandableText';
+﻿import ExpandableText from '@/Components/Content/common/ExpandableText';
 import FilterSection from '@/Components/Content/common/FilterSection';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
-import TableContainer from '@/Components/common/ui/TableContainer';
+import TableContainer from '@/Components/common/TableContainer';
 import { formatDateTimeString } from '@/Utils/formatters';
 import type { SocialPostLog } from '@/types/Publications/Publication';
 import {

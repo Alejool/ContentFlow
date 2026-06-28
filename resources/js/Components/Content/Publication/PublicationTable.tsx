@@ -1,11 +1,11 @@
-import PublicationDesktopRow from '@/Components/Content/Publication/PublicationDesktopRow';
+﻿import PublicationDesktopRow from '@/Components/Content/Publication/PublicationDesktopRow';
 import PublicationMobileRow from '@/Components/Content/Publication/PublicationMobileRow';
 import PublicationMobileRowSkeleton from '@/Components/Content/Publication/PublicationMobileRowSkeleton';
 import PublicationRowSkeleton from '@/Components/Content/Publication/PublicationRowSkeleton';
 import { TableHeader } from '@/Components/Content/Publication/TableHeader';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
-import TableContainer from '@/Components/common/ui/TableContainer';
+import TableContainer from '@/Components/common/TableContainer';
 import type { Publication } from '@/types/Publications/Publication';
 import { memo, useCallback, useEffect, useState } from 'react';
 

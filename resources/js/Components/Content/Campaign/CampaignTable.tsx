@@ -1,4 +1,4 @@
-import CampaignMobileRowSkeleton from '@/Components/Content/Campaign/CampaignMobileRowSkeleton';
+﻿import CampaignMobileRowSkeleton from '@/Components/Content/Campaign/CampaignMobileRowSkeleton';
 import CampaignMobileTable from '@/Components/Content/Campaign/CampaignMobileTable';
 import CampaignPublications from '@/Components/Content/Campaign/CampaignPublications';
 import CampaignRow from '@/Components/Content/Campaign/CampaignRow';
@@ -6,7 +6,7 @@ import CampaignRowSkeleton from '@/Components/Content/Campaign/CampaignRowSkelet
 import { TableHeader } from '@/Components/Content/Publication/TableHeader';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
-import TableContainer from '@/Components/common/ui/TableContainer';
+import TableContainer from '@/Components/common/TableContainer';
 import type { Campaign } from '@/types/Campaign/Campaign';
 import React, { Fragment, memo } from 'react';
 
