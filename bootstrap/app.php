@@ -80,6 +80,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'workspace.owner' => CheckWorkspaceOwner::class,
             'idempotent.publish' => IdempotentPublish::class,
             'idempotent.checkout' => IdempotentCheckout::class,
+            'token.ability' => \App\Http\Middleware\Api\CheckTokenAbility::class,
             'workspace.role' => CheckWorkspaceRole::class,
             'api.plan' => CheckApiWorkspacePlan::class,
             'purchases.enabled' => CheckPurchasesEnabled::class,

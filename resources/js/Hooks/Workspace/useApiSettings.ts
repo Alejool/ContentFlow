@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import type { ApiToken, ApiTokenForm } from '@/types/Workspace/apiSettings';
+import type { ApiToken, ApiTokenForm, ApiScopeGroups, ApiScopeKey } from '@/types/Workspace/apiSettings';
 
 // Ziggy route helper is declared globally in this project
 declare const route: (name: string, params?: unknown) => string;
@@ -32,7 +32,37 @@ export function useApiSettings(
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const { data, setData, reset } = useForm<ApiTokenForm>({ name: '' });
+  const { data, setData, reset } = useForm<ApiTokenForm>({ name: '', abilities: [] });
+
+  // — Scope groups (loaded once)
+  const [scopeGroups, setScopeGroups] = useState<ApiScopeGroups>({});
+
+  useEffect(() => {
+    axios.get(route('workspaces.api-tokens.scopes')).then((r) => {
+      setScopeGroups(r.data?.data?.scopes ?? r.data?.scopes ?? {});
+    }).catch(() => {});
+  }, []);
+
+  const toggleAbility = (ability: ApiScopeKey) => {
+    setData('abilities', data.abilities.includes(ability)
+      ? data.abilities.filter((a) => a !== ability)
+      : [...data.abilities, ability]);
+  };
+
+  const toggleGroup = (groupScopes: Record<string, string>) => {
+    const keys = Object.keys(groupScopes) as ApiScopeKey[];
+    const allSelected = keys.every((k) => data.abilities.includes(k));
+    setData('abilities', allSelected
+      ? data.abilities.filter((a) => !keys.includes(a))
+      : [...new Set([...data.abilities, ...keys])]);
+  };
+
+  const selectAll = () => {
+    const all = Object.values(scopeGroups).flatMap((g) => Object.keys(g.scopes)) as ApiScopeKey[];
+    setData('abilities', all);
+  };
+
+  const clearAll = () => setData('abilities', []);
 
   // ─── Data fetching ────────────────────────────────────────────────────────
   const fetchTokens = useCallback(async () => {
@@ -72,6 +102,7 @@ export function useApiSettings(
       setIsCreating(true);
       const response = await axios.post(route('workspaces.api-tokens.store', workspace.slug), {
         name: data.name,
+        abilities: data.abilities.length > 0 ? data.abilities : ['*'],
       });
       setGeneratedToken(response.data.token || response.data.data?.token);
       toast.success('API token creado exitosamente');
@@ -141,6 +172,12 @@ export function useApiSettings(
     createTokenDirectly,
     handleRevokeToken,
     confirmRevocation,
+    // Scope management
+    scopeGroups,
+    toggleAbility,
+    toggleGroup,
+    selectAll,
+    clearAll,
     copyToClipboard,
   };
 }

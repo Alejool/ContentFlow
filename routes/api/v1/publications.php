@@ -8,51 +8,68 @@ use App\Http\Controllers\Publications\PublicationPreviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
-  Route::get('/publication-locks', [PublicationLockController::class, 'index'])->name('publication-locks.index');
 
-  Route::prefix('publications')->name('publications.')->group(function () {
-    Route::get('/', [PublicationController::class, 'index'])->name('index');
-    Route::get('/pending-approvals', [PublicationController::class, 'pendingApprovals'])->name('pending-approvals');
-    Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
-    Route::get('/export', [PublicationController::class, 'export'])->name('export');
-    Route::get('/action', [PublicationController::class, 'getPublicationAction'])->name('action');
-    Route::post('/suggest-content-type', [PublicationController::class, 'suggestContentType'])->name('suggest-content-type');
-    Route::post('/', [PublicationController::class, 'store'])->name('store')->middleware('rate.limit');
-    Route::get('/{publication}', [PublicationController::class, 'show'])->name('show')->whereNumber('publication');
-    Route::put('/{publication}', [PublicationController::class, 'update'])->name('update')->whereNumber('publication');
-    Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy')->whereNumber('publication');
-    Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate')->whereNumber('publication');
-    Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review')->whereNumber('publication');
-    Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve')->whereNumber('publication');
-    Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms')->whereNumber('publication');
-    Route::post('/{publication}/validate', [PublicationController::class, 'validateContent'])->name('validate')->whereNumber('publication');
-    Route::post('/{publication}/validate-publish', [PublicationController::class, 'validatePublish'])->name('validate-publish')->whereNumber('publication');
-    Route::get('/{publication}/preview', [PublicationPreviewController::class, 'show'])->name('preview')->whereNumber('publication');
-    Route::get('/{publication}/preview/multi', [PublicationPreviewController::class, 'multiPlatform'])->name('preview.multi')->whereNumber('publication');
-    Route::post('/{publication}/auto-optimize', [PublicationPreviewController::class, 'autoOptimize'])->name('auto-optimize')->whereNumber('publication');
-    Route::put('/{publication}/platform-config/{accountId}', [PublicationPreviewController::class, 'updatePlatformConfig'])->name('platform-config.update')->whereNumber('publication')->whereNumber('accountId');
-    Route::get('/{publication}/saved-configurations', [PublicationPreviewController::class, 'getSavedConfigurations'])->name('saved-configurations')->whereNumber('publication');
-    Route::post('/{publication}/generate-thumbnail', [PublicationPreviewController::class, 'generateThumbnail'])->name('generate-thumbnail')->whereNumber('publication');
-    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->middleware(['rate.limit', 'idempotent.publish']);
-    Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
-    Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
-    Route::post('/{publication}/cancel', [PublicationController::class, 'cancel'])->name('cancel')->whereNumber('publication');
-    Route::post('/{publication}/attach-media', [PublicationController::class, 'attachMedia'])->name('attach-media');
-    Route::post('/{publication}/lock-media', [PublicationController::class, 'lockMedia'])->name('lock-media');
-    Route::get('/stats/all', [PublicationController::class, 'stats'])->name('stats_all');
-    Route::post('/{publication}/portal-token', [ClientPortalController::class, 'generateToken'])->name('portal-token');
+    Route::get('/publication-locks', [PublicationLockController::class, 'index'])
+        ->name('publication-locks.index')
+        ->middleware('token.ability:publications:read');
 
-    // Locking API
-    Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock')->whereNumber('publication');
-    Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock')->whereNumber('publication');
-    Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status')->whereNumber('publication');
+    Route::prefix('publications')->name('publications.')->group(function () {
 
-    // Comments API
-    Route::get('/{publication}/comments', [PublicationCommentController::class, 'index'])->name('comments.index')->whereNumber('publication');
-    Route::post('/{publication}/comments', [PublicationCommentController::class, 'store'])->name('comments.store')->whereNumber('publication');
-    Route::delete('/{publication}/comments/{comment}', [PublicationCommentController::class, 'destroy'])->name('comments.destroy')->whereNumber('publication')->whereNumber('comment');
+        // ── Read ─────────────────────────────────────────────────────────────
+        Route::middleware('token.ability:publications:read')->group(function () {
+            Route::get('/', [PublicationController::class, 'index'])->name('index');
+            Route::get('/pending-approvals', [PublicationController::class, 'pendingApprovals'])->name('pending-approvals');
+            Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
+            Route::get('/stats/all', [PublicationController::class, 'stats'])->name('stats_all');
+            Route::get('/export', [PublicationController::class, 'export'])->name('export');
+            Route::get('/action', [PublicationController::class, 'getPublicationAction'])->name('action');
+            Route::get('/{publication}', [PublicationController::class, 'show'])->name('show')->whereNumber('publication');
+            Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms')->whereNumber('publication');
+            Route::get('/{publication}/preview', [PublicationPreviewController::class, 'show'])->name('preview')->whereNumber('publication');
+            Route::get('/{publication}/preview/multi', [PublicationPreviewController::class, 'multiPlatform'])->name('preview.multi')->whereNumber('publication');
+            Route::get('/{publication}/saved-configurations', [PublicationPreviewController::class, 'getSavedConfigurations'])->name('saved-configurations')->whereNumber('publication');
+            Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status')->whereNumber('publication');
+            Route::get('/{publication}/comments', [PublicationCommentController::class, 'index'])->name('comments.index')->whereNumber('publication');
+            Route::get('/{publication}/activities', [PublicationController::class, 'activities'])->name('activities')->whereNumber('publication');
+        });
 
-    // Activities API
-    Route::get('/{publication}/activities', [PublicationController::class, 'activities'])->name('activities')->whereNumber('publication');
-  });
+        // ── Create ────────────────────────────────────────────────────────────
+        Route::middleware('token.ability:publications:create')->group(function () {
+            Route::post('/', [PublicationController::class, 'store'])->name('store')->middleware('rate.limit');
+            Route::post('/suggest-content-type', [PublicationController::class, 'suggestContentType'])->name('suggest-content-type');
+            Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate')->whereNumber('publication');
+            Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review')->whereNumber('publication');
+            Route::post('/{publication}/validate', [PublicationController::class, 'validateContent'])->name('validate')->whereNumber('publication');
+            Route::post('/{publication}/validate-publish', [PublicationController::class, 'validatePublish'])->name('validate-publish')->whereNumber('publication');
+            Route::post('/{publication}/auto-optimize', [PublicationPreviewController::class, 'autoOptimize'])->name('auto-optimize')->whereNumber('publication');
+            Route::post('/{publication}/generate-thumbnail', [PublicationPreviewController::class, 'generateThumbnail'])->name('generate-thumbnail')->whereNumber('publication');
+            Route::post('/{publication}/portal-token', [ClientPortalController::class, 'generateToken'])->name('portal-token');
+            Route::post('/{publication}/comments', [PublicationCommentController::class, 'store'])->name('comments.store')->whereNumber('publication');
+        });
+
+        // ── Update ────────────────────────────────────────────────────────────
+        Route::middleware('token.ability:publications:update')->group(function () {
+            Route::put('/{publication}', [PublicationController::class, 'update'])->name('update')->whereNumber('publication');
+            Route::put('/{publication}/platform-config/{accountId}', [PublicationPreviewController::class, 'updatePlatformConfig'])->name('platform-config.update')->whereNumber('publication')->whereNumber('accountId');
+            Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock')->whereNumber('publication');
+            Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock')->whereNumber('publication');
+            Route::post('/{publication}/attach-media', [PublicationController::class, 'attachMedia'])->name('attach-media');
+            Route::post('/{publication}/lock-media', [PublicationController::class, 'lockMedia'])->name('lock-media');
+        });
+
+        // ── Delete ────────────────────────────────────────────────────────────
+        Route::middleware('token.ability:publications:delete')->group(function () {
+            Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy')->whereNumber('publication');
+            Route::delete('/{publication}/comments/{comment}', [PublicationCommentController::class, 'destroy'])->name('comments.destroy')->whereNumber('publication')->whereNumber('comment');
+        });
+
+        // ── Publish ───────────────────────────────────────────────────────────
+        Route::middleware('token.ability:publications:publish')->group(function () {
+            Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->middleware(['rate.limit', 'idempotent.publish'])->whereNumber('publication');
+            Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish')->whereNumber('publication');
+            Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve')->whereNumber('publication');
+            Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject')->whereNumber('publication');
+            Route::post('/{publication}/cancel', [PublicationController::class, 'cancel'])->name('cancel')->whereNumber('publication');
+        });
+    });
 });

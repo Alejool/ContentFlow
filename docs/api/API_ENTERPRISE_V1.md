@@ -1,9 +1,9 @@
 # Intellipost API — Referencia Completa Enterprise v1
 
-**Versión:** 1.0  
+**Versión:** 1.2  
 **Base URL:** `https://tu-dominio.com/api/v1`  
-**Autenticación:** Bearer Token (Laravel Sanctum)  
-**Fecha:** Marzo 2026
+**Autenticación:** Bearer Token (Laravel Sanctum) — Scoped Abilities  
+**Última actualización:** Junio 2026 — Sistema de scopes granulares por sección
 
 ---
 
@@ -32,9 +32,107 @@
 
 ## 1. Autenticación y Tokens
 
-Intellipost usa **Laravel Sanctum** para la autenticación API. El sistema implementa un esquema de **access token + refresh token** con rotación automática para máxima seguridad.
+Intellipost usa **Laravel Sanctum** para la autenticación API con un sistema de **scopes granulares por sección y acción**.
 
 > **Solo disponible para el plan Enterprise.** Los planes Free, Starter o Professional recibirán un error `402 Payment Required` al intentar generar tokens.
+
+### 1.1 Tipos de token
+
+| Tipo | Cómo se crea | Expira | Scopes |
+|------|-------------|--------|--------|
+| **Dashboard** | Desde Settings → API Tokens | Nunca (revocación manual) | Seleccionables por sección |
+| **Programmatic** | `POST /api/auth/token` | Access: 24h / Refresh: 30 días | `*` (completo) |
+
+### 1.2 Sistema de Scopes (permisos por sección)
+
+Cada token puede crearse con acceso limitado a una o varias secciones. Un token con scope `publications:read` solo puede listar publicaciones — no puede crearlas, editarlas ni publicarlas.
+
+#### Obtener scopes disponibles
+
+```bash
+GET /api-token-scopes
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "scopes": {
+      "publications": {
+        "label": "Publications",
+        "scopes": {
+          "publications:read":    "List and view publications",
+          "publications:create":  "Create new publications",
+          "publications:update":  "Edit existing publications",
+          "publications:delete":  "Delete / cancel publications",
+          "publications:publish": "Publish to social platforms"
+        }
+      },
+      "campaigns": {
+        "label": "Campaigns",
+        "scopes": {
+          "campaigns:read":   "List and view campaigns",
+          "campaigns:create": "Create new campaigns",
+          "campaigns:update": "Edit existing campaigns",
+          "campaigns:delete": "Delete campaigns"
+        }
+      },
+      "social": {
+        "label": "Social Accounts",
+        "scopes": {
+          "social:read":   "View connected social accounts",
+          "social:manage": "Connect / disconnect accounts"
+        }
+      },
+      "analytics":  { "label": "Analytics",    "scopes": { "analytics:read": "Read analytics and reports" } },
+      "approvals":  { "label": "Approvals",    "scopes": { "approvals:read": "...", "approvals:manage": "..." } },
+      "media":      { "label": "Media & Files", "scopes": { "media:read": "...", "media:upload": "...", "media:delete": "..." } },
+      "workspace":  { "label": "Workspace",    "scopes": { "workspace:read": "...", "workspace:manage": "..." } },
+      "ai":         { "label": "AI Assistant", "scopes": { "ai:use": "Use AI features" } },
+      "webhooks":   { "label": "Webhooks",     "scopes": { "webhooks:read": "...", "webhooks:manage": "..." } }
+    },
+    "wildcard": { "*": "Full access to all current and future API endpoints" }
+  }
+}
+```
+
+#### Crear token con scopes desde el Dashboard
+
+Desde **Settings → API Tokens**, selecciona los permisos por sección antes de generar el token.
+
+#### Crear token con scopes via API (programmatic)
+
+```bash
+POST /workspaces/{slug}/api-tokens
+Authorization: Bearer <dashboard_token_with_full_access>
+Content-Type: application/json
+
+{
+  "name": "Bot de publicaciones",
+  "abilities": ["publications:read", "publications:create", "publications:publish"]
+}
+```
+
+Si omites `abilities` o envías array vacío → el token recibe `*` (acceso completo, comportamiento anterior).
+
+#### Error de scope insuficiente
+
+```json
+HTTP 403
+{
+  "success": false,
+  "message": "This token does not have permission to perform this action.",
+  "required_abilities": ["publications:create"],
+  "code": "TOKEN_INSUFFICIENT_SCOPE"
+}
+```
+
+#### Agregar nuevas rutas al sistema de scopes
+
+> **Para desarrolladores:** Al agregar un nuevo endpoint API:
+> 1. Si pertenece a una sección existente (publicaciones, campañas…), simplemente colócalo dentro del grupo `Route::middleware('token.ability:section:action')` correcto en `routes/api/v1/{section}.php`.
+> 2. Si es una sección nueva, agrega sus scopes en `app/Constants/ApiScopes.php` → método `groups()`, luego aplica el middleware al nuevo archivo de rutas.
+> 3. Los docs se actualizan automáticamente vía `GET /api-token-scopes` que lee `ApiScopes::groups()` en tiempo real.
 
 ### Guía Rápida de Inicio
 

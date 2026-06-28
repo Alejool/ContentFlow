@@ -163,6 +163,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('{workspace}/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
     // Enterprise API Documentation Downloads
     Route::get('{workspace}/api-docs/download', [ApiTokenController::class, 'downloadDocs'])->name('api-docs.download');
+    // Public: available token scopes (no auth required)
+    Route::get('api-token-scopes', [ApiTokenController::class, 'scopes'])->name('api-tokens.scopes')->withoutMiddleware(['auth']);
   });
 
 Route::prefix('content')->name('content.')->group(function () {

@@ -29,6 +29,7 @@ import type { ApiSettingsTabProps, ApiToken } from '@/types/Workspace/apiSetting
 
 export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSettingsTabProps) {
   const { t } = useTranslation();
+  const [showScopeSelector, setShowScopeSelector] = useState(false);
 
   const {
     tokens,
@@ -55,6 +56,11 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
     handleRevokeToken,
     confirmRevocation,
     copyToClipboard,
+    scopeGroups,
+    toggleAbility,
+    toggleGroup,
+    selectAll,
+    clearAll,
   } = useApiSettings(workspace, canManageWorkspace);
 
   // ─── Expiry cell renderer ─────────────────────────────────────────────────
@@ -165,28 +171,97 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             </div>
 
             {canManageWorkspace && !generatedToken && (
-              <form onSubmit={createTokenDirectly} className="flex gap-2">
-                <Input
-                  id="name"
-                  type="text"
-                  sizeType="md"
-                  value={data.name}
-                  onChange={(e) => setData('name', e.target.value)}
-                  placeholder={t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'}
-                  className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-theme-bg-secondary sm:w-64"
-                  required
-                />
+              <form onSubmit={createTokenDirectly} className="w-full md:w-auto">
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-2">
+                    <Input
+                      id="name"
+                      type="text"
+                      sizeType="md"
+                      value={data.name}
+                      onChange={(e) => setData('name', e.target.value)}
+                      placeholder={t('workspace.api.token_name_placeholder') || 'Ej: Marketing Automation'}
+                      className="block w-full rounded-md border-neutral-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:bg-theme-bg-secondary sm:w-64"
+                      required
+                    />
 
-                <Button
-                  type="submit"
-                  disabled={isCreating}
-                  variant="primary"
-                  size="md"
-                  className="inline-flex items-center whitespace-nowrap"
-                  icon={isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-                >
-                  {t('workspace.api.generate') || 'Generar'}
-                </Button>
+                  </div>
+
+                  {/* ── Scope selector toggle ────────────────────────────── */}
+                  <button
+                    type="button"
+                    onClick={() => setShowScopeSelector((v) => !v)}
+                    className="text-left text-xs text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 flex items-center gap-1"
+                  >
+                    <Key className="h-3 w-3" />
+                    {data.abilities.length === 0
+                      ? 'Acceso completo — clic para limitar por sección'
+                      : `${data.abilities.length} permiso${data.abilities.length !== 1 ? 's' : ''} seleccionado${data.abilities.length !== 1 ? 's' : ''}`}
+                  </button>
+
+                  {showScopeSelector && Object.keys(scopeGroups).length > 0 && (
+                    <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                          Permisos del token
+                        </span>
+                        <div className="flex gap-2">
+                          <button type="button" onClick={selectAll} className="text-xs text-primary-600 hover:underline dark:text-primary-400">Todos</button>
+                          <span className="text-neutral-400">·</span>
+                          <button type="button" onClick={clearAll} className="text-xs text-neutral-500 hover:underline dark:text-neutral-400">Ninguno</button>
+                        </div>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {Object.entries(scopeGroups).map(([groupKey, group]) => {
+                          const scopeKeys = Object.keys(group.scopes);
+                          const allSelected = scopeKeys.every((k) => data.abilities.includes(k as any));
+                          const someSelected = scopeKeys.some((k) => data.abilities.includes(k as any));
+                          return (
+                            <div key={groupKey} className="rounded-md border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800">
+                              <label className="mb-2 flex cursor-pointer items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={allSelected}
+                                  ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
+                                  onChange={() => toggleGroup(group.scopes)}
+                                  className="h-3.5 w-3.5 rounded border-neutral-300 text-primary-600"
+                                />
+                                <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{group.label}</span>
+                              </label>
+                              <div className="ml-5 space-y-1.5">
+                                {Object.entries(group.scopes).map(([scopeKey, desc]) => (
+                                  <label key={scopeKey} className="flex cursor-pointer items-start gap-2">
+                                    <input
+                                      type="checkbox"
+                                      checked={data.abilities.includes(scopeKey as any)}
+                                      onChange={() => toggleAbility(scopeKey as any)}
+                                      className="mt-0.5 h-3 w-3 rounded border-neutral-300 text-primary-600"
+                                    />
+                                    <div>
+                                      <span className="block text-[10px] font-mono text-neutral-500 dark:text-neutral-400">{scopeKey}</span>
+                                      <span className="block text-xs text-neutral-700 dark:text-neutral-300">{desc}</span>
+                                    </div>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={isCreating || !data.name}
+                    variant="primary"
+                    size="md"
+                    className="inline-flex items-center whitespace-nowrap self-start"
+                    icon={isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+                  >
+                    {t('workspace.api.generate') || 'Generar token'}
+                  </Button>
+                </div>
               </form>
             )}
           </div>
@@ -273,7 +348,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                     <thead className="bg-neutral-50 dark:bg-theme-bg-secondary">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                          {t('workspace.api.table.name')}
+                          {t('workspace.api.table.name')} / Permisos
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                           {t('workspace.api.table.type')}
@@ -300,11 +375,29 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                             key={token.id}
                             className={`transition-colors ${meta.isExpired ? 'opacity-60' : 'hover:bg-neutral-50 dark:hover:bg-neutral-700/30'}`}
                           >
-                            {/* Name */}
-                            <td className="max-w-[180px] px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                            {/* Name + abilities */}
+                            <td className="max-w-[220px] px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
                               <span className="block truncate" title={token.name}>
                                 {token.name}
                               </span>
+                              {token.abilities && (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {(token.abilities.includes('*') || token.abilities.length === 0) ? (
+                                    <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                                      Acceso completo
+                                    </span>
+                                  ) : token.abilities.slice(0, 3).map((a) => (
+                                    <span key={a} className="inline-flex rounded-full bg-primary-50 px-1.5 py-0.5 text-[10px] font-mono text-primary-700 dark:bg-primary-900/20 dark:text-primary-300">
+                                      {a}
+                                    </span>
+                                  ))}
+                                  {!token.abilities.includes('*') && token.abilities.length > 3 && (
+                                    <span className="inline-flex rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
+                                      +{token.abilities.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </td>
 
                             {/* Type badge */}

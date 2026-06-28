@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Workspace;
 
+use App\Constants\ApiScopes;
 use App\Http\Controllers\Controller;
 use App\Models\Workspace\Workspace;
 use App\Traits\System\ApiResponse;
@@ -64,23 +65,36 @@ class ApiTokenController extends Controller
     }
 
     $request->validate([
-      'name' => 'required|string|max:255',
+      'name'      => 'required|string|max:255',
+      'abilities' => 'nullable|array',
+      'abilities.*' => [
+        'string',
+        function ($attribute, $value, $fail) {
+          if (!ApiScopes::isValid($value)) {
+            $fail("Invalid scope: {$value}. See /api/v1/auth/scopes for valid values.");
+          }
+        },
+      ],
     ]);
 
-    // Create token WITHOUT an expiry date — it lives until the user revokes it.
-    // Sanctum's createToken() with null expiration = no expiry.
+    // Use provided abilities or fall back to wildcard for backwards compat.
+    $abilities = $request->filled('abilities')
+      ? $request->abilities
+      : ['*'];
+
     $token = $workspace->createToken(
       $request->name,
-      ['*'],    // full abilities (all scopes)
-      null      // expires_at = null → never expires
+      $abilities,
+      null  // expires_at = null → never expires
     );
 
     return $this->successResponse([
-      'token'       => $token->plainTextToken,
-      'name'        => $request->name,
-      'token_type'  => 'dashboard',
+      'token'         => $token->plainTextToken,
+      'name'          => $request->name,
+      'abilities'     => $abilities,
+      'token_type'    => 'dashboard',
       'never_expires' => true,
-      'expires_at'  => null,
+      'expires_at'    => null,
     ], 'API token created successfully. This token will NOT expire — it is valid until you revoke it.', 201);
   }
 
@@ -97,6 +111,20 @@ class ApiTokenController extends Controller
     $tokenInstance->delete();
 
     return $this->successResponse(null, 'API token revoked successfully.');
+  }
+
+  /**
+   * Return all available token scopes (grouped).
+   * Public — no auth required, safe to expose.
+   */
+  public function scopes()
+  {
+    return $this->successResponse([
+      'scopes' => ApiScopes::groups(),
+      'wildcard' => [
+        '*' => 'Full access to all current and future API endpoints',
+      ],
+    ]);
   }
 
   /**
