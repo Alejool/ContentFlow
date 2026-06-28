@@ -61,26 +61,38 @@ class StripeGateway implements PaymentGatewayInterface
     ): array {
         // Verificar si tiene stripe_price_id configurado
         if (!empty($addonData['stripe_price_id'])) {
-            // Usar Checkout Session con el Price ID configurado
-            $session = $this->stripe->checkout->sessions->create([
-                'mode' => 'payment',
-                'line_items' => [[
-                    'price' => $addonData['stripe_price_id'],
-                    'quantity' => $metadata['quantity'] ?? 1,
-                ]],
-                'success_url' => url('/subscription/addons/success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => url('/subscription/addons/cancelled') . '?session_id={CHECKOUT_SESSION_ID}',
-                'customer_email' => $user->email,
-                'metadata' => array_merge([
-                    'addon_sku' => $addonData['sku'],
-                    'workspace_id' => $workspace->id,
-                    'user_id' => $user->id,
-                    'addon_name' => $addonData['name'],
-                    'addon_amount' => $addonData['amount'],
-                    'addon_type' => $this->getAddonType($addonData['sku']),
-                    'gateway' => 'stripe',
-                ], $metadata),
-            ]);
+            // Idempotency key prevents charging twice when a client retries
+            // due to network errors on the same addon purchase attempt.
+            $addonIdempotencyKey = hash('sha256', implode(':', [
+                'addon_checkout',
+                $workspace->id,
+                $addonData['sku'],
+                $metadata['quantity'] ?? 1,
+                now()->format('YmdH'), // window: 1 hour per identical request
+            ]));
+
+            $session = $this->stripe->checkout->sessions->create(
+                [
+                    'mode' => 'payment',
+                    'line_items' => [[
+                        'price' => $addonData['stripe_price_id'],
+                        'quantity' => $metadata['quantity'] ?? 1,
+                    ]],
+                    'success_url' => url('/subscription/addons/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => url('/subscription/addons/cancelled') . '?session_id={CHECKOUT_SESSION_ID}',
+                    'customer_email' => $user->email,
+                    'metadata' => array_merge([
+                        'addon_sku' => $addonData['sku'],
+                        'workspace_id' => $workspace->id,
+                        'user_id' => $user->id,
+                        'addon_name' => $addonData['name'],
+                        'addon_amount' => $addonData['amount'],
+                        'addon_type' => $this->getAddonType($addonData['sku']),
+                        'gateway' => 'stripe',
+                    ], $metadata),
+                ],
+                ['idempotency_key' => $addonIdempotencyKey],
+            );
 
             return [
                 'url' => $session->url,
@@ -166,16 +178,24 @@ class StripeGateway implements PaymentGatewayInterface
     {
         try {
             $subscription = $this->stripe->subscriptions->retrieve($subscriptionId);
-            
-            $this->stripe->subscriptions->update($subscriptionId, [
-                'items' => [
-                    [
-                        'id' => $subscription->items->data[0]->id,
-                        'price' => $newPriceId,
+
+            // Idempotency key = subscriptionId + newPriceId so retrying the same
+            // swap never creates a double charge or duplicate proration invoice.
+            $idempotencyKey = hash('sha256', "swap:{$subscriptionId}:{$newPriceId}");
+
+            $this->stripe->subscriptions->update(
+                $subscriptionId,
+                [
+                    'items' => [
+                        [
+                            'id' => $subscription->items->data[0]->id,
+                            'price' => $newPriceId,
+                        ],
                     ],
+                    'proration_behavior' => 'always_invoice',
                 ],
-                'proration_behavior' => 'always_invoice',
-            ]);
+                ['idempotency_key' => $idempotencyKey],
+            );
             
             return true;
         } catch (\Exception $e) {

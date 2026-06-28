@@ -24,6 +24,7 @@ use App\Http\Middleware\System\ApiRateLimiter;
 use App\Http\Middleware\Workspace\CheckWorkspaceLimit;
 use App\Http\Middleware\Workspace\CheckWorkspaceOwner;
 use App\Http\Middleware\Publication\IdempotentPublish;
+use App\Http\Middleware\Payment\IdempotentCheckout;
 use App\Http\Middleware\Workspace\CheckWorkspaceRole;
 use Illuminate\Routing\Middleware\CacheResponse;
 use App\Http\Middleware\Subscription\CheckApiWorkspacePlan;
@@ -78,6 +79,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'workspace.limit' => CheckWorkspaceLimit::class,
             'workspace.owner' => CheckWorkspaceOwner::class,
             'idempotent.publish' => IdempotentPublish::class,
+            'idempotent.checkout' => IdempotentCheckout::class,
             'workspace.role' => CheckWorkspaceRole::class,
             'api.plan' => CheckApiWorkspacePlan::class,
             'purchases.enabled' => CheckPurchasesEnabled::class,

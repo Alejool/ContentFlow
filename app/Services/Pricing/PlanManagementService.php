@@ -35,6 +35,15 @@ class PlanManagementService
         string $reason = 'user_initiated',
         ?array $metadata = null
     ): bool {
+        // Guard: same-plan change is a no-op — return true idempotently.
+        if ($user->current_plan === $newPlan) {
+            Log::info('changePlan called with same plan — no-op', [
+                'user_id' => $user->id,
+                'plan' => $newPlan,
+            ]);
+            return true;
+        }
+
         return DB::transaction(function () use (
             $user,
             $newPlan,
