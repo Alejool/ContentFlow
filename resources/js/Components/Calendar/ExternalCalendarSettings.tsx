@@ -1,19 +1,26 @@
-﻿import Button from '@/Components/common/Modern/Button';
+﻿import React from 'react';
+import Button from '@/Components/common/Modern/Button';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
 import {
   useConnectCalendar,
   useDisconnectCalendar,
   useExternalCalendarStatus,
   useRetrySync,
-} from '@/Hooks/Calendar/useExternalCalendar';
-import type { ExternalCalendarConnection } from '@/stores/Calendar/externalCalendarStore';
+  useUpdateSyncSettings,
+} from '@/Hooks/calendar/useExternalCalendar';
+import type { ExternalCalendarConnection, SyncDirection, SyncFrequency } from '@/stores/Calendar/externalCalendarStore';
 import { formatDateTimeString } from '@/Utils/formatters';
 import {
   AlertCircle,
+  ArrowLeftRight,
+  ArrowUpFromLine,
+  ArrowDownToLine,
   Calendar,
   CheckCircle2,
+  Clock,
   Loader2,
   RefreshCw,
+  Save,
   XCircle,
   X as XIcon,
 } from 'lucide-react';
@@ -74,7 +81,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     disconnected: {
       icon: AlertCircle,
       text: t('calendar.external.disconnected'),
-      className: 'bg-gray-100 text-gray-800 dark:bg-neutral-900 dark:text-gray-300',
+      className: 'bg-gray-100 text-gray-800 dark:bg-neutral-900 dark:text-neutral-300',
     },
   };
 
@@ -163,7 +170,7 @@ export default function ExternalCalendarSettings({
     <>
       <div className="space-y-4">
         <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('calendar.external.description')}
           </p>
         </div>
@@ -205,6 +212,23 @@ export default function ExternalCalendarSettings({
   );
 }
 
+const SYNC_DIRECTIONS: { value: SyncDirection; label: string; icon: React.ElementType; desc: string }[] = [
+  { value: 'import',        label: 'Solo importar',     icon: ArrowDownToLine,  desc: 'Del calendario externo al sistema' },
+  { value: 'export',        label: 'Solo exportar',     icon: ArrowUpFromLine,  desc: 'Del sistema al calendario externo' },
+  { value: 'bidirectional', label: 'Bidireccional',     icon: ArrowLeftRight,   desc: 'Sincronización en ambos sentidos' },
+];
+
+const SYNC_FREQUENCIES: { value: SyncFrequency; label: string }[] = [
+  { value: 'manual', label: 'Manual' },
+  { value: '5min',   label: 'Cada 5 min' },
+  { value: '10min',  label: 'Cada 10 min' },
+  { value: '30min',  label: 'Cada 30 min' },
+  { value: '1h',     label: 'Cada hora' },
+  { value: '3h',     label: 'Cada 3 h' },
+  { value: '6h',     label: 'Cada 6 h' },
+  { value: '24h',    label: 'Cada 24 h' },
+];
+
 const CalendarConnectionCard = ({
   connection,
   icon,
@@ -225,24 +249,55 @@ const CalendarConnectionCard = ({
   isSyncing: boolean;
 }) => {
   const { t } = useTranslation();
+  const updateSyncSettings = useUpdateSyncSettings();
+
+  const [direction, setDirection] = useState<SyncDirection>(
+    connection.syncDirection ?? 'bidirectional',
+  );
+  const [frequency, setFrequency] = useState<SyncFrequency>(
+    connection.syncFrequency ?? 'manual',
+  );
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveSettings = async () => {
+    setIsSaving(true);
+    try {
+      await updateSyncSettings.mutateAsync({
+        provider: connection.provider,
+        settings: {
+          syncEnabled: true,
+          syncDirection: direction,
+          syncFrequency: frequency,
+          syncCampaigns: connection.syncConfig?.syncCampaigns ?? [],
+          syncPlatforms: connection.syncConfig?.syncPlatforms ?? [],
+        },
+      });
+      toast.success('Configuración de sincronización guardada');
+    } catch {
+      toast.error('Error al guardar la configuración');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div className="hover:border-primary-500 dark:hover:border-primary-500 rounded-lg border border-gray-200 bg-white p-4 transition-all dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="flex items-start justify-between">
+    <div className="rounded-lg border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      {/* Header */}
+      <div className="flex items-start justify-between p-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-neutral-900">
             {icon}
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 capitalize dark:text-gray-100">
+            <h4 className="text-sm font-semibold capitalize text-gray-900 dark:text-neutral-100">
               {connection.provider} Calendar
             </h4>
             {connection.connected && connection.email && (
-              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{connection.email}</p>
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">{connection.email}</p>
             )}
             {connection.lastSync && (
-              <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-                {t('calendar.external.lastSync')}: {formatDateTimeString(connection.lastSync)}
+              <p className="mt-0.5 text-xs text-gray-400 dark:text-neutral-500">
+                Última sync: {formatDateTimeString(connection.lastSync)}
               </p>
             )}
           </div>
@@ -251,28 +306,108 @@ const CalendarConnectionCard = ({
       </div>
 
       {connection.errorMessage && (
-        <div className="mt-3 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+        <div className="mx-4 mb-3 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
           <p className="text-sm text-red-700 dark:text-red-300">{connection.errorMessage}</p>
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-2">
+      {/* Sync settings — only when connected */}
+      {connection.connected && (
+        <div className="border-t border-gray-100 px-4 py-4 dark:border-neutral-800">
+          {/* Direction */}
+          <div className="mb-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
+              Dirección de sincronización
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {SYNC_DIRECTIONS.map((opt) => {
+                const Icon = opt.icon;
+                const active = direction === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setDirection(opt.value)}
+                    className={`flex flex-col items-center gap-1.5 rounded-lg border-2 px-2 py-3 text-center text-xs font-semibold transition-all ${
+                      active
+                        ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-500 dark:bg-primary-900/20 dark:text-primary-400'
+                        : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-400'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="leading-tight">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1.5 text-[11px] text-gray-400 dark:text-neutral-500">
+              {SYNC_DIRECTIONS.find((d) => d.value === direction)?.desc}
+            </p>
+          </div>
+
+          {/* Frequency */}
+          <div className="mb-4">
+            <p className="mb-2 flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
+              <Clock className="h-3 w-3" />
+              Frecuencia (job automático)
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {SYNC_FREQUENCIES.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setFrequency(opt.value)}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
+                    frequency === opt.value
+                      ? 'bg-primary-500 text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {frequency !== 'manual' && (
+              <p className="mt-1.5 text-[11px] text-gray-400 dark:text-neutral-500">
+                El servidor sincronizará automáticamente según este intervalo.
+              </p>
+            )}
+          </div>
+
+          {/* Save settings */}
+          <Button
+            size="sm"
+            variant="primary"
+            buttonStyle="solid"
+            icon={Save}
+            onClick={handleSaveSettings}
+            loading={isSaving}
+            className="w-full"
+          >
+            Guardar configuración
+          </Button>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex items-center gap-2 border-t border-gray-100 px-4 py-3 dark:border-neutral-800">
         {connection.connected ? (
           <>
             <Button
               variant="primary"
-              size="md"
+              buttonStyle="outline"
+              size="sm"
               icon={RefreshCw}
               onClick={onSync}
               loading={isSyncing}
             >
-              {t('calendar.external.syncNow')}
+              Sincronizar ahora
             </Button>
             <Button
               variant="danger"
               buttonStyle="outline"
-              size="md"
+              size="sm"
               icon={XIcon}
               onClick={onDisconnect}
               loading={isDisconnecting}
@@ -283,11 +418,12 @@ const CalendarConnectionCard = ({
         ) : (
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             icon={Calendar}
             onClick={onConnect}
             loading={isConnecting}
             loadingText={t('calendar.external.connecting')}
+            className="w-full"
           >
             {t('calendar.external.connect')}
           </Button>

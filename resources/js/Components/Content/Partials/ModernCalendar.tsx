@@ -12,6 +12,8 @@
  */
 
 import { BulkActionsBar } from '@/Components/Calendar/BulkActionsBar';
+import { DeleteModal } from '@/Components/Calendar/BulkActions/DeleteModal';
+import { MoveModal } from '@/Components/Calendar/BulkActions/MoveModal';
 import { CalendarErrorBoundary } from '@/Components/Calendar/CalendarErrorBoundary';
 import { CalendarNavigation } from '@/Components/Calendar/CalendarNavigation';
 import { CalendarSidebar } from '@/Components/Calendar/CalendarSidebar';
@@ -29,13 +31,14 @@ import {
     getActivePlatformKeys,
     getPlatformConfig,
 } from '@/Constants/ConfigSocialMedia/socialPlatforms';
-import { useModernCalendar } from '@/Hooks/Calendar/useModernCalendar';
+import { useDeleteEvent } from '@/Hooks/calendar/useCalendarEvents';
+import { useModernCalendar } from '@/Hooks/calendar/useModernCalendar';
 import { useLockStore } from '@/stores/Publications/lockStore';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { usePage } from '@inertiajs/react';
 import { isSameDay, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, Filter, Trash2, X } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ModernCalendarProps {
@@ -94,8 +97,36 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     handleBulkMove,
   } = useModernCalendar();
 
+  // ── Sidebar bulk modals ───────────────────────────────────────────────────
+  const deleteEvent = useDeleteEvent();
+  const [showSidebarDeleteModal, setShowSidebarDeleteModal] = useState(false);
+  const [showSidebarMoveModal, setShowSidebarMoveModal] = useState(false);
+  const [sidebarMoveDate, setSidebarMoveDate] = useState<Date>(() => {
+    const d = new Date(); d.setHours(0, 0, 0, 0); return d;
+  });
+  const [isSidebarDeleting, setIsSidebarDeleting] = useState(false);
+
+  const handleSidebarBulkDelete = async () => {
+    setIsSidebarDeleting(true);
+    try {
+      const ids = Array.from(selectedEvents as Set<string>);
+      // Only delete user_events (publications can't be deleted from calendar)
+      const userEventIds = ids.filter((id: string) =>
+        (filteredEvents as CalendarEvent[]).some(
+          (e: CalendarEvent) => e.id === id && e.type === 'user_event',
+        ),
+      );
+      await Promise.all(userEventIds.map((id: string) => deleteEvent.mutateAsync(id)));
+      clearSelection();
+      refreshEvents();
+    } finally {
+      setIsSidebarDeleting(false);
+      setShowSidebarDeleteModal(false);
+    }
+  };
+
   // ── Eventos del día seleccionado (para sidebar y selectDay) ───────────────
-  const dayEvents = filteredEvents.filter((e) =>
+  const dayEvents = (filteredEvents as CalendarEvent[]).filter((e: CalendarEvent) =>
     isSameDay(parseISO(e.start), selectedDate),
   );
 
@@ -277,7 +308,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
                     showExternalCalendars
                       ? 'border-primary-200 bg-primary-50 text-primary-600 dark:border-primary-800 dark:bg-primary-900/20 dark:text-primary-400'
-                      : 'border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                      : 'border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-gray-700'
                   }`}
                   title="Calendarios Externos"
                 >
@@ -287,14 +318,14 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               )}
 
               {/* Filtros de plataforma */}
-              <div className="scrollbar-subtle flex max-w-full items-center overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-800 sm:max-w-none">
+              <div className="scrollbar-subtle flex max-w-full items-center overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-neutral-800 sm:max-w-none">
                 {platforms.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPlatformFilter(p)}
                     className={`rounded-full p-1.5 transition-all sm:p-2 ${
                       platformFilter === p
-                        ? 'bg-white text-primary-600 shadow dark:bg-gray-700'
+                        ? 'bg-white text-primary-600 shadow dark:bg-neutral-700'
                         : 'text-gray-400 hover:text-gray-600'
                     }`}
                     title={
@@ -320,7 +351,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
           {/* ── Panel calendarios externos ──────────────────────────────────── */}
           {showExternalCalendars && (
-            <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
                   <CalendarIcon className="h-5 w-5 text-primary-500" />
@@ -344,7 +375,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             <div className="min-w-0 flex-1 md:flex-[3] lg:flex-[4] xl:flex-[5]">
               <div
                 id="calendar"
-                className="w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
+                className="w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/50"
               >
                 {renderView()}
               </div>
@@ -357,6 +388,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 events={filteredEvents}
                 currentUser={currentUser}
                 remoteLocks={remoteLocks}
+                selectedEvents={selectedEvents as Set<string>}
+                onToggleSelection={(id) => toggleEventSelection(id)}
+                onSelectAll={selectDay}
+                onClearSelection={clearSelection}
+                onBulkDelete={() => setShowSidebarDeleteModal(true)}
+                onBulkMove={() => setShowSidebarMoveModal(true)}
                 onEventClick={(event) => {
                   if (event.type === 'user_event') {
                     setSelectedEventForModal(event);
@@ -399,7 +436,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             size="md"
           />
           <div className="p-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('calendar.userEvents.modal.messages.confirmDelete') ||
                 t('common.deleteConfirm') ||
                 '¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.'}
@@ -415,6 +452,30 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             cancelStyle="outline"
           />
         </Modal>
+
+        {/* ── Sidebar bulk delete modal ─────────────────────────────────────── */}
+        <DeleteModal
+          isOpen={showSidebarDeleteModal}
+          onClose={() => setShowSidebarDeleteModal(false)}
+          selectedCount={(selectedEvents as Set<string>).size}
+          onConfirm={handleSidebarBulkDelete}
+          isDeleting={isSidebarDeleting}
+        />
+
+        {/* ── Sidebar bulk move modal ───────────────────────────────────────── */}
+        <MoveModal
+          isOpen={showSidebarMoveModal}
+          onClose={() => setShowSidebarMoveModal(false)}
+          selectedCount={(selectedEvents as Set<string>).size}
+          selectedDate={sidebarMoveDate}
+          onDateChange={setSidebarMoveDate}
+          onConfirm={async () => {
+            await handleBulkMove(sidebarMoveDate);
+            setShowSidebarMoveModal(false);
+            clearSelection();
+          }}
+          isMoving={false}
+        />
 
         {/* ── Barra de acciones masivas (feature-gated) ─────────────────────── */}
         {auth.current_workspace?.features?.bulk_operations && (

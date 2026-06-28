@@ -1,4 +1,4 @@
-import Button from '@/Components/common/Modern/Button';
+﻿import Button from '@/Components/common/Modern/Button';
 import Checkbox from '@/Components/common/Modern/Checkbox';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { isDarkColor } from '@/Utils/Calendar/colorHelpers';
@@ -6,7 +6,7 @@ import { formatDateString, formatTimeString } from '@/Utils/formatters';
 import type { CalendarEvent } from '@/types/Calendar/calendar';
 import { isSameDay, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
-import { AlertCircle, Calendar as CalendarIcon, Lock, Trash2 } from 'lucide-react';
+import { AlertCircle, Calendar as CalendarIcon, CalendarArrowUp, CheckSquare, Lock, Trash2, X } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,10 @@ interface CalendarSidebarProps {
   onEventClick: (event: CalendarEvent) => void;
   onDeleteEvent: (event: CalendarEvent) => void;
   onToggleSelection?: (eventId: string) => void;
+  onSelectAll?: () => void;
+  onClearSelection?: () => void;
+  onBulkDelete?: () => void;
+  onBulkMove?: () => void;
   actionSlot?: React.ReactNode;
 }
 
@@ -31,6 +35,10 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
   onEventClick,
   onDeleteEvent,
   onToggleSelection,
+  onSelectAll,
+  onClearSelection,
+  onBulkDelete,
+  onBulkMove,
   actionSlot,
 }) => {
   const { t } = useTranslation();
@@ -39,10 +47,13 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
     .filter((e) => isSameDay(parseISO(e.start), selectedDate))
     .sort((a, b) => a.start.localeCompare(b.start));
 
+  const nSelected = selectedEvents.size;
+  const hasBulkActions = nSelected > 0 && (onBulkDelete || onBulkMove);
+
   return (
-    <div className="flex h-full flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-neutral-800/50 dark:bg-theme-bg-secondary">
+    <div className="flex h-full flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-neutral-800/50 dark:bg-neutral-900">
       {/* Header */}
-      <div className="mb-4">
+      <div className="mb-3">
         <div className="flex items-start justify-between">
           <h4 className="flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
             <CalendarIcon className="text-primary-500 h-5 w-5" />
@@ -56,11 +67,68 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
           </h4>
           {actionSlot}
         </div>
-        <div className="mt-2 flex items-center gap-2">
+
+        <div className="mt-2 flex items-center justify-between gap-2">
           <span className="bg-primary-50 text-primary-500 dark:bg-primary-900/30 rounded-full px-2 py-0.5 text-[10px] font-black tracking-widest uppercase">
             {dayEvents.length}&nbsp;{t('calendar.events.count')}
           </span>
+
+          {dayEvents.length > 0 && onSelectAll && !nSelected && (
+            <button
+              onClick={onSelectAll}
+              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
+            >
+              <CheckSquare className="h-3 w-3" />
+              {t('calendar.selectAll') || 'Sel. todo'}
+            </button>
+          )}
         </div>
+
+        {/* Bulk action bar — visible when events are selected */}
+        {hasBulkActions && (
+          <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-primary-50 px-2.5 py-2 dark:bg-primary-900/20">
+            <span className="mr-1 text-xs font-bold text-primary-600 dark:text-primary-400">
+              {nSelected} sel.
+            </span>
+            {onBulkMove && (
+              <Button
+                type="button"
+                size="xs"
+                variant="secondary"
+                buttonStyle="outline"
+                shadow="none"
+                onClick={onBulkMove}
+                icon={CalendarArrowUp}
+                className="!py-1 !text-[11px]"
+              >
+                {t('calendar.move') || 'Mover'}
+              </Button>
+            )}
+            {onBulkDelete && (
+              <Button
+                type="button"
+                size="xs"
+                variant="danger"
+                buttonStyle="outline"
+                shadow="none"
+                onClick={onBulkDelete}
+                icon={Trash2}
+                className="!py-1 !text-[11px]"
+              >
+                {t('common.delete') || 'Eliminar'}
+              </Button>
+            )}
+            {onClearSelection && (
+              <button
+                onClick={onClearSelection}
+                className="ml-auto rounded p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                title={t('calendar.clearSelection') || 'Limpiar selección'}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Event list */}
@@ -72,7 +140,7 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
             const lockId = event.extendedProps.publication_id || Number(event.resourceId);
             const isLocked = !!remoteLocks[lockId];
             const isSelected = selectedEvents.has(event.id);
-            const eventColor = event.backgroundColor || event.color || '#3B82F6';
+            const eventColor = (event as any).backgroundColor || event.color || '#3B82F6';
 
             const hasNoPlatforms =
               event.hasNoPlatforms ||
@@ -192,8 +260,8 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
             );
           })
         ) : (
-          <div className="rounded-lg border-2 border-dashed border-gray-200 bg-white/50 py-12 text-center dark:border-neutral-800 dark:bg-theme-bg-secondary">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-theme-bg-secondary">
+          <div className="rounded-lg border-2 border-dashed border-gray-200 bg-white/50 py-12 text-center dark:border-neutral-800 dark:bg-neutral-900">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900">
               <CalendarIcon className="h-6 w-6 text-gray-300" />
             </div>
             <p className="text-sm font-medium text-gray-400">{t('calendar.events.empty')}</p>

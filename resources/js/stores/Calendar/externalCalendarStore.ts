@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 
+export type SyncDirection = 'import' | 'export' | 'bidirectional';
+export type SyncFrequency = 'manual' | '5min' | '10min' | '30min' | '1h' | '3h' | '6h' | '24h';
+
 export interface ExternalCalendarConnection {
   provider: 'google' | 'outlook';
   connected: boolean;
@@ -8,6 +11,8 @@ export interface ExternalCalendarConnection {
   status: 'connected' | 'disconnected' | 'error';
   errorMessage?: string;
   syncEnabled?: boolean;
+  syncDirection?: SyncDirection;
+  syncFrequency?: SyncFrequency;
   syncConfig?: {
     syncCampaigns: number[];
     syncPlatforms: string[];

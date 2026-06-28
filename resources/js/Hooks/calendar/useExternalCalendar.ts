@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useExternalCalendarStore } from '@/stores/Calendar/externalCalendarStore';
-import type { ExternalCalendarConnection } from '@/stores/Calendar/externalCalendarStore';
+import type { ExternalCalendarConnection, SyncDirection, SyncFrequency } from '@/stores/Calendar/externalCalendarStore';
 
 interface SyncSettings {
   syncEnabled: boolean;
+  syncDirection: SyncDirection;
+  syncFrequency: SyncFrequency;
   syncCampaigns: number[];
   syncPlatforms: string[];
 }
@@ -26,6 +28,8 @@ export function useExternalCalendarStatus() {
           status: conn.status,
           errorMessage: conn.errorMessage || conn.error_message,
           syncEnabled: conn.syncEnabled ?? conn.sync_enabled ?? false,
+          syncDirection: (conn.syncDirection || conn.sync_direction || 'bidirectional') as SyncDirection,
+          syncFrequency: (conn.syncFrequency || conn.sync_frequency || 'manual') as SyncFrequency,
           syncConfig: conn.syncConfig ||
             conn.sync_config || {
               syncCampaigns: [],
@@ -126,6 +130,8 @@ export function useUpdateSyncSettings() {
     mutationFn: async ({ provider, settings }: { provider: string; settings: SyncSettings }) => {
       const response = await axios.put(`/api/v1/external-calendar/${provider}/sync-settings`, {
         sync_enabled: settings.syncEnabled,
+        sync_direction: settings.syncDirection,
+        sync_frequency: settings.syncFrequency,
         sync_campaigns: settings.syncCampaigns,
         sync_platforms: settings.syncPlatforms,
       });
