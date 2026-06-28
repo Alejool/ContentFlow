@@ -16,6 +16,7 @@ npm-debug.log
 yarn-error.log
 /auth.json
 
+
 # ============================================
 # ARCHIVOS DE ENTORNO Y CONFIGURACIÓN SENSIBLE
 # ============================================
@@ -176,3 +177,6 @@ migrateBackend.cjs
 rollbackFrontendMigration.cjs
 verifyFrontendMigration.cjs
 MIGRATION_COMPLETED.md
+
+
+graphify-out
