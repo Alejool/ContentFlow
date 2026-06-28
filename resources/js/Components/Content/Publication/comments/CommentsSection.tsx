@@ -2,7 +2,7 @@ import { Avatar } from '@/Components/common/Avatar';
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { format } from 'date-fns';
 import { Send, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -49,18 +49,16 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
   const fetchMembers = async () => {
     try {
       if (!currentUser?.current_workspace_id) return;
-      const response = await axios.get(
-        route('api.v1.workspaces.members', currentUser.current_workspace_id),
-      );
-      setMembers(response.data.members || []);
+      const members = await publicationService.getWorkspaceMembers(currentUser.current_workspace_id);
+      setMembers(members);
     } catch (_error) {}
   };
 
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(route('api.v1.publications.comments.index', publicationId));
-      setComments(response.data);
+      const comments = await publicationService.getComments(publicationId);
+      setComments(comments);
     } catch (_error) {
     } finally {
       setLoading(false);
@@ -81,22 +79,16 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
 
     setSubmitting(true);
     try {
-      const response = await axios.post(
-        route('api.v1.publications.comments.store', publicationId),
-        {
-          content: newComment,
-          parent_id: replyTo?.id || null,
-        },
-      );
+      const comment = await publicationService.addComment(publicationId, newComment);
 
       if (replyTo) {
         setComments((prev) =>
           prev.map((c) =>
-            c.id === replyTo.id ? { ...c, replies: [...(c.replies || []), response.data] } : c,
+            c.id === replyTo.id ? { ...c, replies: [...(c.replies || []), comment] } : c,
           ),
         );
       } else {
-        setComments((prev) => [response.data, ...prev]);
+        setComments((prev) => [comment, ...prev]);
       }
 
       setNewComment('');
@@ -116,12 +108,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
     if (!commentToDelete) return;
 
     try {
-      await axios.delete(
-        route('api.v1.publications.comments.destroy', {
-          publication: publicationId,
-          comment: commentToDelete,
-        }),
-      );
+      await publicationService.deleteComment(publicationId, commentToDelete);
       setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
       toast.success(t('publications.modal.comments.deleteSuccess') || 'Comment deleted');
     } catch (_error) {

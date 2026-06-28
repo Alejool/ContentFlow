@@ -34,7 +34,7 @@ import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { Lock, Save } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
@@ -165,7 +165,7 @@ const EditPublicationModal = ({
 
       if (reelsToDelete.length > 0) {
         try {
-          await Promise.all(reelsToDelete.map((reel) => axios.delete(`/api/v1/media/${reel.id}`)));
+          await Promise.all(reelsToDelete.map((reel) => publicationService.deleteMedia(reel.id)));
           toast.success(t('reels.messages.deletedWithVideo'));
         } catch (error) {
           console.error('Failed to delete associated reels', error);

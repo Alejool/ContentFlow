@@ -1,7 +1,8 @@
+import { publicationService } from '@/Services/Publications/publicationService';
 import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 import type { Publication } from '@/types/Publications/Publication';
-import axios, { type AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { create } from 'zustand';
 
 interface PublicationState {
@@ -157,30 +158,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         {} as Record<string, unknown>,
       );
 
-      // Use different endpoint based on approval filter
-      const endpoint = useApprovalFilter
-        ? route('api.v1.publications.pending-approvals')
-        : route('api.v1.publications.index');
+      const fetchFn = useApprovalFilter
+        ? publicationService.listPendingApprovals
+        : publicationService.list;
 
-      const response = await axios.get(endpoint, {
-        params: { ...cleanFilters, page },
-        paramsSerializer: {
-          indexes: null,
-          serialize: (params) => {
-            const searchParams = new URLSearchParams();
-            Object.entries(params).forEach(([key, value]) => {
-              if (Array.isArray(value)) {
-                value.forEach((v) => searchParams.append(`${key}[]`, String(v)));
-              } else if (value !== null && value !== undefined) {
-                searchParams.append(key, String(value));
-              }
-            });
-            return searchParams.toString();
-          },
-        },
-      });
-
-      const data = response.data.publications;
+      const response = await fetchFn({ ...cleanFilters, page });
+      const data = response.publications;
       const incomingItems: Publication[] = data.data ?? data ?? [];
 
       // Only apply optimistic state logic if NOT a forced refresh
@@ -245,8 +228,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
     set({ error: null });
     try {
-      const response = await axios.get(route('api.v1.publications.show', id));
-      const publication = response.data.publication;
+      const publication = await publicationService.get(id);
 
       set((state) => ({
         publications: state.publications.map((p) => (p.id === id ? publication : p)),
@@ -265,31 +247,29 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   fetchPublishedPlatforms: async (publicationId: number) => {
     try {
-      const response = await axios.get(
-        route('api.v1.publications.published-platforms', publicationId),
-      );
+      const response = await publicationService.getPublishedPlatforms(publicationId);
 
-      const published = Array.isArray(response.data.published_platforms)
-        ? response.data.published_platforms
+      const published = Array.isArray(response.published_platforms)
+        ? response.published_platforms
         : [];
-      const failed = Array.isArray(response.data.failed_platforms)
-        ? response.data.failed_platforms
+      const failed = Array.isArray(response.failed_platforms)
+        ? response.failed_platforms
         : [];
-      const publishing = Array.isArray(response.data.publishing_platforms)
-        ? response.data.publishing_platforms
+      const publishing = Array.isArray(response.publishing_platforms)
+        ? response.publishing_platforms
         : [];
-      const removed = Array.isArray(response.data.removed_platforms)
-        ? response.data.removed_platforms
+      const removed = Array.isArray(response.removed_platforms)
+        ? response.removed_platforms
         : [];
-      const scheduled = Array.isArray(response.data.scheduled_platforms)
-        ? response.data.scheduled_platforms
-        : typeof response.data.scheduled_platforms === 'object' &&
-            response.data.scheduled_platforms !== null
-          ? Object.values(response.data.scheduled_platforms)
+      const scheduled = Array.isArray(response.scheduled_platforms)
+        ? response.scheduled_platforms
+        : typeof response.scheduled_platforms === 'object' &&
+            response.scheduled_platforms !== null
+          ? Object.values(response.scheduled_platforms)
           : [];
-      const retry_info = response.data.retry_info ?? {};
-      const recurring_posts = response.data.recurring_posts ?? {};
-      const published_recurring_posts = response.data.published_recurring_posts ?? {};
+      const retry_info = response.retry_info ?? {};
+      const recurring_posts = response.recurring_posts ?? {};
+      const published_recurring_posts = response.published_recurring_posts ?? {};
 
       set((state) => ({
         publishedPlatforms: {
@@ -510,10 +490,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   createPublication: async (formData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(route('api.v1.publications.store'), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const publication = response.data.publication;
+      const publication = await publicationService.create(formData);
       if (publication) {
         get().addPublication(publication);
       }
@@ -537,16 +514,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       if (!formData.has('_method')) {
         formData.append('_method', 'PUT');
       }
-      const response = await axios.post(route('api.v1.publications.update', id), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const publication = response.data.publication || response.data.data;
+      const publication = await publicationService.update(id, formData);
       if (publication) {
         get().updatePublication(id, publication);
       }
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
-      // Move to page 1 so the updated publication appears first
       useContentPaginationStore.getState().resetToFirstPage();
       return publication;
     } catch (error) {
@@ -562,7 +535,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   deletePublication: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(route('api.v1.publications.destroy', id));
+      await publicationService.destroy(id);
       get().removePublication(id);
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
@@ -581,8 +554,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   duplicatePublication: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(route('api.v1.publications.duplicate', id));
-      const publication = response.data.publication;
+      const publication = await publicationService.duplicate(id);
       if (publication) {
         get().addPublication(publication);
       }
@@ -602,28 +574,17 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   publishPublication: async (id, formData) => {
     try {
-      // Generate a unique UUID v4 key per publish attempt to prevent duplicate requests
-      // (e.g. double-click or network retry while the first request is still in flight).
       const idempotencyKey = crypto.randomUUID();
-
-      const response = await axios.post(route('api.v1.publications.publish', id), formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Idempotency-Key': idempotencyKey,
-        },
-      });
-      return { success: response.data.success, data: response.data };
+      const data = await publicationService.publish(id, formData, idempotencyKey);
+      return { success: data.success, data };
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string; code?: string }>;
-
-      // 409 = duplicate in-flight request — surface a clear message
       if (axiosError.response?.status === 409) {
         return {
           success: false,
           data: 'Ya hay una publicación en proceso. Por favor espera unos segundos.',
         };
       }
-
       return {
         success: false,
         data: axiosError.response?.data?.message ?? 'Failed to publish',
@@ -633,10 +594,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   unpublishPublication: async (id, platformIds) => {
     try {
-      const response = await axios.post(route('api.v1.publications.unpublish', id), {
-        platform_ids: platformIds,
-      });
-      return { success: true, data: response.data };
+      const data = await publicationService.unpublish(id, { platform_ids: platformIds });
+      return { success: true, data };
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       return {
@@ -740,10 +699,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   acquireLock: async (id, force = false) => {
     try {
-      const response = await axios.post(route('api.v1.publications.lock', id), {
-        force,
-      });
-      return { success: response.data.success, data: response.data };
+      const data = await publicationService.lock(id, force ? 'force' : '');
+      return { success: true, data };
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       return {
@@ -755,8 +712,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   releaseLock: async (id) => {
     try {
-      const response = await axios.post(route('api.v1.publications.unlock', id));
-      return { success: true, data: response.data };
+      await publicationService.unlock(id);
+      return { success: true, data: {} };
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       return {

@@ -1,5 +1,5 @@
+import { publicationService } from '@/Services/Publications/publicationService';
 import { useCampaignStore } from '@/stores/Campaign/campaignStore';
-import axios from 'axios';
 import { Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -110,10 +110,10 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
         publication_ids: data.publication_ids || [],
       };
 
-      const response = await axios.post(`/api/v1/campaigns`, payload);
+      const campaign = await publicationService.createCampaign(payload);
 
-      if (response.data && response.data.campaign) {
-        addCampaign(response.data.campaign);
+      if (campaign) {
+        addCampaign(campaign);
         handleClose();
         toast.success(t('campaigns.messages.success') || 'Campaign created successfully');
         // Reset pagination to page 1 so the newly created campaign appears at the top

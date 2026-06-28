@@ -5,7 +5,7 @@ import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccoun
 import { usePublicationActions } from '@/Hooks/Publications/usePublicationActions';
 import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { Clock, Copy, Edit, Eye, Folder, Image, Rocket, Send, Trash2, Video } from 'lucide-react';
 import { memo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -77,14 +77,11 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
     try {
       setIsSubmittingForApproval((prev) => ({ ...prev, [item.id]: true }));
 
-      const response = await axios.post(
-        `/api/v1/content/${item.id}/submit-for-approval`,
-        {},
-        { skipErrorHandler: true },
-      );
+      const response = await publicationService.submitContentForApproval(item.id);
 
       // Update stores with fresh data
-      const publication = response.data?.data?.content || response.data?.data?.publication;
+      const publication = (response as { data?: { content?: unknown; publication?: unknown } })?.data?.content
+        || (response as { data?: { publication?: unknown } })?.data?.publication;
       if (publication) {
         const publicationStoreModule = await import('@/stores/Publications/publicationStore');
         const manageContentUIStoreModule = await import('@/stores/Content/manageContentUIStore');

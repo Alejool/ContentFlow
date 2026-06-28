@@ -1,6 +1,6 @@
+import { publicationService } from '@/Services/Publications/publicationService';
 import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
-import axios from 'axios';
 import { create } from 'zustand';
 
 export interface Campaign {
@@ -54,10 +54,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
     get().clearPageData();
 
     try {
-      const params = { ...filters, page };
-      const response = await axios.get(route('api.v1.campaigns.index'), {
-        params,
-      });
+      const response = await publicationService.listCampaigns({ ...filters, page });
 
       let campaignsData = [];
       let paginationData = {
@@ -67,25 +64,25 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
         per_page: 5,
       };
 
-      if (response.data?.campaigns?.data) {
-        campaignsData = response.data.campaigns.data;
+      if (response?.campaigns?.data) {
+        campaignsData = response.campaigns.data;
         paginationData = {
-          current_page: response.data.campaigns.current_page || 1,
-          last_page: response.data.campaigns.last_page || 1,
-          total: response.data.campaigns.total || 0,
-          per_page: response.data.campaigns.per_page || 5,
+          current_page: response.campaigns.current_page || 1,
+          last_page: response.campaigns.last_page || 1,
+          total: response.campaigns.total || 0,
+          per_page: response.campaigns.per_page || 5,
         };
-      } else if (Array.isArray(response.data?.campaigns)) {
-        campaignsData = response.data.campaigns;
+      } else if (Array.isArray(response?.campaigns)) {
+        campaignsData = response.campaigns;
         paginationData.total = campaignsData.length;
-      } else if (Array.isArray(response.data?.data)) {
-        campaignsData = response.data.data;
-        if (response.data.current_page) {
+      } else if (Array.isArray(response?.data)) {
+        campaignsData = response.data;
+        if (response.current_page) {
           paginationData = {
-            current_page: response.data.current_page,
-            last_page: response.data.last_page,
-            total: response.data.total,
-            per_page: response.data.per_page,
+            current_page: response.current_page,
+            last_page: response.last_page,
+            total: response.total,
+            per_page: response.per_page,
           };
         }
       }
@@ -130,15 +127,16 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   deleteCampaign: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(route('api.v1.campaigns.destroy', id));
+      await publicationService.deleteCampaign(id);
       get().removeCampaign(id);
       set({ isLoading: false });
       useCalendarStore.getState().fetchEvents();
       useContentPaginationStore.getState().resetToFirstPage();
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
+      const e = error as { response?: { data?: { message?: string } }; message?: string };
       set({
-        error: error.response?.data?.message ?? 'Failed to delete campaign',
+        error: e.response?.data?.message ?? 'Failed to delete campaign',
         isLoading: false,
       });
       return false;
@@ -148,8 +146,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   duplicateCampaign: async (id: number) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(route('api.v1.campaigns.duplicate', id));
-      const campaign = response.data?.campaign;
+      const campaign = await publicationService.duplicateCampaign(id);
       if (campaign) {
         get().addCampaign(campaign);
       }

@@ -23,7 +23,7 @@ import { useSocialAccounts } from '@/Hooks/ConfigSocialMedia/useSocialAccounts';
 import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
 import { ToastService } from '@/Services/common/ToastService';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { FileText, Hash, Save, Target } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
@@ -789,7 +789,7 @@ export default function AddPublicationModal({
                   try {
                     const id = (publication as any)?.id;
                     if (id) {
-                      await axios.post(route('api.v1.publications.cancel', id));
+                      await publicationService.cancel(id);
                       ToastService.success('Publicación cancelada');
                       handleClose();
                     }
