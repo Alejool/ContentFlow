@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Media;
 
+use App\Notifications\BaseNotification;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\Social\SocialPostLog;

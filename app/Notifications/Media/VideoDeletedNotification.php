@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Media;
 
+use App\Notifications\BaseNotification;
 use App\Models\Social\SocialPostLog;
 
 class VideoDeletedNotification extends BaseNotification
