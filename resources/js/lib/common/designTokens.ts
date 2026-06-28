@@ -9,8 +9,8 @@
  *    error    → red-*
  *    info     → primary-*    ← NOT blue (blue is not in our palette)
  *
- * 2. UI elements (cards, icons, badges, buttons) → primary-* variants only.
- *    Never blue-*/violet-*/indigo-*/emerald-*/teal-*/orange-* for decorative color.
+ * 2. UI elements (cards, icons, badges, buttons) → primary-N variants only.
+ *    Never blue-N, violet-N, indigo-N, emerald-N, teal-N, orange-N for decorative color.
  *
  * 3. Charts / data-viz with multiple series → exempt (use CHART_PALETTE).
  *
