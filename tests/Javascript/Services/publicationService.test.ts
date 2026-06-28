@@ -4,7 +4,7 @@ import { publicationService } from '@/Services/Publications/publicationService';
 
 vi.mock('axios');
 vi.mock('ziggy-js', () => ({
-  route: (name: string, params?: unknown) => `/mocked/${name}/${JSON.stringify(params ?? '')}`,
+  default: (name: string, params?: unknown) => `/mocked/${name}/${JSON.stringify(params ?? '')}`,
 }));
 
 const mockedAxios = vi.mocked(axios);

@@ -246,11 +246,6 @@ export default function MobileNavbar({
         {showingNavigationDropdown && (
           <motion.div
             key="mobile-menu"
-            ref={menuRef}
-            id="mobile-menu-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-label={t('nav.menu.navigation') || 'Navigation menu'}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -261,7 +256,14 @@ export default function MobileNavbar({
                 : 'border-gray-100 bg-white'
             }`}
           >
-            <div className="space-y-1 px-4 py-6">
+            <div
+              ref={menuRef}
+              id="mobile-menu-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-label={t('nav.menu.navigation') || 'Navigation menu'}
+              className="space-y-1 px-4 py-6"
+            >
               {/* Search */}
               <div className="relative mb-4">
                 <Search

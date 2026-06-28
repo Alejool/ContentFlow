@@ -260,13 +260,10 @@ export default function ApprovalWorkflowConfiguration({
           : [],
       };
 
-      console.log('🔍 Sending payload:', payload); // Debug log
-
       await configure(payload);
       toast.success(t('approval.success.configured'));
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
-      console.error('❌ Save error:', axiosError.response?.data);
       toast.error(axiosError.response?.data?.message || t('approval.errors.save_failed'));
     } finally {
       setIsSaving(false);

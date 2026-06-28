@@ -112,7 +112,6 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
 
       setLoading(false);
     } catch (err: any) {
-      console.error('[useSubscriptionUsage] Error fetching usage:', err);
       setError(err.message || 'Failed to load usage data');
       setLoading(false);
     }
@@ -129,82 +128,37 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
 
     // Connect to WebSocket channel for real-time updates
     if (window.Echo) {
-      console.log(
-        '[useSubscriptionUsage] Connecting to channel:',
-        `workspace.${currentWorkspaceId}.limits`,
-      );
       const channel = window.Echo.private(`workspace.${currentWorkspaceId}.limits`);
 
-      // Try listening with the dot notation (Laravel default)
-      console.log('[useSubscriptionUsage] Listening for event:', '.usage.limits.updated');
       channel.listen('.usage.limits.updated', (data: any) => {
-        console.log('[useSubscriptionUsage] ✅ WebSocket event received (dot notation):', data);
-        console.log('[useSubscriptionUsage] Full data structure:', JSON.stringify(data, null, 2));
-
-        // Try different data structures
         let usageData = null;
 
-        // Structure 1: data.limits.data (expected)
         if (data.limits?.success && data.limits.data) {
           usageData = data.limits.data;
-          console.log('[useSubscriptionUsage] Using structure 1: data.limits.data');
-        }
-        // Structure 2: data.data (alternative)
-        else if (data.success && data.data) {
+        } else if (data.success && data.data) {
           usageData = data.data;
-          console.log('[useSubscriptionUsage] Using structure 2: data.data');
-        }
-        // Structure 3: data directly
-        else if (data.plan && data.publications) {
+        } else if (data.plan && data.publications) {
           usageData = data;
-          console.log('[useSubscriptionUsage] Using structure 3: data directly');
         }
 
         if (usageData) {
-          console.log('[useSubscriptionUsage] Updating usage with:', usageData);
           setUsage(usageData);
           setError(null);
         } else {
-          console.warn('[useSubscriptionUsage] Could not find valid usage data in:', data);
-          // Fallback: refetch from API
-          console.log('[useSubscriptionUsage] Falling back to API fetch');
           fetchUsage();
         }
       });
 
-      channel.subscribed(() => {
-        console.log('[useSubscriptionUsage] ✅ WebSocket channel subscribed successfully');
-        console.log(
-          '[useSubscriptionUsage] Channel name:',
-          `workspace.${currentWorkspaceId}.limits`,
-        );
-        console.log('[useSubscriptionUsage] Listening for:', 'usage.limits.updated');
+      channel.error(() => {
+        // silently ignore channel errors — fetchUsage runs on next user action
       });
-
-      channel.error((error: any) => {
-        console.error('[useSubscriptionUsage] ❌ WebSocket channel error:', error);
-      });
-
-      // Listen to ALL events on this channel for debugging
-      channel.listenToAll((eventName: string, data: any) => {
-        console.log('[useSubscriptionUsage] 🔔 ANY EVENT received:', eventName, data);
-      });
-    } else {
-      console.warn('[useSubscriptionUsage] Echo not available, WebSocket updates disabled');
     }
 
     // Listen for plan change events
-    const handlePlanChanged = () => {
-      console.log('[useSubscriptionUsage] Plan changed, refetching immediately...');
-      // Refetch inmediatamente sin delay
-      fetchUsage();
-    };
+    const handlePlanChanged = () => fetchUsage();
 
     // Listen for addon purchase events
-    const handleAddonPurchased = () => {
-      console.log('[useSubscriptionUsage] Addon purchased, refetching...');
-      fetchUsage();
-    };
+    const handleAddonPurchased = () => fetchUsage();
 
     window.addEventListener('subscription-plan-changed', handlePlanChanged);
     window.addEventListener('addon-purchased', handleAddonPurchased);
