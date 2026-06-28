@@ -3,13 +3,13 @@ import Input from '@/Components/common/Modern/Input';
 import Textarea from '@/Components/common/Modern/Textarea';
 import Modal from '@/Components/common/ui/Modal';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { createRoleSchema, type CreateRoleFormData } from '@/schemas/Roles/createRole';
 import axios from 'axios';
 import { CheckSquare, Save, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 
 interface CreateRoleModalProps {
   isOpen: boolean;
@@ -18,14 +18,6 @@ interface CreateRoleModalProps {
   workspace: any;
 }
 
-const createRoleSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255),
-  description: z.string().optional(),
-  permissions: z.array(z.number()).default([]),
-  approval_participant: z.boolean().default(false),
-});
-
-type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 
 export default function CreateRoleModal({
   isOpen,

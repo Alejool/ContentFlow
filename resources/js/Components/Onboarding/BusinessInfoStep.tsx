@@ -5,23 +5,13 @@ import Textarea from '@/Components/common/Modern/Textarea';
 import { Briefcase, Building2, Target, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
+import { businessInfoSchema, type BusinessInfoData } from '@/schemas/Onboarding/businessInfo';
 
 interface BusinessInfoStepProps {
   onComplete: (data: BusinessInfoData) => void;
   onSkip: () => void;
   initialData?: Partial<BusinessInfoData>;
 }
-
-// Zod schema for validation
-const businessInfoSchema = z.object({
-  businessName: z.string().min(1, 'nameRequired'),
-  businessIndustry: z.string().min(1, 'industryRequired'),
-  businessSize: z.string().min(1, 'sizeRequired'),
-  businessGoals: z.string().optional(),
-});
-
-export type BusinessInfoData = z.infer<typeof businessInfoSchema>;
 
 const INDUSTRIES = [
   'technology',

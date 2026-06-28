@@ -2,11 +2,11 @@ import Button from '@/Components/common/Modern/Button';
 import { Popover } from '@/Components/common/Modern/Popover';
 import Textarea from '@/Components/common/Modern/Textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { rejectionSchema, type RejectionFormData } from '@/schemas/Approval/rejection';
 import { AlertCircle, X } from 'lucide-react';
 import { ReactNode, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 
 interface RejectionReasonModalProps {
   trigger: ReactNode;
@@ -16,19 +16,6 @@ interface RejectionReasonModalProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-interface RejectionForm {
-  reason: string;
-}
-
-/**
- * Modal de razón de rechazo usando React Aria Popover
- *
- * Versión mejorada con:
- * - Mejor accesibilidad
- * - Focus automático en textarea
- * - Validación con Zod
- * - Cierre con ESC
- */
 export default function RejectionReasonModalModern({
   trigger,
   onSubmit,
@@ -38,20 +25,13 @@ export default function RejectionReasonModalModern({
 }: RejectionReasonModalProps) {
   const { t } = useTranslation();
 
-  const rejectionSchema = z.object({
-    reason: z
-      .string()
-      .min(10, t('approvals.validation.reasonMin') || 'La razón debe tener al menos 10 caracteres')
-      .max(500, t('approvals.validation.reasonMax') || 'La razón no puede exceder 500 caracteres'),
-  });
-
   const {
     register,
     handleSubmit,
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<RejectionForm>({
+  } = useForm<RejectionFormData>({
     resolver: zodResolver(rejectionSchema),
     defaultValues: {
       reason: '',
@@ -60,7 +40,7 @@ export default function RejectionReasonModalModern({
 
   const reason = watch('reason', '');
 
-  const onFormSubmit = (data: RejectionForm) => {
+  const onFormSubmit = (data: RejectionFormData) => {
     onSubmit(data.reason);
     reset();
     onOpenChange?.(false);

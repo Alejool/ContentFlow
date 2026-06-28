@@ -6,15 +6,7 @@ import { Sparkles, Wand2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-
-const aiPromptSchema = (t: (key: string) => string) =>
-  z.object({
-    prompt: z
-      .string()
-      .min(10, t('common.ai.prompt_min') || 'El prompt debe tener al menos 10 caracteres')
-      .max(500, t('common.ai.prompt_max') || 'El prompt no puede exceder 500 caracteres'),
-  });
+import { getAiPromptSchema, type AiPromptFormData } from '@/schemas/AI/aiPrompt';
 
 interface AiPromptSectionProps {
   onSuggest: (data: Record<string, unknown>) => void;
@@ -53,7 +45,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
   const validatePrompt = () => {
     try {
-      aiPromptSchema(t).parse({ prompt });
+      getAiPromptSchema(t).parse({ prompt });
       setError('');
       return true;
     } catch (err) {

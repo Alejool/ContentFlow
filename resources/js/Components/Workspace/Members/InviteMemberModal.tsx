@@ -4,13 +4,13 @@ import Select from '@/Components/common/Modern/Select';
 import Modal from '@/Components/common/ui/Modal';
 import { buildRoleSelectOptions, getRoleConfig, getRoleLabel } from '@/Utils/Roles/roleHelpers';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getInviteMemberSchema, type InviteMemberFormData } from '@/schemas/Workspace/inviteMember';
 import axios from 'axios';
 import { Mail, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 
 interface InviteMemberModalProps {
   isOpen: boolean;
@@ -20,19 +20,6 @@ interface InviteMemberModalProps {
   workspace: any;
 }
 
-const getInviteSchema = (t: any) =>
-  z.object({
-    email: z.preprocess(
-      (val) => (typeof val === 'string' ? val.trim() : val),
-      z.string().email(t('workspace.invite_modal.validation.email')),
-    ),
-    role_id: z.number().min(1, t('workspace.invite_modal.validation.role')),
-  });
-
-type InviteFormData = {
-  email: string;
-  role_id: number;
-};
 
 export default function InviteMemberModal({
   isOpen,
@@ -51,8 +38,8 @@ export default function InviteMemberModal({
     reset,
     setValue,
     watch,
-  } = useForm<InviteFormData>({
-    resolver: zodResolver(getInviteSchema(t)),
+  } = useForm<InviteMemberFormData>({
+    resolver: zodResolver(getInviteMemberSchema(t)),
     defaultValues: {
       email: '',
       role_id: roles.find((r) => r.slug === 'member')?.id || roles[0]?.id,
@@ -66,7 +53,7 @@ export default function InviteMemberModal({
   // Single source of truth: labels + icons come entirely from roleHelpers
   const roleOptions = buildRoleSelectOptions(roles, t, { iconSize: 'h-3.5 w-3.5' });
 
-  const onSubmit = async (data: InviteFormData) => {
+  const onSubmit = async (data: InviteMemberFormData) => {
     if (!workspace?.id) {
       toast.error(t('workspace.invite_modal.messages.missing_info'));
       return;

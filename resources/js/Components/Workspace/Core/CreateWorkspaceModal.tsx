@@ -4,8 +4,8 @@ import { Building2, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { z } from 'zod';
 import type { TFunction } from 'i18next';
+import { getCreateWorkspaceSchema, type CreateWorkspaceFormData } from '@/schemas/Workspace/createWorkspace';
 
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
@@ -19,14 +19,6 @@ interface CreateWorkspaceModalProps {
   t: TFunction;
 }
 
-const workspaceSchema = (t: TFunction) =>
-  z.object({
-    name: z.string().min(1, t('workspace.invite_modal.validation.nameRequired')).max(255),
-    description: z.string().max(1000).optional().or(z.literal('')),
-  });
-
-type WorkspaceFormData = z.infer<ReturnType<typeof workspaceSchema>>;
-
 const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,15 +28,15 @@ const CreateWorkspaceModal = ({ isOpen, onClose, t }: CreateWorkspaceModalProps)
     formState: { errors },
     reset,
     setError,
-  } = useForm<WorkspaceFormData>({
-    resolver: zodResolver(workspaceSchema(t)),
+  } = useForm<CreateWorkspaceFormData>({
+    resolver: zodResolver(getCreateWorkspaceSchema(t)),
     defaultValues: {
       name: '',
       description: '',
     },
   });
 
-  const onSubmit = (data: WorkspaceFormData) => {
+  const onSubmit = (data: CreateWorkspaceFormData) => {
     setIsSubmitting(true);
     router.post(route('workspaces.store'), data, {
       onSuccess: () => {

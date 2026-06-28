@@ -6,17 +6,13 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { rejectionSchema, type RejectionFormData } from '@/schemas/Approval/rejection';
 
 interface RejectionReasonModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (reason: string) => void;
   publicationTitle: string;
-}
-
-interface RejectionForm {
-  reason: string;
 }
 
 export default function RejectionReasonModal({
@@ -27,20 +23,13 @@ export default function RejectionReasonModal({
 }: RejectionReasonModalProps) {
   const { t } = useTranslation();
 
-  const rejectionSchema = z.object({
-    reason: z
-      .string()
-      .min(10, t('approvals.validation.reasonMin') || 'La razón debe tener al menos 10 caracteres')
-      .max(500, t('approvals.validation.reasonMax') || 'La razón no puede exceder 500 caracteres'),
-  });
-
   const {
     register,
     handleSubmit,
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<RejectionForm>({
+  } = useForm<RejectionFormData>({
     resolver: zodResolver(rejectionSchema),
     defaultValues: {
       reason: '',
@@ -49,7 +38,7 @@ export default function RejectionReasonModal({
 
   const reason = watch('reason', '');
 
-  const onFormSubmit = (data: RejectionForm) => {
+  const onFormSubmit = (data: RejectionFormData) => {
     onSubmit(data.reason);
     reset();
   };
