@@ -97,7 +97,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
 
     const getInputStyles = () => {
       const base = `
-        block w-full rounded-lg transition-all duration-200
+        block w-full rounded-lg border transition-all duration-200
         focus:outline-none focus:ring-2 focus:ring-offset-2
         ${disabled ? 'cursor-not-allowed opacity-60' : ''}
         ${prefix ? 'pl-24' : Icon ? 'pl-10' : 'pl-4'}
