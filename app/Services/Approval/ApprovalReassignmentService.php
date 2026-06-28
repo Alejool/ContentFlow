@@ -6,13 +6,17 @@ use App\Models\Publications\Publication;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Models\Approval\ApprovalLevel;
-use App\Models\ApprovalAction;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Logs\ApprovalLog;
 use App\Models\Approval\ApprovalWorkflow;
 use App\Models\Auth\Role;
 use App\Events\Approval\ApprovalTaskReassigned;
 use App\Services\Roles\RoleService;
+use App\Services\Approval\ApprovalWorkflowEngine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\Approval\NoApproverAvailableNotification;
 
 class ApprovalReassignmentService
 {
@@ -104,13 +108,16 @@ class ApprovalReassignmentService
             $newApprover = $this->findAlternativeApprover($workspace, $requiredRole, $fromUser);
 
             if (!$newApprover) {
-                // No alternative approver found - log for admin notification
-                Log::warning('No alternative approver found for reassignment', [
-                    'content_id' => $content->id,
-                    'workspace_id' => $workspace->id,
+                Log::warning('No alternative approver found — auto-advancing approval step', [
+                    'content_id'    => $content->id,
+                    'workspace_id'  => $workspace->id,
                     'required_role' => $requiredRole->name,
-                    'level' => $currentLevel,
+                    'level'         => $currentLevel,
                 ]);
+
+                // Auto-advance: record the skip in the audit trail and move to next step
+                // so the flow never gets stuck waiting for a user who can no longer approve.
+                $this->autoAdvanceDueToNoApprover($content, $workspace, $currentLevel, $fromUser, $oldRole);
                 return;
             }
 
@@ -410,5 +417,78 @@ class ApprovalReassignmentService
         }
 
         return $totalAdvanced;
+    }
+
+    /**
+     * Auto-advance an approval step when no eligible approver can be found.
+     *
+     * Called when:
+     * - A user loses their approval-capable role mid-flow AND
+     * - No alternative user with the required role exists in the workspace.
+     *
+     * The step is marked auto_advanced in the audit trail, workspace admins are
+     * notified, and the engine moves the request to the next step (or completes
+     * it if this was the last step). The flow is NEVER left in a stuck state.
+     */
+    private function autoAdvanceDueToNoApprover(
+        Publication $content,
+        Workspace $workspace,
+        int $skippedLevel,
+        User $formerApprover,
+        Role $formerRole
+    ): void {
+        DB::transaction(function () use ($content, $workspace, $skippedLevel, $formerApprover, $formerRole) {
+            $pendingRequest = ApprovalRequest::where('publication_id', $content->id)
+                ->where('status', ApprovalRequest::STATUS_PENDING)
+                ->first();
+
+            if (!$pendingRequest) {
+                return;
+            }
+
+            // Record the skip in the audit trail
+            ApprovalLog::create([
+                'approval_request_id' => $pendingRequest->id,
+                'approval_step_id'    => $pendingRequest->current_step_id,
+                'user_id'             => null, // system action
+                'action'              => ApprovalLog::ACTION_AUTO_ADVANCED,
+                'level_number'        => $skippedLevel,
+                'comment'             => "Step auto-advanced: no eligible approver available after role change. " .
+                    "Former approver: {$formerApprover->name} (role: {$formerRole->display_name}).",
+                'metadata'            => [
+                    'reason'           => 'no_approver_available',
+                    'former_approver'  => $formerApprover->id,
+                    'former_role'      => $formerRole->id,
+                    'skipped_level'    => $skippedLevel,
+                    'auto_advanced_at' => now()->toIso8601String(),
+                ],
+            ]);
+
+            // Advance via engine (handles next-step logic and completion)
+            $engine = app(ApprovalWorkflowEngine::class);
+            $engine->autoAdvanceToNextStep($pendingRequest, $skippedLevel);
+
+            // Notify workspace admins
+            $admins = $workspace->users()
+                ->whereHas('roles', fn ($q) => $q->whereIn('roles.slug', ['owner', 'admin']))
+                ->get();
+
+            foreach ($admins as $admin) {
+                try {
+                    $admin->notify(new NoApproverAvailableNotification(
+                        $content,
+                        $skippedLevel,
+                        $formerApprover,
+                        $formerRole
+                    ));
+                } catch (\Throwable $e) {
+                    Log::error('Failed to notify admin of missing approver', [
+                        'admin_id'   => $admin->id,
+                        'content_id' => $content->id,
+                        'error'      => $e->getMessage(),
+                    ]);
+                }
+            }
+        });
     }
 }

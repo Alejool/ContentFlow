@@ -117,17 +117,6 @@ class UpdatePublicationRequest extends FormRequest
       $publication = Publication::find($publication);
     }
     
-    // Debug logging para entender qué datos llegan
-    \Log::info('UpdatePublicationRequest validation data', [
-      'publication_id' => $publication?->id,
-      'content_type' => $this->input('content_type'),
-      'scheduled_at' => $this->input('scheduled_at'),
-      'social_accounts' => $this->input('social_accounts'),
-      'social_account_schedules' => $this->input('social_account_schedules'),
-      'use_global_schedule' => $this->input('use_global_schedule'),
-      'all_input' => $this->all()
-    ]);
-    
     return [
       'title' => 'required|string|max:255',
       'description' => [
@@ -453,23 +442,8 @@ class UpdatePublicationRequest extends FormRequest
       $hasUploadingFiles = $this->input('has_uploading_files') === '1' || $this->input('has_uploading_files') === true;
       $uploadingFilesCount = (int) $this->input('uploading_files_count', 0);
 
-      \Log::info('🔍 UpdatePublicationRequest - Checking uploading files', [
-        'has_uploading_files_raw' => $this->input('has_uploading_files'),
-        'has_uploading_files' => $hasUploadingFiles,
-        'uploading_files_count' => $uploadingFilesCount,
-        'publication_id' => $publication->id,
-        'content_type' => $contentType,
-        'all_inputs' => $this->all()
-      ]);
-
-      // If files are uploading, skip ALL validation
       if ($hasUploadingFiles) {
-        \Log::info('⏭️ Skipping media validation - files are uploading in background', [
-          'publication_id' => $publication->id,
-          'uploading_files_count' => $uploadingFilesCount,
-          'content_type' => $contentType
-        ]);
-        return; // Skip ALL validation
+        return; // Skip validation while background uploads are in progress
       }
 
       // Only proceed with validation if no files are uploading
@@ -524,17 +498,6 @@ class UpdatePublicationRequest extends FormRequest
         $mediaResult = $validationService->validateMediaFiles($contentType, $allMediaFilesAfterUpdate);
         
         if (!$mediaResult->isValid) {
-          \Log::warning('❌ Media validation failed during publication update', [
-            'publication_id' => $publication->id,
-            'content_type' => $contentType,
-            'total_files_after_update' => count($allMediaFilesAfterUpdate),
-            'existing_files' => $existingMediaCount,
-            'new_files' => count($newMediaFiles),
-            'removed_files' => count($removedMediaIds),
-            'errors' => $mediaResult->errors,
-            'all_files_data' => $allMediaFilesAfterUpdate
-          ]);
-          
           foreach ($mediaResult->errors as $error) {
             $validator->errors()->add('media', $error);
           }

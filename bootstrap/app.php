@@ -104,6 +104,8 @@ return Application::configure(basePath: dirname(__DIR__))
             ->timezone('UTC');
         // Daily subscription status check: validate expired subscriptions, process grace periods, send warnings
         $schedule->command('subscription:check-status')->daily();
+        // Hourly: auto-advance approval steps that have exceeded their configured timeout_hours
+        $schedule->command('approval:process-timeouts')->hourly()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {

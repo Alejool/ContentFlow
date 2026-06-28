@@ -40,7 +40,28 @@ class ApprovalWorkflowEngine
         }
 
         return DB::transaction(function () use ($publication, $submitter, $workflow) {
-            // Cancel any previous pending approval requests
+            // Pessimistic lock on the publication row to prevent duplicate simultaneous submissions.
+            // This ensures only one submission can proceed at a time for the same publication.
+            $lockedPublication = \App\Models\Publications\Publication::where('id', $publication->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$lockedPublication) {
+                throw new \Exception('Publication not found');
+            }
+
+            // Guard: if already pending_review, block resubmission — must reject/cancel first.
+            if ($lockedPublication->status === Publication::STATUS_PENDING_REVIEW) {
+                $activeRequest = ApprovalRequest::where('publication_id', $lockedPublication->id)
+                    ->where('status', ApprovalRequest::STATUS_PENDING)
+                    ->exists();
+
+                if ($activeRequest) {
+                    throw new \Exception('An active approval flow already exists for this publication. Cancel or reject it before resubmitting.');
+                }
+            }
+
+            // Cancel any previous (non-active) pending approval requests
             ApprovalRequest::where('publication_id', $publication->id)
                 ->where('status', ApprovalRequest::STATUS_PENDING)
                 ->update([
@@ -570,8 +591,73 @@ class ApprovalWorkflowEngine
     }
 
     /**
+     * Advance an approval request past a given level without requiring a human action.
+     *
+     * Used by ApprovalReassignmentService when no eligible approver exists and by
+     * the timeout processor. The request moves to the next step or is auto-completed
+     * if this was the final step.
+     */
+    public function autoAdvanceToNextStep(ApprovalRequest $request, int $skippedLevel): ApprovalRequest
+    {
+        if (!$request->isPending()) {
+            return $request;
+        }
+
+        return DB::transaction(function () use ($request, $skippedLevel) {
+            $currentStep = $request->currentStep;
+
+            $nextStep = $request->workflow->levels()
+                ->where('level_number', '>', $skippedLevel)
+                ->orderBy('level_number')
+                ->first();
+
+            if ($nextStep) {
+                $request->update(['current_step_id' => $nextStep->id]);
+                $request->publication->update([
+                    'current_approval_level'   => $nextStep->level_number,
+                    'current_approval_step_id' => $nextStep->id,
+                ]);
+
+                event(new ApprovalStepCompleted($request, $currentStep, $nextStep));
+
+                Log::info('Auto-advanced approval to next step (no approver)', [
+                    'request_id'   => $request->id,
+                    'from_level'   => $skippedLevel,
+                    'to_level'     => $nextStep->level_number,
+                ]);
+            } else {
+                // No more steps — auto-complete the entire flow
+                $request->update([
+                    'status'       => ApprovalRequest::STATUS_APPROVED,
+                    'current_step_id' => null,
+                    'completed_at' => now(),
+                    'completed_by' => null,
+                ]);
+
+                $request->publication->update([
+                    'status'                   => Publication::STATUS_APPROVED,
+                    'approved_at'              => now(),
+                    'approved_by'              => null,
+                    'current_approval_level'   => null,
+                    'current_approval_step_id' => null,
+                ]);
+
+                $this->clearApprovalCache($request->publication->workspace_id);
+                event(new ApprovalRequestCompleted($request));
+
+                Log::info('Auto-completed approval flow (no approver on final step)', [
+                    'request_id'     => $request->id,
+                    'publication_id' => $request->publication_id,
+                ]);
+            }
+
+            return $request->fresh();
+        });
+    }
+
+    /**
      * Clear approval cache for workspace
-     * 
+     *
      * @param int $workspaceId
      */
     private function clearApprovalCache(int $workspaceId): void

@@ -36,10 +36,46 @@ class ApprovalRequest extends Model
     ];
 
     // Status constants
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_APPROVED = 'approved';
-    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_PENDING   = 'pending';
+    public const STATUS_APPROVED  = 'approved';
+    public const STATUS_REJECTED  = 'rejected';
     public const STATUS_CANCELLED = 'cancelled';
+
+    /**
+     * Valid status transitions. Any transition not listed here is forbidden.
+     *
+     * pending → approved   (all steps passed)
+     * pending → rejected   (any step rejected)
+     * pending → cancelled  (manual cancellation or resubmission)
+     *
+     * Terminal states (approved, rejected, cancelled) have no further transitions.
+     */
+    private const VALID_TRANSITIONS = [
+        self::STATUS_PENDING => [
+            self::STATUS_APPROVED,
+            self::STATUS_REJECTED,
+            self::STATUS_CANCELLED,
+        ],
+    ];
+
+    /**
+     * Transition to a new status, enforcing the state machine.
+     * Throws \LogicException on invalid transitions.
+     */
+    public function transitionTo(string $newStatus): static
+    {
+        $allowed = self::VALID_TRANSITIONS[$this->status] ?? [];
+
+        if (!in_array($newStatus, $allowed, true)) {
+            throw new \LogicException(
+                "Invalid approval request transition: '{$this->status}' → '{$newStatus}'. " .
+                'Allowed from this state: [' . implode(', ', $allowed) . '].'
+            );
+        }
+
+        $this->status = $newStatus;
+        return $this;
+    }
 
     /**
      * Get the publication that this request belongs to.

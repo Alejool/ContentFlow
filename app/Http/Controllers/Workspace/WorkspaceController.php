@@ -377,9 +377,32 @@ class WorkspaceController extends Controller
       ], 422);
     }
 
+    // Capture old role before the change for approval reassignment
+    $member = $workspace->users()->wherePivot('user_id', $userId)->first();
+    $oldRole = $member ? Role::find($member->pivot->role_id) : null;
+
     $workspace->users()->updateExistingPivot($userId, [
       'role_id' => $validated['role_id']
     ]);
+
+    // Trigger approval reassignment if the role changed
+    if ($oldRole && $role && $oldRole->id !== $role->id) {
+        $affectedUser = User::find($userId);
+        if ($affectedUser) {
+            try {
+                app(\App\Services\Approval\ApprovalReassignmentService::class)
+                    ->handleRoleChange($affectedUser, $workspace, $oldRole, $role);
+            } catch (\Throwable $e) {
+                Log::error('Approval reassignment failed after role change', [
+                    'user_id'      => $userId,
+                    'workspace_id' => $workspace->id,
+                    'old_role'     => $oldRole->id,
+                    'new_role'     => $role->id,
+                    'error'        => $e->getMessage(),
+                ]);
+            }
+        }
+    }
 
     return $this->successResponse(null, 'Member role updated successfully');
   }
@@ -407,6 +430,25 @@ class WorkspaceController extends Controller
     $removedUser = User::find($userId);
     if ($removedUser) {
       $removedUser->notify(new WorkspaceRemovedNotification($workspace->name));
+
+      // Reassign any pending approval steps this user was responsible for
+      $memberPivot = $workspace->users()->wherePivot('user_id', $userId)->first();
+      $userRole = $memberPivot ? Role::find($memberPivot->pivot->role_id) : null;
+
+      if ($userRole) {
+          // Use a dummy "no role" target — reassignment service detects missing approver
+          // and auto-advances stalled flows.
+          try {
+              app(\App\Services\Approval\ApprovalReassignmentService::class)
+                  ->handleRoleChange($removedUser, $workspace, $userRole, $userRole);
+          } catch (\Throwable $e) {
+              Log::error('Approval reassignment failed on member removal', [
+                  'user_id'      => $userId,
+                  'workspace_id' => $workspace->id,
+                  'error'        => $e->getMessage(),
+              ]);
+          }
+      }
     }
 
     $workspace->users()->detach($userId);

@@ -35,18 +35,8 @@ class PublicationPolicy
         $userRole = $this->getUserRoleInWorkspace($user, $workspace);
         
         if (!$userRole) {
-            \Log::warning('submitForApproval: User has no role in workspace', [
-                'user_id' => $user->id,
-                'workspace_id' => $workspace->id,
-            ]);
             return false;
         }
-
-        \Log::info('submitForApproval: Checking permissions for user', [
-            'user_id' => $user->id,
-            'workspace_id' => $workspace->id,
-            'role' => $userRole->slug,
-        ]);
 
         // Usuarios con 'manage-content' O 'publish' pueden enviar a revisión
         // Owner, Admin y roles híbridos como admin-owner siempre pueden
@@ -56,35 +46,13 @@ class PublicationPolicy
         $hasSubmitApprovalPermission = $this->roleService->userHasPermission($user, $workspace, Permission::SUBMIT_FOR_APPROVAL);
         
         if (!$isAdminOrOwner && !$hasManageContent && !$hasPublishPermission && !$hasSubmitApprovalPermission) {
-            \Log::warning('submitForApproval: User lacks required permission to submit for approval', [
-                'user_id' => $user->id,
-                'workspace_id' => $workspace->id,
-                'role' => $userRole->slug,
-                'has_manage_content' => $hasManageContent,
-                'has_publish' => $hasPublishPermission,
-                'has_submit_for_approval' => $hasSubmitApprovalPermission,
-            ]);
             return false;
         }
 
-        // Check if content is in a valid status for submission
+        // Only draft, rejected and failed publications can be submitted for approval
         if (!in_array($publication->status, ['draft', 'rejected', 'failed'])) {
-            \Log::warning('submitForApproval: Invalid publication status', [
-                'publication_id' => $publication->id,
-                'status' => $publication->status,
-            ]);
             return false;
         }
-
-        \Log::info('submitForApproval: User can submit for approval', [
-            'user_id' => $user->id,
-            'publication_id' => $publication->id,
-            'workspace_id' => $workspace->id,
-            'role' => $userRole->slug,
-            'has_manage_content' => $hasManageContent,
-            'has_publish' => $hasPublishPermission,
-            'is_admin_or_owner' => $isAdminOrOwner,
-        ]);
 
         return true;
     }
@@ -186,42 +154,21 @@ class PublicationPolicy
         $workspace = $publication->workspace;
 
         if (!$workspace) {
-            \Log::warning('PublicationPolicy::publish - Workspace not found', [
-                'user_id'        => $user->id,
-                'publication_id' => $publication->id,
-            ]);
             return false;
         }
 
         $userRole = $this->getUserRoleInWorkspace($user, $workspace);
 
-        \Log::info('PublicationPolicy::publish', [
-            'user_id'            => $user->id,
-            'publication_id'     => $publication->id,
-            'workspace_id'       => $workspace->id,
-            'role_slug'          => $userRole?->slug ?? 'NULL',
-            'publication_status' => $publication->status,
-        ]);
-
         if (!$userRole) {
-            \Log::warning('PublicationPolicy::publish - No role found', [
-                'user_id'      => $user->id,
-                'workspace_id' => $workspace->id,
-            ]);
             return false;
         }
 
-        // ── Regla 1: Owner / Admin siempre pueden publicar ────────────────────
+        // Owner / Admin always can publish
         if (in_array($userRole->slug, [Role::OWNER, Role::ADMIN, 'admin-owner'])) {
-            \Log::info('PublicationPolicy::publish - Owner/Admin bypass granted', [
-                'role' => $userRole->slug,
-            ]);
             return true;
         }
 
-        // ── Verificar permiso 'publish' del rol ───────────────────────────────
-        // Si el rol tiene este permiso, puede publicar directo siempre,
-        // independientemente de si hay workflow activo o no.
+        // Role with explicit publish permission can publish directly
         $hasPublishPermission = $this->roleService->userHasPermission(
             $user,
             $workspace,
@@ -229,14 +176,10 @@ class PublicationPolicy
         );
 
         if ($hasPublishPermission) {
-            \Log::info('PublicationPolicy::publish - Role has publish permission, granting', [
-                'role' => $userRole->slug,
-            ]);
             return true;
         }
 
-        // ── El rol NO tiene permiso 'publish': verificar si hay workflow activo ─
-        // Solo en ese caso se bloquea con mensaje de "envía a revisión".
+        // No publish permission: block if workflow is active (must go through review)
         $planFeatures         = $workspace->getPlanFeatures();
         $planSupportsWorkflow = ($planFeatures['approval_workflows'] ?? false) !== false;
 
@@ -246,20 +189,7 @@ class PublicationPolicy
             && $workflow->is_enabled
             && $workflow->is_active;
 
-        \Log::info('PublicationPolicy::publish - No publish permission, checking workflow', [
-            'role'                   => $userRole->slug,
-            'plan_supports_workflow' => $planSupportsWorkflow,
-            'workflow_active'        => $workflowActive,
-        ]);
-
-        // Hay workflow activo y el rol no puede publicar directo → debe ir a revisión
-        // Retorna false; el controller mostrará el mensaje informativo correcto.
-        if ($workflowActive) {
-            return false;
-        }
-
-        // Sin workflow activo y sin permiso → denegado
-        return false;
+        return !$workflowActive;
     }
 
     /**
@@ -408,11 +338,6 @@ class PublicationPolicy
         if ($workspace->created_by === $user->id) {
             return Role::where('slug', Role::OWNER)->first();
         }
-
-        \Log::warning('PublicationPolicy::getUserRoleInWorkspace - No role found', [
-            'user_id' => $user->id,
-            'workspace_id' => $workspace->id,
-        ]);
 
         return null;
     }
