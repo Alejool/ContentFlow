@@ -136,13 +136,14 @@ export function formatDateTimeString(
     const timezone = getUserTimezone();
     const locale = getUserLocale();
 
+    // dateStyle/timeStyle cannot be mixed with individual date-time fields — omit base fields when caller uses shorthands
+    const hasStyleShorthand = options && ('dateStyle' in options || 'timeStyle' in options);
+    const baseOptions: Intl.DateTimeFormatOptions = hasStyleShorthand
+      ? {}
+      : { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+
     return new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
+      ...baseOptions,
       ...options,
       timeZone: timezone,
     }).format(dateObj);
@@ -163,10 +164,14 @@ export function formatDateString(
     const timezone = getUserTimezone();
     const locale = getUserLocale();
 
+    // dateStyle cannot be mixed with individual date fields — omit base fields when caller uses shorthands
+    const hasStyleShorthand = options && ('dateStyle' in options || 'timeStyle' in options);
+    const baseOptions: Intl.DateTimeFormatOptions = hasStyleShorthand
+      ? {}
+      : { year: 'numeric', month: 'short', day: 'numeric' };
+
     return new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+      ...baseOptions,
       ...options,
       timeZone: timezone,
     }).format(dateObj);
