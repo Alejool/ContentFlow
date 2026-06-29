@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\Auth\RolesAndPermissionsSeeder;
 use Database\Seeders\Subscription\SubscriptionControlSeeder;
 use Database\Seeders\System\ExistingUserDummyDataSeeder;
+use Database\Seeders\System\ComprehensiveTestDataSeeder;
 
 
 class DatabaseSeeder extends Seeder
@@ -28,6 +29,7 @@ class DatabaseSeeder extends Seeder
       ->create();
 
     $this->call(ExistingUserDummyDataSeeder::class);
+    $this->call(ComprehensiveTestDataSeeder::class);
 
     // Schema::enableForeignKeyConstraints();
   }
