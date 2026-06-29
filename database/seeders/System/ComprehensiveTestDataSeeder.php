@@ -261,31 +261,29 @@ class ComprehensiveTestDataSeeder extends Seeder
 
     private function createApprovalWorkflows(Workspace $ws, Role $editorRole, Role $adminRole): array
     {
-        // Simple: one level, editor approves
-        $simple = ApprovalWorkflow::firstOrCreate(
-            ['workspace_id' => $ws->id, 'name' => 'Flujo Simple (1 nivel)'],
-            ['is_active' => true, 'is_enabled' => true, 'is_multi_level' => false]
-        );
-        ApprovalLevel::firstOrCreate(
-            ['approval_workflow_id' => $simple->id, 'level_number' => 1],
-            ['level_name' => 'Aprobación Editor', 'role_id' => $editorRole->id, 'require_all_users' => false]
+        // One workflow per workspace (unique constraint) — multi-level Editor → Admin.
+        // The same workflow is reused for both "simple" and "multi" scenarios in this seeder.
+        $wf = ApprovalWorkflow::firstOrCreate(
+            ['workspace_id' => $ws->id],
+            [
+                'name'           => 'Flujo Aprobación (Editor → Admin)',
+                'is_active'      => true,
+                'is_enabled'     => true,
+                'is_multi_level' => true,
+            ]
         );
 
-        // Multi-level: editor → admin
-        $multi = ApprovalWorkflow::firstOrCreate(
-            ['workspace_id' => $ws->id, 'name' => 'Flujo Multi-nivel (Editor → Admin)'],
-            ['is_active' => true, 'is_enabled' => true, 'is_multi_level' => true]
-        );
         ApprovalLevel::firstOrCreate(
-            ['approval_workflow_id' => $multi->id, 'level_number' => 1],
+            ['approval_workflow_id' => $wf->id, 'level_number' => 1],
             ['level_name' => 'Revisión Editor', 'role_id' => $editorRole->id, 'require_all_users' => false]
         );
         ApprovalLevel::firstOrCreate(
-            ['approval_workflow_id' => $multi->id, 'level_number' => 2],
+            ['approval_workflow_id' => $wf->id, 'level_number' => 2],
             ['level_name' => 'Aprobación Final Admin', 'role_id' => $adminRole->id, 'require_all_users' => false]
         );
 
-        return [$simple, $multi];
+        // Return the same workflow twice so callers that expect [$simple, $multi] still work
+        return [$wf, $wf];
     }
 
     private function createStandalonePublications(
