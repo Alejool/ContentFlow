@@ -4,8 +4,8 @@ import VideoValidationAlert from '@/Components/Content/modals/publish/VideoValid
 import Button from '@/Components/common/Modern/Button';
 import YouTubeThumbnailUploader from '@/Components/common/YouTubeThumbnailUploader';
 import { getPlatformConfig } from '@/Constants/ConfigSocialMedia/socialPlatforms';
-import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
 import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationCapabilities';
+import { getCompatibleAccounts } from '@/Utils/Content/socialAccounts.helpers';
 import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
 import { useConfirm } from '@/Hooks/common/useConfirm';
 import { formatDateTimeString, formatDateTimeStyled } from '@/Utils/formatters';
@@ -13,7 +13,7 @@ import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import type { Publication } from '@/types/Publications/Publication';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { usePage } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, ChevronDown, Clock, Share2, X, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, ChevronDown, Clock, Loader2, Lock, Share2, X, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -336,37 +336,14 @@ export default function PublishPublicationModal({
     return labels[contentType] || contentType;
   };
 
-  // Function to get supported content types for each platform
-  const getSupportedContentTypes = (platform: string): string[] => {
-    const supportedTypes: string[] = [];
+  // Compatible accounts derived from the shared utility — single source of truth.
+  // Only checks type support, NOT media-size / duration limits.
+  const compatibleAccounts = getCompatibleAccounts(
+    publication.content_type as any,
+    connectedAccounts,
+  );
 
-    // Find which content types support this platform using shared config
-    for (const [contentType, config] of Object.entries(CONTENT_TYPE_CONFIG)) {
-      if ((config.platforms as readonly string[]).includes(platform.toLowerCase())) {
-        supportedTypes.push(contentType);
-      }
-    }
-
-    return supportedTypes;
-  };
-
-  // Filter connected accounts based on content type compatibility
-  // IMPORTANT: This only checks if the platform SUPPORTS the content type
-  // NOT if the content meets the platform's limits (duration, file size, etc.)
-  const getCompatibleAccounts = () => {
-    const contentType = publication.content_type;
-    if (!contentType) return connectedAccounts;
-
-    return connectedAccounts.filter((account) => {
-      const supportedTypes = getSupportedContentTypes(account.platform);
-      return supportedTypes.includes(contentType);
-    });
-  };
-
-  const compatibleAccounts = getCompatibleAccounts();
-
-  // incompatibleAccounts = platforms that DON'T support this content type at all
-  // Example: carousel on Twitter, carousel on LinkedIn
+  // incompatibleAccounts = platforms that DON'T support this content type at all.
   const incompatibleAccounts = connectedAccounts.filter(
     (account) => !compatibleAccounts.includes(account),
   );
@@ -471,6 +448,25 @@ export default function PublishPublicationModal({
             </div>
 
             <div className="custom-scrollbar flex-1 overflow-y-auto p-6 pt-4">
+              {/* Publishing-in-progress lock banner — blocks editing during active upload */}
+              {(publication.status === 'publishing' || publication.status === 'retrying') && (
+                <div className="mb-6 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                  <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+                  <div className="flex-1">
+                    <h4 className="flex items-center gap-1.5 text-sm font-bold text-blue-800 dark:text-blue-200">
+                      <Lock className="h-3.5 w-3.5" />
+                      {publication.status === 'retrying'
+                        ? t('publications.modal.publish.retryingBanner.title') || 'Reintentando publicación…'
+                        : t('publications.modal.publish.publishingBanner.title') || 'Publicación en curso…'}
+                    </h4>
+                    <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                      {t('publications.modal.publish.publishingBanner.message') ||
+                        'El contenido se está subiendo a las plataformas seleccionadas. No es posible editar la publicación en este momento.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {isPendingReview && (
                 <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                   <div className="mb-4 flex items-start gap-3">

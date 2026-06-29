@@ -1,16 +1,11 @@
-import { REEL_COMPATIBLE_PLATFORMS } from '@/Constants/Content/contentTypes';
+import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
+import type { ContentType } from '@/Constants/Content/contentTypes';
 import type { LucideIcon } from 'lucide-react';
 import { BarChart3, Clock, FileText, Images, Video } from 'lucide-react';
 import { useMemo } from 'react';
 
-export type ContentType = 'post' | 'reel' | 'story' | 'poll' | 'carousel';
-
-interface ContentTypeOption {
-  value: ContentType;
-  label: string;
-  icon: LucideIcon;
-  platforms: string[];
-}
+// Re-export so callers that imported the local type keep working.
+export type { ContentType };
 
 interface ContentTypeIconSelectorProps {
   selectedType: ContentType;
@@ -18,42 +13,43 @@ interface ContentTypeIconSelectorProps {
   onChange: (type: ContentType) => void;
   t: (key: string) => string;
   disabled?: boolean;
-  mediaFiles?: { mime_type?: string; type?: string }[];
+  mediaFiles?: { mime_type?: string; type?: string }[] | undefined;
 }
 
-// Content type platform support (mirroring backend config/content_types.php)
-const contentTypes: ContentTypeOption[] = [
-  {
-    value: 'post',
-    label: 'Post',
-    icon: FileText,
-    platforms: ['instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
-  },
-  {
-    value: 'reel',
-    label: 'Reel/Short',
-    icon: Video,
-    platforms: [...REEL_COMPATIBLE_PLATFORMS],
-  },
-  {
-    value: 'story',
-    label: 'Story',
-    icon: Clock,
-    platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
-  },
-  {
-    value: 'poll',
-    label: 'Poll',
-    icon: BarChart3,
-    platforms: ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'tiktok'],
-  },
-  {
-    value: 'carousel',
-    label: 'Carousel',
-    icon: Images,
-    platforms: ['instagram', 'facebook', 'linkedin', 'twitter', 'youtube', 'pinterest', 'tiktok'],
-  },
-];
+// Icon map — keys mirror CONTENT_TYPE_DISPLAY.icon string values.
+const ICON_MAP: Record<string, LucideIcon> = {
+  FileText,
+  Video,
+  Circle: Clock, // Story uses Clock (time-limited) even though display says "Circle"
+  Images,
+  BarChart3,
+};
+
+// Display labels — defined once here so ContentTypeIconSelector stays self-contained.
+const LABELS: Record<ContentType, string> = {
+  post: 'Post',
+  reel: 'Reel/Short',
+  story: 'Story',
+  poll: 'Poll',
+  carousel: 'Carousel',
+};
+
+const ICON_KEYS: Record<ContentType, string> = {
+  post: 'FileText',
+  reel: 'Video',
+  story: 'Circle',
+  poll: 'BarChart3',
+  carousel: 'Images',
+};
+
+// Derived from CONTENT_TYPE_CONFIG — single source of truth.
+// Any change to CONTENT_TYPE_CONFIG automatically propagates here.
+const CONTENT_TYPES = (Object.keys(CONTENT_TYPE_CONFIG) as ContentType[]).map((value) => ({
+  value,
+  label: LABELS[value],
+  icon: ICON_MAP[ICON_KEYS[value]] ?? FileText,
+  platforms: CONTENT_TYPE_CONFIG[value].platforms as readonly string[],
+}));
 
 export default function ContentTypeIconSelector({
   selectedType,
@@ -63,15 +59,12 @@ export default function ContentTypeIconSelector({
   disabled = false,
   mediaFiles,
 }: ContentTypeIconSelectorProps) {
-  // Filter content types based on selected platforms
+  // Only show types that every selected platform supports.
   const availableTypes = useMemo(() => {
-    if (!selectedPlatforms || selectedPlatforms.length === 0) {
-      return contentTypes;
-    }
-
-    return contentTypes.filter((type) => {
-      return selectedPlatforms.every((platform) => type.platforms.includes(platform.toLowerCase()));
-    });
+    if (!selectedPlatforms || selectedPlatforms.length === 0) return CONTENT_TYPES;
+    return CONTENT_TYPES.filter((type) =>
+      selectedPlatforms.every((p) => type.platforms.includes(p.toLowerCase())),
+    );
   }, [selectedPlatforms]);
 
   return (
@@ -86,16 +79,15 @@ export default function ContentTypeIconSelector({
           (selectedPlatforms.length === 0 ||
             selectedPlatforms.every((p) => type.platforms.includes(p.toLowerCase())));
 
-        // Determine tooltip message
         let tooltipMessage = type.label;
         if (isTypeLocked && !isSelected) {
           tooltipMessage = `${type.label} - ${t('publications.modal.contentType.locked') || 'Locked after uploading media'}`;
         } else if (!isAvailable && selectedPlatforms.length > 0) {
-          const incompatiblePlatforms = selectedPlatforms.filter(
+          const incompatible = selectedPlatforms.filter(
             (p) => !type.platforms.includes(p.toLowerCase()),
           );
-          if (incompatiblePlatforms.length > 0) {
-            tooltipMessage = `${type.label} - Not supported by ${incompatiblePlatforms.join(', ')}`;
+          if (incompatible.length > 0) {
+            tooltipMessage = `${type.label} - Not supported by ${incompatible.join(', ')}`;
           }
         }
 
@@ -111,7 +103,6 @@ export default function ContentTypeIconSelector({
               <Icon className="h-5 w-5" />
             </button>
 
-            {/* Tooltip */}
             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 group-hover:block">
               <div className="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg dark:bg-theme-bg-secondary">
                 {tooltipMessage}

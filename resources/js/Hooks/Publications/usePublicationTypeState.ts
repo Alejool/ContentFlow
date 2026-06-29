@@ -1,3 +1,4 @@
+import { CONTENT_TYPE_CONFIG } from '@/Constants/Content/contentTypes';
 import type { ContentType } from '@/Constants/Content/contentTypes';
 import type { Publication } from '@/types/Publications/Publication';
 import { useCallback, useRef, useState } from 'react';
