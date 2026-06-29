@@ -23,7 +23,7 @@ import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
 import { ToastService } from '@/Services/common/ToastService';
 import { usePage } from '@inertiajs/react';
 import { publicationService } from '@/Services/Publications/publicationService';
-import { FileText, Hash, Save, Target } from 'lucide-react';
+import { ChevronDown, FileText, Hash, Save, Target } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
@@ -48,6 +48,7 @@ export default function AddPublicationModal({
 
   const { invalidAccountIds, expiringSoonAccountIds } = useTokenHealth();
   const [isTextValid, setIsTextValid] = useState(true);
+  const [isMoreOptionsOpen, setIsMoreOptionsOpen] = useState(false);
 
   // Block body scroll when modal is open
   useEffect(() => {
@@ -106,97 +107,6 @@ export default function AddPublicationModal({
   });
 
   const { confirm, ConfirmDialog } = useConfirm();
-
-  // Custom submit handler to intercept fields and upload first
-  const handleFormSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    // We need to check if there are any NEW files to upload
-    // mediaFiles contains { file: File | null, url, id, ... }
-    // If it has a 'file' object, it needs upload.
-
-    // 1. Filter files needing upload
-    const filesToUpload = mediaFiles.filter((m) => m.file instanceof File);
-
-    if (filesToUpload.length > 0) {
-      // Temporarily handling this inside submit for simplicity,
-      // ideally we upload as they are selected or show a specialized UI.
-      // But to keep current UX, we block submit with "Uploading..." state.
-
-      try {
-        // We need to inject the uploaded metadata back into the form data
-        // Since usePublicationForm handles submission via 'handleSubmit', we need to hook into 'onSubmitSuccess' or similar?
-        // Actually 'handleSubmit' from react-hook-form calls the 'onSubmit' callback.
-        // But here we are wrapping the form submit.
-
-        // Let's modify the data passed to the actual submission.
-        // However, 'usePublicationForm' exposes 'handleSubmit' which is RHF's handler.
-        // We can't easily intercept the *data* inside RHF's handleSubmit without wrapping the onSubmit passed to usePublicationForm.
-        // BUT, usePublicationForm accepts `onSubmitSuccess: onSubmit`.
-
-        // Wait, AddPublicationModal props: onSubmit: (data: any) => void;
-        // The Modal calls `handleSubmit(onSubmit)` from usePublicationForm.
-        // We need to intercept the data *before* it goes to the server action or inertia post.
-        // The Logic is inside `usePublicationForm` -> `onSubmit`.
-
-        // Strategy:
-        // 1. Upload files here in the Modal.
-        // 2. Replace the `file` objects in `mediaFiles` (or form data) with the metadata returned by S3.
-        // 3. BUT `usePublicationForm` manages `mediaFiles` state. We can't easily replace it without helper methods.
-
-        // ALTERNATIVE:
-        // Modify `usePublicationForm` to handle the upload?
-        // Or just do it here and pass a "modified" onSubmit to `usePublicationForm`.
-
-        // Let's try wrapping the submit action.
-        // We can iterate and upload, collecting keys.
-        // Then we need to tell the backend "Here are keys, not files".
-        // The backend `store` method expects `media[]`.
-
-        // Let's execute the uploads.
-        const uploadedMetadata: any[] = [];
-
-        // Show loading state (e.g. valid toast or just rely on 'isSubmitting' if we trigger it)
-        // Ideally we'd have a UI for progress.
-
-        await Promise.all(
-          filesToUpload.map(async (media) => {
-            if (media.file) {
-              const result = await uploadFile(media.file, media.tempId);
-              // Store result alongside the original index or id to map it back?
-              // We can just rely on order if we are careful, but async might mix order.
-              // Better to modify the form data 'media' field.
-
-              // We need to modify what the form sends.
-              // RHF 'media' field?
-            }
-          }),
-        );
-
-        // This is getting complex to patch into the existing hook structure without modyfing the hook.
-        // The hook `usePublicationForm` uses `useForm`.
-        // The best place to integrate this "Architecture PRO" is inside `usePublicationForm`'s `onSubmit` logic
-        // OR by handling uploads immediately upon selection (Instagram style).
-
-        // Given the constraints and the goal "Update frontend to upload to S3 directly":
-        // I will intercept the onSubmit passed to AddPublicationModal.
-
-        // But wait, `handleSubmit` is called on form submit.
-        // `handleSubmit` calls `onSubmit` (which is `usePublicationForm` internal).
-        // `usePublicationForm` internal `onSubmit` calls... `createPublication.mutate`.
-
-        // Making "Direct Upload" work seamlessly requires changes in how the form data is prepared.
-      } catch (e) {
-        return;
-      }
-    }
-
-    // Propagate
-    handleSubmit(e);
-  };
-
-  // Re-thinking: Modifying `usePublicationForm` might be cleaner, but I can't see it right now.
-  // Let's implement a wrapper `onFormSubmit` that does the work and then calls `handleSubmit`.
 
   const handleUploadAndSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -484,14 +394,7 @@ export default function AddPublicationModal({
                     {...(watched.scheduled_at ? { scheduledAt: watched.scheduled_at } : {})}
                     t={t}
                     onScheduleChange={(date) => {
-                      let finalDate = date;
-                      if (!date && !watched.scheduled_at) {
-                        const defaultDate = new Date();
-                        defaultDate.setMinutes(defaultDate.getMinutes() + 2);
-                        finalDate = defaultDate.toISOString();
-                      }
-
-                      setValue('scheduled_at', finalDate);
+                      setValue('scheduled_at', date || null);
                     }}
                     useGlobalSchedule={watched.use_global_schedule}
                     onGlobalScheduleToggle={(val) => setValue('use_global_schedule', val)}
@@ -684,40 +587,51 @@ export default function AddPublicationModal({
                   )}
                 </div>
 
-                {/* ==================== SECCIÓN: CAMPAÑA ==================== */}
+                {/* ==================== SECCIÓN: OPCIONES ADICIONALES (colapsada por defecto) ==================== */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
-                    <div className="h-5 w-1 rounded-full bg-primary-500"></div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                      {t('publications.modal.add.campaignSection') || 'Campaña'}
-                    </h3>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
-                      {t('publications.modal.edit.campaigns') || 'Add to Campaign'}
-                    </label>
-                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">
-                      <CampaignSelector
-                        campaigns={campaigns || []}
-                        selectedId={
-                          watched.campaign_id ? parseInt(watched.campaign_id.toString()) : null
-                        }
-                        loading={false}
-                        t={t}
-                        onSelectCampaign={(id) => {
-                          setValue('campaign_id', id?.toString() ?? '', {
-                            shouldValidate: true,
-                          });
-                        }}
-                      />
+                  <button
+                    type="button"
+                    onClick={() => setIsMoreOptionsOpen((v) => !v)}
+                    className="flex w-full items-center justify-between border-b border-gray-200 pb-2 dark:border-neutral-700"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="h-5 w-1 rounded-full bg-primary-500" />
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        {t('publications.modal.add.moreOptions') || 'Más opciones'}
+                      </h3>
                     </div>
-                    {errors.campaign_id?.message && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.campaign_id.message as string}
-                      </p>
-                    )}
-                  </div>
+                    <ChevronDown
+                      className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isMoreOptionsOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {isMoreOptionsOpen && (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
+                        {t('publications.modal.edit.campaigns') || 'Add to Campaign'}
+                      </label>
+                      <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">
+                        <CampaignSelector
+                          campaigns={campaigns || []}
+                          selectedId={
+                            watched.campaign_id ? parseInt(watched.campaign_id.toString()) : null
+                          }
+                          loading={false}
+                          t={t}
+                          onSelectCampaign={(id) => {
+                            setValue('campaign_id', id?.toString() ?? '', {
+                              shouldValidate: true,
+                            });
+                          }}
+                        />
+                      </div>
+                      {errors.campaign_id?.message && (
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.campaign_id.message as string}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -310,6 +310,7 @@ export default function PublishPreviewModal({
   const canPublish =
     previewData &&
     !isPublishing &&
+    !isValidating &&
     (previewData.all_compatible || hasCompatiblePlatforms) &&
     canPublishWithValidation;
 
@@ -743,13 +744,15 @@ export default function PublishPreviewModal({
                   >
                     {isPublishing
                       ? '⏳ Publicando...'
-                      : !canPublishWithValidation
-                        ? '🚫 No se puede publicar'
-                        : !canPublish
-                          ? '⚠️ Contenido no compatible'
-                          : isScheduled
-                            ? '📅 Programar'
-                            : '🚀 Publicar ahora'}
+                      : isValidating
+                        ? '🔍 Validando...'
+                        : !canPublishWithValidation
+                          ? '🚫 No se puede publicar'
+                          : !canPublish
+                            ? '⚠️ Contenido no compatible'
+                            : isScheduled
+                              ? '📅 Programar'
+                              : '🚀 Publicar ahora'}
                   </button>
                 </div>
               </div>

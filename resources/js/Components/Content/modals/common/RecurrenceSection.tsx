@@ -111,13 +111,17 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
 }) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
 
+  // Don't render recurrence UI at all when the plan doesn't include it.
+  // Showing a locked/promo state adds noise for users who can't use it.
+  if (!hasRecurrenceAccess) return null;
+
   return (
     <div className="">
       <Label htmlFor="recurrence" icon={Clock} size="lg" className="mb-2">
         {t('publications.modal.schedule.recurrence.title') || 'Repetir publicación (Recurrencia)'}
       </Label>
 
-      {!hasRecurrenceAccess ? (
+      {false /* locked state removed — return null above handles it */ ? (
         <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 flex flex-col items-start justify-between gap-3 rounded-lg border p-3 shadow-sm sm:flex-row sm:items-center">
           <div className="flex items-start gap-3">
             <div className="bg-primary-100 dark:bg-primary-900/40 shrink-0 rounded-full p-1.5">

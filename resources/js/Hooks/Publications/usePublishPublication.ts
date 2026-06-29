@@ -4,7 +4,7 @@ import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import type { Publication } from '@/types/Publications/Publication';
 import type { SocialAccount } from '@/types/ConfigSocialMedia/SocialAccount';
 import axios from 'axios';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 /* -------------------------------------------------------------------------- */
@@ -114,6 +114,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const [isLoadingThumbnails, setIsLoadingThumbnails] = useState(false);
   const [currentPublicationId, setCurrentPublicationId] = useState<number | null>(null);
   const [hasAtteptedInitialFetch, setHasAttemptedInitialFetch] = useState(false);
+  // Ref-based guard: prevents a second publish call from firing before React
+  // re-renders with publishing=true (e.g. rapid double-click).
+  const isPublishingRef = useRef(false);
 
   /* ----------------------------- Derived state ----------------------------- */
 
@@ -405,6 +408,10 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         return false;
       }
 
+      // Ref guard: blocks double-click before React re-renders with publishing=true.
+      if (isPublishingRef.current) return false;
+      isPublishingRef.current = true;
+
       // Mark platforms as optimistically publishing IMMEDIATELY — this blocks
       // re-selection before the WebSocket/store update arrives.
       const platformsBeingSubmitted = [...selectedPlatforms];
@@ -483,6 +490,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         return false;
       } finally {
         setPublishing(false);
+        isPublishingRef.current = false;
       }
     },
     [selectedPlatforms, publishingPlatforms, youtubeThumbnails, publishPublication, accounts],

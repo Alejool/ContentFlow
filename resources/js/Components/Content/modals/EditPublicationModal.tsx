@@ -34,7 +34,7 @@ import type { Publication } from '@/types/Publications/Publication';
 import { usePage } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { publicationService } from '@/Services/Publications/publicationService';
-import { Lock, Save } from 'lucide-react';
+import { ChevronDown, Eye, Lock, Save } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import { Trans } from 'react-i18next';
@@ -58,6 +58,10 @@ const EditPublicationModal = ({
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] = useState(false);
   const [isYouTubeThumbnailExpanded, setIsYouTubeThumbnailExpanded] = useState(true);
+  // Secondary sections collapsed by default to reduce visual noise.
+  const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
+  const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
 
   const { invalidAccountIds, expiringSoonAccountIds } = useTokenHealth();
   const [isTextValid, setIsTextValid] = useState(true);
@@ -859,50 +863,74 @@ const EditPublicationModal = ({
                   </div>
                 )}
 
-                {/* ==================== SECCIÓN: VISTA PREVIA (Solo si tiene advanced_scheduling) ==================== */}
+                {/* ==================== SECCIÓN: VISTA PREVIA (colapsada por defecto) ==================== */}
                 {hasRecurrenceAccess && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-gray-200 pt-6 pb-2 dark:border-neutral-700">
-                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
-                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
-                        {t('publications.modal.edit.previewSection') || 'Vista Previa'}
-                      </h3>
-                    </div>
+                  <div className="pt-6">
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewExpanded((v) => !v)}
+                      className={`group flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                        isPreviewExpanded
+                          ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20'
+                          : 'border-gray-200 bg-gray-50 hover:border-indigo-200 hover:bg-indigo-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-indigo-800 dark:hover:bg-indigo-900/10'
+                      }`}
+                    >
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isPreviewExpanded ? 'bg-indigo-100 dark:bg-indigo-900/40' : 'bg-gray-200 group-hover:bg-indigo-100 dark:bg-neutral-700 dark:group-hover:bg-indigo-900/40'}`}>
+                        <Eye className={`h-4 w-4 transition-colors ${isPreviewExpanded ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 group-hover:text-indigo-600 dark:text-neutral-400 dark:group-hover:text-indigo-400'}`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-sm font-semibold transition-colors ${isPreviewExpanded ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 group-hover:text-indigo-700 dark:text-neutral-300 dark:group-hover:text-indigo-300'}`}>
+                          {t('publications.modal.edit.previewSection', 'Vista Previa')}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-neutral-500">
+                          {isPreviewExpanded
+                            ? t('publications.modal.edit.previewHideHint', 'Haz clic para ocultar')
+                            : t('publications.modal.edit.previewShowHint', 'Ver cómo se verá tu publicación')}
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 ${isPreviewExpanded ? 'rotate-180 text-indigo-500' : ''}`}
+                      />
+                    </button>
 
-                    <LivePreviewSection
-                      content={previewContent}
-                      mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
-                      mediaTypes={stabilizedMediaPreviews.map((m) => m.type || '')}
-                      user={{
-                        name: auth.user.name,
-                        username: 'username',
-                        avatar: auth.user.photo_url,
-                      }}
-                      title={watched.title ?? ''}
-                      {...(publication?.published_at
-                        ? { publishedAt: publication.published_at }
-                        : {})}
-                      contentType={watched.content_type}
-                      selectedPlatforms={selectedSocialAccounts
-                        .map((id: number) => {
-                          const account = socialAccounts.find((a) => a.id === id);
-                          return account?.platform.toLowerCase() || '';
-                        })
-                        .filter(Boolean)}
-                      pollOptions={poll_options}
-                      pollDuration={poll_duration_hours}
-                      publishedLinks={
-                        publication?.social_post_logs?.reduce(
-                          (acc: Record<string, string>, log: any) => {
-                            if (log.status === 'published' && log.post_url && log.platform) {
-                              acc[log.platform.toLowerCase()] = log.post_url;
-                            }
-                            return acc;
-                          },
-                          {},
-                        ) ?? {}
-                      }
-                    />
+                    {isPreviewExpanded && (
+                      <div className="animate-in fade-in slide-in-from-top-2 mt-3 duration-200">
+                      <LivePreviewSection
+                        content={previewContent}
+                        mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                        mediaTypes={stabilizedMediaPreviews.map((m) => m.type || '')}
+                        user={{
+                          name: auth.user.name,
+                          username: 'username',
+                          avatar: auth.user.photo_url,
+                        }}
+                        title={watched.title ?? ''}
+                        {...(publication?.published_at
+                          ? { publishedAt: publication.published_at }
+                          : {})}
+                        contentType={watched.content_type}
+                        selectedPlatforms={selectedSocialAccounts
+                          .map((id: number) => {
+                            const account = socialAccounts.find((a) => a.id === id);
+                            return account?.platform.toLowerCase() || '';
+                          })
+                          .filter(Boolean)}
+                        pollOptions={poll_options}
+                        pollDuration={poll_duration_hours}
+                        publishedLinks={
+                          publication?.social_post_logs?.reduce(
+                            (acc: Record<string, string>, log: any) => {
+                              if (log.status === 'published' && log.post_url && log.platform) {
+                                acc[log.platform.toLowerCase()] = log.post_url;
+                              }
+                              return acc;
+                            },
+                            {},
+                          ) ?? {}
+                        }
+                      />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1056,103 +1084,175 @@ const EditPublicationModal = ({
                     />
                   </div>
                 ) : (
-                  /* ==================== SECCIÓN: VISTA PREVIA (Reemplaza programación si NO tiene advanced_scheduling) ==================== */
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-gray-200 pb-2 dark:border-neutral-700">
-                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
-                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
-                        {t('publications.modal.edit.previewSection') || 'Vista Previa'}
-                      </h3>
-                    </div>
+                  /* ==================== SECCIÓN: VISTA PREVIA (colapsada por defecto) ==================== */
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewExpanded((v) => !v)}
+                      className={`group flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                        isPreviewExpanded
+                          ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20'
+                          : 'border-gray-200 bg-gray-50 hover:border-indigo-200 hover:bg-indigo-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-indigo-800 dark:hover:bg-indigo-900/10'
+                      }`}
+                    >
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isPreviewExpanded ? 'bg-indigo-100 dark:bg-indigo-900/40' : 'bg-gray-200 group-hover:bg-indigo-100 dark:bg-neutral-700 dark:group-hover:bg-indigo-900/40'}`}>
+                        <Eye className={`h-4 w-4 transition-colors ${isPreviewExpanded ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 group-hover:text-indigo-600 dark:text-neutral-400 dark:group-hover:text-indigo-400'}`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-sm font-semibold transition-colors ${isPreviewExpanded ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 group-hover:text-indigo-700 dark:text-neutral-300 dark:group-hover:text-indigo-300'}`}>
+                          {t('publications.modal.edit.previewSection', 'Vista Previa')}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-neutral-500">
+                          {isPreviewExpanded
+                            ? t('publications.modal.edit.previewHideHint', 'Haz clic para ocultar')
+                            : t('publications.modal.edit.previewShowHint', 'Ver cómo se verá tu publicación')}
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 ${isPreviewExpanded ? 'rotate-180 text-indigo-500' : ''}`}
+                      />
+                    </button>
 
-                    <LivePreviewSection
-                      content={previewContent}
-                      mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
-                      mediaTypes={stabilizedMediaPreviews.map((m) => m.type || '')}
-                      user={{
-                        name: auth.user.name,
-                        username: 'username',
-                        avatar: auth.user.photo_url,
-                      }}
-                      title={watched.title ?? ''}
-                      {...(publication?.published_at
-                        ? { publishedAt: publication.published_at }
-                        : {})}
-                      contentType={watched.content_type}
-                      selectedPlatforms={selectedSocialAccounts
-                        .map((id: number) => {
-                          const account = socialAccounts.find((a) => a.id === id);
-                          return account?.platform.toLowerCase() || '';
-                        })
-                        .filter(Boolean)}
-                      pollOptions={poll_options}
-                      pollDuration={poll_duration_hours}
-                      publishedLinks={
-                        publication?.social_post_logs?.reduce(
-                          (acc: Record<string, string>, log: any) => {
-                            if (log.status === 'published' && log.post_url && log.platform) {
-                              acc[log.platform.toLowerCase()] = log.post_url;
-                            }
-                            return acc;
-                          },
-                          {},
-                        ) ?? {}
-                      }
-                    />
-                  </div>
-                )}
-
-                {/* ==================== SECCIÓN: COMENTARIOS INTERNOS ==================== */}
-                {publication?.id && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-gray-200 pt-6 pb-2 dark:border-neutral-700">
-                      <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
-                      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
-                        {t('publications.modal.edit.commentsSection') || 'Comentarios Internos'}
-                      </h3>
-                    </div>
-                    <CommentsSection publicationId={publication.id} currentUser={auth.user} />
-                  </div>
-                )}
-
-                {/* ==================== SECCIÓN: HISTORIAL Y ACTIVIDAD ==================== */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-gray-200 pt-6 pb-2 dark:border-neutral-700">
-                    <div className="bg-primary-500 h-5 w-1 rounded-full"></div>
-                    <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-white">
-                      {t('publications.modal.edit.historySection') || 'Historial'}
-                    </h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    {publication?.approval_logs && publication.approval_logs.length > 0 && (
-                      <ApprovalHistoryCompacto
-                        logs={publication.approval_logs}
-                        isExpanded={isApprovalHistoryExpanded}
-                        onToggle={() => setIsApprovalHistoryExpanded(!isApprovalHistoryExpanded)}
-                        workflow={
-                          publication?.approval_request?.workflow ||
-                          publication?.current_approval_step?.workflow
+                    {isPreviewExpanded && (
+                      <div className="animate-in fade-in slide-in-from-top-2 mt-3 duration-200">
+                      <LivePreviewSection
+                        content={previewContent}
+                        mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                        mediaTypes={stabilizedMediaPreviews.map((m) => m.type || '')}
+                        user={{
+                          name: auth.user.name,
+                          username: 'username',
+                          avatar: auth.user.photo_url,
+                        }}
+                        title={watched.title ?? ''}
+                        {...(publication?.published_at
+                          ? { publishedAt: publication.published_at }
+                          : {})}
+                        contentType={watched.content_type}
+                        selectedPlatforms={selectedSocialAccounts
+                          .map((id: number) => {
+                            const account = socialAccounts.find((a) => a.id === id);
+                            return account?.platform.toLowerCase() || '';
+                          })
+                          .filter(Boolean)}
+                        pollOptions={poll_options}
+                        pollDuration={poll_duration_hours}
+                        publishedLinks={
+                          publication?.social_post_logs?.reduce(
+                            (acc: Record<string, string>, log: any) => {
+                              if (log.status === 'published' && log.post_url && log.platform) {
+                                acc[log.platform.toLowerCase()] = log.post_url;
+                              }
+                              return acc;
+                            },
+                            {},
+                          ) ?? {}
                         }
-                        {...(() => {
-                          const n =
-                            publication?.approval_request?.currentStep?.level_number ??
-                            publication?.current_approval_step?.level_number;
-                          return n !== undefined ? { currentStepNumber: n } : {};
-                        })()}
-                        approvalStatus={publication?.approval_request?.status ?? 'pending'}
                       />
-                    )}
-
-                    {publication?.activities && publication.activities.length > 0 && (
-                      <TimelineCompacto
-                        activities={publication.activities}
-                        isExpanded={isTimelineExpanded}
-                        onToggle={() => setIsTimelineExpanded(!isTimelineExpanded)}
-                      />
+                      </div>
                     )}
                   </div>
-                </div>
+                )}
+
+                {/* Secciones secundarias agrupadas con gap compacto */}
+                <div className="flex flex-col gap-2">
+                  {/* ==================== COMENTARIOS INTERNOS ==================== */}
+                  {publication?.id && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setIsCommentsExpanded((v) => !v)}
+                        className={`group flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                          isCommentsExpanded
+                            ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20'
+                            : 'border-gray-200 bg-gray-50 hover:border-emerald-200 hover:bg-emerald-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-emerald-800 dark:hover:bg-emerald-900/10'
+                        }`}
+                      >
+                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isCommentsExpanded ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-200 group-hover:bg-emerald-100 dark:bg-neutral-700 dark:group-hover:bg-emerald-900/40'}`}>
+                          <svg className={`h-4 w-4 transition-colors ${isCommentsExpanded ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 group-hover:text-emerald-600 dark:text-neutral-400 dark:group-hover:text-emerald-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className={`text-sm font-semibold transition-colors ${isCommentsExpanded ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-700 group-hover:text-emerald-700 dark:text-neutral-300 dark:group-hover:text-emerald-300'}`}>
+                            {t('publications.modal.edit.commentsSection', 'Comentarios Internos')}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-neutral-500">
+                            {t('publications.modal.edit.commentsHint', 'Notas del equipo sobre esta publicación')}
+                          </p>
+                        </div>
+                        <ChevronDown
+                          className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 ${isCommentsExpanded ? 'rotate-180 text-emerald-500' : ''}`}
+                        />
+                      </button>
+                      {isCommentsExpanded && (
+                        <div className="animate-in fade-in slide-in-from-top-2 mt-2 duration-200">
+                          <CommentsSection publicationId={publication.id} currentUser={auth.user} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ==================== HISTORIAL Y ACTIVIDAD ==================== */}
+                  {((publication?.approval_logs && publication.approval_logs.length > 0) ||
+                    (publication?.activities && publication.activities.length > 0)) && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setIsHistoryExpanded((v) => !v)}
+                        className={`group flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                          isHistoryExpanded
+                            ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'
+                            : 'border-gray-200 bg-gray-50 hover:border-amber-200 hover:bg-amber-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-amber-800 dark:hover:bg-amber-900/10'
+                        }`}
+                      >
+                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isHistoryExpanded ? 'bg-amber-100 dark:bg-amber-900/40' : 'bg-gray-200 group-hover:bg-amber-100 dark:bg-neutral-700 dark:group-hover:bg-amber-900/40'}`}>
+                          <svg className={`h-4 w-4 transition-colors ${isHistoryExpanded ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 group-hover:text-amber-600 dark:text-neutral-400 dark:group-hover:text-amber-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className={`text-sm font-semibold transition-colors ${isHistoryExpanded ? 'text-amber-700 dark:text-amber-300' : 'text-gray-700 group-hover:text-amber-700 dark:text-neutral-300 dark:group-hover:text-amber-300'}`}>
+                            {t('publications.modal.edit.historySection', 'Historial')}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-neutral-500">
+                            {t('publications.modal.edit.historyHint', 'Actividad y aprobaciones')}
+                          </p>
+                        </div>
+                        <ChevronDown
+                          className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 ${isHistoryExpanded ? 'rotate-180 text-amber-500' : ''}`}
+                        />
+                      </button>
+
+                      {isHistoryExpanded && (
+                        <div className="mt-2 space-y-3">
+                          {publication?.approval_logs && publication.approval_logs.length > 0 && (
+                            <ApprovalHistoryCompacto
+                              logs={publication.approval_logs}
+                              isExpanded={isApprovalHistoryExpanded}
+                              onToggle={() => setIsApprovalHistoryExpanded(!isApprovalHistoryExpanded)}
+                              workflow={
+                                publication?.approval_request?.workflow ||
+                                publication?.current_approval_step?.workflow
+                              }
+                              {...(() => {
+                                const n =
+                                  publication?.approval_request?.currentStep?.level_number ??
+                                  publication?.current_approval_step?.level_number;
+                                return n !== undefined ? { currentStepNumber: n } : {};
+                              })()}
+                              approvalStatus={publication?.approval_request?.status ?? 'pending'}
+                            />
+                          )}
+
+                          {publication?.activities && publication.activities.length > 0 && (
+                            <TimelineCompacto
+                              activities={publication.activities}
+                              isExpanded={isTimelineExpanded}
+                              onToggle={() => setIsTimelineExpanded(!isTimelineExpanded)}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>{/* /secondary cards group */}
               </div>
             </div>
           </form>
