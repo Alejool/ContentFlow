@@ -83,7 +83,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
     const sizeConfig = {
       sm: { input: 'py-1 px-2 text-xs', icon: 'w-3 h-3', label: 'text-xs' },
       md: { input: 'py-2 px-3 text-sm', icon: 'w-4 h-4', label: 'text-sm' },
-      lg: { input: 'py-3 px-4 text-base', icon: 'w-5 h-5', label: 'text-base' },
+      lg: { input: 'py-2.5 px-4 text-base', icon: 'w-5 h-5', label: 'text-base' },
     };
 
     const currentSize = sizeConfig[sizeType];
@@ -170,7 +170,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                 {label}
               </Label>
             )}
-            {hint && <span className="text-xs text-gray-500 dark:text-gray-400">{hint}</span>}
+            {hint && <span className="text-xs text-gray-500 dark:text-neutral-400">{hint}</span>}
           </div>
         )}
 
@@ -184,7 +184,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                     ? 'text-red-500 dark:text-red-400'
                     : success
                       ? 'text-green-500 dark:text-green-400'
-                      : 'text-gray-400 dark:text-gray-400'
+                      : 'text-gray-400 dark:text-neutral-400'
               } `}
             >
               {Icon && (
@@ -257,7 +257,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-neutral-700/50 dark:hover:text-gray-300"
+                  className="rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-neutral-400 dark:hover:bg-neutral-700/50 dark:hover:text-gray-300"
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   aria-pressed={showPassword}
                 >

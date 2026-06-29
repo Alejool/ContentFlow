@@ -218,25 +218,25 @@ export default function Select<T extends FieldValues>({
 
   const sizeConfig = {
     sm: {
-      select: 'py-1 px-2 text-sm',
+      select: 'py-1 px-2 text-xs',
       icon: 'w-4 h-4',
       label: 'text-xs',
+      option: 'py-1 px-2 text-xs',
+      search: 'py-1 px-2 text-xs',
+    },
+    md: {
+      select: 'py-2 px-3 text-sm',
+      icon: 'w-5 h-5',
+      label: 'text-sm',
       option: 'py-2 px-3 text-sm',
       search: 'py-2 px-3 text-sm',
     },
-    md: {
-      select: 'py-2 px-3 text-base',
-      icon: 'w-5 h-5',
-      label: 'text-sm',
-      option: 'py-2.5 px-4 text-base',
-      search: 'py-2.5 px-4 text-base',
-    },
     lg: {
-      select: 'py-3 px-4 text-lg',
+      select: 'py-3 px-4 text-base',
       icon: 'w-6 h-6',
       label: 'text-base',
-      option: 'py-2 px-3 text-lg',
-      search: 'py-2 px-3 text-lg',
+      option: 'py-2.5 px-4 text-base',
+      search: 'py-2.5 px-4 text-base',
     },
   };
 
@@ -368,7 +368,7 @@ export default function Select<T extends FieldValues>({
         : 'bg-primary-50 dark:bg-primary-600/20 text-primary-700 dark:text-primary-300';
       return `${base} ${selectedBase}`;
     }
-    return `${base} text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/80`;
+    return `${base} text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-700/80`;
   };
 
   const getMessageStyles = (type: 'error' | 'success') => {
@@ -463,7 +463,7 @@ export default function Select<T extends FieldValues>({
               </Label>
             )}
             {hint && !label && (
-              <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">{hint}</span>
+              <span className="ml-auto text-xs text-gray-500 dark:text-neutral-400">{hint}</span>
             )}
           </div>
         )}
@@ -473,7 +473,7 @@ export default function Select<T extends FieldValues>({
             {Icon && (
               <div
                 className={`absolute top-1/2 left-3 z-10 -translate-y-1/2 ${
-                  isSolidActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+                  isSolidActive ? 'text-white' : 'text-gray-500 dark:text-neutral-400'
                 }`}
               >
                 <div className={currentSize.icon}>
@@ -574,7 +574,7 @@ export default function Select<T extends FieldValues>({
                   className={` ${
                     currentSize.icon
                   } shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${
-                    isSolidActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+                    isSolidActive ? 'text-white' : 'text-gray-500 dark:text-neutral-400'
                   } `}
                   aria-hidden="true"
                 />
@@ -608,7 +608,7 @@ export default function Select<T extends FieldValues>({
               {searchable && (
                 <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <div className="relative">
-                    <Search className="absolute top-1/2 left-2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                    <Search className="absolute top-1/2 left-2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 dark:text-neutral-500" />
                     <input
                       ref={inputRef}
                       type="text"
@@ -617,7 +617,7 @@ export default function Select<T extends FieldValues>({
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => e.stopPropagation()}
-                      className="focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pr-2 pl-8 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-100 dark:placeholder-gray-500"
+                      className="focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 w-full rounded-md border border-gray-200 bg-gray-50 py-1.5 pr-2 pl-8 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-100 dark:placeholder-neutral-500"
                       aria-label="Search options"
                     />
                   </div>
@@ -627,7 +627,7 @@ export default function Select<T extends FieldValues>({
               <div className="py-1">
                 {filteredOptions.length === 0 ? (
                   <div
-                    className={`${currentSize.option} px-4 py-3 text-center text-gray-500 dark:text-gray-400`}
+                    className={`${currentSize.option} px-4 py-3 text-center text-gray-500 dark:text-neutral-400`}
                   >
                     No options found
                   </div>

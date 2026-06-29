@@ -45,9 +45,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sizeClasses = {
       xs: 'px-2 py-1 text-xs',
       sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2.5 text-base',
-      lg: 'px-5 py-3 text-lg',
-      xl: 'px-6 py-3.5 text-xl',
+      md: 'px-4 py-2 text-base',
+      lg: 'px-5 py-2.5 text-lg',
+      xl: 'px-6 py-3 text-xl',
       premium: 'px-10 py-4 text-base font-bold',
     };
 
@@ -77,14 +77,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         hoverTo: 'hover:to-red-700',
       },
       secondary: {
-        bg: 'bg-gray-200 dark:bg-gray-700',
+        bg: 'bg-gray-200 dark:bg-neutral-700',
         hoverBg: 'hover:bg-gray-300 dark:hover:bg-gray-600',
-        text: 'text-gray-900 dark:text-gray-100',
-        border: 'border-gray-300 dark:border-gray-600',
+        text: 'text-gray-900 dark:text-neutral-100',
+        border: 'border-gray-300 dark:border-neutral-600',
         hoverText: 'hover:text-gray-900 dark:hover:text-white',
         focusRing: 'focus:ring-gray-500 dark:focus:ring-gray-400',
-        from: 'from-gray-200 dark:from-gray-700',
-        to: 'to-gray-300 dark:to-gray-600',
+        from: 'from-gray-200 dark:from-neutral-700',
+        to: 'to-gray-300 dark:to-neutral-600',
         hoverFrom: 'hover:from-gray-300 dark:hover:from-gray-600',
         hoverTo: 'hover:to-gray-400 dark:hover:to-gray-500',
       },
@@ -116,7 +116,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         bg: 'bg-transparent',
         hoverBg: 'hover:bg-gray-100 dark:hover:bg-gray-800',
         text: 'text-black dark:text-white',
-        border: 'border-gray-300 dark:border-gray-700',
+        border: 'border-gray-300 dark:border-neutral-700',
         hoverText: 'hover:text-gray-700 dark:hover:text-gray-300',
         focusRing: 'focus:ring-gray-500',
         from: 'from-transparent',
@@ -174,7 +174,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             hover:bg-opacity-10 hover:${colors.hoverBg.replace('hover:', '')}
             ${
               currentTheme === 'dark' && variant === 'ghost'
-                ? 'dark:border-gray-700 dark:text-gray-300'
+                ? 'dark:border-neutral-700 dark:text-neutral-300'
                 : ''
             }
           `;
@@ -182,7 +182,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           return `
             ${colors.text}
             bg-transparent
-            border border-gray-300 dark:border-gray-700
+            border border-gray-300 dark:border-neutral-700
             hover:${colors.hoverBg}
             hover:${colors.hoverText}
             ${currentTheme === 'dark' ? 'dark:hover:bg-gray-800 dark:hover:text-gray-300' : ''}
