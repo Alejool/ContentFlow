@@ -125,14 +125,14 @@ export default function AiReelsGallery() {
           {/* Header */}
           <div className="mb-8">
             <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
                 <Sparkles className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                   Reels Generados con IA
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   Todos tus videos optimizados para redes sociales
                 </p>
               </div>
@@ -143,13 +143,13 @@ export default function AiReelsGallery() {
           <div className="mb-6 flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtros:</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">Filtros:</span>
             </div>
 
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-theme-bg-secondary dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
             >
               <option value="all">Todas las plataformas</option>
               <option value="instagram">📸 Instagram</option>
@@ -160,7 +160,7 @@ export default function AiReelsGallery() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-theme-bg-secondary dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-white"
             >
               <option value="all">Todos los estados</option>
               <option value="completed">Completados</option>
@@ -192,17 +192,17 @@ export default function AiReelsGallery() {
                   <button
                     onClick={() => fetchReels(pagination.current_page - 1)}
                     disabled={pagination.current_page === 1}
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700"
                   >
                     Anterior
                   </button>
-                  <span className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                  <span className="px-4 py-2 text-sm text-gray-700 dark:text-neutral-300">
                     Página {pagination.current_page} de {pagination.last_page}
                   </span>
                   <button
                     onClick={() => fetchReels(pagination.current_page + 1)}
                     disabled={pagination.current_page === pagination.last_page}
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700"
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700"
                   >
                     Siguiente
                   </button>
@@ -252,7 +252,7 @@ function ReelCard({
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-primary-300 hover:shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-primary-600">
+    <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:border-primary-300 hover:shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary dark:hover:border-primary-600">
       {/* Video Preview */}
       <div className="relative aspect-[9/16] bg-black">
         {isLoading ? (
@@ -300,7 +300,7 @@ function ReelCard({
           <h3 className="mb-1 truncate text-sm font-semibold text-gray-900 dark:text-white">
             {reel.publication?.title || reel.file_name}
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-500 dark:text-neutral-400">
             {formatDateString(reel.created_at, {
               day: 'numeric',
               month: 'short',
@@ -326,7 +326,7 @@ function ReelCard({
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600 dark:hover:text-gray-300 disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-gray-300 disabled:opacity-50"
           >
             {downloading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

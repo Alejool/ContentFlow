@@ -1,4 +1,4 @@
-import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
+﻿import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
 import ColorPicker from '@/Components/common/Modern/ColorPicker';
 import DatePickerModern from '@/Components/common/Modern/DatePicker';
@@ -79,7 +79,7 @@ export default function UserEventModal({
         </div>
 
         <div
-          className="custom-scrollbar flex-1 overflow-y-auto bg-gray-50 transition-colors duration-200 ease-out dark:bg-theme-bg-primary"
+          className="custom-scrollbar flex-1 overflow-y-auto bg-gray-50 transition-colors duration-200 ease-out dark:bg-neutral-950"
           style={{
             backgroundImage: `linear-gradient(180deg, ${selectedColor}24 0%, transparent 42%)`,
           }}
@@ -184,7 +184,7 @@ export default function UserEventModal({
             />
 
             <div className={`space-y-2 ${isReadOnly ? 'pointer-events-none opacity-70' : ''}`}>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
                 {t('calendar.userEvents.modal.fields.visibility')}
               </label>
               <Controller
@@ -199,7 +199,7 @@ export default function UserEventModal({
                         'flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border-2 px-4 py-4 text-xs font-bold transition-colors duration-200 ease-out',
                         field.value
                           ? 'shadow-md'
-                          : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-100 dark:border-neutral-800 dark:bg-gray-800/30 dark:text-gray-500 dark:hover:bg-gray-700',
+                          : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-100 dark:border-neutral-800 dark:bg-neutral-800/30 dark:text-neutral-500 dark:hover:bg-gray-700',
                       )}
                       style={
                         (field.value
@@ -222,7 +222,7 @@ export default function UserEventModal({
                         'flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border-2 px-4 py-4 text-xs font-bold transition-colors duration-200 ease-out',
                         !field.value
                           ? 'shadow-md'
-                          : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-100 dark:border-neutral-800 dark:bg-gray-800/30 dark:text-gray-500 dark:hover:bg-gray-700',
+                          : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-gray-100 dark:border-neutral-800 dark:bg-neutral-800/30 dark:text-neutral-500 dark:hover:bg-gray-700',
                       )}
                       style={
                         (!field.value
@@ -287,7 +287,7 @@ export default function UserEventModal({
                     t('calendar.userEvents.modal.visibility.privateHint')}
               </p>
               {!event && (
-                <p className="mt-1 text-[10px] italic text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-[10px] italic text-gray-500 dark:text-neutral-400">
                   {t('calendar.userEvents.modal.footer.note')}
                 </p>
               )}

@@ -128,7 +128,7 @@ export default function Switch({
         <div className="relative inline-flex items-center">
           <div
             className={`relative inline-flex ${sizes.track} cursor-pointer items-center rounded-full transition-colors duration-200 group-focus-visible:ring-2 group-focus-visible:ring-primary-500 group-focus-visible:ring-offset-2 ${
-              isSelected ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-700'
+              isSelected ? 'bg-primary-600' : 'bg-gray-300 dark:bg-neutral-700'
             }`}
           >
             <LazyMotion features={domAnimation}>
@@ -150,7 +150,7 @@ export default function Switch({
       <div className="relative">
         <div
           className={`block ${sizes.track} rounded-full transition-colors duration-200 group-focus-visible:ring-2 group-focus-visible:ring-primary-500 group-focus-visible:ring-offset-2 ${
-            isSelected ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-700'
+            isSelected ? 'bg-primary-500' : 'bg-gray-300 dark:bg-neutral-700'
           }`}
         >
           <div
@@ -197,7 +197,7 @@ export default function Switch({
           )}
           {description && (
             <span
-              className={`block text-gray-500 dark:text-gray-400 ${descriptionSizeClasses[size]}`}
+              className={`block text-gray-500 dark:text-neutral-400 ${descriptionSizeClasses[size]}`}
             >
               {description}
             </span>

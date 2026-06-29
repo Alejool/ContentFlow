@@ -38,7 +38,7 @@ export default function LiveFields({
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
           {t('publications.modal.live.startTime') || 'Start Time'}
         </label>
         <Input
@@ -54,7 +54,7 @@ export default function LiveFields({
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
           {t('publications.modal.live.duration') || 'Expected Duration'}
         </label>
         <div className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export default function LiveFields({
             className="w-32"
             icon={Clock}
           />
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-neutral-400">
             {t('publications.modal.live.minutes') || 'minutes'}
           </span>
         </div>

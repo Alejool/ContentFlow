@@ -105,7 +105,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                 tabIndex={-1}
               >
                 <header
-                  className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 lg:sticky lg:top-0 dark:border-neutral-800 dark:bg-black/80`}
+                  className={`${isHeaderSticky ? 'sticky top-0' : 'relative'} z-40 flex min-w-0 flex-col border-b border-gray-200/50 bg-white/80 backdrop-blur-xl transition-all duration-300 lg:sticky lg:top-0 dark:border-gray-900 dark:bg-neutral-900/40`}
                 >
                   {/* @ts-expect-error route() is missing zero-argument overload in local types */}
                   {!route().current('workspaces.*') && (
@@ -122,9 +122,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                     </div>
                     <div className="flex min-w-0 shrink-0 items-center gap-3">
                       <div className="hidden items-center gap-2 md:flex">
-                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-theme-bg-secondary" />
+                        <div className="mx-1 h-6 w-px bg-neutral-200 dark:bg-theme-bg-secondary" />
                         <NotificationButton />
-                        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-theme-bg-secondary" />
+                        <div className="mx-1 h-6 w-px bg-neutral-200 dark:bg-theme-bg-secondary" />
                         <ProfileDropdown
                           user={user}
                           isProfileActive={!!route().current('profile.edit')}

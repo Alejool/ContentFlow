@@ -31,18 +31,18 @@ export default function AdminRecentActivity({ recentActivity = [] }: AdminRecent
   const { t } = useTranslation();
 
   return (
-    <Card className="mt-2 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+    <Card className="mt-2 border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-gray-100">
+        <CardTitle className="text-gray-900 dark:text-neutral-100">
           {t('admin.dashboard.recent_activity')}
         </CardTitle>
-        <CardDescription className="text-gray-600 dark:text-gray-400">
+        <CardDescription className="text-gray-600 dark:text-neutral-400">
           Latest system settings changes
         </CardDescription>
       </CardHeader>
       <CardContent>
         {recentActivity.length === 0 ? (
-          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-neutral-400">
             <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
             No settings have been modified yet
           </div>
@@ -54,7 +54,7 @@ export default function AdminRecentActivity({ recentActivity = [] }: AdminRecent
                   className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${categoryDot(item.category)}`}
                 />
                 <div className="min-w-0 flex-1">
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                  <span className="font-medium text-gray-800 dark:text-neutral-200">
                     {item.label || item.key}
                   </span>
                   <span className="mx-1 text-gray-400">→</span>
@@ -64,13 +64,13 @@ export default function AdminRecentActivity({ recentActivity = [] }: AdminRecent
                         ? 'font-semibold text-green-600 dark:text-green-400'
                         : item.value === false
                           ? 'font-semibold text-red-500 dark:text-red-400'
-                          : 'text-gray-600 dark:text-gray-400'
+                          : 'text-gray-600 dark:text-neutral-400'
                     }
                   >
                     {String(item.value)}
                   </span>
                 </div>
-                <div className="shrink-0 text-right text-xs text-gray-400 dark:text-gray-500">
+                <div className="shrink-0 text-right text-xs text-gray-400 dark:text-neutral-500">
                   <div>{item.updated_by}</div>
                   <div>{formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}</div>
                 </div>

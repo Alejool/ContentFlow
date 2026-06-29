@@ -100,7 +100,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       pending_review: 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400',
       approved: 'bg-violet-100 text-violet-800 dark:bg-violet-900/20 dark:text-violet-400',
       scheduled: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
-      draft: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+      draft: 'bg-gray-100 text-gray-800 dark:bg-neutral-900/20 dark:text-neutral-400',
       rejected: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
     };
     return colors[status] || colors.draft;
@@ -111,7 +111,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-neutral-800">
         <div className="flex items-center gap-3">
-          <FaFilter className="text-gray-500 dark:text-gray-400" />
+          <FaFilter className="text-gray-500 dark:text-neutral-400" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {t('calendar.filters', 'Filters')}
           </h3>
@@ -125,14 +125,14 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {hasActiveFilters && (
             <button
               onClick={handleClearAll}
-              className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
             >
               {t('calendar.clear_all', 'Clear All')}
             </button>
           )}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            className="text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-gray-300"
           >
             {isExpanded ? '−' : '+'}
           </button>
@@ -142,7 +142,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       {/* Results Counter */}
       {hasActiveFilters && (
         <div className="border-b border-gray-200 bg-blue-50 px-4 py-2 dark:border-neutral-800 dark:bg-blue-900/10">
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <p className="text-sm text-gray-700 dark:text-neutral-300">
             {t('calendar.showing_filtered', 'Showing {{count}} of {{total}} events', {
               count: filteredCount,
               total: totalEvents,
@@ -156,7 +156,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <div className="space-y-6 p-4">
           {/* Platform Filters */}
           <div>
-            <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-neutral-300">
               {t('calendar.filter_by_platform', 'Platform')}
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -174,7 +174,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                       isActive
                         ? activeClass
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
                     }`}
                   >
                     {platform.name}
@@ -187,7 +187,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {/* Campaign Filters */}
           {campaigns.length > 0 && (
             <div>
-              <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-neutral-300">
                 {t('calendar.filter_by_campaign', 'Campaign')}
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -198,7 +198,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                       filters.campaigns.includes(campaign.id.toString())
                         ? 'bg-purple-100 text-purple-800 ring-2 ring-purple-500 dark:bg-purple-900/30 dark:text-purple-400'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-900 dark:text-gray-300 dark:hover:bg-neutral-800'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800'
                     } `}
                   >
                     {campaign.name || campaign.title}
@@ -210,7 +210,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
           {/* Status Filters */}
           <div>
-            <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-neutral-300">
               {t('calendar.filter_by_status', 'Status')}
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -221,7 +221,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                     filters.statuses.includes(status)
                       ? `${getStatusColor(status)} ring-2 ring-current`
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-900 dark:text-gray-300 dark:hover:bg-neutral-800'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800'
                   } `}
                 >
                   {getStatusLabel(status)}

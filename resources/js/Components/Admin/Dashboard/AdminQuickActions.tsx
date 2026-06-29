@@ -28,7 +28,7 @@ export default function AdminQuickActions() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">
         {t('admin.dashboard.quick_actions')}
       </h3>
       {quickActions.map((action) => {
@@ -36,21 +36,21 @@ export default function AdminQuickActions() {
         return (
           <Card
             key={action.title}
-            className="group border-gray-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+            className="group border-gray-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
           >
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div
-                    className={`rounded-xl p-3 ${action.iconBg} transition-transform group-hover:scale-110`}
+                    className={`rounded-lg p-3 ${action.iconBg} transition-transform group-hover:scale-110`}
                   >
                     <Icon className={`h-6 w-6 ${action.iconColor}`} />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                    <h4 className="font-semibold text-gray-900 dark:text-neutral-100">
                       {action.title}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{action.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-neutral-400">{action.description}</p>
                   </div>
                 </div>
                 <Link href={action.href}>

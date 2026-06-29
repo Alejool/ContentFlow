@@ -127,7 +127,7 @@ export default function CreateRoleModal({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-neutral-300">
                 {t('workspace.roles_management.key_permissions_label')}
               </label>
               <div className="h-[200px] space-y-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-800 dark:bg-theme-bg-secondary">

@@ -23,7 +23,7 @@ export default function PublicationHeader({ title, description, status }: Public
           </span>
         )}
       </div>
-      <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">{description}</p>
+      <p className="text-base leading-relaxed text-gray-600 dark:text-neutral-300">{description}</p>
     </div>
   );
 }

@@ -70,7 +70,7 @@ export default function Modal({
                 className="w-full"
               >
                 <DialogPanel
-                  className={`relative mx-auto w-full overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-theme-bg-secondary dark:ring-white/10 ${maxWidthClass}`}
+                  className={`relative mx-auto w-full overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5 dark:bg-theme-bg-secondary dark:ring-white/10 ${maxWidthClass}`}
                 >
                   {children}
                 </DialogPanel>

@@ -29,7 +29,7 @@ export default function EmptyState({
         />
       </div>
       <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
-      <p className="mx-auto max-w-sm leading-relaxed text-gray-500 dark:text-gray-400">
+      <p className="mx-auto max-w-sm leading-relaxed text-gray-500 dark:text-neutral-400">
         {description}
       </p>
     </div>

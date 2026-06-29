@@ -68,7 +68,7 @@ export default function UpdateProfileInformation({
             {/* Sección: Información Personal */}
             <div>
               <div className="flex items-center gap-3 pb-4">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300">
                   {t('profile.information.sections.personal')}
                 </h3>
               </div>
@@ -107,7 +107,7 @@ export default function UpdateProfileInformation({
             {/* Sección: Contacto */}
             <div className="border-t border-gray-100 pt-8 dark:border-neutral-800">
               <div className="flex items-center gap-3 pb-4">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300">
                   {t('profile.information.sections.contact')}
                 </h3>
               </div>

@@ -84,14 +84,14 @@ export default function PricingPage({
                 <CardTitle className="mb-3 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
                   {t('pricing.faq', '¿Tienes preguntas?')}
                 </CardTitle>
-                <CardDescription className="text-lg text-gray-600 dark:text-gray-400">
+                <CardDescription className="text-lg text-gray-600 dark:text-neutral-400">
                   {t('pricing.faqSubtitle', 'Estamos aquí para ayudarte')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pb-8 text-center">
                 <a
                   href="mailto:support@Intellipost.com"
-                  className="group inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl"
+                  className="group inline-flex items-center gap-3 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:shadow-xl"
                 >
                   <span>support@Intellipost.com</span>
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />

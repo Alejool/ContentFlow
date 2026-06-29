@@ -221,7 +221,7 @@ export default function Addons({ addons }: Props) {
             <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
               {t('subscription.addons.title', 'Paquetes Adicionales')}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-neutral-400">
               {t(
                 'subscription.addons.subtitle',
                 'Extiende tu capacidad con créditos de IA, almacenamiento, publicaciones y miembros del equipo',
@@ -247,7 +247,7 @@ export default function Addons({ addons }: Props) {
                   (pkg: any) => pkg.currency && pkg.currency !== 'USD',
                 ),
             ) && (
-              <div className="rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-sm dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20">
+              <div className="rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-sm dark:border-blue-800 dark:from-blue-900/20 dark:to-indigo-900/20">
                 <div className="flex items-start gap-4">
                   <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-800/50">
                     <Info className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -256,7 +256,7 @@ export default function Addons({ addons }: Props) {
                     <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
                       {t('subscription.addons.currencyBanner.title', 'Precios en tu Moneda Local')}
                     </h3>
-                    <p className="mb-3 text-sm text-gray-700 dark:text-gray-300">
+                    <p className="mb-3 text-sm text-gray-700 dark:text-neutral-300">
                       {t(
                         'subscription.addons.currencyBanner.description',
                         'Los precios se muestran automáticamente en tu moneda local para tu comodidad. El equivalente en USD se muestra como referencia.',

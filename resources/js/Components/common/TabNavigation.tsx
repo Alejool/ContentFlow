@@ -109,7 +109,7 @@ function TabNavigation({
                     className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                       isActive
                         ? 'bg-white/20 text-white'
-                        : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                        : 'bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-neutral-300'
                     }`}
                   >
                     {tab.badge}
@@ -128,24 +128,24 @@ function TabNavigation({
       case 'pills':
         return isActive
           ? 'bg-primary-500 text-white'
-          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700';
+          : 'bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-gray-700';
       case 'underline':
         return `border-b-2 rounded-lg ${
           isActive
             ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-            : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            : 'border-transparent text-gray-600 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-gray-200'
         }`;
       default:
         return isActive
-          ? 'bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 border-primary-500'
-          : 'bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800';
+          ? 'bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 border-primary-500'
+          : 'bg-gray-50 dark:bg-neutral-900 text-gray-600 dark:text-neutral-400 hover:bg-gray-100 dark:hover:bg-gray-800';
     }
   };
 
   const containerClasses = {
-    default: 'flex gap-2 p-1 bg-gray-100 dark:bg-gray-900 rounded-lg',
+    default: 'flex gap-2 p-1 bg-gray-100 dark:bg-neutral-900 rounded-lg',
     pills: 'flex gap-2 flex-wrap',
-    underline: 'flex -mb-px border-b border-gray-200 dark:border-gray-700',
+    underline: 'flex -mb-px border-b border-gray-200 dark:border-neutral-700',
   };
 
   return (
@@ -172,7 +172,7 @@ function TabNavigation({
                   className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                     isActive
                       ? 'bg-white/20 text-white'
-                      : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                      : 'bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-neutral-300'
                   }`}
                 >
                   {tab.badge}

@@ -155,7 +155,7 @@ export default function ContentTypeSelector({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
         {t('publications.modal.contentType.label') || 'Content Type'}
       </label>
 
@@ -204,7 +204,7 @@ export default function ContentTypeSelector({
                         className={`h-5 w-5 transition-colors ${
                           isSelected
                             ? 'text-primary-600 dark:text-primary-400'
-                            : 'text-gray-600 dark:text-gray-400'
+                            : 'text-gray-600 dark:text-neutral-400'
                         } `}
                       />
                     </div>
@@ -219,7 +219,7 @@ export default function ContentTypeSelector({
                       >
                         {type.label}
                       </p>
-                      <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                      <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                         {type.description}
                       </p>
                     </div>
@@ -230,7 +230,7 @@ export default function ContentTypeSelector({
           </div>
 
           {selectedPlatforms.length > 0 && availableTypes.length < contentTypes.length && (
-            <p className="text-xs italic text-gray-500 dark:text-gray-400">
+            <p className="text-xs italic text-gray-500 dark:text-neutral-400">
               {t('publications.modal.contentType.filteredByPlatforms') ||
                 'Some content types are hidden based on selected platforms'}
             </p>
@@ -257,10 +257,10 @@ export default function ContentTypeSelector({
             <div className="space-y-3 text-sm">
               {/* Reglas de medios */}
               <div>
-                <p className="mb-1 font-medium text-gray-700 dark:text-gray-300">
+                <p className="mb-1 font-medium text-gray-700 dark:text-neutral-300">
                   {t('publications.modal.contentType.mediaAllowed') || 'Media Allowed:'}
                 </p>
-                <ul className="space-y-1 text-gray-600 dark:text-gray-400">
+                <ul className="space-y-1 text-gray-600 dark:text-neutral-400">
                   {selectedTypeDetails.mediaRules.videoOnly && <li>• Solo 1 video</li>}
                   {selectedTypeDetails.mediaRules.imageOnly && <li>• Solo imágenes</li>}
                   {!selectedTypeDetails.mediaRules.videoOnly &&
@@ -292,7 +292,7 @@ export default function ContentTypeSelector({
 
               {/* Plataformas compatibles */}
               <div>
-                <p className="mb-1 font-medium text-gray-700 dark:text-gray-300">
+                <p className="mb-1 font-medium text-gray-700 dark:text-neutral-300">
                   {t('publications.modal.contentType.platforms') || 'Platforms:'}
                 </p>
                 <div className="flex flex-wrap gap-1">
@@ -302,7 +302,7 @@ export default function ContentTypeSelector({
                       className={`rounded px-2 py-0.5 text-xs font-medium ${
                         selectedPlatforms.includes(platform)
                           ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                          : 'bg-gray-200 text-gray-600 dark:bg-neutral-700 dark:text-gray-400'
+                          : 'bg-gray-200 text-gray-600 dark:bg-neutral-700 dark:text-neutral-400'
                       } `}
                     >
                       {platform.charAt(0).toUpperCase() + platform.slice(1)}
@@ -314,28 +314,28 @@ export default function ContentTypeSelector({
               {/* Notas especiales por tipo */}
               {selectedType === 'reel' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
-                  <p className="text-xs italic text-gray-500 dark:text-gray-400">
+                  <p className="text-xs italic text-gray-500 dark:text-neutral-400">
                     Los Reels/Shorts deben ser videos verticales (9:16) de corta duración
                   </p>
                 </div>
               )}
               {selectedType === 'story' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
-                  <p className="text-xs italic text-gray-500 dark:text-gray-400">
+                  <p className="text-xs italic text-gray-500 dark:text-neutral-400">
                     Las Stories desaparecen después de 24 horas
                   </p>
                 </div>
               )}
               {selectedType === 'carousel' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
-                  <p className="text-xs italic text-gray-500 dark:text-gray-400">
+                  <p className="text-xs italic text-gray-500 dark:text-neutral-400">
                     Los carousels requieren mínimo 2 elementos
                   </p>
                 </div>
               )}
               {selectedType === 'poll' && (
                 <div className="border-t border-gray-200 pt-2 dark:border-neutral-700">
-                  <p className="text-xs italic text-gray-500 dark:text-gray-400">
+                  <p className="text-xs italic text-gray-500 dark:text-neutral-400">
                     Las encuestas permiten interacción directa con tu audiencia
                   </p>
                 </div>

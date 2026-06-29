@@ -68,7 +68,7 @@ export default function RejectionReasonModal({
             </DialogTitle>
             <button
               onClick={handleClose}
-              className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
+              className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
             >
               <X className="h-5 w-5" />
             </button>
@@ -76,7 +76,7 @@ export default function RejectionReasonModal({
 
           <form onSubmit={handleSubmit(onFormSubmit)}>
             <div className="p-6">
-              <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+              <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-neutral-400">
                 {t('approvals.rejectionReasonDescription') ||
                   'Proporciona una razón detallada para el rechazo de'}{' '}
                 <span className="font-bold text-gray-900 dark:text-white">

@@ -91,7 +91,7 @@ export default function InviteMemberModal({
             <h2 className="truncate text-xl font-bold text-gray-900 dark:text-white">
               {t('workspace.invite_modal.title')}
             </h2>
-            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+            <p className="truncate text-sm text-gray-500 dark:text-neutral-400">
               {t('workspace.invite_modal.subtitle', { name: workspace?.name })}
             </p>
           </div>
@@ -111,7 +111,7 @@ export default function InviteMemberModal({
           />
 
           <div className="relative space-y-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">
               {t('workspace.invite_modal.role_label')}
             </label>
             <Select

@@ -41,7 +41,7 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
     <span className={`date-display ${className}`}>
       {formattedDate}
       {showTimezone && (
-        <small className="ml-2 text-xs text-gray-500 dark:text-gray-400">({timezoneLabel()})</small>
+        <small className="ml-2 text-xs text-gray-500 dark:text-neutral-400">({timezoneLabel()})</small>
       )}
     </span>
   );

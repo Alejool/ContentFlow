@@ -225,11 +225,11 @@ export default function PhoneInput({
   return (
     <div className={className}>
       {label && (
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-neutral-300">
           {label}
           {required && <span className="ml-1 text-red-500">*</span>}
           {!required && (
-            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(Opcional)</span>
+            <span className="ml-2 text-xs text-gray-500 dark:text-neutral-400">(Opcional)</span>
           )}
         </label>
       )}
@@ -253,7 +253,7 @@ export default function PhoneInput({
         {/* Input de número */}
         <div className="col-span-7">
           <div className="relative">
-            <div className="absolute top-1/2 left-3 z-10 -translate-y-1/2 text-base font-medium text-gray-500 dark:text-gray-400">
+            <div className="absolute top-1/2 left-3 z-10 -translate-y-1/2 text-base font-medium text-gray-500 dark:text-neutral-400">
               +{callingCode}
             </div>
             <input

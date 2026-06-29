@@ -31,7 +31,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('auth.forgot-password.title')}
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-600 dark:text-neutral-400">
               {t('auth.forgot-password.enterEmail')}
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             )}
 
             <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <p className="text-sm text-gray-700 dark:text-neutral-300">
                 {t('auth.forgot-password.description')}
               </p>
             </div>
@@ -83,18 +83,18 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             </Button>
 
             <div className="pt-4">
-              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
-                <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-800/50">
+                <p className="mb-2 text-sm text-gray-600 dark:text-neutral-400">
                   {t('auth.forgot-password.recomendations.receiveEmail')}
                 </p>
                 <ul className="list-disc space-y-1 px-2 text-sm">
-                  <li className="text-gray-500 dark:text-gray-500">
+                  <li className="text-gray-500 dark:text-neutral-500">
                     {t('auth.forgot-password.recomendations.1')}
                   </li>
-                  <li className="text-gray-500 dark:text-gray-500">
+                  <li className="text-gray-500 dark:text-neutral-500">
                     {t('auth.forgot-password.recomendations.2')}
                   </li>
-                  <li className="text-gray-500 dark:text-gray-500">
+                  <li className="text-gray-500 dark:text-neutral-500">
                     {t('auth.forgot-password.recomendations.3')}
                   </li>
                 </ul>

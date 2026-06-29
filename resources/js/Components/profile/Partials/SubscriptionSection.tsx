@@ -70,9 +70,9 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
     return (
       <div className="space-y-4">
         <div className="animate-pulse">
-          <div className="mb-2 h-4 w-1/4 rounded bg-gray-200 dark:bg-gray-700"></div>
-          <div className="mb-1 h-2 rounded bg-gray-200 dark:bg-gray-700"></div>
-          <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mb-2 h-4 w-1/4 rounded bg-gray-200 dark:bg-neutral-700"></div>
+          <div className="mb-1 h-2 rounded bg-gray-200 dark:bg-neutral-700"></div>
+          <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-neutral-700"></div>
         </div>
       </div>
     );
@@ -161,8 +161,8 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
           <div key={metric.key} className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Icon className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
                   {metric.label}
                 </span>
               </div>
@@ -174,7 +174,7 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
             </div>
 
             {metric.limit !== '∞' && metric.limit !== -1 && (
-              <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
                 <div
                   className={`h-2 rounded-full transition-all ${getProgressBarColor(metric.percentage)}`}
                   style={{ width: `${Math.min(metric.percentage, 100)}%` }}
@@ -234,7 +234,7 @@ export default function SubscriptionSection({
   const getPlanColor = (planId: string) => {
     switch (planId) {
       case 'free':
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300';
       case 'demo':
         return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
       case 'starter':
@@ -244,7 +244,7 @@ export default function SubscriptionSection({
       case 'enterprise':
         return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300';
     }
   };
 
@@ -343,9 +343,9 @@ export default function SubscriptionSection({
           )}
 
           {subscription.current_period_end && !subscription.is_trial && (
-            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-              <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
+              <Calendar className="h-4 w-4 text-gray-600 dark:text-neutral-400" />
+              <span className="text-sm text-gray-700 dark:text-neutral-300">
                 {t('subscription.billing.renewsOn')}: {formatDate(subscription.current_period_end)}
               </span>
             </div>
@@ -369,13 +369,13 @@ export default function SubscriptionSection({
               );
               return (
                 <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
-                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-neutral-400">
                     <span className="font-medium">Periodo de facturación</span>
                     <span className="font-semibold">
                       {daysLeft} {daysLeft === 1 ? 'día' : 'días'} restantes
                     </span>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                     <div
                       className="h-full rounded-full bg-primary-500 transition-all duration-500 dark:bg-primary-400"
                       style={{ width: `${elapsedPct}%` }}
@@ -471,7 +471,7 @@ export default function SubscriptionSection({
                     }),
                   )
                 }
-                className="group cursor-pointer rounded-xl border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-theme-bg-secondary"
+                className="group cursor-pointer rounded-lg border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-theme-bg-secondary"
               >
                 <div className="mb-2 flex items-center gap-3">
                   <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400">
@@ -481,7 +481,7 @@ export default function SubscriptionSection({
                     {t('workspace.tabs.white_label', 'Marca Blanca')}
                   </h4>
                 </div>
-                <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                <p className="text-xs leading-relaxed text-gray-500 dark:text-neutral-400">
                   {t(
                     'workspace.white_label.description',
                     'Personaliza los reportes y correos con tu propio logotipo y colores corporativos.',
@@ -498,7 +498,7 @@ export default function SubscriptionSection({
                     }),
                   )
                 }
-                className="group cursor-pointer rounded-xl border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-theme-bg-secondary"
+                className="group cursor-pointer rounded-lg border border-primary-200/50 bg-white p-4 shadow-sm transition-all duration-300 hover:border-primary-500 hover:shadow-md dark:border-primary-800/30 dark:bg-theme-bg-secondary"
               >
                 <div className="mb-2 flex items-center gap-3">
                   <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/40 dark:text-primary-400">
@@ -508,7 +508,7 @@ export default function SubscriptionSection({
                     {t('workspace.tabs.api', 'Acceso API')}
                   </h4>
                 </div>
-                <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                <p className="text-xs leading-relaxed text-gray-500 dark:text-neutral-400">
                   {t(
                     'workspace.api.description',
                     'Conecta tus aplicaciones externas y automatiza publicaciones mediante nuestra API segura.',
@@ -547,7 +547,7 @@ export default function SubscriptionSection({
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
                         {invoice.description}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500 dark:text-neutral-400">
                         {formatDate(invoice.date)}
                       </p>
                     </div>

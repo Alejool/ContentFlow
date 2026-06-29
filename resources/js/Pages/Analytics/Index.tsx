@@ -129,7 +129,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
   ];
 
   const renderLockedPremiumFeature = (title: string, description: string) => (
-    <div className="relative overflow-hidden rounded-2xl border border-primary-200/50 shadow-lg dark:border-primary-800/30">
+    <div className="relative overflow-hidden rounded-lg border border-primary-200/50 shadow-lg dark:border-primary-800/30">
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 p-8 backdrop-blur-sm dark:bg-theme-bg-secondary/90">
         <div className="rounded-full bg-primary-100 p-4 dark:bg-primary-900/40">
           <LockKeyhole className="h-8 w-8 text-primary-600 dark:text-primary-400" />
@@ -137,7 +137,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
         <h3 className="text-center text-xl font-bold text-gray-900 dark:text-white">
           {title}
         </h3>
-        <p className="max-w-md text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="max-w-md text-center text-sm text-gray-600 dark:text-neutral-400">
           {description}
         </p>
         <button
@@ -158,7 +158,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
     <AuthenticatedLayout>
       <Head title={t('analytics.title')} />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 text-gray-900 transition-colors duration-300 dark:text-gray-100 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 text-gray-900 transition-colors duration-300 dark:text-neutral-100 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 dark:border-black/70 dark:from-black/90 dark:to-black/95 md:flex-row">
           <div>
@@ -168,9 +168,9 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 <span className="ml-3 inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-400 border-t-transparent align-middle" />
               )}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">{t('analytics.subtitle')}</p>
+            <p className="text-lg text-gray-600 dark:text-neutral-400">{t('analytics.subtitle')}</p>
             {lastSyncedAt && (
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-1 text-xs text-gray-400 dark:text-neutral-500">
                 {t('analytics.lastSynced', 'Última actualización')}:{' '}
                 {formatTimeString(lastSyncedAt)}
               </p>
@@ -210,7 +210,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
         </div>
 
         {/* Tab Navigation */}
-        <div className="mb-8 border-b border-gray-200 dark:border-gray-800">
+        <div className="mb-8 border-b border-gray-200 dark:border-neutral-800">
           <nav className="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -226,11 +226,11 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                         ? tab.highlight 
                           ? 'border-amber-500 text-amber-600 dark:text-amber-400' 
                           : 'border-primary-500 text-primary-600 dark:border-primary-400 dark:text-primary-400'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-neutral-400 dark:hover:border-gray-600 dark:hover:text-gray-300'
                     }
                   `}
                 >
-                  <Icon className={`h-5 w-5 ${isActive ? (tab.highlight ? 'text-amber-500' : 'text-primary-500') : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400'}`} />
+                  <Icon className={`h-5 w-5 ${isActive ? (tab.highlight ? 'text-amber-500' : 'text-primary-500') : 'text-gray-400 group-hover:text-gray-500 dark:text-neutral-500 dark:group-hover:text-gray-400'}`} />
                   {tab.label}
                 </button>
               );
@@ -255,7 +255,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
-                <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100">
+                <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-neutral-100">
                   {t('analytics.charts.engagementTrends')}
                 </h2>
                 <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
@@ -264,7 +264,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
               </div>
 
               <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
-                <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-100">
+                <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-neutral-100">
                   {t('analytics.formatPerformance.title', 'Rendimiento por Formato')}
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">{t('analytics.formatPerformance.subtitle', 'Interacción basada en el tipo de contenido')}</p>
@@ -304,7 +304,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
               
               <div className="w-full max-h-[480px] flex flex-col rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
                 <div className="shrink-0">
-                  <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+                  <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-neutral-100">
                     {t('analytics.topPosts.title', 'Mejores Publicaciones')}
                   </h2>
                   <p className="text-sm text-gray-500 mb-6">{t('analytics.topPosts.subtitle', 'Top 5 publicaciones por interacción')}</p>
@@ -320,7 +320,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             {(detailedPublications.length > 0 || campaigns.length > 0) && (
               <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
                 <div className="mb-5 flex flex-col gap-1">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100">
                     {t('analytics.charts.detailedPublications', 'Rendimiento Detallado por Publicación')}
                   </h2>
                 </div>
@@ -345,7 +345,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
 
             {detailedPlatforms.length > 0 && (
               <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100">
                   {t('analytics.charts.detailedPlatforms')}
                 </h2>
                 <p className={`mb-5 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -365,7 +365,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             {hasAdvancedAnalytics ? (
               <>
                 <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
-                  <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+                  <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-neutral-100">
                     {t('analytics.demographics.title', 'Demografía de la Audiencia')}
                   </h2>
                   <p className="text-sm text-gray-500 mb-6">{t('analytics.demographics.subtitle', 'Conoce mejor quién interactúa con tu contenido')}</p>
@@ -376,7 +376,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
-                    <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+                    <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-neutral-100">
                       {t('analytics.bestTimeToPost.title', 'Mejor Hora para Publicar')}
                     </h2>
                     <p className="text-sm text-gray-500 mb-6">{t('analytics.bestTimeToPost.subtitle', 'Momentos de mayor actividad de tu audiencia')}</p>

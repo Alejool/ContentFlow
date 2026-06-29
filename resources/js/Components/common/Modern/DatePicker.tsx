@@ -162,7 +162,7 @@ const CustomTimeSelector = ({
 
   return (
     <div className="flex w-full shrink-0 flex-col border-t border-gray-100 bg-white md:w-[220px] md:border-t-0 md:border-l dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 md:h-16 md:gap-2 md:px-4 md:text-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-gray-300">
+      <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 md:h-16 md:gap-2 md:px-4 md:text-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
         <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
         <span>{currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}</span>
       </div>
@@ -540,7 +540,7 @@ const DatePickerModern = <T extends FieldValues>({
           <CalendarGrid className="w-full">
             <CalendarGridHeader>
               {(day: string) => (
-                <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+                <CalendarHeaderCell className="w-10 pb-2 text-center text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-neutral-500">
                   {day}
                 </CalendarHeaderCell>
               )}
@@ -567,8 +567,8 @@ const DatePickerModern = <T extends FieldValues>({
                         : isToday
                           ? 'border-primary-500 bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400 border-2 font-semibold'
                           : isDisabled
-                            ? 'cursor-not-allowed text-gray-300 dark:text-gray-700'
-                            : 'text-gray-700 hover:scale-105 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800',
+                            ? 'cursor-not-allowed text-gray-300 dark:text-neutral-700'
+                            : 'text-gray-700 hover:scale-105 hover:bg-gray-100 dark:text-neutral-300 dark:hover:bg-neutral-800',
                       isFoc && !isSelected
                         ? 'ring-primary-400/40 ring-2 ring-offset-2 dark:ring-offset-neutral-900'
                         : '',
@@ -584,11 +584,11 @@ const DatePickerModern = <T extends FieldValues>({
 
         {/* Footer */}
         <div className="flex min-h-14 items-center justify-between gap-3 border-t border-gray-100 bg-white px-4 py-3 text-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex flex-1 items-center gap-2 text-sm font-medium text-gray-700 dark:text-neutral-300">
             <Calendar className="h-4 w-4 shrink-0 text-gray-400" />
             <span className="truncate">{formatDisplayDate(displayDate)}</span>
             {showTimezone && useUTC && (
-              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
+              <span className="ml-1 text-xs text-gray-400 dark:text-neutral-500">
                 ({timezoneLabel()})
               </span>
             )}
@@ -655,7 +655,7 @@ const DatePickerModern = <T extends FieldValues>({
     <I18nProvider locale={currentLocale === 'es' ? 'es-ES' : 'en-US'}>
       <div className={`relative ${containerClassName}`} ref={triggerRef}>
         {showTimezone && useUTC && (
-          <div className="mb-1 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+          <div className="mb-1 flex items-center gap-1 text-xs text-gray-500 dark:text-neutral-400">
             <Clock className="h-3 w-3" />
             {timezoneLabel()}
           </div>

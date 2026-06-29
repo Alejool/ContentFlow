@@ -116,12 +116,12 @@ export default function PlatformVideoSettings({
       {/* Metadatos del video */}
       {videoMetadata && videoMetadata.width && videoMetadata.height && (
         <div className="rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-secondary">
-          <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+          <p className="mb-2 text-xs font-medium text-gray-700 dark:text-neutral-300">
             {t('videoValidation.videoInfo')}
           </p>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-neutral-400">
                 {t('videoValidation.duration')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
@@ -129,7 +129,7 @@ export default function PlatformVideoSettings({
               </span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-neutral-400">
                 {t('videoValidation.resolution')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
@@ -137,7 +137,7 @@ export default function PlatformVideoSettings({
               </span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-neutral-400">
                 {t('videoValidation.aspectRatio')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">
@@ -151,7 +151,7 @@ export default function PlatformVideoSettings({
               </span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-neutral-400">
                 {t('videoValidation.orientation')}:
               </span>
               <span className="ml-1 font-medium text-gray-900 dark:text-white">

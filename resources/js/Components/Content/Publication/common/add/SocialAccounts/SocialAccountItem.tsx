@@ -175,7 +175,7 @@ const SocialAccountItem = memo(
                 )}
               </div>
               {(account.account_name || account.name) && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-500 dark:text-neutral-400">
                   @{account.account_name || account.name}
                 </span>
               )}
@@ -185,7 +185,7 @@ const SocialAccountItem = memo(
                     className={`flex items-center gap-1 text-xs ${
                       customSchedule
                         ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-500 dark:text-gray-400'
+                        : 'text-gray-500 dark:text-neutral-400'
                     }`}
                   >
                     <Clock className="h-3 w-3" />
@@ -345,7 +345,7 @@ const SocialAccountItem = memo(
                   setIsYouTubeThumbnailExpanded &&
                   setIsYouTubeThumbnailExpanded(!isYouTubeThumbnailExpanded)
                 }
-                className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:text-primary-400"
+                className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:text-primary-400"
               >
                 <span>YouTube Thumbnail</span>
                 <ChevronDown

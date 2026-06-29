@@ -18,7 +18,7 @@ export default function CreatorInfo({ user }: CreatorInfoProps) {
       <Avatar src={user.photo_url} name={user.name} size="md" className="shrink-0" />
       <div>
         <h4 className="text-sm font-bold text-gray-900 dark:text-white">{user.name}</h4>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('common.creator')}</p>
+        <p className="text-xs text-gray-500 dark:text-neutral-400">{t('common.creator')}</p>
       </div>
     </div>
   );

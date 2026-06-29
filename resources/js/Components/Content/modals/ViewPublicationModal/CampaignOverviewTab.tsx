@@ -27,11 +27,11 @@ export default function CampaignOverviewTab({ item }: CampaignOverviewTabProps) 
 
       <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         <div className="flex flex-col items-start justify-between gap-2 text-xs sm:flex-row sm:items-center">
-          <span className="text-gray-500 dark:text-gray-400">
+          <span className="text-gray-500 dark:text-neutral-400">
             {t('campaigns.modal.view.created')}:{' '}
             {formatPublicationDate(item.created_at) || t('common.notSet', 'Not set')}
           </span>
-          <span className="text-gray-500 dark:text-gray-400">
+          <span className="text-gray-500 dark:text-neutral-400">
             {t('campaigns.modal.view.lastUpdated')}:{' '}
             {formatPublicationDate(item.updated_at) || t('common.notSet', 'Not set')}
           </span>

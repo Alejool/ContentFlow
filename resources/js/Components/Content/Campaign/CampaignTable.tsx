@@ -59,7 +59,7 @@ const CampaignTable = memo(
         case 'active':
           return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
         case 'inactive':
-          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+          return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
         case 'completed':
           return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
         case 'deleted':
@@ -67,7 +67,7 @@ const CampaignTable = memo(
         case 'paused':
           return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
         default:
-          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+          return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
       }
     };
 
@@ -77,7 +77,7 @@ const CampaignTable = memo(
         title={t('campaigns.title') || 'Campañas'}
         subtitle={t('campaigns.subtitle') || 'Gestiona tus agrupaciones de publicaciones'}
       >
-        <div className="scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 hidden overflow-x-auto lg:block">
+        <div className="scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-neutral-700 hidden overflow-x-auto lg:block">
           <div className="grid grid-cols-1 grid-rows-1">
             {/* Data Table */}
             <div
@@ -86,7 +86,7 @@ const CampaignTable = memo(
               <table className="z-0 w-full border-collapse whitespace-nowrap text-left">
                 {items.length > 0 && (
                   <thead className="border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-                    <tr className="border-b text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <tr className="border-b text-[10px] uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                       <TableHeader mode="campaigns" t={t} />
                     </tr>
                   </thead>

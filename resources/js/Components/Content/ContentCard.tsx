@@ -119,10 +119,10 @@ export default function ContentCard({
         {item.accounts.slice(0, 3).map((account: any, index: number) => (
           <div
             key={index}
-            className="flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700"
+            className="flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 dark:bg-neutral-700"
             title={account.provider}
           >
-            <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
+            <span className="text-xs font-bold text-gray-600 dark:text-neutral-300">
               {account.provider?.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -148,11 +148,11 @@ export default function ContentCard({
 
   return (
     <div
-      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800"
       onClick={handleCardClick}
     >
       {(itemHasMedia || itemIsProcessing) && (
-        <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-700">
+        <div className="relative overflow-hidden bg-gray-100 dark:bg-neutral-700">
           <PublicationThumbnailCard
             publication={item}
             {...(mediaUrl && { mediaUrl })}
@@ -217,7 +217,7 @@ export default function ContentCard({
       )}
 
       {!itemHasMedia && (
-        <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-900">
+        <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white p-4 dark:border-neutral-700 dark:from-neutral-800 dark:to-neutral-900">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div
@@ -230,7 +230,7 @@ export default function ContentCard({
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-neutral-300">
                   {type === 'campaign' ? 'Campaña' : 'Publicación'}
                 </span>
                 {remoteLock && (
@@ -270,7 +270,7 @@ export default function ContentCard({
         )}
 
         <div className="mb-3 flex-1">
-          <p className="line-clamp-2 break-words text-sm text-gray-600 dark:text-gray-300">
+          <p className="line-clamp-2 break-words text-sm text-gray-600 dark:text-neutral-300">
             {item.description ||
               item.content?.substring(0, 120) ||
               t('publications.table.description')}
@@ -322,7 +322,7 @@ export default function ContentCard({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-500 dark:text-neutral-400">
                   {t('publications.modal.publish.platforms')}:
                 </span>
                 {getPlatformIcons()}
@@ -334,7 +334,7 @@ export default function ContentCard({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="h-3.5 w-3.5 text-gray-400" />
-                <span className="text-xs text-gray-600 dark:text-gray-300">
+                <span className="text-xs text-gray-600 dark:text-neutral-300">
                   {item.publications?.length || 0} publicaciones
                 </span>
               </div>
@@ -351,7 +351,7 @@ export default function ContentCard({
               {item.user && (
                 <>
                   <Avatar src={item.user.photo_url} name={item.user.name} size="xs" />
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                  <span className="text-xs font-medium text-gray-600 dark:text-neutral-300">
                     {item.user.name}
                   </span>
                 </>
@@ -365,7 +365,7 @@ export default function ContentCard({
                 ) : (
                   <ImageIcon className="h-3.5 w-3.5 text-gray-400" />
                 )}
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-500 dark:text-neutral-400">
                   {mediaCount.total} {mediaCount.total === 1 ? t('common.item') : t('common.files')}
                 </span>
               </div>
@@ -377,7 +377,7 @@ export default function ContentCard({
               {item.scheduled_at ? (
                 <>
                   <Calendar className="h-3.5 w-3.5 text-gray-400" />
-                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                  <span className="text-xs text-gray-600 dark:text-neutral-300">
                     {formatDateString(item.scheduled_at, {
                       day: 'numeric',
                       month: 'short',
@@ -390,7 +390,7 @@ export default function ContentCard({
                 item.created_at && (
                   <>
                     <Clock className="h-3.5 w-3.5 text-gray-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300">
+                    <span className="text-xs text-gray-600 dark:text-neutral-300">
                       {formatDateString(item.created_at, {
                         day: 'numeric',
                         month: 'short',
@@ -405,7 +405,7 @@ export default function ContentCard({
         </div>
       </div>
 
-      <div className="border-t border-gray-100 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+      <div className="border-t border-gray-100 bg-gray-50/50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
         <div className="flex items-center gap-2">
           {type === 'publication' && canManageContent && (
             <>

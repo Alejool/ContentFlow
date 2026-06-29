@@ -221,7 +221,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
   const getPlanBadgeClass = (plan: string) => {
     switch (plan.toLowerCase()) {
       case 'free':
-        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600';
+        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600';
       case 'demo':
         return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700';
       case 'starter':
@@ -231,7 +231,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
       case 'enterprise':
         return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600';
+        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600';
     }
   };
 
@@ -255,7 +255,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('subscription.billing.title', 'Facturación')}
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-600 dark:text-neutral-400">
               {t('subscription.billing.description', 'Gestiona tu facturación y métodos de pago')}
             </p>
           </div>
@@ -347,9 +347,9 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-neutral-400">
                       {t('subscription.billing.plan', 'Plan')}
                     </p>
                     <p className="text-lg font-semibold text-gray-900 capitalize dark:text-white">
@@ -358,7 +358,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                   </div>
                   {subscription.ends_at && (
                     <div className="text-right">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-600 dark:text-neutral-400">
                         {t('subscription.billing.renewsOn', 'Se renueva el')}
                       </p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -464,10 +464,10 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
               {invoicesList.length === 0 ? (
                 <div className="py-12 text-center">
                   <DollarSign className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                  <p className="mb-2 text-gray-600 dark:text-gray-400">
+                  <p className="mb-2 text-gray-600 dark:text-neutral-400">
                     {t('subscription.billing.noInvoices', 'No hay facturas disponibles')}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-neutral-500">
                     {t(
                       'subscription.billing.noInvoicesDescription',
                       'Las facturas de Stripe aparecerán aquí una vez que tengas una suscripción activa',
@@ -480,7 +480,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                     {invoicesList.map((invoice) => (
                       <div
                         key={invoice.id}
-                        className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                        className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-gray-800"
                       >
                         <div className="flex flex-1 items-center gap-4">
                           <div className="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-3 dark:from-blue-900/30 dark:to-blue-800/30">
@@ -497,7 +497,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600 dark:text-neutral-400">
                               {invoice.description || 'Suscripción'}
                             </p>
                             <div className="mt-2 flex items-center gap-4">
@@ -536,7 +536,7 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                             </Button>
                           )}
                           {!invoice.hosted_invoice_url && !invoice.invoice_pdf && (
-                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                            <span className="text-xs text-gray-400 dark:text-neutral-500">
                               {t('subscription.billing.noDownload', 'No disponible')}
                             </span>
                           )}
@@ -588,10 +588,10 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('subscription.billing.cancelDetails', 'Al cancelar tu suscripción:')}
             </p>
-            <ul className="ml-2 list-inside list-disc space-y-1 text-sm text-gray-600 dark:text-gray-400">
+            <ul className="ml-2 list-inside list-disc space-y-1 text-sm text-gray-600 dark:text-neutral-400">
               <li>
                 {t(
                   'subscription.billing.cancelPoint1',

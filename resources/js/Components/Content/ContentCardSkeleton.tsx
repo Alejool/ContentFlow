@@ -2,7 +2,7 @@ import Skeleton from '@/Components/common/ui/Skeleton';
 
 const ContentCardSkeleton = () => {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
       {/* Thumbnail Section */}
       <Skeleton className="h-40 w-full rounded-none" />
 
@@ -19,7 +19,7 @@ const ContentCardSkeleton = () => {
         </div>
 
         {/* Actions Footer */}
-        <div className="mt-auto flex items-center justify-between gap-2 border-t border-gray-100 pt-4 dark:border-gray-700">
+        <div className="mt-auto flex items-center justify-between gap-2 border-t border-gray-100 pt-4 dark:border-neutral-700">
           <div className="flex flex-1 items-center gap-1">
             <Skeleton className="h-10 flex-1 rounded-lg" />
             <Skeleton className="h-10 w-16 rounded-lg" />

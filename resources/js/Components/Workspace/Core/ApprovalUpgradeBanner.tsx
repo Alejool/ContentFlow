@@ -23,7 +23,7 @@ export default function ApprovalUpgradeBanner({
 
   return (
     <div
-      className={`animate-in fade-in slide-in-from-top-2 flex flex-col items-start justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 p-4 shadow-sm duration-500 dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center ${className}`}
+      className={`animate-in fade-in slide-in-from-top-2 flex flex-col items-start justify-between gap-4 rounded-lg border border-primary-200 bg-primary-50 p-4 shadow-sm duration-500 dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center ${className}`}
     >
       <div className="flex items-start gap-4">
         <div className="shrink-0 rounded-full bg-primary-100 p-2 dark:bg-primary-900/40">

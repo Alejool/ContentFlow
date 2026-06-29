@@ -111,7 +111,7 @@ export default function ClientPortal({ publication, token }: Props) {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+          className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -143,7 +143,7 @@ export default function ClientPortal({ publication, token }: Props) {
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 shadow-sm backdrop-blur-lg dark:border-zinc-800 dark:bg-zinc-900/80">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-xl font-bold text-white shadow-lg shadow-orange-500/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-600 text-xl font-bold text-white shadow-lg shadow-orange-500/30">
               C
             </div>
             <div>
@@ -172,7 +172,7 @@ export default function ClientPortal({ publication, token }: Props) {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100/50 p-4 shadow-sm dark:border-blue-800/30 dark:from-blue-900/20 dark:to-blue-900/10"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100/50 p-4 shadow-sm dark:border-blue-800/30 dark:from-blue-900/20 dark:to-blue-900/10"
         >
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
           <div className="text-sm leading-relaxed text-blue-900 dark:text-blue-200">
@@ -189,7 +189,7 @@ export default function ClientPortal({ publication, token }: Props) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+          className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
         >
           <div className="p-6">
             {/* Media Preview */}
@@ -256,7 +256,7 @@ export default function ClientPortal({ publication, token }: Props) {
 
             {/* Actions */}
             {!canReview ? (
-              <div className="rounded-xl border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100/50 p-4 text-center dark:border-yellow-800/30 dark:from-yellow-900/20 dark:to-yellow-900/10">
+              <div className="rounded-lg border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100/50 p-4 text-center dark:border-yellow-800/30 dark:from-yellow-900/20 dark:to-yellow-900/10">
                 <p className="mb-2 text-lg font-bold text-yellow-800 dark:text-yellow-300">
                   {t('portal.status.' + publication.status, publication.status)}
                 </p>
@@ -300,14 +300,14 @@ export default function ClientPortal({ publication, token }: Props) {
                 onSubmit={handleReject}
                 className="space-y-4"
               >
-                <div className="mb-3 flex items-center gap-3 rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-red-100/50 p-3 font-bold text-red-700 dark:border-red-800/30 dark:from-red-900/20 dark:to-red-900/10 dark:text-red-400">
+                <div className="mb-3 flex items-center gap-3 rounded-lg border border-red-200 bg-gradient-to-r from-red-50 to-red-100/50 p-3 font-bold text-red-700 dark:border-red-800/30 dark:from-red-900/20 dark:to-red-900/10 dark:text-red-400">
                   <MessageSquare className="h-5 w-5" />
                   {t('portal.rejection.title')}
                 </div>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="h-32 w-full rounded-xl border-2 border-gray-200 bg-white p-4 text-base text-gray-700 shadow-inner transition-all focus:border-red-500 focus:ring-4 focus:ring-red-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus:border-red-600"
+                  className="h-32 w-full rounded-lg border-2 border-gray-200 bg-white p-4 text-base text-gray-700 shadow-inner transition-all focus:border-red-500 focus:ring-4 focus:ring-red-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus:border-red-600"
                   placeholder={t('portal.rejection.placeholder')}
                   required
                 />

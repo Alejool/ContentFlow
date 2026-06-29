@@ -205,7 +205,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
                 {isToday(day) && (
                   <div className="absolute top-0 left-0 h-1 w-full bg-primary-500 shadow-[0_0_8px_rgba(var(--primary-500),0.5)]" />
                 )}
-                <div className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <div className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-neutral-400">
                   {format(day, 'EEE')}
                 </div>
                 <div

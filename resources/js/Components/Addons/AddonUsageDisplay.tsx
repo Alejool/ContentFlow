@@ -44,10 +44,10 @@ export default function AddonUsageDisplay({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h3>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">{name}</h3>
+        <span className="text-sm text-gray-500 dark:text-neutral-400">
           {formatValue(currentUsage)} {t('subscription.addons.used', 'usado')}
         </span>
       </div>
@@ -55,16 +55,16 @@ export default function AddonUsageDisplay({
       {/* Plan Base Usage */}
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
             {t('subscription.addons.basePlan', 'Plan Base')}
           </span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-neutral-400">
             {isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado') : formatValue(planLimit)}
           </span>
         </div>
 
         {!isUnlimited && (
-          <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+          <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
             <div
               className="h-2 rounded-full bg-blue-500 transition-all duration-300 dark:bg-blue-400"
               style={{
@@ -74,7 +74,7 @@ export default function AddonUsageDisplay({
           </div>
         )}
 
-        <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-neutral-400">
           <span>
             {formatValue(planUsage)} {t('subscription.addons.usedFromPlan', 'usado del plan')}
           </span>
@@ -84,7 +84,7 @@ export default function AddonUsageDisplay({
 
       {/* Addon Usage (only if exceeding plan or has addons) */}
       {(normalizedAddonTotal > 0 || isExceedingPlan) && (
-        <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
+        <div className="border-t border-gray-200 pt-4 dark:border-neutral-700">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-orange-700 dark:text-orange-400">
               {t('subscription.addons.extensionAddonsTitle', 'Addons de Extensión')}
@@ -143,16 +143,16 @@ export default function AddonUsageDisplay({
       )}
 
       {/* Total Usage Summary */}
-      <div className="-mx-6 -mb-6 mt-4 rounded-b-lg border-t border-gray-200 bg-gray-50 px-6 pb-6 pt-4 dark:border-gray-700 dark:bg-gray-900/50">
+      <div className="-mx-6 -mb-6 mt-4 rounded-b-lg border-t border-gray-200 bg-gray-50 px-6 pb-6 pt-4 dark:border-neutral-700 dark:bg-neutral-900/50">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          <span className="text-sm font-medium text-gray-900 dark:text-neutral-100">
             {t('subscription.addons.totalAvailableUsage', 'Uso Total Disponible')}
           </span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
             {isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado') : formatValue(planLimit + normalizedAddonTotal)}
           </span>
         </div>
-        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
           {t('subscription.addons.planLabel', 'Plan:')}{' '}
           {isUnlimited ? t('subscription.addons.unlimited', 'Ilimitado') : formatValue(planLimit)} +{' '}
           {t('subscription.addons.addonsLabel', 'Addons:')} {formatValue(normalizedAddonTotal)}

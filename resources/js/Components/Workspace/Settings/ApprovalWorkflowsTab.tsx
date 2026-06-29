@@ -104,22 +104,22 @@ export default function ApprovalWorkflowsTab({
   if (!hasBasicApprovalAccess) {
     return (
       <div className="mx-auto max-w-4xl">
-        <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-8 text-center dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
+        <div className="rounded-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-8 text-center dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
             <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             {t('common.approvals.upgrade.title')}
           </h3>
-          <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
+          <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-neutral-400">
             {t('common.approvals.upgrade.description')}
           </p>
 
           <div className="mx-auto mb-6 max-w-md rounded-lg bg-white p-6 dark:bg-theme-bg-secondary">
-            <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-neutral-300">
               {t('common.approvals.upgrade.benefits_title') || 'With approvals you get:'}
             </p>
-            <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-gray-400">
+            <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-neutral-400">
               <li className="flex items-center">
                 <CheckCircle className="mr-2 h-4 w-4 shrink-0 text-green-500" />
                 {t('common.approvals.upgrade.benefits.custom_workflows')}
@@ -405,7 +405,7 @@ export default function ApprovalWorkflowsTab({
 
   if (isEditing && editingWorkflow) {
     return (
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex flex-col border-b border-gray-200 bg-gray-50 p-6 md:flex-row md:items-center md:justify-between dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -490,7 +490,7 @@ export default function ApprovalWorkflowsTab({
             </div>
 
             {rolesWithApprovePermission.length === 0 && usersWithApprovePermission.length === 0 && (
-              <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
                 <div className="flex items-start gap-3">
                   <Shield className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
                   <div>
@@ -673,7 +673,7 @@ export default function ApprovalWorkflowsTab({
       </div>
 
       {workflows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center dark:border-neutral-700 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="bg-primary-50 dark:bg-primary-900/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
             <CheckCircle className="text-primary-600 h-8 w-8" />
           </div>
@@ -698,7 +698,7 @@ export default function ApprovalWorkflowsTab({
           {workflows.map((workflow) => (
             <div
               key={workflow.id}
-              className="group hover:border-primary-300 dark:hover:border-primary-700 rounded-xl border border-gray-200 bg-white p-5 transition-all dark:border-neutral-800 dark:bg-theme-bg-secondary"
+              className="group hover:border-primary-300 dark:hover:border-primary-700 rounded-lg border border-gray-200 bg-white p-5 transition-all dark:border-neutral-800 dark:bg-theme-bg-secondary"
             >
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -736,7 +736,7 @@ export default function ApprovalWorkflowsTab({
               <div className="flex flex-wrap items-center gap-2">
                 {workflow.steps.map((step, idx) => (
                   <div key={idx} className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300">
+                    <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-300">
                       {step.user_id ? <User className="h-3 w-3" /> : <Users className="h-3 w-3" />}
                       {step.name}
                     </div>

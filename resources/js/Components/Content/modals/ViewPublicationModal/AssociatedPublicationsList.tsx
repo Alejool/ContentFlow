@@ -15,7 +15,7 @@ export default function AssociatedPublicationsList({
 
   return (
     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-neutral-300">
         <Layers className="h-4 w-4" />
         {t('campaigns.modal.view.associatedPublications')} (
         <span className="font-bold">{publications.length}</span>)
@@ -59,7 +59,7 @@ function PublicationRow({ pub }: { pub: any }) {
           <FileText className="h-4 w-4 text-gray-400" />
         </div>
       )}
-      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+      <span className="text-sm font-medium text-gray-700 dark:text-neutral-200">
         {pub.title || pub.name || 'Untitled'}
       </span>
 

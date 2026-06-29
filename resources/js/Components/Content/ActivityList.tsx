@@ -90,9 +90,9 @@ const ActivityTimelineItem = ({
       <div className="min-w-0 flex-1 space-y-2 pt-1.5">
         <div className="flex justify-between space-x-4">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-neutral-400">
               {!activity.description && (
-                <span className="font-medium text-gray-900 dark:text-gray-200">
+                <span className="font-medium text-gray-900 dark:text-neutral-200">
                   {activity.type === 'publication_failed'
                     ? t('activity.timeline.system', 'Sistema')
                     : activity.user?.name || t('activity.timeline.system', 'Sistema')}{' '}
@@ -101,7 +101,7 @@ const ActivityTimelineItem = ({
               {formatActivityText(activity)}
             </p>
           </div>
-          <div className="whitespace-nowrap text-right text-sm text-gray-500 dark:text-gray-400">
+          <div className="whitespace-nowrap text-right text-sm text-gray-500 dark:text-neutral-400">
             <time dateTime={activity.created_at}>
               {formatDate(new Date(activity.created_at), 'PPp', {
                 locale: locale,
@@ -116,7 +116,7 @@ const ActivityTimelineItem = ({
               <div className="mb-1 font-medium text-red-700 dark:text-red-400">
                 {t('activity.timeline.before', 'Antes')}:
               </div>
-              <div className="break-words font-mono text-[10px] leading-tight text-gray-700 dark:text-gray-300">
+              <div className="break-words font-mono text-[10px] leading-tight text-gray-700 dark:text-neutral-300">
                 {typeof activity.formatted_changes.before === 'object'
                   ? JSON.stringify(activity.formatted_changes.before, null, 2)
                   : activity.formatted_changes.before || '(vacío)'}
@@ -126,7 +126,7 @@ const ActivityTimelineItem = ({
               <div className="mb-1 font-medium text-green-700 dark:text-green-400">
                 {t('activity.timeline.after', 'Después')}:
               </div>
-              <div className="break-words font-mono text-[10px] leading-tight text-gray-700 dark:text-gray-300">
+              <div className="break-words font-mono text-[10px] leading-tight text-gray-700 dark:text-neutral-300">
                 {typeof activity.formatted_changes.after === 'object'
                   ? JSON.stringify(activity.formatted_changes.after, null, 2)
                   : activity.formatted_changes.after || '(vacío)'}
@@ -292,7 +292,7 @@ export default function ActivityList({ activities }: ActivityListProps) {
 
   if (activities.length === 0) {
     return (
-      <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+      <div className="py-8 text-center text-gray-500 dark:text-neutral-400">
         <p>{t('activity.timeline.noActivity', 'No activity recorded yet.')}</p>
       </div>
     );

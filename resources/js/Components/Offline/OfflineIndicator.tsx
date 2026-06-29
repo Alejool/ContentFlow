@@ -85,12 +85,12 @@ export const OfflineIndicator: React.FC = () => {
 
       {/* Expanded Details - Requirements: 6.5 */}
       {isExpanded && pendingCount > 0 && (
-        <div className="mt-2 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div className="mt-2 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
           <div className="px-4 py-3">
-            <p className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+            <p className="mb-2 text-xs font-medium text-gray-700 dark:text-neutral-300">
               Pending Operations
             </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-neutral-400">
               {!isOnline
                 ? "These operations will be synced automatically when you're back online."
                 : 'Syncing operations in the background...'}

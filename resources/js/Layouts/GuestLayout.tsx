@@ -29,7 +29,7 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
     <div>
       {section !== 'login' && <ReturnToLogin />}
       <ThemeLanguageContainer />
-      <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 lg:flex-row">
+      <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 lg:flex-row">
         <div className="relative w-full overflow-hidden bg-primary-500 lg:w-1/2">
           <div className="absolute inset-0 bg-black/10" />
           <div className="relative flex h-full flex-col items-center justify-center p-8 text-white">

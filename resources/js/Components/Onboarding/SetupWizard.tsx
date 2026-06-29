@@ -137,7 +137,7 @@ export default function SetupWizard({
       aria-labelledby="wizard-title"
       aria-describedby="wizard-description"
     >
-      <div className="max-h-[95vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white shadow-2xl md:max-h-[90vh] dark:bg-theme-bg-secondary">
+      <div className="max-h-[95vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-2xl md:max-h-[90vh] dark:bg-theme-bg-secondary">
         {/* Header - Responsive layout (Requirement 7.1, 7.2) */}
         <div className="sticky top-0 z-10 flex items-start justify-between gap-2 border-b border-gray-200 bg-white px-4 py-3 md:items-center md:gap-4 md:px-6 md:py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="min-w-0 flex-1">
@@ -151,7 +151,7 @@ export default function SetupWizard({
             </h2>
             <p
               id="wizard-description"
-              className="mt-1 line-clamp-2 text-xs text-gray-500 md:text-sm dark:text-gray-400"
+              className="mt-1 line-clamp-2 text-xs text-gray-500 md:text-sm dark:text-neutral-400"
             >
               {currentStep === 'welcome' && t('wizard.description.welcome')}
               {currentStep === 'platforms' && t('wizard.description.platforms')}
@@ -189,7 +189,7 @@ export default function SetupWizard({
           <button
             onClick={handleBack}
             disabled={currentStep === 'welcome' || state.isLoading}
-            className="focus:ring-primary-500 order-2 flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:order-1 dark:text-gray-400 dark:hover:text-white"
+            className="focus:ring-primary-500 order-2 flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:order-1 dark:text-neutral-400 dark:hover:text-white"
             aria-label={t('wizard.previousStep')}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -205,7 +205,7 @@ export default function SetupWizard({
               <button
                 onClick={handleSkip}
                 disabled={isSkipping || state.isLoading}
-                className="focus:ring-primary-500 min-h-[44px] rounded-lg px-4 py-2 text-center text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-white"
+                className="focus:ring-primary-500 min-h-[44px] rounded-lg px-4 py-2 text-center text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400 dark:hover:text-white"
                 aria-label={t('wizard.skipSetup')}
               >
                 {isSkipping ? t('wizard.skipping') : t('wizard.skip')}
@@ -285,7 +285,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
         <h3 className="mb-2 text-lg font-semibold text-gray-900 md:mb-3 md:text-xl dark:text-white">
           {t('wizard.welcome.heading')}
         </h3>
-        <p className="text-sm leading-relaxed text-gray-600 md:text-base dark:text-gray-400">
+        <p className="text-sm leading-relaxed text-gray-600 md:text-base dark:text-neutral-400">
           {t('wizard.welcome.description')}
         </p>
       </div>
@@ -310,7 +310,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
           <h4 className="mb-1 font-medium text-gray-900 dark:text-white">
             {t('wizard.welcome.features.schedule.title')}
           </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('wizard.welcome.features.schedule.description')}
           </p>
         </div>
@@ -334,7 +334,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
           <h4 className="mb-1 font-medium text-gray-900 dark:text-white">
             {t('wizard.welcome.features.analytics.title')}
           </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('wizard.welcome.features.analytics.description')}
           </p>
         </div>
@@ -358,7 +358,7 @@ function WelcomeScreen({ onNext, onSkip }: { onNext: () => void; onSkip: () => v
           <h4 className="mb-1 font-medium text-gray-900 dark:text-white">
             {t('wizard.welcome.features.collaborate.title')}
           </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('wizard.welcome.features.collaborate.description')}
           </p>
         </div>
@@ -383,7 +383,7 @@ function PlatformsScreen({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <p className="text-gray-600 dark:text-gray-200">{t('wizard.platforms.description')}</p>
+        <p className="text-gray-600 dark:text-neutral-200">{t('wizard.platforms.description')}</p>
       </div>
 
       <div
@@ -393,7 +393,7 @@ function PlatformsScreen({
       >
         {availablePlatforms.length === 0 ? (
           <div className="col-span-full py-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 dark:text-neutral-400">
               No platforms available. Please check your configuration.
             </p>
           </div>
@@ -418,7 +418,7 @@ function PlatformsScreen({
 
       {connectedAccounts.length === 0 && (
         <div className="py-8 text-center" role="status" aria-live="polite">
-          <p className="text-gray-500 dark:text-gray-400">{t('wizard.platforms.noAccounts')}</p>
+          <p className="text-gray-500 dark:text-neutral-400">{t('wizard.platforms.noAccounts')}</p>
         </div>
       )}
     </div>
@@ -457,7 +457,7 @@ function SuccessScreen({
         <h3 className="mb-2 text-lg font-semibold text-gray-900 md:mb-3 md:text-xl dark:text-white">
           {t('wizard.success.heading')}
         </h3>
-        <p className="text-sm leading-relaxed text-gray-600 md:text-base dark:text-gray-400">
+        <p className="text-sm leading-relaxed text-gray-600 md:text-base dark:text-neutral-400">
           {t('wizard.success.description', {
             count: connectedAccounts.length,
             accountText,
@@ -484,7 +484,7 @@ function SuccessScreen({
                 <p className="font-medium text-gray-900 capitalize dark:text-white">
                   {account.platform}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{account.account_name}</p>
+                <p className="text-sm text-gray-500 dark:text-neutral-400">{account.account_name}</p>
               </div>
               <svg
                 className="h-5 w-5 text-green-600"
@@ -505,7 +505,7 @@ function SuccessScreen({
       </div>
 
       <div className="pt-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t('wizard.success.nextStep')}</p>
+        <p className="text-sm text-gray-500 dark:text-neutral-400">{t('wizard.success.nextStep')}</p>
       </div>
     </div>
   );

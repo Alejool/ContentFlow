@@ -37,7 +37,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative overflow-hidden rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-5 dark:border-red-800 dark:from-red-900/20 dark:to-orange-900/20"
+          className="relative overflow-hidden rounded-lg border border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-5 dark:border-red-800 dark:from-red-900/20 dark:to-orange-900/20"
         >
           {/* Decoración de fondo */}
           <div className="absolute top-0 right-0 h-32 w-32 translate-x-8 -translate-y-8 transform opacity-10">
@@ -49,7 +49,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-100 shadow-sm dark:bg-red-900/40"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-red-100 shadow-sm dark:bg-red-900/40"
             >
               <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
             </motion.div>
@@ -73,7 +73,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
         >
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-neutral-900">
-              <span className="text-lg font-bold text-gray-700 dark:text-gray-300">
+              <span className="text-lg font-bold text-gray-700 dark:text-neutral-300">
                 {selectedCount}
               </span>
             </div>
@@ -83,7 +83,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
                   ? 'Se eliminará 1 evento'
                   : `Se eliminarán ${selectedCount} eventos`}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-neutral-400">
                 Esta acción no se puede deshacer
               </p>
             </div>

@@ -77,7 +77,7 @@ const PublicationTable = memo(function PublicationTable({
       case 'publishing':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
       case 'draft':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
       case 'scheduled':
         return 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400';
       case 'failed':
@@ -89,7 +89,7 @@ const PublicationTable = memo(function PublicationTable({
       case 'rejected':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
     }
   }, []);
 
@@ -117,7 +117,7 @@ const PublicationTable = memo(function PublicationTable({
                 <div className="w-full overflow-x-auto">
                   <table className="z-0 w-full border-collapse text-left">
                     <thead className="sticky top-0 z-10 border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-theme-bg-secondary">
-                      <tr className="border-b bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-400">
+                      <tr className="border-b bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500 dark:bg-theme-bg-secondary dark:text-neutral-400">
                         <TableHeader mode="publications" t={t} />
                       </tr>
                     </thead>
@@ -155,7 +155,7 @@ const PublicationTable = memo(function PublicationTable({
               <div className="animate-out fade-out fill-mode-forwards z-20 col-start-1 row-start-1 bg-white/50 duration-500 dark:bg-theme-bg-secondary">
                 <table className="w-full border-collapse text-left">
                   <thead>
-                    <tr className="border-b text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <tr className="border-b text-xs uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                       <TableHeader mode="publications" t={t} />
                     </tr>
                   </thead>

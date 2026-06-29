@@ -59,7 +59,7 @@ export default function ThemeSwitcher() {
             exit={{ scale: 0.5, opacity: 0, rotate: 180 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
-            <Icon className="h-5 w-5 text-gray-700 transition-all duration-300 group-hover:scale-110 dark:text-gray-300" />
+            <Icon className="h-5 w-5 text-gray-700 transition-all duration-300 group-hover:scale-110 dark:text-neutral-300" />
           </motion.div>
         </AnimatePresence>
 
@@ -70,7 +70,7 @@ export default function ThemeSwitcher() {
             isAnimating ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
           }`}
         >
-          <NextIcon className="h-2.5 w-2.5 text-gray-600 dark:text-gray-400" />
+          <NextIcon className="h-2.5 w-2.5 text-gray-600 dark:text-neutral-400" />
         </motion.div>
 
         <motion.div

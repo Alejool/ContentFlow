@@ -41,7 +41,7 @@ export function PublicationStatusCard({
       }}
       whileHover={{ scale: 1.02, y: -2 }}
       className={cn(
-        'group relative flex flex-col items-center overflow-hidden rounded-xl border p-3 text-center shadow-sm transition-all duration-300 sm:p-4',
+        'group relative flex flex-col items-center overflow-hidden rounded-lg border p-3 text-center shadow-sm transition-all duration-300 sm:p-4',
         'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
         'hover:shadow-lg',
       )}
@@ -62,7 +62,7 @@ export function PublicationStatusCard({
               <Popover.Button
                 className={cn(
                   'rounded-full p-1 transition-all duration-200',
-                  'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300',
+                  'text-gray-400 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300',
                   'hover:bg-gray-100 dark:hover:bg-neutral-700',
                   open && 'bg-gray-100 dark:bg-neutral-700',
                 )}
@@ -80,7 +80,7 @@ export function PublicationStatusCard({
                 leaveTo="opacity-0 translate-y-1"
               >
                 <Popover.Panel className="absolute right-0 top-8 z-30 w-48 rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary">
-                  <p className="text-xs text-gray-600 dark:text-gray-300">{tooltipContent}</p>
+                  <p className="text-xs text-gray-600 dark:text-neutral-300">{tooltipContent}</p>
                 </Popover.Panel>
               </Transition>
             </>
@@ -113,7 +113,7 @@ export function PublicationStatusCard({
       <p
         className={cn(
           'relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide sm:text-xs',
-          'text-gray-500 dark:text-gray-400',
+          'text-gray-500 dark:text-neutral-400',
           'transition-colors duration-300 group-hover:text-gray-700 dark:group-hover:text-gray-200',
         )}
       >

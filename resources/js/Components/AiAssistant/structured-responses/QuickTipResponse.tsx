@@ -45,7 +45,7 @@ export default function QuickTipResponse({ data, theme }: QuickTipResponseProps)
         <StepsList steps={data.response.steps} theme={theme} />
       )}
 
-      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-neutral-400">
         {data.estimated_time && (
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
@@ -76,7 +76,7 @@ interface CampaignOptionsProps {
 function CampaignOptions({ campaigns, theme }: CampaignOptionsProps) {
   return (
     <div className="space-y-3">
-      <h4 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <h4 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-neutral-300">
         <List className="h-4 w-4" />
         Campañas disponibles:
       </h4>
@@ -172,7 +172,7 @@ function ActionOptions({ actions, theme }: ActionOptionsProps) {
 
   return (
     <div className="space-y-3">
-      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-neutral-300">
         Acciones disponibles:
       </h4>
       <div className="grid grid-cols-1 gap-2">
@@ -209,7 +209,7 @@ interface StepsListProps {
 function StepsList({ steps, theme }: StepsListProps) {
   return (
     <div className="space-y-3">
-      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Pasos a seguir:</h4>
+      <h4 className="text-sm font-medium text-gray-700 dark:text-neutral-300">Pasos a seguir:</h4>
       <div className="space-y-2">
         {steps.map((step, index) => (
           <div

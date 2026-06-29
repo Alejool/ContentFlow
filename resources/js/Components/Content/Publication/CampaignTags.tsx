@@ -11,7 +11,7 @@ const CampaignTags = memo(function CampaignTags({ publication, t }: CampaignTags
 
   if (campaigns.length === 0) {
     return (
-      <span className="text-xs italic text-gray-400 dark:text-gray-500">
+      <span className="text-xs italic text-gray-400 dark:text-neutral-500">
         {t('publications.table.noCampaign')}
       </span>
     );

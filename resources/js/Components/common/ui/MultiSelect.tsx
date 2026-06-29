@@ -45,7 +45,7 @@ export default function MultiSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-primary-400 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:border-primary-500"
+        className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-primary-400 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:border-primary-500"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Select options. ${selected.length} of ${options.length} selected`}

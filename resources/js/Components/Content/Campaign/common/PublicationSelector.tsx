@@ -82,7 +82,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
             <PublicationThumbnail thumbnail={thumbnail} />
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="truncate text-sm font-medium text-gray-900 dark:text-neutral-100">
                 {pub.title || pub.name || 'Untitled'}
               </p>
             </div>
@@ -126,7 +126,7 @@ const PublicationThumbnail: React.FC<{
 
   if (isS3Key && isLoading) {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 dark:bg-gray-700">
+      <div className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 dark:bg-neutral-700">
         <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
       </div>
     );

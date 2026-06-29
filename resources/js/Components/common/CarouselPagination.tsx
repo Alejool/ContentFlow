@@ -29,7 +29,7 @@ export function CarouselPagination({
       >
         <ChevronLeft className="h-5 w-5" />
       </Button>
-      <span className="min-w-[60px] text-center text-sm text-gray-600 dark:text-gray-400">
+      <span className="min-w-[60px] text-center text-sm text-gray-600 dark:text-neutral-400">
         {currentSlide + 1} / {totalSlides}
       </span>
       <Button
@@ -67,7 +67,7 @@ export function CarouselDots({
           key={index}
           onClick={() => onDotClick(index)}
           className={`h-2 rounded-full transition-all ${
-            currentSlide === index ? 'w-6 bg-primary-600' : 'w-2 bg-gray-300 dark:bg-gray-600'
+            currentSlide === index ? 'w-6 bg-primary-600' : 'w-2 bg-gray-300 dark:bg-neutral-600'
           }`}
           aria-label={`Ir a slide ${index + 1}`}
         />

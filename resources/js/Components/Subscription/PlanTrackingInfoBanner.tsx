@@ -12,7 +12,7 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
   const formattedDate = startDate ? formatDateString(startDate) : formatDateString(new Date());
 
   return (
-    <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 p-6 dark:border-green-700/50 dark:from-green-900/20 dark:to-emerald-800/20">
+    <div className="rounded-lg border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 p-6 dark:border-green-700/50 dark:from-green-900/20 dark:to-emerald-800/20">
       <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
         <Zap className="h-5 w-5 text-green-600 dark:text-green-400" />
         {t('subscription.addons.newTrackingSystem.title', 'Nuevo Sistema de Trazabilidad por Plan')}
@@ -27,7 +27,7 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
                 'Uso independiente por plan',
               )}
             </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700 dark:text-neutral-300">
               {t(
                 'subscription.addons.newTrackingSystem.independentUsageDesc',
                 'Cada plan empieza desde 0',
@@ -42,7 +42,7 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.newTrackingSystem.startDate', 'Fecha de inicio')}
             </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700 dark:text-neutral-300">
               {t(
                 'subscription.addons.newTrackingSystem.startDateDesc',
                 'El uso se cuenta desde {date}',
@@ -60,7 +60,7 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.newTrackingSystem.addonsIntact', 'Addons intactos')}
             </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700 dark:text-neutral-300">
               {t(
                 'subscription.addons.newTrackingSystem.addonsIntactDesc',
                 'Tus addons se mantienen al cambiar de plan',
@@ -75,7 +75,7 @@ export function PlanTrackingInfoBanner({ startDate }: PlanTrackingInfoBannerProp
             <p className="font-semibold text-gray-900 dark:text-white">
               {t('subscription.addons.newTrackingSystem.smartConsumption', 'Consumo inteligente')}
             </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700 dark:text-neutral-300">
               {t(
                 'subscription.addons.newTrackingSystem.smartConsumptionDesc',
                 'Solo se usan cuando excedes tu plan base',

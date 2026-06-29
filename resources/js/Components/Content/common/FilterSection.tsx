@@ -141,7 +141,7 @@ export default function FilterSection({
   return (
     <div className="mt-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h3 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-neutral-300">
           <Filter className="h-4 w-4" />
           {t('common.filters.title')}
         </h3>
@@ -153,7 +153,7 @@ export default function FilterSection({
                 onResetFilters();
                 setSearch('');
               }}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:text-gray-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               {t('logs.filters.clear')}

@@ -50,14 +50,14 @@ export const DroppableDay: React.FC<DroppableDayProps> = ({
               isTodayDay
                 ? 'scale-110 bg-primary-600 text-white shadow-lg shadow-primary-500/30'
                 : isCurrentMonth
-                  ? 'text-gray-700 group-hover:bg-gray-100 dark:text-gray-300 dark:group-hover:bg-neutral-900'
-                  : 'text-gray-400 dark:text-gray-600'
+                  ? 'text-gray-700 group-hover:bg-gray-100 dark:text-neutral-300 dark:group-hover:bg-neutral-900'
+                  : 'text-gray-400 dark:text-neutral-600'
             } `}
           >
             {format(day, 'd')}
           </span>
           <span
-            className={`text-xs font-medium uppercase lg:hidden ${isTodayDay ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}`}
+            className={`text-xs font-medium uppercase lg:hidden ${isTodayDay ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-neutral-400'}`}
           >
             {format(day, 'EEE')}
           </span>

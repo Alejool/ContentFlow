@@ -45,7 +45,7 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
 
   if (loading) {
     return (
-      <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="py-8 text-center text-sm text-gray-500 dark:text-neutral-400">
         <div className="border-primary-500 mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
         {t('common.loading') || 'Loading...'}
       </div>
@@ -54,7 +54,7 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
 
   if (campaigns.length === 0) {
     return (
-      <div className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="py-6 text-center text-sm text-gray-500 dark:text-neutral-400">
         {t('publications.modal.add.noCampaigns') || 'No campaigns available'}
       </div>
     );
@@ -94,7 +94,7 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                 isSelected
                   ? 'bg-primary-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 dark:bg-neutral-700 dark:text-neutral-400'
               }`}
             >
               <Target className="h-5 w-5" />
@@ -106,14 +106,14 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
                 className={`truncate text-sm font-semibold ${
                   isSelected
                     ? 'text-primary-700 dark:text-primary-300'
-                    : 'text-gray-900 dark:text-gray-100'
+                    : 'text-gray-900 dark:text-neutral-100'
                 }`}
               >
                 {campaign.name || campaign.title || 'Untitled Campaign'}
               </p>
 
               {dateRange && (
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500 dark:text-neutral-400">
                   <Calendar className="h-3 w-3" />
                   <span>{dateRange}</span>
                 </div>
@@ -127,7 +127,7 @@ const CampaignSelector: React.FC<CampaignSelectorProps> = ({
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                         : campaign.status.toLowerCase() === 'completed'
                           ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+                          : 'bg-gray-100 text-gray-800 dark:bg-neutral-900/30 dark:text-neutral-400'
                     }`}
                   >
                     {campaign.status}

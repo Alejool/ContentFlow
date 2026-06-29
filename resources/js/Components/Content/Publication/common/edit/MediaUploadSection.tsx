@@ -176,7 +176,7 @@ const MediaUploadSection = memo(
 
             {/* Indicador de límites */}
             {mediaPreviews.length > 0 && (
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-neutral-400">
                 <Info className="h-3 w-3" />
                 <span>
                   {mediaRules.videoOnly
@@ -597,7 +597,7 @@ const EmptyUploadState = memo(
     return (
       <div className="space-y-4">
         <div
-          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? 'bg-gray-200 dark:bg-gray-800' : 'bg-primary-100 group-hover:scale-110 dark:bg-primary-900/30'}`}
+          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? 'bg-gray-200 dark:bg-neutral-800' : 'bg-primary-100 group-hover:scale-110 dark:bg-primary-900/30'}`}
         >
           {isProcessing ? (
             <Loader2 className="h-8 w-8 animate-spin text-white" />

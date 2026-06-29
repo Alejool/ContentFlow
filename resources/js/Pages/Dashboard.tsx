@@ -165,7 +165,7 @@ export default function Dashboard({
             <h1 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">
               ¡Bienvenido, {auth.user.name}!
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-lg text-gray-600 dark:text-neutral-400">
               {t('dashboard.subtitle', 'Estadísticas generales del sistema.')}
             </p>
           </div>
@@ -178,7 +178,7 @@ export default function Dashboard({
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                   period === days
                     ? 'bg-white text-gray-900 shadow-sm dark:bg-neutral-800 dark:text-white'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-gray-200'
                 }`}
               >
                 {days} {t('common.units.days', 'Days')}
@@ -198,14 +198,14 @@ export default function Dashboard({
               <div className="flex flex-1 items-start gap-4">
                 <div className="shrink-0">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-700">
-                    <Mail className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                    <Mail className="h-6 w-6 text-gray-600 dark:text-neutral-300" />
                   </div>
                 </div>
                 <div className="flex-1">
                   <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                     {t('auth.verification.banner.title')}
                   </h3>
-                  <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
                     {t('auth.verification.banner.message')}
                   </p>
                   {successMessage && (
@@ -237,7 +237,7 @@ export default function Dashboard({
         )}
 
         {/* Tab Navigation */}
-        <div className="mb-8 border-b border-gray-200 dark:border-gray-800">
+        <div className="mb-8 border-b border-gray-200 dark:border-neutral-800">
           <nav className="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -251,11 +251,11 @@ export default function Dashboard({
                     ${
                       isActive
                         ? 'border-primary-500 text-primary-600 dark:border-primary-400 dark:text-primary-400'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-neutral-400 dark:hover:border-gray-600 dark:hover:text-gray-300'
                     }
                   `}
                 >
-                  <Icon className={`h-5 w-5 ${isActive ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400'}`} />
+                  <Icon className={`h-5 w-5 ${isActive ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500 dark:text-neutral-500 dark:group-hover:text-gray-400'}`} />
                   {tab.label}
                 </button>
               );
@@ -279,7 +279,7 @@ export default function Dashboard({
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {t('dashboard.sections.performance', 'Resumen de Rendimiento')}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-neutral-400">
                     {t('dashboard.sections.performanceDesc', 'Métricas clave sobre el alcance y la interacción de tu contenido.')}
                   </p>
                 </div>
@@ -302,7 +302,7 @@ export default function Dashboard({
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {t('dashboard.sections.publications', 'Estado de Publicaciones')}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-neutral-400">
                     {t('dashboard.sections.publicationsDesc', 'Reporte del estado actual de tus campañas y publicaciones recientes.')}
                   </p>
                 </div>
@@ -320,7 +320,7 @@ export default function Dashboard({
                       <action.icon className="h-6 w-6" />
                     </div>
                     <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">{action.title}</h3>
-                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{action.desc}</p>
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-neutral-400">{action.desc}</p>
                     <div className={`absolute bottom-0 left-0 h-1 transition-all duration-300 bg-${action.color}-500 w-0 group-hover:w-full dark:bg-${action.color}-500/50`} />
                   </Link>
                 ))}
@@ -342,7 +342,7 @@ export default function Dashboard({
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {t('dashboard.sections.interaction', 'Métricas de Interacción')}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-neutral-400">
                     {t('dashboard.sections.interactionDesc', 'Análisis detallado de cómo los usuarios interactúan con tu marca.')}
                   </p>
                 </div>

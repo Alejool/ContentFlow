@@ -52,7 +52,7 @@ export default function WorkspaceSettingsHeader({ workspace }: WorkspaceSettings
             </div>
           </div>
         </div>
-        <p className="flex justify-start text-gray-600 dark:text-gray-400">
+        <p className="flex justify-start text-gray-600 dark:text-neutral-400">
           {workspace.description || t('workspace.no_description')}
         </p>
       </div>

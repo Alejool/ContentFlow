@@ -19,7 +19,7 @@ function ConfirmationDialog({ isOpen, onClose, onConfirm, isLoading }: Confirmat
 
   return (
     <div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm duration-200">
-      <div className="animate-in zoom-in-95 w-full max-w-md rounded-xl bg-white p-6 shadow-2xl duration-200 dark:bg-theme-bg-secondary">
+      <div className="animate-in zoom-in-95 w-full max-w-md rounded-lg bg-white p-6 shadow-2xl duration-200 dark:bg-theme-bg-secondary">
         <div className="mb-6 flex items-start gap-4">
           <div className="rounded-full bg-amber-100 p-3 dark:bg-amber-900/30">
             <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
@@ -28,7 +28,7 @@ function ConfirmationDialog({ isOpen, onClose, onConfirm, isLoading }: Confirmat
             <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
               {t('profile.onboarding.confirmTitle') || 'Restart Onboarding?'}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('profile.onboarding.confirmMessage') ||
                 'This will reset your onboarding progress and restart the guided tour. Your account data and settings will not be affected.'}
             </p>
@@ -88,7 +88,7 @@ export default function OnboardingSection() {
             <RotateCcw className="text-primary-600 dark:text-primary-400 h-5 w-5" />
             {t('profile.onboarding.title') || 'Onboarding'}
           </h3>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-600 dark:text-neutral-400">
             {t('profile.onboarding.description') ||
               'Manage your onboarding experience and guided tour'}
           </p>
@@ -123,7 +123,7 @@ export default function OnboardingSection() {
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {t('profile.onboarding.restartLabel') || 'Restart Onboarding Tour'}
             </p>
-            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
               {t('profile.onboarding.restartHint') ||
                 'Review the platform features and setup process again'}
             </p>

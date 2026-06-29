@@ -140,14 +140,14 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                 <div className="flex-1">
                   <div className="rounded-lg bg-gray-50 p-3 dark:bg-theme-bg-secondary">
                     <div className="mb-1 flex items-center justify-between">
-                      <span className="text-xs font-semibold text-gray-900 dark:text-gray-100">
+                      <span className="text-xs font-semibold text-gray-900 dark:text-neutral-100">
                         {comment.user.name}
                       </span>
                       <span className="text-[10px] text-gray-500">
                         {format(new Date(comment.created_at), 'MMM d, h:mm a')}
                       </span>
                     </div>
-                    <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+                    <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-neutral-300">
                       {comment.content}
                     </p>
                   </div>
@@ -186,14 +186,14 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                         <div className="flex-1">
                           <div className="rounded-lg bg-gray-100 px-4 py-2 dark:bg-theme-bg-secondary">
                             <div className="mb-0.5 flex items-center justify-between">
-                              <span className="text-[12px] font-bold text-gray-900 dark:text-gray-100">
+                              <span className="text-[12px] font-bold text-gray-900 dark:text-neutral-100">
                                 {reply.user.name}
                               </span>
                               <span className="text-[10px] text-gray-500">
                                 {format(new Date(reply.created_at), 'MMM d, h:mm a')}
                               </span>
                             </div>
-                            <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+                            <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-neutral-300">
                               {reply.content}
                             </p>
                           </div>
@@ -259,7 +259,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                   className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800"
                 >
                   <Avatar src={member.photo_url} name={member.name} size="xs" />
-                  <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
+                  <span className="text-xs font-medium text-gray-900 dark:text-neutral-100">
                     {member.name}
                   </span>
                 </button>

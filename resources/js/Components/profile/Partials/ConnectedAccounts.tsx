@@ -121,7 +121,7 @@ export default function ConnectedAccounts({ className = '' }) {
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
                   account.isConnected
                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-gray-100 text-gray-600 dark:bg-neutral-700 dark:text-gray-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-neutral-700 dark:text-neutral-400'
                 } `}
               >
                 {account.isConnected ? (
@@ -140,7 +140,7 @@ export default function ConnectedAccounts({ className = '' }) {
               {/* Icono de configuración */}
               <div className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100">
                 <div className="rounded-lg bg-white p-1.5 shadow-md dark:bg-neutral-700">
-                  <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  <Settings className="h-4 w-4 text-gray-600 dark:text-neutral-400" />
                 </div>
               </div>
 

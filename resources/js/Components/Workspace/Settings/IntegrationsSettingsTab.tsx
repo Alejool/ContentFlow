@@ -402,7 +402,7 @@ export default function IntegrationsSettingsTab({
 
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-neutral-300">
                     {t('workspace.integrations.webhook_secret')}
                   </label>
                   <div className="flex items-center gap-2">
@@ -545,7 +545,7 @@ export default function IntegrationsSettingsTab({
                             ) : log.channel === 'discord' ? (
                               <Server className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             ) : (
-                              <Bell className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                              <Bell className="h-4 w-4 text-gray-600 dark:text-neutral-400" />
                             )}
                           </div>
                           <span className="text-sm font-medium capitalize text-gray-900 dark:text-white">

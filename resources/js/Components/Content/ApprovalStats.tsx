@@ -83,7 +83,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
               <div className="mb-1 text-2xl font-bold leading-none text-gray-900 dark:text-white">
                 {stat.value}
               </div>
-              <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <div className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                 {stat.label}
               </div>
             </div>

@@ -156,7 +156,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                 {item.user && (
                   <div className="mb-2 flex items-center gap-2">
                     <Avatar src={item.user.photo_url} name={item.user.name} size="xs" />
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-600 dark:text-neutral-400">
                       {item.user.name}
                     </span>
                   </div>
@@ -166,7 +166,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                   <h3 className="truncate text-base leading-tight font-bold text-gray-900 dark:text-white">
                     {item.title || t('publications.table.untitled')}
                   </h3>
-                  <p className="mt-1 line-clamp-2 text-xs break-words text-gray-600 dark:text-gray-400">
+                  <p className="mt-1 line-clamp-2 text-xs break-words text-gray-600 dark:text-neutral-400">
                     {item.description || t('publications.table.noDescription')}
                   </p>
                 </div>
@@ -300,13 +300,13 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
 
                   {/* More options menu */}
                   <Menu>
-                    <MenuButton className="focus:ring-primary-500 inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700">
+                    <MenuButton className="focus:ring-primary-500 inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700">
                       <MoreVertical className="h-5 w-5" />
                       <span className="sr-only">{t('common.more')}</span>
                     </MenuButton>
                     <MenuItems
                       anchor="bottom end"
-                      className="ring-opacity-5 z-[9999] mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white shadow-lg ring-1 ring-black focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary"
+                      className="ring-opacity-5 z-[9999] mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg ring-1 ring-black focus:outline-none dark:border-neutral-700 dark:bg-theme-bg-secondary"
                     >
                       <div className="space-y-1 p-2">
                         <MenuItem>

@@ -17,7 +17,7 @@ export default function ReelsSection({ reels }: ReelsSectionProps) {
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
           <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
         </div>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300">
           {t('reels.section.title')} ({reels.length})
         </h3>
       </div>

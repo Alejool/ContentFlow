@@ -60,7 +60,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
                 exit="exit"
                 className={`absolute z-[9999] max-w-xs ${positionClasses[position]}`}
               >
-                <div className="rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg dark:bg-gray-800">
+                <div className="rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg dark:bg-neutral-800">
                   <div className="flex items-start gap-2">
                     <div className="flex-1">
                       {typeof content === 'string' ? (

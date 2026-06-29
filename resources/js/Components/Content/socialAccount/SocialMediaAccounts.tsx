@@ -321,7 +321,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
     <Disclosure defaultOpen={defaultOpen} as="div" key={`social-accounts-${defaultOpen ? 'open' : 'closed'}`}>
       {({ open }) => (
         <div>
-          <DisclosureButton className={`flex w-full items-center justify-between rounded-lg border p-4 transition-all duration-300 ${highlighted ? 'border-primary-400/50 bg-primary-50/80 shadow-lg shadow-primary-500/10 dark:bg-primary-900/20 dark:border-primary-500/30' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm dark:border-black/50 dark:bg-black/70 dark:hover:border-neutral-600'}`}>
+          <DisclosureButton className={`flex w-full items-center justify-between rounded-lg border p-4 transition-all duration-300 ${highlighted ? 'border-primary-400/50 bg-primary-50/80 shadow-lg shadow-primary-500/10 dark:bg-primary-900/20 dark:border-primary-500/30' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm dark:border-black/50 dark:bg-neutral-900/70 dark:hover:border-neutral-600'}`}>
             <div className="flex items-center gap-3">
               <motion.div
                 animate={{ rotate: open ? 360 : 0 }}
@@ -331,10 +331,10 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                 <BarChart3 className="text-primary-500 h-5 w-5" />
               </motion.div>
               <div className="text-left">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                <h3 className="font-semibold text-gray-900 dark:text-neutral-100">
                   {t('manageContent.socialMedia.title')}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   {connectedAccountsCount} {t('manageContent.socialMedia.accounts')}{' '}
                   {t('manageContent.socialMedia.connected')}
                 </p>
@@ -342,7 +342,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-neutral-400">
                   {open
                     ? t('manageContent.socialMedia.hide')
                     : t('manageContent.socialMedia.seeAccounts')}
@@ -394,7 +394,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                 className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-tight uppercase transition-colors ${
                                   account.isConnected
                                     ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/80 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                    : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-400'
+                                    : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-400'
                                 }`}
                               >
                                 {account.isConnected ? (
@@ -461,7 +461,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                 )}
                               </motion.div>
 
-                              <h3 className="w-full truncate px-2 text-lg leading-tight font-bold text-gray-900 dark:text-gray-100">
+                              <h3 className="w-full truncate px-2 text-lg leading-tight font-bold text-gray-900 dark:text-neutral-100">
                                 {account.isConnected && account.accountDetails?.account_name
                                   ? account.accountDetails.account_name
                                   : account.name}
@@ -469,7 +469,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
 
                               {account.isConnected && account.accountDetails ? (
                                 <div className="mt-1.5 flex flex-col items-center gap-1">
-                                  <p className="rounded-full border border-gray-100 bg-gray-50 px-2 py-0.5 text-[10px] font-bold text-gray-500 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:text-gray-400">
+                                  <p className="rounded-full border border-gray-100 bg-gray-50 px-2 py-0.5 text-[10px] font-bold text-gray-500 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:text-neutral-400">
                                     {account.accountDetails.account_metadata?.username
                                       ? `@${account.accountDetails.account_metadata.username}`
                                       : `ID: ${account.accountDetails.account_id}`}
@@ -483,7 +483,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                   )}
                                 </div>
                               ) : (
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                                   {t('manageContent.socialMedia.status.connectToShare')}
                                 </p>
                               )}
@@ -496,48 +496,48 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                             if (!apiLimits) return null;
                             return (
                               <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50/80 px-3 py-2.5 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
-                                <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                                   {t('manageContent.socialMedia.apiLimits')}
                                 </p>
                                 <div className="space-y-1">
                                   {account.platform.toLowerCase() === 'facebook' && (<>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.requestsPerHour')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerHour}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerHour')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerHour}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.requestsPerMinute')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerMinute}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerMinute')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerMinute}</span>
                                     </div>
                                   </>)}
                                   {account.platform.toLowerCase() === 'tiktok' && (<>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.requestsPerDay')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerDay}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerDay')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerDay}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.postsPerDay')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.postsPerDay}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.postsPerDay')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.postsPerDay}</span>
                                     </div>
                                   </>)}
                                   {account.platform.toLowerCase() === 'twitter' && (<>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.postsPerThreeHours')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.postsPerThreeHours}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.postsPerThreeHours')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.postsPerThreeHours}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.requestsPerDay')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerDay}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerDay')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerDay}</span>
                                     </div>
                                   </>)}
                                   {account.platform.toLowerCase() === 'youtube' && (<>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.dailyQuota')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.quotaUnitsPerDay} units</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.dailyQuota')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.quotaUnitsPerDay} units</span>
                                     </div>
                                     <div className="flex items-center justify-between text-[10px]">
-                                      <span className="text-gray-600 dark:text-gray-400">{t('manageContent.socialMedia.limits.uploadCost')}:</span>
-                                      <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.uploadCost}</span>
+                                      <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.uploadCost')}:</span>
+                                      <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.uploadCost}</span>
                                     </div>
                                   </>)}
                                 </div>

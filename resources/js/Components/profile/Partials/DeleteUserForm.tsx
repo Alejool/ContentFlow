@@ -97,7 +97,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
             </h2>
           </div>
 
-          <p className="mb-8 leading-relaxed font-medium text-gray-600 dark:text-gray-400">
+          <p className="mb-8 leading-relaxed font-medium text-gray-600 dark:text-neutral-400">
             {t('profile.delete.confirmMessage')}
           </p>
 

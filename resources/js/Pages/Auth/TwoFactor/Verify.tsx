@@ -55,7 +55,7 @@ export default function Verify() {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               Two-Factor Authentication
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-600 dark:text-neutral-400">
               Enter your authentication code to continue
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function Verify() {
             </Button>
 
             <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-neutral-400">
                 Lost your device?{' '}
                 <span className="text-primary-600 dark:text-primary-400 font-medium">
                   Use a backup code

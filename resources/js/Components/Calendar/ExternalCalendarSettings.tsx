@@ -377,7 +377,7 @@ const CalendarConnectionCard = ({
 
           {/* Save settings */}
           <Button
-            size="sm"
+            size="md"
             variant="primary"
             buttonStyle="solid"
             icon={Save}
@@ -396,7 +396,6 @@ const CalendarConnectionCard = ({
           <>
             <Button
               variant="primary"
-              buttonStyle="outline"
               size="sm"
               icon={RefreshCw}
               onClick={onSync}
@@ -406,7 +405,7 @@ const CalendarConnectionCard = ({
             </Button>
             <Button
               variant="danger"
-              buttonStyle="outline"
+              buttonStyle='ghost'
               size="sm"
               icon={XIcon}
               onClick={onDisconnect}

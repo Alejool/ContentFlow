@@ -259,7 +259,7 @@ export default function GlobalUploadIndicator() {
 
   return (
     <>
-      <div className="w-72 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-gray-800">
+      <div className="w-72 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
         {/* Header */}
         <div
           className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-neutral-700"

@@ -91,7 +91,7 @@ export default function SocialMediaAccounts({
       className={`rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm`}
     >
       <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
-        <h2 className={`text-xl font-bold text-gray-900 dark:text-gray-100`}>
+        <h2 className={`text-xl font-bold text-gray-900 dark:text-neutral-100`}>
           {t('analytics.socialMedia.title')}
         </h2>
       </div>
@@ -99,7 +99,7 @@ export default function SocialMediaAccounts({
       {showChart && displayAccounts.length > 0 && (
         <div className="mb-10">
           <h3
-            className={`mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400`}
+            className={`mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-neutral-400`}
           >
             {t('analytics.charts.followersByPlatform')}
           </h3>

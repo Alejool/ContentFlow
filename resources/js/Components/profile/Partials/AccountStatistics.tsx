@@ -73,7 +73,7 @@ export default function AccountStatistics({
                 <item.icon className={`h-5 w-5 ${item.iconColor}`} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{item.title}</p>
+                <p className="mb-1 text-xs text-gray-500 dark:text-neutral-400">{item.title}</p>
                 <div className="flex items-center gap-1">
                   {item.iconElement}
                   <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">

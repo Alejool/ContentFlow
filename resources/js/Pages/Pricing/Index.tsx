@@ -136,7 +136,7 @@ export default function Pricing() {
               return (
                 <div
                   key={plan.id}
-                  className={`relative flex flex-col rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                  className={`relative flex flex-col rounded-lg bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                     isHighlighted
                       ? 'border-primary-500 ring-primary-100 border-2 ring-4'
                       : 'border-2 border-gray-200'
@@ -157,7 +157,7 @@ export default function Pricing() {
                     {/* Icon & Title */}
                     <div className="mb-6 text-center">
                       <div
-                        className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl ${
+                        className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-lg ${
                           isHighlighted
                             ? 'from-primary-500 to-primary-600 bg-gradient-to-br text-white'
                             : 'bg-gray-100 text-gray-700'
@@ -208,18 +208,18 @@ export default function Pricing() {
                     <div className="mt-auto">
                       {plan.buttonVariant === 'primary' ? (
                         <CheckoutButton
-                          className={`from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 w-full transform rounded-xl bg-gradient-to-r px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl`}
+                          className={`from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 w-full transform rounded-lg bg-gradient-to-r px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl`}
                         />
                       ) : plan.buttonVariant === 'secondary' ? (
                         <button
-                          className={`w-full rounded-xl bg-gray-900 px-6 py-3 font-semibold text-white shadow-md transition-all duration-200 hover:bg-gray-800 hover:shadow-lg`}
+                          className={`w-full rounded-lg bg-gray-900 px-6 py-3 font-semibold text-white shadow-md transition-all duration-200 hover:bg-gray-800 hover:shadow-lg`}
                         >
                           {plan.buttonText}
                         </button>
                       ) : (
                         <button
                           disabled
-                          className={`w-full cursor-not-allowed rounded-xl border-2 border-gray-200 bg-gray-100 px-6 py-3 font-semibold text-gray-500`}
+                          className={`w-full cursor-not-allowed rounded-lg border-2 border-gray-200 bg-gray-100 px-6 py-3 font-semibold text-gray-500`}
                         >
                           {plan.buttonText}
                         </button>

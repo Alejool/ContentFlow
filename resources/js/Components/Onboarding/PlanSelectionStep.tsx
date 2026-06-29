@@ -123,7 +123,7 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
             {t('planSelection.title')}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-neutral-400">
             {checkingSubscription
               ? t('common.messages.checkingSubscription')
               : t('common.messages.loadingPlans')}
@@ -142,7 +142,7 @@ export default function PlanSelectionStep({ onComplete, onSkip }: PlanSelectionS
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t('planSelection.title')}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">{t('planSelection.description')}</p>
+        <p className="text-gray-600 dark:text-neutral-400">{t('planSelection.description')}</p>
       </div>
 
       {/* Usar el mismo componente que PricingPage */}

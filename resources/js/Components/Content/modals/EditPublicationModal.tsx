@@ -663,7 +663,7 @@ const EditPublicationModal = ({
                                           ? 'bg-primary-500 text-white'
                                           : isPast
                                             ? 'bg-green-500 text-white'
-                                            : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                                            : 'bg-gray-300 text-gray-600 dark:bg-neutral-600 dark:text-neutral-300'
                                       }`}
                                     >
                                       {isPast ? '✓' : index + 1}
@@ -672,7 +672,7 @@ const EditPublicationModal = ({
                                       <div className="text-xs font-semibold text-gray-900 dark:text-white">
                                         {step.name}
                                       </div>
-                                      <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                      <div className="text-[10px] text-gray-600 dark:text-neutral-400">
                                         {step.role?.name || 'Sin rol asignado'}
                                       </div>
                                     </div>

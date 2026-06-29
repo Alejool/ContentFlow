@@ -101,7 +101,7 @@ export default function ColorPicker({
       {label && (
         <label
           htmlFor={id}
-          className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-neutral-300"
         >
           {label}
         </label>
@@ -136,7 +136,7 @@ export default function ColorPicker({
         </span>
 
         {/* Hex value */}
-        <span className="flex-1 text-left font-mono text-xs tracking-wider text-gray-700 dark:text-gray-300">
+        <span className="flex-1 text-left font-mono text-xs tracking-wider text-gray-700 dark:text-neutral-300">
           {safeColor.toUpperCase()}
         </span>
 
@@ -158,7 +158,7 @@ export default function ColorPicker({
         <div
           role="dialog"
           aria-label="Color picker"
-          className="absolute z-50 mt-1.5 w-64 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary"
+          className="absolute z-50 mt-1.5 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-theme-bg-secondary"
         >
           {/* Large color preview */}
           <div

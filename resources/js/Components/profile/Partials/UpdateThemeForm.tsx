@@ -74,11 +74,11 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
       {/* Personal theme colors — available to all */}
       <div className="space-y-4">
         <header>
-          <h2 className="flex items-center gap-2 text-lg font-medium text-gray-900 dark:text-gray-100">
+          <h2 className="flex items-center gap-2 text-lg font-medium text-gray-900 dark:text-neutral-100">
             <Palette className="h-5 w-5 text-primary-500" />
             {t('profile.theme.title') || 'Apariencia del Sistema'}
           </h2>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-600 dark:text-neutral-400">
             {t('profile.theme.description') ||
               'Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.'}
           </p>
@@ -103,7 +103,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
                 >
                   {data.theme_color === color.value && <Check className="h-6 w-6" />}
                 </div>
-                <span className="text-sm font-medium capitalize text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-medium capitalize text-gray-700 dark:text-neutral-300">
                   {t(`colors.${color.name}`) || color.name}
                 </span>
               </button>
@@ -121,7 +121,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
       <div className="space-y-4 border-t border-gray-100 pt-6 dark:border-neutral-800/50">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-neutral-100">
               <Crown className="h-4 w-4 text-amber-500" />
               Branding del Workspace
               {!hasBrandingAccess && (
@@ -138,7 +138,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
 
         {hasBrandingAccess ? (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               Configura el logo y colores personalizados de tu workspace.
             </p>
             <Button
@@ -151,7 +151,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
             </Button>
           </div>
         ) : (
-          <div className="relative overflow-hidden rounded-xl border border-amber-200 bg-amber-50/50 p-5 dark:border-amber-800/30 dark:bg-amber-900/10">
+          <div className="relative overflow-hidden rounded-lg border border-amber-200 bg-amber-50/50 p-5 dark:border-amber-800/30 dark:bg-amber-900/10">
             {/* Blurred mock */}
             <div className="pointer-events-none flex select-none gap-4 opacity-60 blur-sm">
               {['#f97316', '#3b82f6', '#a855f7'].map((c) => (
@@ -173,7 +173,7 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
             {/* Lock overlay */}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/60 backdrop-blur-[2px] dark:bg-theme-bg-secondary">
               <Lock className="h-6 w-6 text-amber-500" />
-              <p className="px-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200">
+              <p className="px-4 text-center text-sm font-semibold text-gray-700 dark:text-neutral-200">
                 Disponible en plan <strong>Professional</strong> o superior
               </p>
               <button

@@ -96,7 +96,7 @@ export function PublicationStatusCards({
                 animate={{ scale: isActive ? 1.04 : 1, opacity: isActive ? 1 : 0.75 }}
                 transition={{ duration: 0.4 }}
                 className={cn(
-                  'group relative flex w-[148px] flex-none flex-col items-center overflow-hidden rounded-xl border p-3 text-center shadow-sm sm:p-4',
+                  'group relative flex w-[148px] flex-none flex-col items-center overflow-hidden rounded-lg border p-3 text-center shadow-sm sm:p-4',
                   'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
                   statusConfig.border,
                   isActive && 'shadow-md',
@@ -118,7 +118,7 @@ export function PublicationStatusCards({
                   <StatusIcon className={cn('h-4 w-4 sm:h-5 sm:w-5', statusConfig.text)} />
                 </div>
 
-                <p className="relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:text-xs">
+                <p className="relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-neutral-400 sm:text-xs">
                   {t(`publications.status.${statusKey}`)}
                 </p>
 
@@ -153,7 +153,7 @@ export function PublicationStatusCards({
             activeIndex === 0 ? 'pointer-events-none opacity-0' : 'opacity-100 hover:scale-110',
           )}
         >
-          <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-neutral-300" />
         </button>
         <button
           onClick={() => nudge('right')}
@@ -165,7 +165,7 @@ export function PublicationStatusCards({
               : 'opacity-100 hover:scale-110',
           )}
         >
-          <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          <ChevronRight className="h-4 w-4 text-gray-600 dark:text-neutral-300" />
         </button>
 
         {/* dots */}
@@ -183,8 +183,8 @@ export function PublicationStatusCards({
               className={cn(
                 'h-1.5 rounded-full transition-all duration-300',
                 i === activeIndex
-                  ? 'w-4 bg-gray-500 dark:bg-gray-300'
-                  : 'w-1.5 bg-gray-300 dark:bg-gray-600',
+                  ? 'w-4 bg-gray-500 dark:bg-neutral-300'
+                  : 'w-1.5 bg-gray-300 dark:bg-neutral-600',
               )}
             />
           ))}
@@ -227,7 +227,7 @@ export function PublicationStatusCards({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
             className={cn(
-              'group relative flex flex-col items-center overflow-hidden rounded-xl border p-3 text-center shadow-sm transition-all duration-300 sm:p-4',
+              'group relative flex flex-col items-center overflow-hidden rounded-lg border p-3 text-center shadow-sm transition-all duration-300 sm:p-4',
               'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
               statusConfig.border,
               statusConfig.hover,
@@ -250,7 +250,7 @@ export function PublicationStatusCards({
               <StatusIcon className={cn('h-4 w-4 sm:h-5 sm:w-5', statusConfig.text)} />
             </div>
 
-            <p className="relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:text-xs">
+            <p className="relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-neutral-400 sm:text-xs">
               {t(`publications.status.${statusKey}`)}
             </p>
 

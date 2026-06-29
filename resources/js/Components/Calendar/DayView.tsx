@@ -49,7 +49,7 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onEventClick?.(event);
       }}
-      className={`relative cursor-grab rounded-xl p-3 transition-all hover:shadow-lg active:cursor-grabbing ${
+      className={`relative cursor-grab rounded-lg p-3 transition-all hover:shadow-lg active:cursor-grabbing ${
         isSelected ? 'ring-primary-500 ring-2 ring-offset-1' : ''
       } ${isDragging ? 'scale-95 opacity-50' : ''}`}
       style={{
@@ -137,7 +137,7 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
     >
       {/* Time label — clicking it also opens the add modal */}
       <div className="hover:bg-primary-50 dark:hover:bg-primary-900/20 relative w-20 shrink-0 border-r border-gray-100 bg-gray-50 px-3 py-3 text-right transition-colors dark:border-neutral-800 dark:bg-neutral-900/50">
-        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-semibold text-gray-500 dark:text-neutral-400">
           {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
         </span>
         {onAddEvent && (
@@ -178,7 +178,7 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
             type="button"
             onClick={handleSlotClick}
             variant="ghost"
-            className="hover:border-primary-300 hover:bg-primary-50 hover:text-primary-500 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 flex h-full min-h-[66px] w-full items-center justify-center rounded-lg border-2 border-dashed border-transparent text-xs text-gray-400 transition-all dark:text-gray-600"
+            className="hover:border-primary-300 hover:bg-primary-50 hover:text-primary-500 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 flex h-full min-h-[66px] w-full items-center justify-center rounded-lg border-2 border-dashed border-transparent text-xs text-gray-400 transition-all dark:text-neutral-600"
             icon={<Plus className="h-4 w-4" />}
           >
             {''}
@@ -284,7 +284,7 @@ export const DayView: React.FC<DayViewProps> = ({
       {/* Drag overlay */}
       <DragOverlay>
         {activeEvent ? (
-          <div className="border-primary-400 w-64 cursor-grabbing rounded-xl border bg-white p-3 opacity-90 shadow-2xl dark:bg-neutral-800">
+          <div className="border-primary-400 w-64 cursor-grabbing rounded-lg border bg-white p-3 opacity-90 shadow-2xl dark:bg-neutral-800">
             <div className="flex items-center gap-2">
               {activeEvent.title}
             </div>

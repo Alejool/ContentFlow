@@ -106,7 +106,7 @@ export default function ListBox({
         </Label>
       )}
 
-      {hint && !label && <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">{hint}</p>}
+      {hint && !label && <p className="mb-2 text-sm text-gray-500 dark:text-neutral-400">{hint}</p>}
 
       <AriaListBox
         aria-label={label || 'List'}
@@ -127,7 +127,7 @@ export default function ListBox({
           <div className="flex flex-col items-center justify-center py-8 text-center">
             {emptyState || (
               <>
-                <div className="mb-2 text-gray-400 dark:text-gray-500">
+                <div className="mb-2 text-gray-400 dark:text-neutral-500">
                   <svg
                     className="mx-auto h-12 w-12"
                     fill="none"
@@ -142,7 +142,7 @@ export default function ListBox({
                     />
                   </svg>
                 </div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-sm font-medium text-gray-500 dark:text-neutral-400">
                   No items available
                 </p>
               </>
@@ -165,7 +165,7 @@ export default function ListBox({
                 return `${baseClasses} bg-gray-100 text-gray-900 dark:bg-theme-bg-secondary dark:text-white`;
               }
 
-              return `${baseClasses} text-gray-700 dark:text-gray-300`;
+              return `${baseClasses} text-gray-700 dark:text-neutral-300`;
             }}
           >
             {({ isSelected }) => (
@@ -182,7 +182,7 @@ export default function ListBox({
                     <Text
                       slot="description"
                       className={`mt-0.5 truncate text-xs ${
-                        isSelected ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'
+                        isSelected ? 'text-white/80' : 'text-gray-500 dark:text-neutral-400'
                       }`}
                     >
                       {item.description}

@@ -52,9 +52,9 @@ const getPlatformColors = (
       hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
     },
     tiktok: {
-      bg: 'bg-gray-50 dark:bg-gray-900/20',
-      text: 'text-gray-700 dark:text-gray-400',
-      border: 'border-gray-200 dark:border-gray-800',
+      bg: 'bg-gray-50 dark:bg-neutral-900/20',
+      text: 'text-gray-700 dark:text-neutral-400',
+      border: 'border-gray-200 dark:border-neutral-800',
       hover: 'hover:bg-gray-100 dark:hover:bg-gray-900/30',
     },
   };
@@ -185,7 +185,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                       {t('publications.modal.schedule.recurrence.select_accounts') ||
                         'Redes con recurrencia'}
                     </Label>
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                       {t('publications.modal.schedule.recurrence.select_accounts_desc') ||
                         'Selecciona qué redes publicarán de forma recurrente. Las demás solo publicarán una vez.'}
                     </p>
@@ -215,7 +215,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                       <div className="flex-1 cursor-pointer">
                         <label
                           htmlFor="all_accounts_checkbox"
-                          className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-gray-100"
+                          className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-neutral-100"
                         >
                           {t('publications.modal.schedule.recurrence.all_accounts') ||
                             'Aplicar a todas'}
@@ -246,7 +246,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                     {/* Opciones individuales - Solo mostrar si NO es "todas" */}
                     {recurrenceAccounts && recurrenceAccounts.length > 0 && (
                       <div className="space-y-2 pt-2">
-                        <p className="px-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                        <p className="px-1 text-xs font-medium text-gray-600 dark:text-neutral-400">
                           Selección personalizada:
                         </p>
                         {socialAccounts
@@ -300,10 +300,10 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                                     <span className={`text-sm font-bold ${colors.text}`}>
                                       {account.platform}
                                     </span>
-                                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                                    <span className="text-xs text-gray-400 dark:text-neutral-500">
                                       ·
                                     </span>
-                                    <span className="truncate text-sm text-gray-700 dark:text-gray-300">
+                                    <span className="truncate text-sm text-gray-700 dark:text-neutral-300">
                                       {account.account_name}
                                     </span>
                                   </label>
@@ -336,8 +336,8 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                             <span className={`text-sm font-bold ${colors.text}`}>
                               {account.platform}
                             </span>
-                            <span className="text-xs text-gray-400 dark:text-gray-500">·</span>
-                            <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                            <span className="text-xs text-gray-400 dark:text-neutral-500">·</span>
+                            <span className="truncate text-sm font-medium text-gray-800 dark:text-neutral-200">
                               {account.account_name}
                             </span>
                           </div>
@@ -400,7 +400,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                     }}
                     disabled={disabled}
                     suffix={
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-gray-500 dark:text-neutral-400">
                         {recurrenceType === 'daily'
                           ? t('common.units.days') || 'días'
                           : recurrenceType === 'weekly'
@@ -435,7 +435,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                         className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-all ${
                           recurrenceDays.includes(day.value)
                             ? 'bg-primary-600 ring-primary-100 dark:ring-primary-900/30 text-white shadow-md ring-2'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:text-gray-400 dark:hover:bg-neutral-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-theme-bg-secondary dark:text-neutral-400 dark:hover:bg-neutral-700'
                         }`}
                       >
                         {day.label}
@@ -561,10 +561,10 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                                   <span className={`text-sm font-bold ${colors.text}`}>
                                     {account.platform}
                                   </span>
-                                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                                  <span className="text-xs text-gray-400 dark:text-neutral-500">
                                     ·
                                   </span>
-                                  <span className="truncate text-sm font-medium text-gray-700 dark:text-gray-300">
+                                  <span className="truncate text-sm font-medium text-gray-700 dark:text-neutral-300">
                                     {account.account_name}
                                   </span>
                                 </div>
@@ -607,7 +607,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                                           >
                                             {idx + 1}
                                           </span>
-                                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                          <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
                                             {dayName.charAt(0).toUpperCase() + dayName.slice(1)},{' '}
                                             {dayNumber} de {monthName}
                                           </span>
@@ -630,7 +630,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                   ) : (
                     <div className="py-6 text-center">
                       <AlertCircle className="mx-auto mb-2 h-8 w-8 text-amber-500 dark:text-amber-400" />
-                      <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <p className="mb-1 text-sm font-medium text-gray-700 dark:text-neutral-300">
                         {!hasAnyDates
                           ? 'Configura una fecha para ver el preview'
                           : recurrenceType === 'weekly' &&
@@ -638,7 +638,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                             ? 'Selecciona al menos un día de la semana'
                             : 'Configura los parámetros de recurrencia'}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500 dark:text-neutral-400">
                         {!hasAnyDates
                           ? "Activa la 'Programación Global' arriba o configura fechas individuales por red social"
                           : recurrenceType === 'weekly' &&
@@ -649,7 +649,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                     </div>
                   )}
 
-                  <p className="mt-3 flex items-start gap-1.5 text-[10px] text-gray-500 italic dark:text-gray-400">
+                  <p className="mt-3 flex items-start gap-1.5 text-[10px] text-gray-500 italic dark:text-neutral-400">
                     <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
                     <span>
                       {t('publications.modal.schedule.recurrence.preview_note') ||

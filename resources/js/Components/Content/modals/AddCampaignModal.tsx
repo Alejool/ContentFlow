@@ -264,7 +264,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
             />
 
             <div className="form-group">
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-neutral-300">
                 {t('campaigns.modal.add.publications') || 'Publications'}
               </label>
 
@@ -280,7 +280,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                 />
               </div>
 
-              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-neutral-400">
                 {t('campaigns.modal.add.associatedPublicationsRequired') ||
                   'Associated Publications is required'}
               </p>

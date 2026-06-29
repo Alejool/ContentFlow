@@ -72,7 +72,7 @@ export default function AddonSuccess() {
 
             <CardContent className="space-y-6">
               {/* Success Message */}
-              <div className="space-y-4 rounded-lg bg-white p-6 dark:bg-gray-800">
+              <div className="space-y-4 rounded-lg bg-white p-6 dark:bg-neutral-800">
                 <div className="flex items-start gap-4">
                   <Sparkles className="mt-1 h-6 w-6 shrink-0 text-blue-600" />
                   <div className="space-y-2">

@@ -67,7 +67,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   return (
     <div className={`datetime-picker ${className}`}>
       {label && (
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
           {label}
           {required && <span className="ml-1 text-red-500">*</span>}
         </label>
@@ -81,11 +81,11 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
         max={maxValue}
         disabled={disabled}
         required={required}
-        className={`w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white ${error ? 'border-red-500' : 'border-gray-300'} `}
+        className={`w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white ${error ? 'border-red-500' : 'border-gray-300'} `}
       />
 
       <div className="mt-1 flex items-center justify-between">
-        <small className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+        <small className="flex items-center gap-1 text-xs text-gray-500 dark:text-neutral-400">
           <i className="bi bi-clock"></i>
           {timezoneLabel()}
         </small>

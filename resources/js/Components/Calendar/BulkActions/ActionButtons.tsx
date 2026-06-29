@@ -124,11 +124,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                   minWidth: 280,
                   zIndex: 99999,
                 }}
-                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-800"
+                className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-800"
               >
                 {/* Header */}
                 <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/60">
-                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-neutral-500">
                     {t('calendar.selectOptions') || 'Opciones de selección'}
                   </p>
                 </div>
@@ -156,7 +156,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                       {t('calendar.selectDayDescription') || 'Solo eventos del día seleccionado'}
                     </p>
                   </div>
@@ -172,7 +172,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                   }}
                   className="group flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50"
                 >
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors group-hover:bg-gray-200 dark:bg-neutral-900 dark:text-gray-400 dark:group-hover:bg-neutral-800">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors group-hover:bg-gray-200 dark:bg-neutral-900 dark:text-neutral-400 dark:group-hover:bg-neutral-800">
                     <CheckSquare className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -180,11 +180,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
                         {t('calendar.selectAllEvents') || 'Seleccionar todos'}
                       </span>
-                      <span className="inline-flex items-center justify-center rounded-full bg-gray-500 px-2 py-0.5 text-xs font-bold text-white dark:bg-gray-600">
+                      <span className="inline-flex items-center justify-center rounded-full bg-gray-500 px-2 py-0.5 text-xs font-bold text-white dark:bg-neutral-600">
                         {totalEvents}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                       {t('calendar.selectAllDescription') ||
                         'Todos los eventos visibles en el calendario'}
                     </p>

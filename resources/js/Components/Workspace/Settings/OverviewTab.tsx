@@ -19,7 +19,7 @@ function QuickActionCard({ action }: { action: QuickAction }) {
     <motion.button
       variants={fadeUp}
       onClick={action.action}
-      className="group flex w-full items-center gap-4 rounded-xl border border-gray-100 bg-white p-4 text-left transition-all duration-200 hover:border-gray-200 hover:shadow-md dark:border-neutral-800 dark:bg-theme-bg-secondary dark:hover:border-neutral-700"
+      className="group flex w-full items-center gap-4 rounded-lg border border-gray-100 bg-white p-4 text-left transition-all duration-200 hover:border-gray-200 hover:shadow-md dark:border-neutral-800 dark:bg-theme-bg-secondary dark:hover:border-neutral-700"
     >
       <div
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105 ${action.iconBg}`}
@@ -62,7 +62,7 @@ export default function OverviewTab({ workspace, onTabChange }: OverviewTabProps
         ))}
       </div>
 
-      <div className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="border-b border-gray-100 px-5 py-4 dark:border-neutral-800">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             {t('workspace.quick_actions.title')}

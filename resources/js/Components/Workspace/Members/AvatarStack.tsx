@@ -37,7 +37,7 @@ const AvatarStack = ({ users, roles, max = 4, className = '' }: AvatarStackProps
       })}
       {remaining > 0 && (
         <div
-          className="flex h-8 w-8 cursor-help items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-xs font-bold text-gray-600 ring-2 ring-white transition-transform duration-200 hover:scale-110 dark:from-neutral-800 dark:to-neutral-700 dark:text-gray-400 dark:ring-neutral-900"
+          className="flex h-8 w-8 cursor-help items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-xs font-bold text-gray-600 ring-2 ring-white transition-transform duration-200 hover:scale-110 dark:from-neutral-800 dark:to-neutral-700 dark:text-neutral-400 dark:ring-neutral-900"
           title={`${remaining} more members`}
         >
           +{remaining}

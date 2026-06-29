@@ -3,7 +3,7 @@ import Skeleton from '@/Components/common/ui/Skeleton';
 
 const ReelCardSkeleton = () => {
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
       {/* Video Preview */}
       <Skeleton className="h-64 w-full rounded-none" />
 

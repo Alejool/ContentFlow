@@ -53,7 +53,7 @@ export function VirtualizedEventList({
             e.stopPropagation();
             // Could open a modal showing all events for this day
           }}
-          className="px-2 py-1 text-left text-xs text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
+          className="px-2 py-1 text-left text-xs text-gray-500 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400"
         >
           +{hiddenCount} more
         </button>

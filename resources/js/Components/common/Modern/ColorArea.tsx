@@ -103,7 +103,7 @@ export default function ColorArea({
         {/* Hue Slider */}
         {showSliders && (
           <div>
-            <AriaLabel className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
+            <AriaLabel className="mb-1 block text-xs font-medium text-gray-700 dark:text-neutral-300">
               Tono
             </AriaLabel>
             <ColorSlider

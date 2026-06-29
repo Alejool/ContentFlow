@@ -16,7 +16,7 @@ export const SelectionInfo: React.FC<SelectionInfoProps> = ({
   return (
     <div className="flex items-center px-2">
       <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-        {selectedCount} <span className="text-sm font-medium text-gray-500 dark:text-gray-400 ml-1">{t('calendar.selected')}</span>
+        {selectedCount} <span className="text-sm font-medium text-gray-500 dark:text-neutral-400 ml-1">{t('calendar.selected')}</span>
       </span>
     </div>
   );

@@ -49,7 +49,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
               {t('subscription.success.heading')}
             </h1>
 
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <p className="text-xl text-gray-600 dark:text-neutral-400">
               {t('subscription.success.message')}
             </p>
           </div>
@@ -67,7 +67,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
             <CardContent className="pt-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-gray-200 py-3 dark:border-neutral-800">
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className="text-gray-600 dark:text-neutral-400">
                     {t('subscription.success.selectedPlan')}
                   </span>
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -76,7 +76,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
                 </div>
 
                 <div className="flex items-center justify-between border-b border-gray-200 py-3 dark:border-neutral-800">
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className="text-gray-600 dark:text-neutral-400">
                     {t('subscription.success.amountPaid')}
                   </span>
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -85,7 +85,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
                 </div>
 
                 <div className="flex items-center justify-between py-3">
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className="text-gray-600 dark:text-neutral-400">
                     {t('subscription.success.status')}
                   </span>
                   <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
@@ -108,25 +108,25 @@ export default function Success({ auth, plan, amount, currency }: Props) {
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.success.step1')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.success.step2')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.success.step3')}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.success.step4')}
                   </span>
                 </li>
@@ -162,7 +162,7 @@ export default function Success({ auth, plan, amount, currency }: Props) {
 
           {/* Support Info */}
           <div className="mt-12 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('subscription.success.needHelp')}{' '}
               <a
                 href="mailto:support@Intellipost.com"

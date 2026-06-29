@@ -378,7 +378,7 @@ export default function TourOverlay({
         <div className="rounded-lg bg-white p-6 shadow-2xl dark:bg-theme-bg-secondary">
           <div className="flex items-center gap-3">
             <div className="border-3 h-6 w-6 animate-spin rounded-full border-primary-200 border-t-primary-600" />
-            <p className="text-gray-700 dark:text-gray-300">
+            <p className="text-gray-700 dark:text-neutral-300">
               {t('tour.navigating', 'Navigating to next section...')}
             </p>
           </div>
@@ -409,7 +409,7 @@ export default function TourOverlay({
                 <h3 id="tour-title" className="text-lg font-semibold text-gray-900 dark:text-white">
                   {currentStep.title}
                 </h3>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
                   {t('tour.step', {
                     current: currentStep.id.split('-')[1] || 1,
                     total: totalSteps,
@@ -428,7 +428,7 @@ export default function TourOverlay({
 
           {/* Content */}
           <div className="px-6 py-4">
-            <p id="tour-description" className="leading-relaxed text-gray-700 dark:text-gray-300">
+            <p id="tour-description" className="leading-relaxed text-gray-700 dark:text-neutral-300">
               {currentStep.description}
             </p>
           </div>
@@ -456,7 +456,7 @@ export default function TourOverlay({
                   onClick={handleSkip}
                   icon={SkipForward}
                   iconPosition="left"
-                  className="w-full justify-center text-gray-600 dark:text-gray-400 md:w-auto"
+                  className="w-full justify-center text-gray-600 dark:text-neutral-400 md:w-auto"
                 >
                   {t('tour.skipTour')}
                 </Button>
@@ -526,7 +526,7 @@ export default function TourOverlay({
                 {currentStep.title}
               </h3>
               <p
-                className="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                className="mt-1 text-sm text-gray-500 dark:text-neutral-400"
                 aria-label={t('tour.step', {
                   current: currentStep.id.split('-')[1] || 1,
                   total: totalSteps,
@@ -550,7 +550,7 @@ export default function TourOverlay({
 
         {/* Content */}
         <div className="px-6 py-4">
-          <p id="tour-description" className="leading-relaxed text-gray-700 dark:text-gray-300">
+          <p id="tour-description" className="leading-relaxed text-gray-700 dark:text-neutral-300">
             {currentStep.description}
           </p>
         </div>
@@ -592,7 +592,7 @@ export default function TourOverlay({
                 onClick={handleSkip}
                 icon={SkipForward}
                 iconPosition="left"
-                className="w-full justify-center text-gray-600 dark:text-gray-400 md:w-auto"
+                className="w-full justify-center text-gray-600 dark:text-neutral-400 md:w-auto"
                 aria-label={t('tour.skipGuidedTour')}
               >
                 {t('tour.skipTour')}

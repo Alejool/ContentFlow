@@ -11,9 +11,9 @@ export default function Maintenance({ message, estimatedTime }: Props) {
     <>
       <Head title="Mantenimiento" />
 
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-neutral-900 dark:to-neutral-800">
         <div className="w-full max-w-md">
-          <div className="rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-gray-800">
+          <div className="rounded-lg bg-white p-8 text-center shadow-xl dark:bg-neutral-800">
             {/* Icono animado */}
             <div className="mb-6 flex justify-center">
               <div className="relative">
@@ -30,13 +30,13 @@ export default function Maintenance({ message, estimatedTime }: Props) {
             </h1>
 
             {/* Mensaje */}
-            <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+            <p className="mb-6 text-lg text-gray-600 dark:text-neutral-300">
               {message || 'Estamos realizando mejoras en el sistema.'}
             </p>
 
             {/* Tiempo estimado */}
             {estimatedTime && (
-              <div className="mb-6 flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
+              <div className="mb-6 flex items-center justify-center gap-2 text-gray-500 dark:text-neutral-400">
                 <Clock className="h-5 w-5" />
                 <span>{estimatedTime}</span>
               </div>
@@ -60,7 +60,7 @@ export default function Maintenance({ message, estimatedTime }: Props) {
             </button>
 
             {/* Footer */}
-            <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+            <p className="mt-6 text-xs text-gray-400 dark:text-neutral-500">
               Si el problema persiste, contacta con soporte
             </p>
           </div>

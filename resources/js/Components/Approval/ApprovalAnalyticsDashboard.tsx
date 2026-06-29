@@ -101,7 +101,7 @@ export default function ApprovalAnalyticsDashboard({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
@@ -111,7 +111,7 @@ export default function ApprovalAnalyticsDashboard({
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 {t('approval.analytics.title')}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-neutral-400">
                 {t('approval.analytics.subtitle')}
               </p>
             </div>
@@ -145,7 +145,7 @@ export default function ApprovalAnalyticsDashboard({
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Average Publication Time */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-3">
             <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/20">
               <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -157,13 +157,13 @@ export default function ApprovalAnalyticsDashboard({
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
             {formatTime(analytics.average_publication_time)}
           </p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
             {t('approval.analytics.from_submission_to_publish')}
           </p>
         </div>
 
         {/* Total Pending Content */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-3">
             <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900/20">
               <FileText className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -178,13 +178,13 @@ export default function ApprovalAnalyticsDashboard({
               0,
             )}
           </p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
             {t('approval.analytics.across_all_levels')}
           </p>
         </div>
 
         {/* Stale Content */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-2 flex items-center gap-3">
             <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/20">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -196,7 +196,7 @@ export default function ApprovalAnalyticsDashboard({
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
             {analytics.stale_pending_content.length}
           </p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
             {t('approval.analytics.pending_over_7_days')}
           </p>
         </div>
@@ -205,7 +205,7 @@ export default function ApprovalAnalyticsDashboard({
       {/* Charts Row 1: Average Approval Time & Approval Rates */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Average Approval Time by Level */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <Clock className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -227,14 +227,14 @@ export default function ApprovalAnalyticsDashboard({
               theme={actualTheme}
             />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
+            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
         </div>
 
         {/* Approval/Rejection Rates by Role */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -261,7 +261,7 @@ export default function ApprovalAnalyticsDashboard({
               theme={actualTheme}
             />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
+            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
@@ -271,7 +271,7 @@ export default function ApprovalAnalyticsDashboard({
       {/* Charts Row 2: Pending by Level & Approval Rate Distribution */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Pending Content by Level */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -293,14 +293,14 @@ export default function ApprovalAnalyticsDashboard({
               theme={actualTheme}
             />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
+            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
         </div>
 
         {/* Approval Rate Distribution */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -310,7 +310,7 @@ export default function ApprovalAnalyticsDashboard({
           {approvalRatesPieData.length > 0 ? (
             <PieChart data={approvalRatesPieData} height={300} theme={actualTheme} />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
+            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
@@ -318,7 +318,7 @@ export default function ApprovalAnalyticsDashboard({
       </div>
 
       {/* Approver Workload */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-4 flex items-center gap-2">
           <Users className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           <h4 className="font-bold text-gray-900 dark:text-white">
@@ -341,7 +341,7 @@ export default function ApprovalAnalyticsDashboard({
             theme={actualTheme}
           />
         ) : (
-          <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-gray-400">
+          <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
             {t('approval.analytics.no_data_available')}
           </div>
         )}
@@ -349,7 +349,7 @@ export default function ApprovalAnalyticsDashboard({
 
       {/* Stale Content Table */}
       {analytics.stale_pending_content.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -383,7 +383,7 @@ export default function ApprovalAnalyticsDashboard({
                     <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                       {content.title}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-neutral-400">
                       {formatDateString(content.submitted_at)}
                     </td>
                     <td className="px-4 py-3">
@@ -391,7 +391,7 @@ export default function ApprovalAnalyticsDashboard({
                         {content.days_pending} {t('approval.analytics.days')}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-neutral-400">
                       {t('approval.analytics.level')} {content.current_level}
                     </td>
                   </tr>
@@ -404,7 +404,7 @@ export default function ApprovalAnalyticsDashboard({
 
       {/* Detailed Stats Table */}
       {analytics.approval_rates_by_role.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary-600 dark:text-primary-400" />
             <h4 className="font-bold text-gray-900 dark:text-white">
@@ -441,7 +441,7 @@ export default function ApprovalAnalyticsDashboard({
                     <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
                       {stat.role}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-3 text-right text-sm text-gray-500 dark:text-neutral-400">
                       {stat.total_actions}
                     </td>
                     <td className="px-4 py-3 text-right text-sm text-green-600 dark:text-green-400">

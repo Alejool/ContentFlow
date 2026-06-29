@@ -196,7 +196,7 @@ export default function NotificationsSettingsTab({ workspace }: NotificationsSet
                         ) : log.channel === 'discord' ? (
                           <Server className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                         ) : (
-                          <Bell className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                          <Bell className="h-4 w-4 text-gray-600 dark:text-neutral-400" />
                         )}
                       </div>
                       <span className="text-sm font-medium capitalize text-gray-900 dark:text-white">

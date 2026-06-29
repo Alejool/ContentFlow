@@ -59,7 +59,7 @@ export default function BusinessInfoStep({
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t('businessInfo.title')}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">{t('businessInfo.description')}</p>
+        <p className="text-gray-600 dark:text-neutral-400">{t('businessInfo.description')}</p>
       </div>
 
       <form onSubmit={handleSubmit((data) => onComplete(data))} className="space-y-6">
@@ -112,7 +112,7 @@ export default function BusinessInfoStep({
           control={control}
           render={({ field }) => (
             <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-neutral-300">
                 {t('businessInfo.fields.size')}
               </label>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -127,7 +127,7 @@ export default function BusinessInfoStep({
                         : 'border-gray-300 hover:border-primary-300 dark:border-neutral-700'
                     }`}
                   >
-                    <Users className="mx-auto mb-2 h-6 w-6 text-gray-600 dark:text-gray-400" />
+                    <Users className="mx-auto mb-2 h-6 w-6 text-gray-600 dark:text-neutral-400" />
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {t(`businessInfo.sizes.${size}`)}
                     </p>

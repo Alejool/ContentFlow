@@ -69,7 +69,7 @@ export const AddonPackageCard: React.FC<AddonPackageCardProps> = ({
 
       <CardContent className="space-y-4">
         {/* Amount */}
-        <div className="rounded-lg bg-gray-50 py-4 text-center dark:bg-gray-800">
+        <div className="rounded-lg bg-gray-50 py-4 text-center dark:bg-neutral-800">
           <div className="text-3xl font-bold text-blue-600">{totalAmount.toLocaleString()}</div>
           <div className="text-muted-foreground text-sm">{unit}</div>
         </div>

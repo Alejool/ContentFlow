@@ -35,9 +35,9 @@ export const OfflineDemo: React.FC = () => {
         <h1 className="mb-6 text-2xl font-bold">Offline Components Demo</h1>
 
         {/* Example 1: Disabled button */}
-        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
           <h2 className="mb-4 text-lg font-semibold">Example 1: Disabled Button</h2>
-          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
             This button is automatically disabled when offline using the useOfflineDisable hook.
           </p>
           <button
@@ -49,9 +49,9 @@ export const OfflineDemo: React.FC = () => {
         </section>
 
         {/* Example 2: Disabled wrapper */}
-        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
           <h2 className="mb-4 text-lg font-semibold">Example 2: Disabled Content Wrapper</h2>
-          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
             This video player is wrapped and disabled when offline with an overlay.
           </p>
           <OfflineDisabledWrapper
@@ -71,9 +71,9 @@ export const OfflineDemo: React.FC = () => {
         </section>
 
         {/* Example 3: Pending operations modal */}
-        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <section className="mb-8 rounded-lg bg-white p-6 shadow dark:bg-neutral-800">
           <h2 className="mb-4 text-lg font-semibold">Example 3: Pending Operations</h2>
-          <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
             Click the button to view pending operations in a modal.
           </p>
           <button
@@ -106,9 +106,9 @@ export const OfflineDemo: React.FC = () => {
       {/* Pending operations modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800">
+          <div className="mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-xl dark:bg-neutral-800">
             {/* Modal header */}
-            <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700">
+            <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-neutral-700">
               <h2 className="text-lg font-semibold">Pending Operations</h2>
               <button
                 onClick={() => setShowModal(false)}

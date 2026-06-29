@@ -157,7 +157,7 @@ export const WorkspaceTimezoneSettings: React.FC<WorkspaceTimezoneSettingsProps>
         {/* Save Button */}
         {canManage && !hideButton && (
           <div className="flex items-center justify-between border-t border-gray-100 pt-6 dark:border-neutral-800">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-neutral-400">
               {hasChanges
                 ? t('workspace.timezone.unsaved_changes')
                 : t('workspace.timezone.no_changes')}

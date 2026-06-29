@@ -69,7 +69,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     <I18nProvider locale={locale}>
       <div className={`space-y-3 ${className}`}>
         <div className="flex justify-center">
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
             <AriaCalendar
               value={dateToCalendarDate(selectedDate)}
               onChange={handleCalendarChange}
@@ -79,7 +79,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
               <CalendarGrid>
                 <CalendarGridHeader>
                   {(day: string) => (
-                    <CalendarHeaderCell className="w-9 pb-2 text-center text-xs font-bold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                    <CalendarHeaderCell className="w-9 pb-2 text-center text-xs font-bold tracking-wide text-gray-500 uppercase dark:text-neutral-400">
                       {day}
                     </CalendarHeaderCell>
                   )}
@@ -105,7 +105,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                               ? 'border-2 border-primary-500 bg-primary-50 font-bold text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
                               : isDisabled
                                 ? 'cursor-not-allowed opacity-30'
-                                : 'text-gray-700 hover:bg-primary-50 hover:text-primary-600 dark:text-gray-200 dark:hover:bg-neutral-700 dark:hover:text-primary-400',
+                                : 'text-gray-700 hover:bg-primary-50 hover:text-primary-600 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-primary-400',
                         ].join(' ')
                       }
                     >
@@ -129,7 +129,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                 }}
                 className="w-14 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-center text-lg font-bold text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-neutral-600 dark:bg-neutral-900 dark:text-white"
               />
-              <span className="text-xl font-bold text-gray-600 dark:text-gray-300">:</span>
+              <span className="text-xl font-bold text-gray-600 dark:text-neutral-300">:</span>
               <input
                 type="number"
                 min={0}
@@ -168,7 +168,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
 
         {validation.isValid && (
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-500 dark:text-neutral-400">
               {t('calendar.selected_date', 'Selected date:')}
             </p>
             <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">

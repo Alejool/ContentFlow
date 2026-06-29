@@ -121,7 +121,7 @@ export default function RoleManagement({
       owner: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
       admin: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
       editor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      viewer: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+      viewer: 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400',
     };
     return colors[roleName.toLowerCase()] || colors.viewer;
   };
@@ -129,7 +129,7 @@ export default function RoleManagement({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-2 flex items-center gap-3">
           <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
             <Shield className="h-6 w-6 text-primary-600 dark:text-primary-400" />
@@ -138,7 +138,7 @@ export default function RoleManagement({
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {t('roles.management.title')}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-neutral-400">
               {t('roles.management.subtitle')}
             </p>
           </div>
@@ -150,7 +150,7 @@ export default function RoleManagement({
         {roles.map((role) => (
           <div
             key={role.id}
-            className="rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-theme-bg-secondary dark:hover:border-primary-700"
+            className="rounded-lg border border-gray-200 bg-white p-5 transition-all hover:border-primary-300 dark:border-neutral-800 dark:bg-theme-bg-secondary dark:hover:border-primary-700"
           >
             <div className="mb-3 flex items-center justify-between">
               <h4 className="font-bold text-gray-900 dark:text-white">{role.display_name}</h4>
@@ -179,7 +179,7 @@ export default function RoleManagement({
             </div>
 
             {role.description && (
-              <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">{role.description}</p>
+              <p className="mb-3 text-sm text-gray-500 dark:text-neutral-400">{role.description}</p>
             )}
 
             <div
@@ -190,14 +190,14 @@ export default function RoleManagement({
             >
               {expandedPermissions === role.id && (
                 <div className="mt-3 border-t border-gray-200 pt-3 dark:border-neutral-700">
-                  <p className="mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  <p className="mb-2 text-xs font-semibold text-gray-700 dark:text-neutral-300">
                     {t('roles.permissions')}:
                   </p>
                   <div className="space-y-1">
                     {role.permissions.map((permission) => (
                       <div
                         key={permission.id}
-                        className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400"
+                        className="flex items-center gap-1 text-xs text-gray-600 dark:text-neutral-400"
                       >
                         <UserCheck className="h-3 w-3" />
                         {permission.display_name}
@@ -212,10 +212,10 @@ export default function RoleManagement({
       </div>
 
       {/* Users List */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="border-b border-gray-200 p-6 dark:border-neutral-800">
           <h4 className="font-bold text-gray-900 dark:text-white">{t('roles.users_list')}</h4>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-neutral-400">
             {t('roles.users_list_subtitle')}
           </p>
         </div>
@@ -224,17 +224,17 @@ export default function RoleManagement({
           <table className="w-full">
             <thead className="border-b border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                   {t('roles.table.user')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                   {t('roles.table.current_role')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                   {t('roles.table.permissions')}
                 </th>
                 {canManageRoles && (
-                  <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <th className="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t('roles.table.actions')}
                   </th>
                 )}
@@ -263,7 +263,7 @@ export default function RoleManagement({
                         )}
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                          <p className="text-sm text-gray-500 dark:text-neutral-400">{user.email}</p>
                         </div>
                       </div>
                     </td>
@@ -281,14 +281,14 @@ export default function RoleManagement({
                         {userRole?.permissions.slice(0, 3).map((permission) => (
                           <span
                             key={permission.id}
-                            className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400"
+                            className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-neutral-400"
                             title={permission.description}
                           >
                             {permission.display_name}
                           </span>
                         ))}
                         {userRole && userRole.permissions.length > 3 && (
-                          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400">
+                          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-theme-bg-secondary dark:text-neutral-400">
                             +{userRole.permissions.length - 3}
                           </span>
                         )}
@@ -319,7 +319,7 @@ export default function RoleManagement({
       </div>
 
       {!canManageRoles && (
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
           <div className="flex items-start gap-3">
             <UserX className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <div>
@@ -346,11 +346,11 @@ export default function RoleManagement({
         size="2xl"
       >
         <div className="space-y-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('roles.edit_role_subtitle')}
           </p>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('roles.select_permissions')}
           </p>
 
@@ -379,7 +379,7 @@ export default function RoleManagement({
                     {permission.display_name}
                   </p>
                   {permission.description && (
-                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                       {permission.description}
                     </p>
                   )}

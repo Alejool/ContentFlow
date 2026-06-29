@@ -32,7 +32,7 @@ export default function PublishedPostsSection({
     <div className="rounded-lg bg-gray-50 p-4 dark:bg-theme-bg-secondary md:col-span-2">
       <div className="mb-3 flex items-center gap-2">
         <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
-        <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+        <span className="text-sm font-semibold text-gray-500 dark:text-neutral-400">
           {t('publications.table.publishedOn', 'Publicado en')}
         </span>
       </div>
@@ -66,7 +66,7 @@ export default function PublishedPostsSection({
                         </span>
                       </div>
                       {accountName && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400">@{accountName}</p>
+                        <p className="text-xs text-gray-600 dark:text-neutral-400">@{accountName}</p>
                       )}
                     </div>
                   </div>
@@ -74,7 +74,7 @@ export default function PublishedPostsSection({
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatPublicationDate(publishDate) || t('common.notSet', 'Not set')}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-neutral-400">
                       {formatTime(publishDate)}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ export default function PublishedPostsSection({
                         </span>
                       </div>
                       {accountName && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400">@{accountName}</p>
+                        <p className="text-xs text-gray-600 dark:text-neutral-400">@{accountName}</p>
                       )}
                     </div>
                   </div>
@@ -119,7 +119,7 @@ export default function PublishedPostsSection({
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatPublicationDate(publishDate) || t('common.notSet', 'Not set')}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-neutral-400">
                       {formatTime(publishDate)}
                     </p>
                   </div>

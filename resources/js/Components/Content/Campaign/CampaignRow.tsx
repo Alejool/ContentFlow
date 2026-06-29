@@ -76,7 +76,7 @@ const CampaignRow = memo(
               <h3 className="truncate text-sm font-medium text-gray-900 dark:text-white">
                 {item.name}
               </h3>
-              <p className="mt-0.5 max-w-md truncate text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-0.5 max-w-md truncate text-xs text-gray-500 dark:text-neutral-400">
                 {item.description && item.description.length > 80
                   ? `${item.description.substring(0, 80)}...`
                   : item.description || 'No description'}
@@ -85,7 +85,7 @@ const CampaignRow = memo(
               {/* Goal & Dates */}
               <div className="mt-1.5 flex flex-wrap items-center gap-3">
                 {(item.start_date || item.end_date) && (
-                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-neutral-400">
                     <Calendar className="h-3 w-3" />
                     <span>
                       {item.start_date
@@ -103,13 +103,13 @@ const CampaignRow = memo(
                   </div>
                 )}
                 {item.goal && (
-                  <div className="flex items-center gap-1 rounded bg-gray-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-white/5 dark:text-gray-400">
+                  <div className="flex items-center gap-1 rounded bg-gray-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-white/5 dark:text-neutral-400">
                     <Target className="text-primary-500 h-3 w-3" />
                     <span className="max-w-[150px] truncate">{item.goal}</span>
                   </div>
                 )}
                 {item.budget && (
-                  <div className="flex items-center gap-1 rounded bg-green-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
+                  <div className="flex items-center gap-1 rounded bg-green-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-green-900/10 dark:text-neutral-400">
                     <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
                     <span>{formatCurrency(item.budget)}</span>
                   </div>

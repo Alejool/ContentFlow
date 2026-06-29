@@ -109,11 +109,11 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
           </div>
         </div>
 
-        <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-neutral-100">
           {t('calendar.error.title', 'Something went wrong')}
         </h2>
 
-        <p className="mb-4 text-gray-600 dark:text-gray-400">
+        <p className="mb-4 text-gray-600 dark:text-neutral-400">
           {t(
             'calendar.error.description',
             'An error occurred while rendering the calendar. Please try again.',
@@ -122,7 +122,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
 
         {error && import.meta.env.DEV && (
           <div className="mb-4 rounded bg-gray-100 p-3 text-left dark:bg-neutral-900">
-            <p className="break-all font-mono text-xs text-gray-700 dark:text-gray-300">
+            <p className="break-all font-mono text-xs text-gray-700 dark:text-neutral-300">
               {error.message}
             </p>
           </div>
@@ -137,7 +137,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
           {t('calendar.error.retry_button', 'Try Again')}
         </button>
 
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-4 text-sm text-gray-500 dark:text-neutral-400">
           {t('calendar.error.persist', 'If the problem persists, please contact support.')}
         </p>
       </div>

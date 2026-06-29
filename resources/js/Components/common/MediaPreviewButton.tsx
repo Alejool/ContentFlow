@@ -126,7 +126,7 @@ function PreviewThumbnail({
       className={`group relative w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-100 transition-all hover:shadow-lg dark:bg-theme-bg-secondary ${height} ${className}`}
     >
       {isLoading ? (
-        <div className="h-full w-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+        <div className="h-full w-full flex items-center justify-center bg-gray-200 dark:bg-neutral-700">
           <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
         </div>
       ) : isVideo ? (
@@ -141,18 +141,18 @@ function PreviewThumbnail({
               onError={() => setImageError(true)}
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
-              <div className="rounded-full bg-white/90 p-4 shadow-lg backdrop-blur-sm dark:bg-gray-900/90">
+              <div className="rounded-full bg-white/90 p-4 shadow-lg backdrop-blur-sm dark:bg-neutral-900/90">
                 <Video className="h-8 w-8 text-primary-600 dark:text-primary-400" />
               </div>
             </div>
           </>
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
+          <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-neutral-700">
             <div className="text-center">
-              <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 text-gray-500 dark:bg-gray-600">
+              <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 text-gray-500 dark:bg-neutral-600">
                 <Video className="h-8 w-8" />
               </div>
-              <span className="text-sm text-gray-500 dark:text-gray-400">Video no disponible</span>
+              <span className="text-sm text-gray-500 dark:text-neutral-400">Video no disponible</span>
             </div>
           </div>
         )
@@ -167,12 +167,12 @@ function PreviewThumbnail({
           <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5" />
         </>
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
+        <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-neutral-700">
           <div className="text-center">
-            <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 text-gray-500 dark:bg-gray-600">
+            <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 text-gray-500 dark:bg-neutral-600">
               <Video className="h-8 w-8" />
             </div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Imagen no disponible</span>
+            <span className="text-sm text-gray-500 dark:text-neutral-400">Imagen no disponible</span>
           </div>
         </div>
       )}

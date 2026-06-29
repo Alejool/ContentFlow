@@ -64,7 +64,7 @@ export default function PublicationRow({
                 </span>
               )}
             </h3>
-            <p className="mt-0.5 line-clamp-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-0.5 line-clamp-1 text-xs text-gray-500 dark:text-neutral-400">
               {item.description || 'No description'}
             </p>
             {item.platform_settings &&

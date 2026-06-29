@@ -69,12 +69,12 @@ export default function ConfirmDialog({
               <DialogTitle className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
                 {title}
               </DialogTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
+              <p className="text-sm text-gray-600 dark:text-neutral-400">{message}</p>
             </div>
 
             <button
               onClick={onClose}
-              className="shrink-0 rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
+              className="shrink-0 rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
               aria-label="Close dialog"
             >
               <X className="h-5 w-5" />

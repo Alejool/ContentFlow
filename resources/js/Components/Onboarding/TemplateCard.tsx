@@ -54,7 +54,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
     'border-gray-200 dark:border-neutral-700';
   const badgeColor =
     categoryBadgeColors[template.category as keyof typeof categoryBadgeColors] ||
-    'bg-white/90 dark:bg-theme-bg-secondary text-gray-700 dark:text-gray-300 border-gray-200 dark:border-neutral-600';
+    'bg-white/90 dark:bg-theme-bg-secondary text-gray-700 dark:text-neutral-300 border-gray-200 dark:border-neutral-600';
 
   const handleSelect = async () => {
     setIsSelecting(true);
@@ -77,7 +77,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
         {/* Generated Content Preview */}
         <div className="absolute inset-0 flex flex-col justify-center p-6">
           <div className="max-h-full overflow-hidden rounded-lg bg-white p-4 shadow-lg dark:bg-theme-bg-secondary">
-            <p className="line-clamp-6 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+            <p className="line-clamp-6 whitespace-pre-wrap text-sm text-gray-700 dark:text-neutral-300">
               {template.content.text}
             </p>
             {template.content.hashtags && template.content.hashtags.length > 0 && (
@@ -136,7 +136,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
         <h3 className="mb-2 line-clamp-1 text-lg font-semibold text-gray-900 dark:text-white">
           {template.name}
         </h3>
-        <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+        <p className="line-clamp-2 text-sm text-gray-600 dark:text-neutral-400">
           {template.description}
         </p>
 
@@ -152,7 +152,7 @@ export default function TemplateCard({ template, onSelect }: TemplateCardProps) 
               </span>
             ))}
             {template.content.hashtags.length > 3 && (
-              <span className="px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+              <span className="px-2 py-1 text-xs text-gray-500 dark:text-neutral-400">
                 +{template.content.hashtags.length - 3} more
               </span>
             )}

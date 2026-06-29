@@ -34,12 +34,12 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
     const colors: Record<string, string> = {
       published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
       scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-      draft: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+      draft: 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300',
       rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
       approved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
       pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
   };
 
   const getStatusText = (status: string) => {
@@ -65,7 +65,7 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
       >
         <div className="flex items-center gap-3">
           <div className="rounded-lg border border-gray-200 bg-white p-2 dark:border-neutral-500 dark:bg-neutral-600">
-            <History className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+            <History className="h-4 w-4 text-gray-600 dark:text-neutral-300" />
           </div>
           <div className="text-left">
             <div className="flex items-center gap-2">
@@ -80,19 +80,19 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-neutral-400">
               {totalActivities + ' ' + t('activity.timeline.total')}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-500 dark:text-neutral-400">
             {isExpanded ? t('common.collapse') : t('common.expand')}
           </span>
           {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <ChevronUp className="h-5 w-5 text-gray-500 dark:text-neutral-400" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <ChevronDown className="h-5 w-5 text-gray-500 dark:text-neutral-400" />
           )}
         </div>
       </button>

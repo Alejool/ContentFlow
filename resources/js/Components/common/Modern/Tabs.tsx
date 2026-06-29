@@ -96,7 +96,7 @@ const SortableTabItem = ({
                 ? 'bg-primary-600 text-white shadow-md ring-1 ring-primary-500/50'
                 : isHovered && !isDisabled
                   ? 'bg-gray-100 text-gray-900 dark:bg-neutral-700 dark:text-white'
-                  : 'text-gray-500 dark:text-gray-400'
+                  : 'text-gray-500 dark:text-neutral-400'
             }`;
           }
 
@@ -121,7 +121,7 @@ const SortableTabItem = ({
                 className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                   isSelected
                     ? 'bg-white/20 text-white'
-                    : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                    : 'bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-neutral-300'
                 }`}
               >
                 {badgeValue}
@@ -281,7 +281,7 @@ export default function Tabs({
                     ? 'bg-primary-600 text-white shadow-md'
                     : isHovered && !disabled
                       ? 'bg-gray-100 text-gray-900 dark:bg-neutral-700 dark:text-white'
-                      : 'text-gray-600 dark:text-gray-400'
+                      : 'text-gray-600 dark:text-neutral-400'
                 }`;
               }
 
@@ -291,7 +291,7 @@ export default function Tabs({
                     ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                     : isHovered && !disabled
                       ? 'border-gray-300 text-gray-900 dark:border-neutral-600 dark:text-white'
-                      : 'border-transparent text-gray-600 dark:text-gray-400'
+                      : 'border-transparent text-gray-600 dark:text-neutral-400'
                 }`;
               }
 
@@ -301,7 +301,7 @@ export default function Tabs({
                     ? 'bg-primary-600 text-white shadow-md ring-1 ring-primary-500/50'
                     : isHovered && !disabled
                       ? 'bg-gray-100 text-gray-900 dark:bg-neutral-700 dark:text-white'
-                      : 'text-gray-600 dark:text-gray-400'
+                      : 'text-gray-600 dark:text-neutral-400'
                 }`;
               }
 
@@ -310,7 +310,7 @@ export default function Tabs({
                   ? 'border-primary-500 bg-white text-primary-600 shadow-sm dark:bg-theme-bg-secondary dark:text-primary-400'
                   : isHovered && !disabled
                     ? 'border-gray-300 bg-gray-50 text-gray-900 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white'
-                    : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-400'
+                    : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-400'
               }`;
             }}
           >
@@ -327,7 +327,7 @@ export default function Tabs({
                     className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                       isSelected
                         ? 'bg-white/20 text-white'
-                        : 'bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-gray-300'
+                        : 'bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-neutral-300'
                     }`}
                   >
                     {tab.badge}

@@ -125,7 +125,7 @@ const ContentTypeStats = memo(({ publications, className = '' }: ContentTypeStat
 
   return (
     <div
-      className={`rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`rounded-lg border border-gray-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800 ${className}`}
     >
       <div className="mb-4 flex items-center gap-2">
         <BarChart3 className="h-5 w-5 text-primary-600 dark:text-primary-400" />
@@ -147,7 +147,7 @@ const ContentTypeStats = memo(({ publications, className = '' }: ContentTypeStat
                   <span>{display.label}</span>
                 </div>
 
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                   <div
                     className={`h-full transition-all duration-500 ${display.color.replace('text-', 'bg-').replace('100', '500')}`}
                     style={{ width: `${percentage}%` }}
@@ -157,16 +157,16 @@ const ContentTypeStats = memo(({ publications, className = '' }: ContentTypeStat
 
               <div className="ml-3 flex items-center gap-2">
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">{count}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">({percentage}%)</span>
+                <span className="text-xs text-gray-500 dark:text-neutral-400">({percentage}%)</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-4 border-t border-gray-200 pt-3 dark:border-gray-700">
+      <div className="mt-4 border-t border-gray-200 pt-3 dark:border-neutral-700">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Total de publicaciones</span>
+          <span className="text-gray-600 dark:text-neutral-400">Total de publicaciones</span>
           <div className="flex items-center gap-1">
             <TrendingUp className="h-4 w-4 text-green-500" />
             <span className="font-semibold text-gray-900 dark:text-white">

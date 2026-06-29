@@ -53,8 +53,8 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
-          <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg dark:bg-gray-800">
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-neutral-900">
+          <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg dark:bg-neutral-800">
             <div className="mb-4">
               <svg
                 className="mx-auto h-16 w-16 text-red-500"
@@ -75,7 +75,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Oops! Something went wrong
             </h1>
 
-            <p className="mb-6 text-gray-600 dark:text-gray-400">
+            <p className="mb-6 text-gray-600 dark:text-neutral-400">
               We're sorry, but something unexpected happened. The error has been logged and we'll
               look into it.
             </p>
@@ -91,7 +91,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex justify-center gap-3">
               <button
                 onClick={this.handleReset}
-                className="rounded-lg bg-gray-200 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                className="rounded-lg bg-gray-200 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-gray-600"
               >
                 Try Again
               </button>

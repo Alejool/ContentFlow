@@ -67,7 +67,7 @@ export default function RejectionReasonModalModern({
         </h2>
         <button
           onClick={handleClose}
-          className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
+          className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
         >
           <X className="h-5 w-5" />
         </button>
@@ -75,7 +75,7 @@ export default function RejectionReasonModalModern({
 
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <div className="p-6">
-          <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          <p className="mb-6 text-sm leading-relaxed text-gray-600 dark:text-neutral-400">
             {t('approvals.rejectionReasonDescription') ||
               'Proporciona una razón detallada para el rechazo de'}{' '}
             <span className="font-bold text-gray-900 dark:text-white">"{publicationTitle}"</span>
@@ -88,7 +88,7 @@ export default function RejectionReasonModalModern({
           <div className="space-y-2">
             <label
               htmlFor="rejection-reason"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-700 dark:text-neutral-300"
             >
               {t('approvals.rejectionReason') || 'Razón del rechazo'}
             </label>
@@ -105,7 +105,7 @@ export default function RejectionReasonModalModern({
             {errors.reason && (
               <p className="text-sm text-red-500 dark:text-red-400">{errors.reason.message}</p>
             )}
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400">
               <span>{t('common.minCharacters', { count: 10 }) || 'Mínimo 10 caracteres'}</span>
               <span className={reason.length > 500 ? 'text-red-500' : ''}>
                 {reason.length} / 500

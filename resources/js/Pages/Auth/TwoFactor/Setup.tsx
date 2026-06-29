@@ -80,7 +80,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('twoFactor.setup.title')}
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">{t('twoFactor.setup.subtitle')}</p>
+            <p className="mt-2 text-gray-600 dark:text-neutral-400">{t('twoFactor.setup.subtitle')}</p>
           </div>
 
           <div className="space-y-6">
@@ -100,11 +100,11 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
             </div>
 
             {/* QR Code Section */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+            <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
               <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 {t('twoFactor.setup.step1.title')}
               </h3>
-              <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
                 {t('twoFactor.setup.step1.description')}
               </p>
               <div className="mb-4 flex justify-center rounded-lg bg-white p-4">
@@ -112,12 +112,12 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
               </div>
 
               {/* Manual Entry */}
-              <div className="mt-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50">
-                <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
+              <div className="mt-4 rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/50">
+                <p className="mb-2 text-xs text-gray-600 dark:text-neutral-400">
                   {t('twoFactor.setup.step1.manualEntry')}
                 </p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 rounded border border-gray-200 bg-white px-3 py-2 font-mono text-sm dark:border-gray-700 dark:bg-gray-800">
+                  <code className="flex-1 rounded border border-gray-200 bg-white px-3 py-2 font-mono text-sm dark:border-neutral-700 dark:bg-neutral-800">
                     {secret}
                   </code>
                   <Button
@@ -134,7 +134,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
             </div>
 
             {/* Backup Codes Section */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+            <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
               <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 {t('twoFactor.setup.step2.title')}
               </h3>
@@ -155,13 +155,13 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
               <div className="grid grid-cols-2 gap-2">
                 {backupCodes.map((code, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <code className="flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-sm dark:border-gray-700 dark:bg-gray-900/50">
+                    <code className="flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-sm dark:border-neutral-700 dark:bg-neutral-900/50">
                       {code}
                     </code>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(code, 'backup', index)}
-                      className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      className="p-2 text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-gray-200"
                     >
                       {copiedBackupCode === index ? (
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -177,12 +177,12 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
             {/* Verification Form */}
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800"
+              className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800"
             >
               <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 {t('twoFactor.setup.step3.title')}
               </h3>
-              <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">
                 {t('twoFactor.setup.step3.description')}
               </p>
 
@@ -198,7 +198,7 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
                   error={errors.code?.message}
                   {...register('code')}
                 />
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-xs text-gray-500 dark:text-neutral-400">
                   {t('twoFactor.setup.step3.hint')}
                 </p>
               </div>

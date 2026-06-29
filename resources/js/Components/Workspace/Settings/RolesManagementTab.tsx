@@ -100,7 +100,7 @@ function RoleCard({
 
   return (
     <div
-      className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-lg dark:border-neutral-800 dark:bg-theme-bg-secondary"
+      className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white transition-all duration-300 hover:shadow-lg dark:border-neutral-800 dark:bg-theme-bg-secondary"
       style={isCurrentRole ? styles.cardBg : {}}
     >
       {/* Color accent bar */}
@@ -111,7 +111,7 @@ function RoleCard({
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
               style={styles.iconBg}
             >
               <RoleIcon
@@ -357,7 +357,7 @@ export default function RolesManagementTab({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-6">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
             {t('workspace.roles_management.title')}
@@ -412,7 +412,7 @@ export default function RolesManagementTab({
           {/* Permissions section */}
           <div>
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+              <p className="text-sm font-semibold text-gray-800 dark:text-neutral-200">
                 {t('roles.permissions')} ({selectedPermissions.length}/{permissions.length})
               </p>
               <div className="flex gap-2">

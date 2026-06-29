@@ -75,7 +75,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                 Exportar calendario
               </h3>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                 {events.length} eventos
               </p>
             </div>
@@ -93,7 +93,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
                   <div className="text-sm font-medium text-gray-900 dark:text-white">
                     Google Calendar
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-gray-500 dark:text-neutral-400">
                     Exportar como archivo .ics
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
                   <div className="text-sm font-medium text-gray-900 dark:text-white">
                     Outlook Calendar
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-gray-500 dark:text-neutral-400">
                     Exportar como archivo .ics
                   </div>
                 </div>
@@ -120,7 +120,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
               <div className="mt-2 rounded-lg bg-gray-50 p-3 dark:bg-neutral-900/50">
                 <div className="flex items-start gap-2">
                   <CalendarIcon className="mt-0.5 h-4 w-4 text-gray-400" />
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-gray-600 dark:text-neutral-400">
                     El archivo .ics se puede importar en cualquier aplicación de calendario
                     compatible
                   </p>

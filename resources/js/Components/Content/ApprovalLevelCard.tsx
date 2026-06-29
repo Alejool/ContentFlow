@@ -65,8 +65,8 @@ export default function ApprovalLevelCard({
   let statusColor = 'gray';
   let statusIcon = Clock;
   let statusText = t('approvals.status.pending') || 'Pendiente';
-  let borderColor = 'border-gray-300 dark:border-gray-700';
-  let bgColor = 'bg-gray-50 dark:bg-gray-800/50';
+  let borderColor = 'border-gray-300 dark:border-neutral-700';
+  let bgColor = 'bg-gray-50 dark:bg-neutral-800/50';
 
   if (level.status === 'approved') {
     statusColor = 'green';
@@ -127,7 +127,7 @@ export default function ApprovalLevelCard({
                   name: level.level_name,
                 })}
               </h4>
-              <p className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+              <p className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-neutral-400">
                 <User className="h-3.5 w-3.5" />
                 {level.role.display_name}
               </p>
@@ -153,17 +153,17 @@ export default function ApprovalLevelCard({
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {t('approvals.level.approvedBy') || 'Aprobado por'}:
                   </span>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-700 dark:text-neutral-300">
                     {level.approved_action.user.name}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-neutral-400">
                   {format(new Date(level.approved_action.created_at), 'PPp', {
                     locale,
                   })}
                 </p>
                 {level.approved_action.comment && (
-                  <p className="mt-2 text-sm italic text-gray-700 dark:text-gray-300">
+                  <p className="mt-2 text-sm italic text-gray-700 dark:text-neutral-300">
                     "{level.approved_action.comment}"
                   </p>
                 )}
@@ -184,11 +184,11 @@ export default function ApprovalLevelCard({
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {t('approvals.level.rejectedBy') || 'Rechazado por'}:
                   </span>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-700 dark:text-neutral-300">
                     {level.rejected_action.user.name}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-neutral-400">
                   {format(new Date(level.rejected_action.created_at), 'PPp', {
                     locale,
                   })}
@@ -251,10 +251,10 @@ export default function ApprovalLevelCard({
 
         {/* Waiting Message - For future levels */}
         {level.is_future_level && (
-          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
+          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
             <div className="flex items-start gap-2">
-              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gray-500 dark:text-gray-400" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gray-500 dark:text-neutral-400" />
+              <p className="text-sm text-gray-600 dark:text-neutral-400">
                 {t('approvals.level.waitingFor') || 'Esperando aprobación de'}:{' '}
                 <strong>{level.role.display_name}</strong>
               </p>

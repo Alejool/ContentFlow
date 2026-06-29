@@ -99,14 +99,14 @@ const PublicationPlatformSelector = memo<PublicationPlatformSelectorProps>(
     return (
       <div className="space-y-4">
         {/* Resumen de compatibilidad */}
-        <div className="rounded-lg border bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/30">
+        <div className="rounded-lg border bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-900/30">
           <div className="flex items-start gap-3">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                 {t('publications.platformValidation.title', 'Compatibilidad de Plataformas')}
               </h3>
-              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
                 {validationStatus.compatible_count > 0
                   ? `${validationStatus.compatible_count} plataforma(s) compatible(s)`
                   : 'No hay plataformas compatibles'}
@@ -303,7 +303,7 @@ const PlatformSpec = memo<PlatformSpecProps>(({ icon, label, specs }) => {
   }
 
   return (
-    <p className="text-xs text-gray-600 dark:text-gray-400">
+    <p className="text-xs text-gray-600 dark:text-neutral-400">
       <span className="mr-1">{icon}</span>
       <span className="font-medium">{label}:</span> {specItems.join(', ') || 'Soportado'}
     </p>

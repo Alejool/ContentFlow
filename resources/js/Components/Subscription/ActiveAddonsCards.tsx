@@ -52,7 +52,7 @@ export function ActiveAddonsCards({ showCarousel = true }: ActiveAddonsCardsProp
             <Package className="h-6 w-6 text-primary-600 dark:text-primary-400" />
             {t('subscription.addons.additionalPackages', 'Paquetes Adicionales')}
           </h2>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-600 dark:text-neutral-400">
             {addons.length}{' '}
             {addons.length === 1
               ? t('subscription.addons.activeAddon', 'paquete activo')
@@ -62,7 +62,7 @@ export function ActiveAddonsCards({ showCarousel = true }: ActiveAddonsCardsProp
               {formatCurrency(totalSpent)} {t('subscription.addons.totalSpent', 'Total Gastado')}
             </span>
             {addons.length > 0 && (
-              <span className="ml-2 text-gray-500 dark:text-gray-400">
+              <span className="ml-2 text-gray-500 dark:text-neutral-400">
                 • {t('subscription.addons.showingUsage', 'Mostrando uso actual')}
               </span>
             )}

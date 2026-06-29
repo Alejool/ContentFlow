@@ -154,19 +154,19 @@ export default function SystemSettings({ settings, categories }: Props) {
     return (
       <div
         key={setting.id}
-        className="mb-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+        className="mb-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="mb-2 flex items-center gap-2">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-neutral-100">
                 {setting.label}
               </h3>
               {getImpactBadge(setting.key)}
             </div>
-            <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">{setting.description}</p>
+            <p className="mb-3 text-sm text-gray-600 dark:text-neutral-400">{setting.description}</p>
             {setting.updated_by && (
-              <p className="text-xs text-gray-500 dark:text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-neutral-500">
                 {t('admin.system_settings.last_updated', {
                   date: formatDateTimeString(setting.updated_at, {
                     dateStyle: 'long',
@@ -193,10 +193,10 @@ export default function SystemSettings({ settings, categories }: Props) {
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-between text-gray-900 dark:text-gray-100">
+        <div className="flex items-center justify-between text-gray-900 dark:text-neutral-100">
           <div>
             <h2 className="text-3xl font-bold">{t('admin.system_settings.page_title')}</h2>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-sm text-gray-600 dark:text-neutral-400">
               {t('admin.system_settings.page_description')}
             </p>
           </div>
@@ -212,7 +212,7 @@ export default function SystemSettings({ settings, categories }: Props) {
 
       <AdminNavigation currentRoute="/admin/system-settings" />
 
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {hasChanges && (
             <AlertCard
@@ -246,13 +246,13 @@ export default function SystemSettings({ settings, categories }: Props) {
               ([categoryKey, categoryLabel]) =>
                 activeTab === categoryKey && (
                   <div key={categoryKey}>
-                    <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <CardHeader className="border-b border-gray-200 dark:border-gray-700">
-                        <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                    <Card className="border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
+                      <CardHeader className="border-b border-gray-200 dark:border-neutral-700">
+                        <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-neutral-100">
                           {getCategoryIconElement(categoryKey)}
                           {t(`admin.system_settings.categories.${categoryKey}`) || categoryLabel}
                         </CardTitle>
-                        <CardDescription className="text-gray-600 dark:text-gray-400">
+                        <CardDescription className="text-gray-600 dark:text-neutral-400">
                           {t(`admin.system_settings.descriptions.${categoryKey}`)}
                         </CardDescription>
                       </CardHeader>
@@ -267,51 +267,51 @@ export default function SystemSettings({ settings, categories }: Props) {
             )}
           </div>
 
-          <Card className="mt-6 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-            <CardHeader className="border-b border-gray-200 dark:border-gray-700">
-              <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+          <Card className="mt-6 border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
+            <CardHeader className="border-b border-gray-200 dark:border-neutral-700">
+              <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-neutral-100">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
                 {t('admin.system_settings.info_section.title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
-                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-neutral-100">
                   {t('admin.system_settings.info_section.plans_title')}
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   {t('admin.system_settings.info_section.plans_description')}
                 </p>
               </div>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
-                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-neutral-100">
                   {t('admin.system_settings.info_section.features_title')}
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   {t('admin.system_settings.info_section.features_description')}
                 </p>
               </div>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
-                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-neutral-100">
                   {t('admin.system_settings.info_section.addons_title')}
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   {t('admin.system_settings.info_section.addons_description')}
                 </p>
               </div>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
-                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-neutral-100">
                   {t('admin.system_settings.info_section.integrations_title')}
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   {t('admin.system_settings.info_section.integrations_description')}
                 </p>
               </div>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
-                <h4 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900/50">
+                <h4 className="mb-2 font-semibold text-gray-900 dark:text-neutral-100">
                   {t('admin.system_settings.info_section.payment_methods_title')}
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-neutral-400">
                   {t('admin.system_settings.info_section.payment_methods_description')}
                 </p>
               </div>

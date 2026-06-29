@@ -37,7 +37,7 @@ export default function ThemeLanguageContainer({
           {canLogin && (
             <Link
               href="/login"
-              className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400"
+              className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:text-neutral-300 dark:hover:text-primary-400"
             >
               {t('welcome.login')}
             </Link>
@@ -53,7 +53,7 @@ export default function ThemeLanguageContainer({
           )}
         </div>
 
-        <div className="h-6 w-px bg-gray-300 dark:bg-gray-700"></div>
+        <div className="h-6 w-px bg-gray-300 dark:bg-neutral-700"></div>
 
         <div className="flex items-center space-x-2">
           <ThemeSwitcher />
@@ -77,12 +77,12 @@ export default function ThemeLanguageContainer({
 
           {/* Menú desplegable */}
           {isMobileMenuOpen && (
-            <div className="absolute right-4 top-16 z-50 min-w-[180px] rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+            <div className="absolute right-4 top-16 z-50 min-w-[180px] rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
               <div className="flex flex-col space-y-3">
                 {canLogin && (
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400"
+                    className="px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:text-primary-600 dark:text-neutral-300 dark:hover:text-primary-400"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('welcome.login')}
@@ -99,7 +99,7 @@ export default function ThemeLanguageContainer({
                   </Link>
                 )}
 
-                <div className="border-t border-gray-200 pt-3 dark:border-gray-700">
+                <div className="border-t border-gray-200 pt-3 dark:border-neutral-700">
                   <div className="flex items-center justify-center space-x-3">
                     <ThemeSwitcher />
                     <LanguageSwitcher />

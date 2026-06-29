@@ -131,7 +131,7 @@ export default function ExportButtons({
         </Button>
       </div>
       {showHistoryInfo && historyDays && (
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-neutral-400">
           <Info className="h-3 w-3" />
           <span>
             {historyDays === 365

@@ -24,7 +24,7 @@ export default function AnimatedPagination({
           className={`relative h-3 rounded-full transition-all duration-300 ${
             index === current
               ? 'w-12 bg-primary-600'
-              : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500'
+              : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-neutral-600 dark:hover:bg-gray-500'
           }`}
           whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.9 }}

@@ -13,13 +13,13 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
         {label && (
           <label htmlFor={id} className="flex cursor-pointer select-none items-center">
             <div className="relative mr-3 flex h-5 w-5 items-center justify-center">
-              <div className="h-5 w-5 rounded-full border-2 border-gray-300 transition-all peer-checked:border-primary-500 peer-checked:bg-primary-500 dark:border-gray-600" />
+              <div className="h-5 w-5 rounded-full border-2 border-gray-300 transition-all peer-checked:border-primary-500 peer-checked:bg-primary-500 dark:border-neutral-600" />
               <div className="absolute h-2 w-2 rounded-full bg-white opacity-0 transition-opacity peer-checked:opacity-100" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
               {description && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
+                <span className="text-xs text-gray-500 dark:text-neutral-400">{description}</span>
               )}
             </div>
           </label>

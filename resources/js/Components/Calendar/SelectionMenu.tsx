@@ -64,11 +64,11 @@ export const SelectionMenu: React.FC<SelectionMenuProps> = ({
               left: position.x,
               top: position.y,
             }}
-            className="z-[101] min-w-[220px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-800"
+            className="z-[101] min-w-[220px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-800"
           >
             {/* Header */}
             <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/50">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-neutral-400">
                 Opciones de selección
               </p>
             </div>
@@ -86,10 +86,10 @@ export const SelectionMenu: React.FC<SelectionMenuProps> = ({
                   <CheckCheck className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                     {t('calendar.selectAll')}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-neutral-400">
                     Todos los eventos del calendario
                   </p>
                 </div>
@@ -107,10 +107,10 @@ export const SelectionMenu: React.FC<SelectionMenuProps> = ({
                     <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       Seleccionar este día
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-neutral-400">
                       {formatDateString(dayDate, {
                         day: 'numeric',
                         month: 'short',

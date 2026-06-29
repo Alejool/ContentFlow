@@ -153,14 +153,14 @@ export default function PlatformCharacterValidator({
         {results.map((r) => (
           <div key={r.platform}>
             <div className="mb-0.5 flex items-center justify-between">
-              <span className="text-xs text-gray-700 dark:text-gray-300">{r.label}</span>
+              <span className="text-xs text-gray-700 dark:text-neutral-300">{r.label}</span>
               <span
                 className={`text-xs font-medium tabular-nums ${
                   r.isOver
                     ? 'text-red-700 dark:text-red-400'
                     : r.pct >= 0.85
                       ? 'text-amber-700 dark:text-amber-400'
-                      : 'text-gray-500 dark:text-gray-400'
+                      : 'text-gray-500 dark:text-neutral-400'
                 }`}
               >
                 {r.count.toLocaleString()} / {r.limit.toLocaleString()}

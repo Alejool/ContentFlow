@@ -236,7 +236,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
               className={`flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
                 isDragging
                   ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
-                  : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-theme-bg-secondary'
+                  : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary'
               }`}
             >
               {!file ? (
@@ -251,12 +251,12 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                     <p className="mb-1 text-base font-medium text-gray-900 dark:text-white">
                       {t('excel.dragDropText') || 'Arrastra tu archivo aquí'}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-neutral-400">
                       {t('excel.orClickToSelect') || 'o haz clic para seleccionar'}
                     </p>
                   </div>
                   <div className="pt-2">
-                    <p className="inline-block rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-500">
+                    <p className="inline-block rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-500 dark:bg-theme-bg-secondary dark:text-neutral-500">
                       {t('excel.supportedFormats') || 'Formatos: .xlsx, .xls, .csv (Máx. 10MB)'}
                     </p>
                   </div>
@@ -277,7 +277,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                           <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                             {file.name}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-neutral-400">
                             {(file.size / 1024).toFixed(2)} KB
                           </p>
                         </div>
@@ -324,7 +324,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                 {result.data && (
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className="text-gray-600 dark:text-neutral-400">
                         {t('excel.successful') || 'Exitosos'}:
                       </span>
                       <span className="font-semibold text-green-600 dark:text-green-400">
@@ -332,7 +332,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className="text-gray-600 dark:text-neutral-400">
                         {t('excel.failed') || 'Fallidos'}:
                       </span>
                       <span className="font-semibold text-red-600 dark:text-red-400">
@@ -340,7 +340,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className="text-gray-600 dark:text-neutral-400">
                         {t('excel.total') || 'Total'}:
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
@@ -356,11 +356,11 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
                       {t('excel.errors') || 'Errores encontrados'}:
                     </h5>
                     {result.errors.map((error, idx) => (
-                      <div key={idx} className="rounded bg-white p-2 text-xs dark:bg-gray-800">
+                      <div key={idx} className="rounded bg-white p-2 text-xs dark:bg-neutral-800">
                         <p className="mb-1 font-semibold text-red-600 dark:text-red-400">
                           {t('excel.row') || 'Fila'} {error.row}:
                         </p>
-                        <ul className="list-inside list-disc space-y-0.5 text-gray-600 dark:text-gray-400">
+                        <ul className="list-inside list-disc space-y-0.5 text-gray-600 dark:text-neutral-400">
                           {error.errors.map((err, i) => (
                             <li key={i}>{err}</li>
                           ))}

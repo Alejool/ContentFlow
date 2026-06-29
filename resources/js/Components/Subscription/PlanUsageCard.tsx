@@ -64,11 +64,11 @@ export default function PlanUsageCard({ usage, className = '' }: PlanUsageCardPr
           {usage.map((metric) => (
             <div
               key={metric.type}
-              className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+              className="rounded-lg border border-gray-200 p-4 dark:border-neutral-700"
             >
               <div className="mb-2 flex items-center gap-2">
                 {getMetricIcon(metric.type)}
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
                   {getMetricName(metric.type)}
                 </span>
               </div>
@@ -77,7 +77,7 @@ export default function PlanUsageCard({ usage, className = '' }: PlanUsageCardPr
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
                     {metric.current}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-600 dark:text-neutral-400">
                     / {formatLimit(metric.limit, metric.type)}
                   </span>
                 </div>
@@ -91,7 +91,7 @@ export default function PlanUsageCard({ usage, className = '' }: PlanUsageCardPr
                         : '[&>div]:bg-green-500'
                   }`}
                 />
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-neutral-400">
                   {metric.remaining === -1
                     ? t('subscription.usage.unlimited', 'Ilimitado')
                     : `${metric.remaining} ${t('subscription.usage.remaining', 'restante')}`}

@@ -44,7 +44,7 @@ export function AddonCard({ addon }: AddonCardProps) {
     }
     if (addon.status === 'depleted') {
       return (
-        <span className="absolute -right-5 -top-5 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+        <span className="absolute -right-5 -top-5 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-neutral-700 dark:text-neutral-200">
           {t('subscription.addons.depleted', 'Agotado')}
         </span>
       );
@@ -68,10 +68,10 @@ export function AddonCard({ addon }: AddonCardProps) {
 
   return (
     <div
-      className={`rounded-xl border-2 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-gray-800 ${
+      className={`rounded-lg border-2 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-neutral-800 ${
         isLow
           ? 'border-orange-300 bg-orange-50/30 dark:border-orange-700 dark:bg-orange-900/10'
-          : 'border-gray-200 dark:border-gray-700'
+          : 'border-gray-200 dark:border-neutral-700'
       }`}
     >
       {/* Header */}
@@ -88,9 +88,9 @@ export function AddonCard({ addon }: AddonCardProps) {
       </div>
 
       {/* Uso actual - Más prominente */}
-      <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-700/50">
+      <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-neutral-700/50">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-neutral-400">
             {t('subscription.addons.currentUsage', 'Uso Actual')}
           </span>
           <span
@@ -110,20 +110,20 @@ export function AddonCard({ addon }: AddonCardProps) {
           <span className="text-2xl font-bold text-gray-900 dark:text-white">
             {addon.type === 'storage' ? formatBytesAsGB(gbToBytes(addon.used), 1) : formatNumber(addon.used)}
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-500 dark:text-neutral-400">
             / {addon.type === 'storage' ? formatBytesAsGB(gbToBytes(addon.amount), 0) : formatNumber(addon.amount)}
           </span>
         </div>
 
         {/* Barra de progreso */}
-        <div className="mb-2 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-600">
+        <div className="mb-2 h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-600">
           <div
             className={`h-2 rounded-full transition-all ${getProgressBarColor(addon.percentage)}`}
             style={{ width: `${Math.min(addon.percentage, 100)}%` }}
           />
         </div>
 
-        <div className="text-xs text-gray-600 dark:text-gray-400">
+        <div className="text-xs text-gray-600 dark:text-neutral-400">
           <span className="font-medium">{t('subscription.addons.remaining', 'Restante')}: </span>
           <span className="font-semibold text-primary-600 dark:text-primary-400">
             {addon.type === 'storage'
@@ -134,8 +134,8 @@ export function AddonCard({ addon }: AddonCardProps) {
       </div>
 
       {/* Información de compra */}
-      <div className="border-t border-gray-200 pt-3 dark:border-gray-700">
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+      <div className="border-t border-gray-200 pt-3 dark:border-neutral-700">
+        <div className="text-xs text-gray-500 dark:text-neutral-400">
           {addon.purchase_count && addon.purchase_count > 1 ? (
             <>
               {t('subscription.addons.multiplePurchases', '{{count}} compras', {
@@ -158,7 +158,7 @@ export function AddonCard({ addon }: AddonCardProps) {
           )}
         </div>
         {addon.expires_at && (
-          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
             {t('subscription.addons.expiresOn', 'Expira el')}:{' '}
             {formatDate(addon.expires_at)}
           </div>

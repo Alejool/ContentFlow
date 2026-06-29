@@ -73,7 +73,7 @@ const ApprovalHistoryCompacto = ({
       >
         <div className="flex items-center gap-3">
           <div className="rounded-lg border border-gray-200 bg-white p-2 dark:border-neutral-500 dark:bg-neutral-600">
-            <Shield className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+            <Shield className="h-4 w-4 text-gray-600 dark:text-neutral-300" />
           </div>
           <div className="text-left">
             <div className="flex items-center gap-2">
@@ -92,13 +92,13 @@ const ApprovalHistoryCompacto = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-500 dark:text-neutral-400">
             {isExpanded ? t('common.collapse') : t('common.expand')}
           </span>
           {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <ChevronUp className="h-5 w-5 text-gray-500 dark:text-neutral-400" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            <ChevronDown className="h-5 w-5 text-gray-500 dark:text-neutral-400" />
           )}
         </div>
       </button>

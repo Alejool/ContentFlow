@@ -19,7 +19,7 @@ export default function AddonsSummary() {
       <div className="animate-pulse">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-48 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+            <div key={i} className="h-48 rounded-lg bg-gray-200 dark:bg-neutral-700"></div>
           ))}
         </div>
       </div>
@@ -37,7 +37,7 @@ export default function AddonsSummary() {
   if (!data) {
     return (
       <div className="py-8 text-center">
-        <p className="text-gray-500 dark:text-gray-400">{t('subscription.addons.loadingError')}</p>
+        <p className="text-gray-500 dark:text-neutral-400">{t('subscription.addons.loadingError')}</p>
       </div>
     );
   }

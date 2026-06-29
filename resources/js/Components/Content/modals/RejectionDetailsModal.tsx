@@ -39,7 +39,7 @@ export default function RejectionDetailsModal({
             </DialogTitle>
             <button
               onClick={onClose}
-              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
             >
               <X className="h-5 w-5" />
             </button>
@@ -55,7 +55,7 @@ export default function RejectionDetailsModal({
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                <label className="mb-1 block text-xs font-medium text-gray-500 dark:text-neutral-400">
                   {t('common.publication') || 'Publicación'}
                 </label>
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -70,14 +70,14 @@ export default function RejectionDetailsModal({
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-neutral-400">
                     {t('approvals.rejectedBy') || 'Rechazado por'}
                   </p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {publication.rejector?.name || 'Admin'}
                   </p>
                   {publication.rejected_at && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-neutral-400">
                       {formatDateTimeString(publication.rejected_at)}
                     </p>
                   )}
@@ -85,11 +85,11 @@ export default function RejectionDetailsModal({
               </div>
 
               <div>
-                <label className="mb-2 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                <label className="mb-2 block text-xs font-medium text-gray-500 dark:text-neutral-400">
                   {t('approvals.rejectionReason') || 'Razón del Rechazo'}
                 </label>
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-                  <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                  <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-neutral-300">
                     {publication.rejection_reason ||
                       t('approvals.noReasonProvided') ||
                       'No se proporcionó una razón.'}

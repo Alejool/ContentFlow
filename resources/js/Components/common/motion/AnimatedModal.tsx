@@ -114,7 +114,7 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
             {/* Modal */}
             <m.div
               ref={modalRef}
-              className={`relative w-full ${sizeStyles[size]} overflow-hidden rounded-xl border border-theme-border-default bg-theme-bg-elevated shadow-2xl`}
+              className={`relative w-full ${sizeStyles[size]} overflow-hidden rounded-lg border border-theme-border-default bg-theme-bg-elevated shadow-2xl`}
               variants={modalVariants}
               initial="hidden"
               animate="visible"

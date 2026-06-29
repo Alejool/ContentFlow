@@ -42,7 +42,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
     <div className="mb-6 space-y-3">
       {/* ─── Expired / Failed Accounts ─── */}
       {expiredAccounts.length > 0 && (
-        <div className="relative flex items-start gap-4 rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm dark:border-red-800/40 dark:bg-red-900/20">
+        <div className="relative flex items-start gap-4 rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm dark:border-red-800/40 dark:bg-red-900/20">
           <div className="shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
               <WifiOff className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -95,7 +95,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
 
       {/* ─── Expiring Soon Accounts ─── */}
       {expiringSoonAccounts.length > 0 && (
-        <div className="relative flex items-start gap-4 rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm dark:border-amber-700/40 dark:bg-amber-900/20">
+        <div className="relative flex items-start gap-4 rounded-lg border border-amber-200 bg-amber-50 p-4 shadow-sm dark:border-amber-700/40 dark:bg-amber-900/20">
           <div className="shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
               <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
@@ -120,7 +120,7 @@ export default function ExpiredTokensBanner({ accounts }: ExpiredTokensBannerPro
                 return (
                   <div key={account.id} className="flex items-center gap-2">
                     <span className="text-sm">{PLATFORM_ICONS[account.platform] ?? '🔗'}</span>
-                    <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                    <span className="text-xs font-medium text-gray-800 dark:text-neutral-200">
                       {account.account_name}
                     </span>
                     <span className={`text-xs font-semibold ${urgency}`}>

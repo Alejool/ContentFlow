@@ -34,7 +34,7 @@ export default function ApprovalSuccessModal({
             </DialogTitle>
             <button
               onClick={onClose}
-              className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
+              className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-gray-300"
             >
               <X className="h-5 w-5" />
             </button>
@@ -50,7 +50,7 @@ export default function ApprovalSuccessModal({
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-neutral-500">
                   {t('common.publication') || 'Publicación'}
                 </label>
                 <p className="text-sm font-bold text-gray-900 dark:text-white">
@@ -65,11 +65,11 @@ export default function ApprovalSuccessModal({
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
+                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-neutral-500">
                     {t('approvals.approvedBy') || 'Aprobado por'}
                   </p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">{approverName}</p>
-                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                     {formatDateTimeString(approvedAt)}
                   </p>
                 </div>

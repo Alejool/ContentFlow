@@ -171,7 +171,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <div className="flex items-center gap-3">
             <div className="group relative shrink-0 cursor-pointer" onClick={handleShowVideoModal}>
               {/* Thumbnail estático sin cargar el video */}
-              <div className="relative flex h-20 w-32 items-center justify-center overflow-hidden rounded border border-gray-300 bg-gradient-to-br from-gray-800 to-gray-900 dark:border-gray-600">
+              <div className="relative flex h-20 w-32 items-center justify-center overflow-hidden rounded border border-gray-300 bg-gradient-to-br from-gray-800 to-gray-900 dark:border-neutral-600">
                 <Play className="h-12 w-12 text-white/60" />
               </div>
               <div className="absolute inset-0 flex items-center justify-center rounded bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
@@ -179,8 +179,8 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
               </div>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="mb-1 text-xs font-medium text-gray-700 dark:text-gray-300">Video:</p>
-              <p className="truncate text-sm text-gray-600 dark:text-gray-400">
+              <p className="mb-1 text-xs font-medium text-gray-700 dark:text-neutral-300">Video:</p>
+              <p className="truncate text-sm text-gray-600 dark:text-neutral-400">
                 {videoFileName || `Video #${videoId}`}
               </p>
               <button
@@ -196,7 +196,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       )}
 
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="text-sm font-medium text-gray-700 dark:text-neutral-300">
           YouTube Thumbnail
           <span className="ml-2 text-xs text-gray-500">(Recommended: 1280x720)</span>
         </label>
@@ -237,7 +237,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <button
             type="button"
             onClick={handleInputClick}
-            className="hover:bg-opacity-80 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-300"
+            className="hover:bg-opacity-80 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-300"
           >
             {t('publications.modal.publish.button.change')}
           </button>
@@ -257,7 +257,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <Upload
             className={`mx-auto mb-2 h-8 w-8 ${isDragging ? 'text-primary-500' : 'text-gray-400'}`}
           />
-          <p className="mb-1 text-sm text-gray-700 dark:text-gray-300">
+          <p className="mb-1 text-sm text-gray-700 dark:text-neutral-300">
             {t('publications.modal.publish.dragDrop.title')}
           </p>
           <p className="text-xs text-gray-500">

@@ -95,11 +95,11 @@ export default function PublicationThumbnailCard({
             <Calendar className="text-primary-600 dark:text-primary-400 h-10 w-10" />
           </div>
         ) : itemIsProcessing || isLoading ? (
-          <div className="flex h-full w-full animate-pulse flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
+          <div className="flex h-full w-full animate-pulse flex-col items-center justify-center bg-gray-100 dark:bg-neutral-800">
             <div className="mb-2 flex items-center justify-center rounded-lg bg-blue-100 p-3 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
               {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Clock className="h-6 w-6 animate-spin" />}
             </div>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <span className="text-xs font-medium text-gray-500 dark:text-neutral-400">
               {isLoading ? t('common.loading') : t('common.processing')}...
             </span>
           </div>
@@ -123,12 +123,12 @@ export default function PublicationThumbnailCard({
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
+          <div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-neutral-700">
             <div className="text-center">
-              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gray-300 p-3 text-gray-500 dark:bg-gray-600">
+              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gray-300 p-3 text-gray-500 dark:bg-neutral-600">
                 {isVideo ? <Video className="h-6 w-6" /> : <ImageIcon className="h-6 w-6" />}
               </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-gray-500 dark:text-neutral-400">
                 {isVideo ? t('common.videoTypes.video') : t('common.videoTypes.post')}
               </span>
             </div>
@@ -136,7 +136,7 @@ export default function PublicationThumbnailCard({
         )}
         {!itemIsProcessing && isVideo && !isUserEvent && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/20">
-            <div className="rounded-full bg-white/90 p-2.5 shadow-lg backdrop-blur-sm dark:bg-gray-900/90">
+            <div className="rounded-full bg-white/90 p-2.5 shadow-lg backdrop-blur-sm dark:bg-neutral-900/90">
               <Video className="text-primary-600 dark:text-primary-400 h-5 w-5" />
             </div>
           </div>

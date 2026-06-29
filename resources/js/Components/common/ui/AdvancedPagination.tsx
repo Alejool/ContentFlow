@@ -53,7 +53,7 @@ export default function AdvancedPagination({
 
   return (
     <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 px-6 py-4 dark:border-neutral-700/50 lg:flex-row">
-      <div className="flex flex-col items-center gap-4 text-sm text-gray-500 dark:text-gray-400 sm:flex-row">
+      <div className="flex flex-col items-center gap-4 text-sm text-gray-500 dark:text-neutral-400 sm:flex-row">
         <div className="flex items-center gap-2">
           <span>{t('common.pagination.show', { defaultValue: 'Mostrar' })}</span>
           <div className="w-20">
@@ -108,7 +108,7 @@ export default function AdvancedPagination({
                 className={`h-10 min-w-[40px] rounded-lg px-3 text-sm font-medium transition-all ${
                   currentPage === page
                     ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
-                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700'
+                    : 'text-gray-600 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
                 }`}
                 aria-label={`${t('common.page', { defaultValue: 'Page' })} ${page}`}
                 aria-current={currentPage === page ? 'page' : undefined}

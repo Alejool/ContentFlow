@@ -392,7 +392,7 @@ export default function PlanCard({
             >
               ${displayPrice}
             </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-gray-500 dark:text-neutral-400">
               /
               {plan.price === 0
                 ? t('planSelection.intervals.forever')
@@ -449,7 +449,7 @@ export default function PlanCard({
                     )}
                   />
                 </div>
-                <span className="text-sm leading-tight text-gray-700 dark:text-gray-300">
+                <span className="text-sm leading-tight text-gray-700 dark:text-neutral-300">
                   {feature}
                 </span>
               </li>
@@ -503,7 +503,7 @@ export default function PlanCard({
             </p>
           )}
           {!plan.enabled && plan.requires_stripe && (
-            <p className="mb-1 text-center text-xs text-gray-500 dark:text-gray-400">
+            <p className="mb-1 text-center text-xs text-gray-500 dark:text-neutral-400">
               {t('pricing.paymentSetup', 'Configuración en proceso')}
             </p>
           )}
@@ -614,7 +614,7 @@ export default function PlanCard({
                 {getPlanTagline(plan.id)}
               </p>
 
-              <CardDescription className="min-h-[2rem] text-xs text-gray-600 dark:text-gray-400">
+              <CardDescription className="min-h-[2rem] text-xs text-gray-600 dark:text-neutral-400">
                 {plan.description}
               </CardDescription>
             </div>
@@ -631,7 +631,7 @@ export default function PlanCard({
                 ${displayPrice}
               </span>
               {plan.price > 0 && (
-                <span className="text-lg text-gray-600 dark:text-gray-400">
+                <span className="text-lg text-gray-600 dark:text-neutral-400">
                   /{billingCycle === 'monthly' ? 'mes' : 'año'}
                 </span>
               )}
@@ -686,7 +686,7 @@ export default function PlanCard({
                     )}
                   />
                 </div>
-                <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                <span className="text-sm text-gray-700 dark:text-neutral-300">{feature}</span>
               </li>
             ))}
           </ul>
@@ -746,7 +746,7 @@ export default function PlanCard({
               </p>
             )}
             {!plan.enabled && plan.requires_stripe && (
-              <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-2 text-center text-xs text-gray-500 dark:text-neutral-400">
                 {t('pricing.paymentSetup', 'Configuración de pagos en proceso')}
               </p>
             )}

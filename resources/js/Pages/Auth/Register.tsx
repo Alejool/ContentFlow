@@ -71,7 +71,7 @@ export default function Register() {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('auth.register.title')}
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">{t('auth.register.subtitle')}</p>
+            <p className="mt-2 text-gray-600 dark:text-neutral-400">{t('auth.register.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -166,7 +166,7 @@ export default function Register() {
                 className="text-primary-600 focus:ring-primary-500 mt-1 h-4 w-4 rounded border-gray-300 focus:ring-offset-0"
                 required
               />
-              <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
+              <label htmlFor="terms" className="text-sm text-gray-600 dark:text-neutral-400">
                 {t('auth.register.agreeWith')}{' '}
                 <Link
                   href="/terms"
@@ -195,7 +195,7 @@ export default function Register() {
             </Button>
 
             <div className="text-center">
-              <p className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <p className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-neutral-400">
                 {t('auth.register.alreadyRegistered')}{' '}
                 <Link
                   href={route('login')}
@@ -209,10 +209,10 @@ export default function Register() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+                <div className="w-full border-t border-gray-300 dark:border-neutral-700"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                <span className="bg-white px-4 text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
                   {t('auth.register.orContinueWith')}
                 </span>
               </div>
@@ -223,7 +223,7 @@ export default function Register() {
                 type="button"
                 onClick={handleGoogleRegister}
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/50"
+                className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-gray-700/50"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path

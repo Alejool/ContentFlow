@@ -46,7 +46,7 @@ export const ThreadsPreview = ({
 
           {/* Media */}
           {mediaUrls.length > 0 && (
-            <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
+            <div className="mt-3 overflow-hidden rounded-lg border border-gray-200">
               {mediaUrls[0].match(/\.(mp4|mov|webm)$/i) ? (
                 <video
                   src={mediaUrls[0]}

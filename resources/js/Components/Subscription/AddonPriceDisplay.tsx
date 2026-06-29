@@ -44,7 +44,7 @@ export function AddonPriceDisplay({
 
       {/* Equivalente en USD (si no es USD) */}
       {showUsdEquivalent && currency !== 'USD' && (
-        <div className={`${subTextClasses[size]} mt-1 text-gray-500 dark:text-gray-400`}>
+        <div className={`${subTextClasses[size]} mt-1 text-gray-500 dark:text-neutral-400`}>
           ≈ {formatCurrency(priceUsd, 'USD')}
         </div>
       )}

@@ -139,7 +139,7 @@ const UpdatePasswordForm = ({ className = '' }: UpdatePasswordFormProps) => {
             </ModernButton>
 
             {isSubmitting && (
-              <div className="mt-4 flex items-center gap-3 text-sm font-bold text-gray-500 dark:text-gray-400">
+              <div className="mt-4 flex items-center gap-3 text-sm font-bold text-gray-500 dark:text-neutral-400">
                 <div className="border-primary-500 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></div>
                 {t('common.processing')}
               </div>

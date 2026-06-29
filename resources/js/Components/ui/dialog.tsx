@@ -109,7 +109,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
           <div
             ref={ref}
             className={cn(
-              'relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800',
+              'relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg dark:bg-neutral-800',
               'animate-in fade-in-0 zoom-in-95',
               className,
             )}

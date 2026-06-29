@@ -10,7 +10,7 @@ export const WeekdayHeaderRow: React.FC = () => (
     {WEEKDAY_LABELS.map((day) => (
       <div
         key={day}
-        className="py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400"
+        className="py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-neutral-400"
       >
         {day}
       </div>

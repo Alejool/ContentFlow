@@ -694,7 +694,7 @@ export default function AddPublicationModal({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
                       {t('publications.modal.edit.campaigns') || 'Add to Campaign'}
                     </label>
                     <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">
@@ -738,7 +738,7 @@ export default function AddPublicationModal({
           {/* Progress bar could go here */}
           {uploading && (
             <div className="px-6 pb-2">
-              <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
                 <div className="h-2.5 rounded-full bg-blue-600" style={{ width: '50%' }}></div>
               </div>
               <p className="mt-1 text-center text-xs text-gray-500">Uploading to S3...</p>

@@ -290,7 +290,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                 leaveTo="transform opacity-0 scale-95 -translate-y-1"
                               >
                                 <MenuItems
-                                  className={`absolute left-0 z-50 mt-1 w-44 rounded-xl border py-1 shadow-lg focus:outline-none ${c.dropdownBg}`}
+                                  className={`absolute left-0 z-50 mt-1 w-44 rounded-lg border py-1 shadow-lg focus:outline-none ${c.dropdownBg}`}
                                 >
                                   {TYPE_OPTIONS.map(({ key, icon: Icon }) => (
                                     <MenuItem key={key}>
@@ -345,7 +345,7 @@ export default function NotificationsModal({ isOpen, onClose }: NotificationsMod
                                 leaveTo="transform opacity-0 scale-95 -translate-y-1"
                               >
                                 <MenuItems
-                                  className={`absolute left-0 z-50 mt-1 w-36 rounded-xl border py-1 shadow-lg focus:outline-none ${c.dropdownBg}`}
+                                  className={`absolute left-0 z-50 mt-1 w-36 rounded-lg border py-1 shadow-lg focus:outline-none ${c.dropdownBg}`}
                                 >
                                   {PRIORITY_OPTIONS.map((p) => (
                                     <MenuItem key={p}>

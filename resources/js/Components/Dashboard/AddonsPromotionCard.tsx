@@ -71,7 +71,7 @@ export function AddonsPromotionCard({
 
       {/* Banner promocional si hay uso alto y está habilitado */}
       {showPromoBanner && hasHighUsage && (
-        <div className="text-dark rounded-xl border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100 p-6 shadow-sm hover:shadow-md dark:border-primary-700/50 dark:from-primary-900/20 dark:to-primary-800/20 dark:text-white">
+        <div className="text-dark rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-100 p-6 shadow-sm hover:shadow-md dark:border-primary-700/50 dark:from-primary-900/20 dark:to-primary-800/20 dark:text-white">
           <div className="mb-4 flex items-start justify-between">
             <div>
               <h3 className="mb-2 flex items-center text-xl font-bold">

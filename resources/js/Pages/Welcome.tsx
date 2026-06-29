@@ -235,7 +235,7 @@ export default function Welcome({
     <>
       <Head title="Intellipost - Plataforma de Gestión de Contenido" />
 
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-950">
         <div className="pointer-events-none fixed inset-0 z-0">
           <div className="animate-pulse-slow absolute top-[-10%] left-[-10%] h-[50%] w-[50%] rounded-full bg-blue-500/10 blur-[120px]" />
           <div className="animate-pulse-slow absolute right-[-10%] bottom-[-10%] h-[50%] w-[50%] rounded-full bg-purple-500/10 blur-[120px] delay-1000" />
@@ -325,7 +325,7 @@ export default function Welcome({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
-                  className="mx-auto mt-6 max-w-2xl text-lg text-gray-700 dark:text-gray-300"
+                  className="mx-auto mt-6 max-w-2xl text-lg text-gray-700 dark:text-neutral-300"
                 >
                   {t('welcome.subtitle') ||
                     'La plataforma todo en uno para crear, programar y optimizar contenido en redes sociales. Impulsado por IA.'}
@@ -352,7 +352,7 @@ export default function Welcome({
                         <a
                           href="#pricing"
                           onClick={scrollToPricing}
-                          className="border-primary-600 text-primary-600 hover:bg-primary-50 dark:text-primary-400 inline-flex items-center justify-center rounded-lg border bg-white px-8 py-3 text-base font-medium transition-colors dark:bg-gray-800 dark:hover:bg-gray-700"
+                          className="border-primary-600 text-primary-600 hover:bg-primary-50 dark:text-primary-400 inline-flex items-center justify-center rounded-lg border bg-white px-8 py-3 text-base font-medium transition-colors dark:bg-neutral-800 dark:hover:bg-gray-700"
                         >
                           {t('welcome.viewPricing') || 'Ver Planes'}
                         </a>
@@ -381,7 +381,7 @@ export default function Welcome({
                       whileInView={{ opacity: 1 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.6, delay: 0.4 }}
-                      className="mb-8 text-sm font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
+                      className="mb-8 text-sm font-semibold tracking-wider text-gray-500 uppercase dark:text-neutral-400"
                     >
                       {t('welcome.connectsWith', 'Se integra perfectamente con')}
                     </motion.p>
@@ -399,7 +399,7 @@ export default function Welcome({
                               delay: 0.5 + index * 0.1,
                             }}
                             whileHover={{ scale: 1.1, filter: 'grayscale(0%)' }}
-                            className="font-heading flex cursor-default items-center gap-3 text-xl font-bold text-gray-400 grayscale transition-all duration-300 hover:text-gray-900 md:text-2xl dark:text-gray-500 dark:hover:text-white"
+                            className="font-heading flex cursor-default items-center gap-3 text-xl font-bold text-gray-400 grayscale transition-all duration-300 hover:text-gray-900 md:text-2xl dark:text-neutral-500 dark:hover:text-white"
                           >
                             <Icon className={`h-6 w-6 md:h-8 md:w-8 ${platform.textColor}`} />
                             <span>{platform.name}</span>
@@ -432,7 +432,7 @@ export default function Welcome({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.4 }}
-                  className="mt-4 mb-12 text-center text-gray-600 dark:text-gray-300"
+                  className="mt-4 mb-12 text-center text-gray-600 dark:text-neutral-300"
                 >
                   {t('welcome.featuresSubtitle') ||
                     'Gestiona tu contenido con herramientas impulsadas por IA'}
@@ -452,7 +452,7 @@ export default function Welcome({
                           className="relative"
                         >
                           <div className="bg-primary-500 relative overflow-hidden rounded-lg p-1">
-                            <div className="relative rounded-lg bg-white p-8 md:p-12 dark:bg-gray-900">
+                            <div className="relative rounded-lg bg-white p-8 md:p-12 dark:bg-neutral-900">
                               <div className="grid items-center gap-8 md:grid-cols-2">
                                 {/* Left side - Icon and Title */}
                                 <motion.div
@@ -476,7 +476,7 @@ export default function Welcome({
                                   <h3 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl dark:text-white">
                                     {features[currentFeatureIndex]?.title}
                                   </h3>
-                                  <p className="text-lg text-gray-600 dark:text-gray-300">
+                                  <p className="text-lg text-gray-600 dark:text-neutral-300">
                                     {features[currentFeatureIndex]?.description}
                                   </p>
                                 </motion.div>
@@ -498,7 +498,7 @@ export default function Welcome({
                                           delay: 0.5 + idx * 0.1,
                                           duration: 0.4,
                                         }}
-                                        className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800"
+                                        className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:bg-neutral-800/50 dark:hover:bg-gray-800"
                                       >
                                         <motion.div
                                           initial={{ scale: 0 }}
@@ -511,7 +511,7 @@ export default function Welcome({
                                         >
                                           <CheckCircle2 className="h-4 w-4 text-white" />
                                         </motion.div>
-                                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                                        <span className="font-medium text-gray-700 dark:text-neutral-300">
                                           {highlight}
                                         </span>
                                       </motion.div>
@@ -533,7 +533,7 @@ export default function Welcome({
                             className={`relative h-3 rounded-full transition-all duration-300 ${
                               index === currentFeatureIndex
                                 ? 'bg-primary-600 w-12'
-                                : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500'
+                                : 'w-3 bg-gray-300 hover:bg-gray-400 dark:bg-neutral-600 dark:hover:bg-gray-500'
                             }`}
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.9 }}
@@ -622,7 +622,7 @@ export default function Welcome({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.4 }}
-                  className="mt-4 text-center text-gray-600 dark:text-gray-300"
+                  className="mt-4 text-center text-gray-600 dark:text-neutral-300"
                 >
                   {t('welcome.pricingSubtitle') ||
                     'Desde planes gratuitos hasta soluciones empresariales'}
@@ -686,8 +686,8 @@ export default function Welcome({
                           className={`relative block rounded-lg border ${
                             isPopular
                               ? 'border-primary-500 shadow-lg'
-                              : 'hover:border-primary-500 border-gray-200 hover:shadow-lg dark:border-gray-700'
-                          } h-full cursor-pointer bg-white p-6 transition-all dark:bg-gray-800`}
+                              : 'hover:border-primary-500 border-gray-200 hover:shadow-lg dark:border-neutral-700'
+                          } h-full cursor-pointer bg-white p-6 transition-all dark:bg-neutral-800`}
                         >
                           {isPopular && (
                             <motion.div
@@ -713,26 +713,26 @@ export default function Welcome({
                               <span className="text-4xl font-bold text-gray-900 dark:text-white">
                                 ${plan.price}
                               </span>
-                              <span className="text-gray-600 dark:text-gray-400">
+                              <span className="text-gray-600 dark:text-neutral-400">
                                 {t('pricing.perMonth') || '/mes'}
                               </span>
                             </div>
                             <ul className="mt-6 space-y-3 text-left text-sm">
                               <li className="flex items-center gap-2">
                                 <div className="bg-primary-500 h-1.5 w-1.5 rounded-full"></div>
-                                <span className="text-gray-700 dark:text-gray-300">
+                                <span className="text-gray-700 dark:text-neutral-300">
                                   {getPublicationsText()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <div className="bg-primary-500 h-1.5 w-1.5 rounded-full"></div>
-                                <span className="text-gray-700 dark:text-gray-300">
+                                <span className="text-gray-700 dark:text-neutral-300">
                                   {getSocialAccountsText()}
                                 </span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <div className="bg-primary-500 h-1.5 w-1.5 rounded-full"></div>
-                                <span className="text-gray-700 dark:text-gray-300">
+                                <span className="text-gray-700 dark:text-neutral-300">
                                   {getStorageText()}
                                 </span>
                               </li>
@@ -771,7 +771,7 @@ export default function Welcome({
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {t('welcome.readyToStart') || '¿Listo para transformar tu contenido?'}
                   </h2>
-                  <p className="mt-2 text-gray-600 dark:text-gray-300">
+                  <p className="mt-2 text-gray-600 dark:text-neutral-300">
                     {t('welcome.joinNow') || 'Únete a miles de creadores que ya usan Intellipost'}
                   </p>
 
@@ -788,7 +788,7 @@ export default function Welcome({
                         <a
                           href="#pricing"
                           onClick={scrollToPricing}
-                          className="border-primary-600 text-primary-600 hover:bg-primary-50 dark:text-primary-400 inline-flex items-center justify-center rounded-lg border bg-white px-8 py-3 text-lg font-medium transition-colors dark:bg-gray-800 dark:hover:bg-gray-700"
+                          className="border-primary-600 text-primary-600 hover:bg-primary-50 dark:text-primary-400 inline-flex items-center justify-center rounded-lg border bg-white px-8 py-3 text-lg font-medium transition-colors dark:bg-neutral-800 dark:hover:bg-gray-700"
                         >
                           {t('welcome.viewPricing') || 'Ver Planes y Precios'}
                         </a>
@@ -804,7 +804,7 @@ export default function Welcome({
                     ) : null}
                   </div>
 
-                  <div className="mt-6 flex flex-col items-center justify-center gap-4 text-sm text-gray-600 sm:flex-row dark:text-gray-400">
+                  <div className="mt-6 flex flex-col items-center justify-center gap-4 text-sm text-gray-600 sm:flex-row dark:text-neutral-400">
                     <div className="flex items-center gap-2">
                       <Zap className="h-4 w-4 text-yellow-500" />
                       <span>{t('welcome.demoAccess') || 'Demo de 30 días disponible'}</span>
@@ -815,7 +815,7 @@ export default function Welcome({
             </div>
           </main>
 
-          <footer className="border-t border-gray-200 py-8 dark:border-gray-800">
+          <footer className="border-t border-gray-200 py-8 dark:border-neutral-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col items-center justify-between md:flex-row">
                 <div className="mb-4 flex items-center md:mb-0">
@@ -833,21 +833,21 @@ export default function Welcome({
                 <div className="flex items-center space-x-6">
                   <Link
                     href={route('privacy')}
-                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm text-gray-600 transition-colors dark:text-gray-400"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm text-gray-600 transition-colors dark:text-neutral-400"
                   >
                     <Shield className="h-4 w-4" />
                     {t('welcome.privacy') || 'Privacidad'}
                   </Link>
                   <Link
                     href={route('terms')}
-                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm text-gray-600 transition-colors dark:text-gray-400"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm text-gray-600 transition-colors dark:text-neutral-400"
                   >
                     <Globe className="h-4 w-4" />
                     {t('welcome.terms') || 'Términos'}
                   </Link>
                   <Link
                     href={route('contact')}
-                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm text-gray-600 transition-colors dark:text-gray-400"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm text-gray-600 transition-colors dark:text-neutral-400"
                   >
                     <Mail className="h-4 w-4" />
                     {t('welcome.contact') || 'Contacto'}

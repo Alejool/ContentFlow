@@ -406,7 +406,7 @@ export default function ManageContentPage() {
             <h1 className="truncate text-xl font-extrabold tracking-tight text-gray-900 dark:text-white lg:text-2xl">
               {t('manageContent.title')}
             </h1>
-            <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400 sm:text-base lg:text-lg">
+            <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-neutral-400 sm:text-base lg:text-lg">
               {t('manageContent.subtitle')}
             </p>
           </div>
@@ -419,7 +419,7 @@ export default function ManageContentPage() {
                     <Button
                       id="create-publication"
                       variant="primary"
-                      size="md"
+                      size="lg"
                       icon={Plus}
                       className="gap-2 text-xs font-bold uppercase tracking-wider"
                     >
@@ -441,10 +441,10 @@ export default function ManageContentPage() {
                         {({ focus }) => (
                           <button
                             onClick={() => openAddModal('publication')}
-                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
+                            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
                               focus
                                 ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-neutral-800'
+                                : 'text-gray-700 hover:bg-gray-50 dark:text-neutral-200 dark:hover:bg-neutral-800'
                             }`}
                           >
                             <span
@@ -472,10 +472,10 @@ export default function ManageContentPage() {
                         {({ focus }) => (
                           <button
                             onClick={() => openAddModal('campaign')}
-                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
+                            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
                               focus
                                 ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-neutral-800'
+                                : 'text-gray-700 hover:bg-gray-50 dark:text-neutral-200 dark:hover:bg-neutral-800'
                             }`}
                           >
                             <span
@@ -537,7 +537,7 @@ export default function ManageContentPage() {
             {activeTab === 'approvals' && (
               <div className="animate-in fade-in zoom-in space-y-6 duration-300">
                 {planId !== 'enterprise' && (
-                  <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-primary-200 bg-primary-50 p-4 shadow-sm dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center">
+                  <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-primary-200 bg-primary-50 p-4 shadow-sm dark:border-primary-800 dark:bg-primary-900/20 sm:flex-row sm:items-center">
                     <div className="flex items-start gap-3">
                       <div className="shrink-0 rounded-full bg-primary-100 p-2 dark:bg-primary-900/40">
                         <Shield className="h-5 w-5 text-primary-600 dark:text-primary-400" />
@@ -688,7 +688,7 @@ export default function ManageContentPage() {
         />
 
         <div className="p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('common.deleteConfirm') ||
               '┬┐Est├ís seguro de que deseas eliminar este elemento? Esta acci├│n no se puede deshacer.'}
           </p>

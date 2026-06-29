@@ -47,9 +47,9 @@ const PublicationStatusTimeline = ({
       key: 'draft',
       label: t('publications.status.draft') || 'Borrador',
       icon: FileText,
-      color: 'text-gray-600 dark:text-gray-400',
-      bgColor: 'bg-gray-100 dark:bg-gray-800',
-      borderColor: 'border-gray-300 dark:border-gray-600',
+      color: 'text-gray-600 dark:text-neutral-400',
+      bgColor: 'bg-gray-100 dark:bg-neutral-800',
+      borderColor: 'border-gray-300 dark:border-neutral-600',
     },
     pending_review: {
       key: 'pending_review',
@@ -254,7 +254,7 @@ const PublicationStatusTimeline = ({
                     ? `${step.bgColor} ${step.borderColor} ${step.color} font-semibold shadow-sm`
                     : state === 'completed'
                       ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300'
-                      : 'border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-500'
+                      : 'border-gray-200 bg-gray-50 text-gray-400 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-500'
                 }`}
               >
                 {state === 'completed' ? (
@@ -274,7 +274,7 @@ const PublicationStatusTimeline = ({
                   className={`h-0.5 w-4 ${
                     state === 'completed'
                       ? 'bg-green-300 dark:bg-green-700'
-                      : 'bg-gray-200 dark:bg-gray-700'
+                      : 'bg-gray-200 dark:bg-neutral-700'
                   }`}
                 />
               )}
@@ -303,7 +303,7 @@ const PublicationStatusTimeline = ({
                     ? `${step.bgColor} ${step.borderColor} ${step.color} shadow-md`
                     : state === 'completed'
                       ? 'border-green-500 bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                      : 'border-gray-300 bg-gray-100 text-gray-400 dark:border-gray-600 dark:bg-gray-800'
+                      : 'border-gray-300 bg-gray-100 text-gray-400 dark:border-neutral-600 dark:bg-neutral-800'
                 }`}
               >
                 {state === 'completed' ? (
@@ -323,8 +323,8 @@ const PublicationStatusTimeline = ({
                       state === 'current'
                         ? 'text-gray-900 dark:text-white'
                         : state === 'completed'
-                          ? 'text-gray-700 dark:text-gray-300'
-                          : 'text-gray-500 dark:text-gray-400'
+                          ? 'text-gray-700 dark:text-neutral-300'
+                          : 'text-gray-500 dark:text-neutral-400'
                     }`}
                   >
                     {step.label}
@@ -347,7 +347,7 @@ const PublicationStatusTimeline = ({
 
                 {/* Timestamp if available */}
                 {state === 'completed' && (
-                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                     {step.key === 'approved' && approvedAt && (
                       <span>{formatDateTimeStyled(approvedAt, 'short', 'short')}</span>
                     )}
@@ -358,7 +358,7 @@ const PublicationStatusTimeline = ({
                 )}
 
                 {state === 'current' && step.key === 'scheduled' && scheduledAt && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+                  <p className="mt-1 flex items-center gap-1 text-xs text-gray-600 dark:text-neutral-400">
                     <Clock className="h-3 w-3" />
                     <span>
                       {t('publications.scheduled_for') || 'Programado para'}:{' '}
@@ -375,7 +375,7 @@ const PublicationStatusTimeline = ({
                 className={`absolute top-10 left-5 -ml-px h-8 w-0.5 ${
                   state === 'completed'
                     ? 'bg-green-300 dark:bg-green-700'
-                    : 'bg-gray-200 dark:bg-gray-700'
+                    : 'bg-gray-200 dark:bg-neutral-700'
                 }`}
               />
             )}

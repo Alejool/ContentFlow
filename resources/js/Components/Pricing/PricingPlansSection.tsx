@@ -182,7 +182,7 @@ export default function PricingPlansSection({
             {t('pricing.title')}
           </h1>
 
-          <p className="mx-auto mb-10 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
+          <p className="mx-auto mb-10 max-w-2xl text-xl text-gray-600 dark:text-neutral-400">
             {t('pricing.subtitle')}
           </p>
 
@@ -403,7 +403,7 @@ export default function PricingPlansSection({
           >
             <ModalIcon className={cn('h-7 w-7', meta.iconClass)} />
           </div>
-          <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          <p className="text-sm leading-relaxed text-gray-600 dark:text-neutral-400">
             {modal.message}
           </p>
           <div className="mt-2 flex w-full justify-center gap-3">
@@ -425,7 +425,7 @@ export default function PricingPlansSection({
               onClick={closeModal}
               className={cn(
                 'rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors',
-                'bg-white text-gray-700 dark:bg-theme-bg-secondary dark:text-gray-200',
+                'bg-white text-gray-700 dark:bg-theme-bg-secondary dark:text-neutral-200',
                 'border-gray-200 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-700',
                 !modal.actionLabel && 'flex-1',
               )}

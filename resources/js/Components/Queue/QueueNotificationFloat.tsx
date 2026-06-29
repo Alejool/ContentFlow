@@ -84,7 +84,7 @@ export default function QueueNotificationFloat({
     if (!label) return null;
 
     return (
-      <span className="inline-flex items-center rounded-full bg-white/50 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-800/50 dark:text-gray-300">
+      <span className="inline-flex items-center rounded-full bg-white/50 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-neutral-800/50 dark:text-neutral-300">
         {label}
       </span>
     );
@@ -107,7 +107,7 @@ export default function QueueNotificationFloat({
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                   {getTitle()}
                 </h4>
                 {onClose && (
@@ -120,14 +120,14 @@ export default function QueueNotificationFloat({
                 )}
               </div>
 
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{getMessage()}</p>
+              <p className="mt-1 text-sm text-gray-600 dark:text-neutral-400">{getMessage()}</p>
 
               {queueStatus.status === 'queued' && (
                 <div className="mt-2 space-y-2">
                   {getPriorityBadge()}
 
                   {queueStatus.queuePosition > 1 && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-neutral-500">
                       Posición en cola: #{queueStatus.queuePosition}
                     </p>
                   )}
@@ -135,7 +135,7 @@ export default function QueueNotificationFloat({
                   {/* Barra de progreso */}
                   {queueStatus.estimatedWaitMinutes > 0 && (
                     <div className="mt-2">
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                         <motion.div
                           className="h-full bg-blue-500"
                           initial={{ width: '0%' }}
@@ -153,7 +153,7 @@ export default function QueueNotificationFloat({
 
               {queueStatus.status === 'publishing' && (
                 <div className="mt-2">
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                     <motion.div
                       className="h-full bg-blue-500"
                       animate={{

@@ -92,8 +92,8 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
 
       // Default fallback UI
       return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 dark:bg-gray-900">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 dark:bg-neutral-900">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-neutral-800">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
               <svg
                 className="h-6 w-6 text-red-600 dark:text-red-400"
@@ -114,13 +114,13 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
               Something went wrong
             </h2>
 
-            <p className="mb-6 text-center text-gray-600 dark:text-gray-400">
+            <p className="mb-6 text-center text-gray-600 dark:text-neutral-400">
               We encountered an error while loading the onboarding experience. Don&apos;t worry,
               your progress has been saved.
             </p>
 
             {import.meta.env.DEV && this.state.error && (
-              <div className="mb-4 max-h-32 overflow-auto rounded bg-gray-100 p-3 font-mono text-xs text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+              <div className="mb-4 max-h-32 overflow-auto rounded bg-gray-100 p-3 font-mono text-xs text-gray-800 dark:bg-neutral-700 dark:text-neutral-200">
                 {this.state.error.message}
               </div>
             )}
@@ -135,13 +135,13 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
 
               <button
                 onClick={() => (window.location.href = '/dashboard')}
-                className="flex-1 rounded-lg bg-gray-200 px-4 py-2 font-medium text-gray-900 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                className="flex-1 rounded-lg bg-gray-200 px-4 py-2 font-medium text-gray-900 transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-white dark:hover:bg-gray-600"
               >
                 Go to Dashboard
               </button>
             </div>
 
-            <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-500">
+            <p className="mt-4 text-center text-xs text-gray-500 dark:text-neutral-500">
               If this problem persists, please contact support.
             </p>
           </div>

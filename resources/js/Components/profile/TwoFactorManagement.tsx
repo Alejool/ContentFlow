@@ -70,7 +70,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           {isEnabled ? (
@@ -78,15 +78,15 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
               <ShieldCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
           ) : (
-            <div className="rounded-lg bg-gray-100 p-2 dark:bg-gray-900/30">
-              <Shield className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+            <div className="rounded-lg bg-gray-100 p-2 dark:bg-neutral-900/30">
+              <Shield className="h-6 w-6 text-gray-600 dark:text-neutral-400" />
             </div>
           )}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Two-Factor Authentication
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {isEnabled
                 ? 'Your account is protected with 2FA'
                 : 'Add an extra layer of security to your account'}
@@ -99,7 +99,7 @@ export default function TwoFactorManagement({ isEnabled, enabledAt }: TwoFactorM
               Enabled
             </span>
           ) : (
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-900/30 dark:text-gray-400">
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400">
               Disabled
             </span>
           )}

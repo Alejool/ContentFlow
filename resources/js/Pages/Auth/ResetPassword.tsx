@@ -64,7 +64,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {t('auth.reset-password.title')}
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-600 dark:text-neutral-400">
               {t('auth.reset-password.subtitle')}
             </p>
           </div>

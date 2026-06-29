@@ -50,7 +50,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Gender Distribution */}
-      <div className={`rounded-xl p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-100 bg-gray-50/50'}`}>
+      <div className={`rounded-lg p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-100 bg-gray-50/50'}`}>
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
           <Users className="w-4 h-4" />
           Distribución por Género
@@ -79,7 +79,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
       </div>
 
       {/* Age Distribution */}
-      <div className={`rounded-xl p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-100 bg-gray-50/50'}`}>
+      <div className={`rounded-lg p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-100 bg-gray-50/50'}`}>
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
           <Users className="w-4 h-4" />
           Rango de Edad
@@ -108,7 +108,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
       </div>
 
       {/* Top Locations */}
-      <div className={`rounded-xl p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-100 bg-gray-50/50'}`}>
+      <div className={`rounded-lg p-5 border ${isDark ? 'border-gray-800 bg-gray-900/50' : 'border-gray-100 bg-gray-50/50'}`}>
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
           <MapPin className="w-4 h-4" />
           Top Ciudades
@@ -123,7 +123,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
                   <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{loc.name}</span>
                   <span className="font-semibold text-primary-600">{loc.value.toLocaleString()}</span>
                 </div>
-                <div className="h-2 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-primary-500 rounded-full transition-all duration-1000 ease-out" 
                     style={{ width: `${percentage}%` }}

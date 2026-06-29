@@ -98,10 +98,10 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
           <div className="px-6 py-4">
             {event && (
               <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-neutral-900">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-medium text-gray-900 dark:text-neutral-100">
                   {t('calendar.conflict.event', 'Event')}: {event.title}
                 </p>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                   {t('calendar.conflict.field_label', 'Conflicting field')}:{' '}
                   {getFieldLabel(conflict.field)}
                 </p>
@@ -134,28 +134,28 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                       aria-label={t('calendar.conflict.select_local', 'Select your version')}
                     />
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {t('calendar.conflict.your_version', 'Your Version')}
                     </h4>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-gray-500 dark:text-neutral-400">
                     {t('calendar.conflict.local', 'Local')}
                   </span>
                 </div>
 
                 <div className="ml-6 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-neutral-400">
                     <Clock className="h-3 w-3" />
                     <span>{formatDateTimeString(conflict.localTimestamp)}</span>
                   </div>
                   {conflict.localUser && (
-                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-neutral-400">
                       <User className="h-3 w-3" />
                       <span>{conflict.localUser}</span>
                     </div>
                   )}
                   <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-800">
-                    <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
+                    <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-neutral-100">
                       {formatValue(conflict.localValue)}
                     </pre>
                   </div>
@@ -187,28 +187,28 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                       aria-label={t('calendar.conflict.select_server', 'Select server version')}
                     />
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {t('calendar.conflict.server_version', 'Server Version')}
                     </h4>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-gray-500 dark:text-neutral-400">
                     {t('calendar.conflict.server', 'Server')}
                   </span>
                 </div>
 
                 <div className="ml-6 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-neutral-400">
                     <Clock className="h-3 w-3" />
                     <span>{formatDateTimeString(conflict.serverTimestamp)}</span>
                   </div>
                   {conflict.serverUser && (
-                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-neutral-400">
                       <User className="h-3 w-3" />
                       <span>{conflict.serverUser}</span>
                     </div>
                   )}
                   <div className="mt-2 rounded border border-gray-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-800">
-                    <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-gray-100">
+                    <pre className="text-xs break-all whitespace-pre-wrap text-gray-900 dark:text-neutral-100">
                       {formatValue(conflict.serverValue)}
                     </pre>
                   </div>
@@ -231,7 +231,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-gray-500 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-neutral-500 dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-gray-500"
             >
               {t('calendar.conflict.cancel', 'Cancel')}
             </button>

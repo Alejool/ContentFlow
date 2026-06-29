@@ -12,7 +12,7 @@ const ListSkeleton = ({ items = 5, hasAvatar = true, hasActions = true }: ListSk
       {Array.from({ length: items }).map((_, index) => (
         <div
           key={index}
-          className="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+          className="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800"
         >
           {hasAvatar && <Skeleton variant="circle" className="h-10 w-10 shrink-0" />}
 

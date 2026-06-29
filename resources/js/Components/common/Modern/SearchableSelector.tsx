@@ -74,7 +74,7 @@ export default function SearchableSelector<T>({
 
   if (loading) {
     return (
-      <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="py-8 text-center text-sm text-gray-500 dark:text-neutral-400">
         <div className="border-primary-500 mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
         Loading...
       </div>
@@ -93,7 +93,7 @@ export default function SearchableSelector<T>({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={searchPlaceholder}
-          className="focus:ring-primary-500 block w-full rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-100 dark:placeholder-gray-500"
+          className="focus:ring-primary-500 block w-full rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-100 dark:placeholder-neutral-500"
           disabled={disabled}
         />
         {searchQuery && (
@@ -110,7 +110,7 @@ export default function SearchableSelector<T>({
       {/* Items List - Scrollable */}
       <div className={`space-y-2 overflow-y-auto ${maxHeight} custom-scrollbar`}>
         {filteredItems.length === 0 ? (
-          <div className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="py-6 text-center text-sm text-gray-500 dark:text-neutral-400">
             {items.length === 0 ? emptyMessage : noResultsMessage}
           </div>
         ) : (

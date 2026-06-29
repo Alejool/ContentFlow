@@ -36,7 +36,7 @@ export default function PollOptions({
   return (
     <div className="space-y-6 border-t border-gray-200 pt-6 dark:border-neutral-700">
       <div className="space-y-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-neutral-300">
           {t('platformSettings.twitter.pollOptions')}
         </h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -60,7 +60,7 @@ export default function PollOptions({
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-neutral-300">
           {t('platformSettings.twitter.pollDuration')}
         </h3>
         <div className="w-full md:w-1/2">

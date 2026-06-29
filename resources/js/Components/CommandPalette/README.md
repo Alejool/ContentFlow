@@ -189,7 +189,7 @@ Los estilos usan Tailwind CSS. Edita las clases en `CommandPalette.tsx`:
 className="fixed inset-0 bg-gray-500/25 backdrop-blur-sm dark:bg-black/50"
 
 // Panel
-className="transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 dark:divide-gray-800 dark:bg-gray-900"
+className="transform divide-y divide-gray-100 overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5 dark:divide-gray-800 dark:bg-gray-900"
 
 // Items con hover
 className="flex cursor-pointer select-none items-center rounded-lg p-3 transition-colors bg-gray-100 dark:bg-gray-800"
@@ -414,7 +414,7 @@ Los estilos usan Tailwind CSS. Edita las clases en `CommandPalette.tsx`:
 className="fixed inset-0 bg-gray-500/25 backdrop-blur-sm dark:bg-black/50"
 
 // Panel
-className="transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 dark:divide-gray-800 dark:bg-gray-900"
+className="transform divide-y divide-gray-100 overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5 dark:divide-gray-800 dark:bg-gray-900"
 
 // Items
 className="flex cursor-pointer select-none items-center rounded-lg p-3"

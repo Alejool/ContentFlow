@@ -34,7 +34,7 @@ export default function PublicationStatusSection({
 
   return (
     <div className="px-6 pb-4">
-      <div className="overflow-hidden rounded-xl border-2 border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary">
+      <div className="overflow-hidden rounded-lg border-2 border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-theme-bg-secondary">
         {/* Header */}
         <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:border-neutral-700 dark:from-blue-950/30 dark:to-indigo-950/30">
           <div className="p-4">
@@ -62,7 +62,7 @@ export default function PublicationStatusSection({
                         }) || `Publicando en redes (${totalInProgress})...`
                       : t('publish.allPublished') || 'Todas las publicaciones completadas'}
                   </h3>
-                  <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">
+                  <p className="mt-0.5 text-xs text-gray-600 dark:text-neutral-400">
                     {totalCompleted > 0 && (
                       <span className="font-medium text-green-600 dark:text-green-400">
                         {totalCompleted} {t('publish.completed') || 'completadas'}
@@ -96,9 +96,9 @@ export default function PublicationStatusSection({
                   aria-label={isExpanded ? 'Contraer' : 'Expandir'}
                 >
                   {isExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                    <ChevronUp className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                    <ChevronDown className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                   )}
                 </button>
               </div>
@@ -115,7 +115,7 @@ export default function PublicationStatusSection({
                     }}
                   />
                 </div>
-                <p className="mt-1.5 text-right text-xs text-gray-600 dark:text-gray-400">
+                <p className="mt-1.5 text-right text-xs text-gray-600 dark:text-neutral-400">
                   {totalCompleted} / {totalAccounts} {t('publish.platforms') || 'plataformas'}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export default function PublicationStatusSection({
             {/* Publishing Accounts (In Progress) */}
             {publishingAccounts.length > 0 && (
               <div className="space-y-2">
-                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-neutral-300">
                   <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
                   {t('publish.inProgress') || 'En Curso'}
                 </h4>
@@ -147,7 +147,7 @@ export default function PublicationStatusSection({
                           {account.platform}
                         </p>
                         {(account.account_name || account.name) && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-neutral-400">
                             @{account.account_name || account.name}
                           </p>
                         )}
@@ -164,7 +164,7 @@ export default function PublicationStatusSection({
             {/* Published Accounts (Completed) */}
             {publishedAccounts.length > 0 && (
               <div className="space-y-2">
-                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-neutral-300">
                   <div className="h-2 w-2 rounded-full bg-green-500" />
                   {t('publish.completed') || 'Completadas'}
                 </h4>
@@ -182,7 +182,7 @@ export default function PublicationStatusSection({
                           {account.platform}
                         </p>
                         {(account.account_name || account.name) && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-neutral-400">
                             @{account.account_name || account.name}
                           </p>
                         )}

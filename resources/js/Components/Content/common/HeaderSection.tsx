@@ -26,7 +26,7 @@ export default function HeaderSection({
               ? t('campaigns.title') || 'Campaign Groups'
               : t('publications.title') || 'Your Publications'}
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
             {mode === 'campaigns'
               ? t('campaigns.subtitle') || 'Campaign Groups'
               : t('publications.subtitle') || 'Your Publications'}

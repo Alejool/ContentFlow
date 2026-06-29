@@ -59,7 +59,7 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
       {displayPosts.map((post, index) => (
         <div
           key={post.id}
-          className={`flex flex-col gap-3 rounded-xl border p-4 transition-all hover:-translate-y-1 hover:shadow-md ${
+          className={`flex flex-col gap-3 rounded-lg border p-4 transition-all hover:-translate-y-1 hover:shadow-md ${
             isDark
               ? 'border-gray-800 bg-gray-800/50 hover:border-gray-700'
               : 'border-gray-100 bg-gray-50 hover:border-gray-200'
@@ -71,7 +71,7 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
                 index === 0
                   ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-500'
                   : index === 1
-                  ? 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                  ? 'bg-gray-200 text-gray-700 dark:bg-neutral-800 dark:text-neutral-400'
                   : index === 2
                   ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-600'
                   : 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-500'
@@ -82,10 +82,10 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
             <div className="min-w-0 flex-1">
               {formatTitle(post.title)}
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 dark:bg-neutral-800 dark:text-gray-400 px-1.5 py-0.5 rounded">
+                <span className="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 px-1.5 py-0.5 rounded">
                   {post.type}
                 </span>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-[11px] text-gray-500 dark:text-neutral-400 truncate">
                   {post.published_at}
                 </p>
               </div>
@@ -93,15 +93,15 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
           </div>
           
           <div className="flex flex-wrap items-center gap-4 text-sm mt-1">
-            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-1.5 text-gray-600 dark:text-neutral-300">
               <Eye className="h-4 w-4 shrink-0 text-blue-500" />
               <span className="truncate">{post.views.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-1.5 text-gray-600 dark:text-neutral-300">
               <MousePointer2 className="h-4 w-4 shrink-0 text-purple-500" />
               <span className="truncate">{post.clicks.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-1.5 text-gray-600 dark:text-neutral-300">
               <Heart className="h-4 w-4 shrink-0 text-rose-500" />
               <span className="font-semibold truncate">{post.engagement.toLocaleString()}</span>
             </div>

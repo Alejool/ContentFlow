@@ -49,7 +49,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border-primary-200 from-primary-50 dark:border-primary-800 dark:from-primary-900/20 relative overflow-hidden rounded-xl border bg-gradient-to-br to-blue-50 p-5 dark:to-blue-900/20"
+          className="border-primary-200 from-primary-50 dark:border-primary-800 dark:from-primary-900/20 relative overflow-hidden rounded-lg border bg-gradient-to-br to-blue-50 p-5 dark:to-blue-900/20"
         >
           {/* Decoración de fondo */}
           <div className="absolute top-0 right-0 h-32 w-32 translate-x-8 -translate-y-8 transform opacity-10">
@@ -57,7 +57,7 @@ export const MoveModal: React.FC<MoveModalProps> = ({
           </div>
 
           <div className="relative flex items-start gap-4">
-            <div className="bg-primary-100 dark:bg-primary-900/40 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm">
+            <div className="bg-primary-100 dark:bg-primary-900/40 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-sm">
               <Calendar className="text-primary-600 dark:text-primary-400 h-6 w-6" />
             </div>
             <div className="flex-1">
@@ -91,13 +91,13 @@ export const MoveModal: React.FC<MoveModalProps> = ({
           />
 
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900/50">
-            <p className="mb-2 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
+            <p className="mb-2 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-neutral-400">
               {t('calendar.selected_date')}
             </p>
             <p className="text-base font-semibold text-gray-900 dark:text-white">
               {formatSelectedDate(selectedDate)}
             </p>
-            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-neutral-400">
               <div className="h-1 w-1 rounded-full bg-gray-400" />
               <span>{t('calendar.preserveOriginalTime')}</span>
               <div className="h-1 w-1 rounded-full bg-gray-400" />

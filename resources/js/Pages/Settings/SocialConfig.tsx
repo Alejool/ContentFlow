@@ -94,7 +94,7 @@ function PlatformCard({
                     key={key}
                     className="flex items-start justify-between gap-2 rounded-lg bg-gray-50 p-2.5 dark:bg-theme-bg-secondary"
                   >
-                    <span className="truncate text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="truncate text-xs font-medium text-gray-600 dark:text-neutral-400">
                       {label}
                     </span>
                     <span className="truncate text-xs font-bold text-gray-900 dark:text-white">
@@ -104,7 +104,7 @@ function PlatformCard({
                 );
               })}
             {Object.keys(platformSettings).length > 3 && (
-              <div className="pt-1 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+              <div className="pt-1 text-center text-xs font-medium text-gray-500 dark:text-neutral-400">
                 +{Object.keys(platformSettings).length - 3} más
               </div>
             )}

@@ -121,10 +121,10 @@ export default function PlatformConfigCard({
         <div className="flex items-center gap-2.5">
           <span className="text-2xl">{getPlatformIcon(config.platform)}</span>
           <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
               {formatPlatformName(config.platform)}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">@{config.account_name}</span>
+            <span className="text-xs text-gray-500 dark:text-neutral-400">@{config.account_name}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -162,14 +162,14 @@ export default function PlatformConfigCard({
         {/* Type Selector */}
         {config.is_compatible && (
           <div className="mb-2 flex items-center gap-2">
-            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-gray-400">
+            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-neutral-400">
               Tipo:
             </label>
             {editable && config.can_change_type && config.available_types ? (
               <select
                 value={selectedType}
                 onChange={handleTypeChange}
-                className="flex-1 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-100"
+                className="flex-1 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-100"
               >
                 {config.available_types.map((type) => (
                   <option key={type} value={type}>
@@ -178,7 +178,7 @@ export default function PlatformConfigCard({
                 ))}
               </select>
             ) : (
-              <span className="flex-1 rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-gray-300">
+              <span className="flex-1 rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-neutral-300">
                 {formatType(config.type)}
               </span>
             )}
@@ -188,7 +188,7 @@ export default function PlatformConfigCard({
         {/* Quality Info */}
         {config.quality && (
           <div className="mb-2 flex items-center gap-2">
-            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-gray-400">
+            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-neutral-400">
               Calidad:
             </label>
             <div className="flex flex-1 flex-wrap gap-1.5">
@@ -209,10 +209,10 @@ export default function PlatformConfigCard({
         {/* Format Info */}
         {config.format && (
           <div className="mb-2 flex items-center gap-2">
-            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-gray-400">
+            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-neutral-400">
               Formato:
             </label>
-            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-gray-300">
+            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-neutral-300">
               {config.format.extension}
             </span>
           </div>
@@ -260,7 +260,7 @@ export default function PlatformConfigCard({
           <div className="mt-2 border-t border-gray-200 pt-2 dark:border-neutral-700">
             <button
               onClick={() => setSettingsExpanded(!settingsExpanded)}
-              className="flex items-center gap-1 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              className="flex items-center gap-1 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-neutral-400 dark:hover:text-gray-200"
             >
               <span>{settingsExpanded ? '▼' : '▶'}</span>
               <span>Configuración aplicada</span>
@@ -269,10 +269,10 @@ export default function PlatformConfigCard({
               <div className="mt-2 rounded-md bg-gray-50 p-2 dark:bg-theme-bg-secondary">
                 {Object.entries(config.applied_settings).map(([key, value]) => (
                   <div key={key} className="flex justify-between py-1 text-xs">
-                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                    <span className="font-medium text-gray-500 dark:text-neutral-400">
                       {formatSettingKey(key)}:
                     </span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="font-semibold text-gray-900 dark:text-neutral-100">
                       {formatSettingValue(value)}
                     </span>
                   </div>

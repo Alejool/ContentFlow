@@ -36,7 +36,7 @@ export default function CampaignPublications({
                         <PublicationThumbnail publication={pub} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                        <div className="truncate text-sm font-medium text-gray-800 dark:text-neutral-200">
                           {pub.title}
                         </div>
                         <div className="text-xs text-gray-500">

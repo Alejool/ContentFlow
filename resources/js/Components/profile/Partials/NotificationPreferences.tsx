@@ -74,7 +74,7 @@ export default function NotificationPreferences() {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {t('profile.notifications.title') || 'Notification Preferences'}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-neutral-400">
             {t('profile.notifications.description') ||
               'Configure how you want to be notified about upload and processing completions'}
           </p>
@@ -90,7 +90,7 @@ export default function NotificationPreferences() {
               <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                 {t('profile.notifications.in_app') || 'In-App Notifications'}
               </h4>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                 {t('profile.notifications.in_app_description') ||
                   'Show notifications within the application'}
               </p>
@@ -119,7 +119,7 @@ export default function NotificationPreferences() {
               <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                 {t('profile.notifications.browser') || 'Browser Notifications'}
               </h4>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                 {t('profile.notifications.browser_description') ||
                   'Show system notifications even when the app is in the background'}
               </p>
@@ -172,7 +172,7 @@ export default function NotificationPreferences() {
               <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                 {t('profile.notifications.upload_complete') || 'Upload Completions'}
               </h4>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                 {t('profile.notifications.upload_complete_description') ||
                   'Notify when file uploads complete'}
               </p>
@@ -201,7 +201,7 @@ export default function NotificationPreferences() {
               <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                 {t('profile.notifications.processing_complete') || 'Processing Completions'}
               </h4>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                 {t('profile.notifications.processing_complete_description') ||
                   'Notify when video processing completes'}
               </p>

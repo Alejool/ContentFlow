@@ -74,7 +74,7 @@ export function GatewaySelector({
   if (loading) {
     return (
       <div className={`animate-pulse ${className}`}>
-        <div className="h-10 rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="h-10 rounded bg-gray-200 dark:bg-neutral-700"></div>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export function GatewaySelector({
   // Contenido del selector
   const selectorContent = (
     <>
-      <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-neutral-300">
         {t('payment.paymentMethod') || 'Método de pago'}
       </label>
       <div
@@ -114,7 +114,7 @@ export function GatewaySelector({
             className={`relative flex min-h-[100px] flex-col items-center justify-center rounded-lg border-2 p-4 transition-all ${
               selectedGateway === gateway.name
                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                : 'border-gray-200 hover:border-primary-300 dark:border-gray-700 dark:hover:border-primary-600'
+                : 'border-gray-200 hover:border-primary-300 dark:border-neutral-700 dark:hover:border-primary-600'
             } ${!gateway.available ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} `}
           >
             {gateway.logo ? (
@@ -124,7 +124,7 @@ export function GatewaySelector({
                 className="mb-2 h-10 w-auto object-contain"
               />
             ) : (
-              <CreditCard className="mb-2 h-8 w-8 text-gray-600 dark:text-gray-400" />
+              <CreditCard className="mb-2 h-8 w-8 text-gray-600 dark:text-neutral-400" />
             )}
 
             <span className="text-center text-sm font-medium text-gray-900 dark:text-white">
@@ -168,7 +168,7 @@ export function GatewaySelector({
 
         {/* Modal */}
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+          <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-neutral-800">
             {/* Close button */}
             <button
               onClick={handleModalClose}

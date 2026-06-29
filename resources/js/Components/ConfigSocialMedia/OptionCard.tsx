@@ -37,13 +37,13 @@ export default function OptionCard({
         <div>
           <span className="block font-medium text-gray-900 dark:text-white">{label}</span>
           {description && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
+            <span className="text-xs text-gray-500 dark:text-neutral-400">{description}</span>
           )}
         </div>
       </div>
       <div
         className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-          selected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 dark:border-gray-600'
+          selected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 dark:border-neutral-600'
         }`}
       >
         {selected && <Check className="h-3 w-3 text-white" />}

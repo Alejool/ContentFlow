@@ -208,7 +208,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
       {/* Counter */}
       {reels.length > 1 && (
-        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-center text-sm text-gray-600 dark:text-neutral-400">
           {currentIndex + 1} / {reels.length}
         </div>
       )}

@@ -66,7 +66,7 @@ export default function DisconnectBlockerModal({
               </DialogTitle>
 
               <div className="mt-2 text-sm">
-                <p className="mb-4 text-gray-600 dark:text-gray-300">
+                <p className="mb-4 text-gray-600 dark:text-neutral-300">
                   <span className="font-semibold text-red-500">{accountName}</span>
                   <br />
                   {getMessage()}
@@ -75,7 +75,7 @@ export default function DisconnectBlockerModal({
                 <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
                   <div className="max-h-60 overflow-y-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="sticky top-0 bg-gray-100 text-gray-600 dark:bg-theme-bg-secondary dark:text-gray-400">
+                      <thead className="sticky top-0 bg-gray-100 text-gray-600 dark:bg-theme-bg-secondary dark:text-neutral-400">
                         <tr>
                           <th className="px-4 py-2 font-medium">
                             {t('manageContent.socialMedia.blockerModal.table.publication') ||
@@ -89,7 +89,7 @@ export default function DisconnectBlockerModal({
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200 text-gray-700 dark:divide-neutral-700 dark:text-gray-300">
+                      <tbody className="divide-y divide-gray-200 text-gray-700 dark:divide-neutral-700 dark:text-neutral-300">
                         {posts.map((post) => (
                           <tr key={post.id}>
                             <td className="px-4 py-2">

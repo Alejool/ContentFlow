@@ -138,15 +138,15 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
 
             <div className="flex flex-col gap-1">
               <div className="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
-                <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                <span className="text-sm font-bold text-gray-900 dark:text-neutral-100">
                   {formatActivityType(activity)}
                 </span>
-                <time className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <time className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                   {format(new Date(activity.created_at), 'PPp', { locale })}
                 </time>
               </div>
 
-              <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+              <div className="space-y-2 text-xs text-gray-600 dark:text-neutral-400">
                 <div className="flex items-center gap-1.5 opacity-80">
                   <User className="h-3.5 w-3.5" />
                   <span className="font-medium">

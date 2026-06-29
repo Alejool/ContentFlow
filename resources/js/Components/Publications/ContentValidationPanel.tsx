@@ -119,7 +119,7 @@ export default function ContentValidationPanel({
               </div>
               <ul className="list-disc space-y-1 pl-6">
                 {result.errors?.map((error, index) => (
-                  <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                  <li key={index} className="text-sm text-gray-700 dark:text-neutral-300">
                     {error}
                   </li>
                 ))}
@@ -145,7 +145,7 @@ export default function ContentValidationPanel({
               </div>
               <ul className="list-disc space-y-1 pl-6">
                 {result.warnings?.map((warning, index) => (
-                  <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                  <li key={index} className="text-sm text-gray-700 dark:text-neutral-300">
                     {warning}
                   </li>
                 ))}
@@ -179,7 +179,7 @@ export default function ContentValidationPanel({
         <div className="border-t border-gray-200 pt-3 dark:border-neutral-700">
           <button
             onClick={() => setMediaInfoExpanded(!mediaInfoExpanded)}
-            className="flex items-center gap-1.5 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            className="flex items-center gap-1.5 text-xs text-gray-600 transition-colors hover:text-gray-800 dark:text-neutral-400 dark:hover:text-gray-200"
           >
             <span>{mediaInfoExpanded ? '▼' : '▶'}</span>
             <span>Detalles técnicos</span>
@@ -189,50 +189,50 @@ export default function ContentValidationPanel({
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                 {validationResult.media_info.extension && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                       Formato:
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {validationResult.media_info.extension.toUpperCase()}
                     </span>
                   </div>
                 )}
                 {validationResult.media_info.duration && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                       Duración:
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {formatDuration(validationResult.media_info.duration)}
                     </span>
                   </div>
                 )}
                 {validationResult.media_info.width && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                       Resolución:
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {validationResult.media_info.width}x{validationResult.media_info.height}
                     </span>
                   </div>
                 )}
                 {validationResult.media_info.aspect_ratio && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                       Aspecto:
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {validationResult.media_info.aspect_ratio}
                     </span>
                   </div>
                 )}
                 {validationResult.media_info.size && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                       Tamaño:
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
                       {formatFileSize(validationResult.media_info.size)}
                     </span>
                   </div>

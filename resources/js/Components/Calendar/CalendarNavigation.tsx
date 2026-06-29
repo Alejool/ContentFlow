@@ -101,7 +101,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
                   className={`text-sm ${
                     currentDate.getMonth() === i
                       ? ''
-                      : 'border-none! text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-900'
+                      : 'border-none! text-gray-700 hover:bg-gray-100 dark:text-neutral-300 dark:hover:bg-neutral-900'
                   }`}
                 >
                   {formatDate(new Date(2024, i, 1), 'monthShort')}
@@ -144,7 +144,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           size="sm"
           rounded="lg"
           shadow="sm"
-          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-neutral-800!"
+          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-neutral-300! dark:hover:bg-neutral-800!"
           title={t('calendar.navigation.previous') || 'Anterior'}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -160,7 +160,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           className={`relative font-semibold transition-all hover:shadow ${
             isCurrentDay(currentDate)
               ? 'bg-primary-100! text-primary-700! dark:bg-primary-900! dark:text-primary-300!'
-              : 'text-gray-700! hover:bg-white! dark:text-gray-200! dark:hover:bg-neutral-800!'
+              : 'text-gray-700! hover:bg-white! dark:text-neutral-200! dark:hover:bg-neutral-800!'
           }`}
           title={t('calendar.navigation.today') || 'Hoy'}
         >
@@ -177,7 +177,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
           size="sm"
           rounded="lg"
           shadow="sm"
-          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-neutral-800!"
+          className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-neutral-300! dark:hover:bg-neutral-800!"
           title={t('calendar.navigation.next') || 'Siguiente'}
           icon={<ChevronRight className="h-5 w-5" />}
         >
@@ -192,7 +192,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
             size="sm"
             rounded="lg"
             shadow="sm"
-            className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-gray-300! dark:hover:bg-neutral-800!"
+            className="border-none! p-2 text-gray-600! hover:bg-white! dark:text-neutral-300! dark:hover:bg-neutral-800!"
             title={t('calendar.navigation.selectDate') || 'Seleccionar fecha'}
             icon={<CalendarIcon className="h-5 w-5" />}
           >

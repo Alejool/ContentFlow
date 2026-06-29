@@ -190,7 +190,7 @@ const PlatformCard = memo(
                       : isFailed
                         ? 'border-red-500 bg-red-50 shadow-md dark:border-red-600 dark:bg-red-900/30'
                         : isRemovedPlatform
-                          ? 'border-gray-500 bg-gray-50 shadow-md dark:border-gray-600 dark:bg-gray-900/30'
+                          ? 'border-gray-500 bg-gray-50 shadow-md dark:border-neutral-600 dark:bg-neutral-900/30'
                           : isSelected
                             ? 'border-primary-600 bg-primary-100 ring-primary-300/60 dark:border-primary-400 dark:bg-primary-900/50 dark:ring-primary-600/50 shadow-lg ring-4'
                             : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-white hover:shadow-md dark:border-neutral-700 dark:bg-theme-bg-secondary'
@@ -478,7 +478,7 @@ const PlatformCard = memo(
                   </span>
                 )}
               </div>
-              <div className="truncate text-xs text-gray-600 dark:text-gray-400">
+              <div className="truncate text-xs text-gray-600 dark:text-neutral-400">
                 @{account.account_name}
               </div>
             </div>
@@ -486,7 +486,7 @@ const PlatformCard = memo(
 
           {/* Connected By Info */}
           {account.user?.name && !isPublishing && !isUnpublishing && !isPublished && (
-            <div className="z-10 truncate text-[10px] font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
+            <div className="z-10 truncate text-[10px] font-medium tracking-wide text-gray-500 uppercase dark:text-neutral-400">
               {t('manageContent.socialMedia.status.connectedBy') || 'Conectado por'}:{' '}
               {account.user.name}
             </div>
@@ -506,7 +506,7 @@ const PlatformCard = memo(
                   (sp: any) => sp.social_account_id === account.id,
                 );
                 return schedPost?.scheduled_at ? (
-                  <span className="rounded-lg bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-theme-bg-secondary dark:text-gray-400">
+                  <span className="rounded-lg bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-theme-bg-secondary dark:text-neutral-400">
                     {formatDateTimeStyled(schedPost.scheduled_at, 'short', 'short')}
                   </span>
                 ) : null;

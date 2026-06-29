@@ -184,7 +184,7 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
                   >
                     {item.title || t('publications.table.untitled')}
                   </h3>
-                  <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed font-medium text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed font-medium text-gray-500 dark:text-neutral-400">
                     {item.description || 'Sin descripción'}
                   </p>
                 </div>

@@ -55,11 +55,11 @@ export default function ValidationLimitsCard({
         <div className="flex items-center gap-2">
           <span className="text-2xl">{platformIcons[result.platform.toLowerCase()] || '📱'}</span>
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+            <h4 className="font-semibold text-gray-900 dark:text-neutral-100">
               {result.account_name}
             </h4>
             <div className="mt-1 flex items-center gap-2">
-              <span className="text-xs capitalize text-gray-500 dark:text-gray-400">
+              <span className="text-xs capitalize text-gray-500 dark:text-neutral-400">
                 {result.platform}
               </span>
               <span
@@ -96,25 +96,25 @@ export default function ValidationLimitsCard({
       {/* Limits Info */}
       {showDetails && (
         <div className="mb-3 rounded-md border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-          <h5 className="mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
+          <h5 className="mb-2 text-xs font-semibold text-gray-700 dark:text-neutral-300">
             Límites de la plataforma:
           </h5>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <span className="text-gray-500 dark:text-gray-400">Duración máxima:</span>
-              <span className="ml-1 font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-gray-500 dark:text-neutral-400">Duración máxima:</span>
+              <span className="ml-1 font-medium text-gray-700 dark:text-neutral-300">
                 {SocialMediaLimitsService.formatDuration(result.limits.max_video_duration)}
               </span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400">Tamaño máximo:</span>
-              <span className="ml-1 font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-gray-500 dark:text-neutral-400">Tamaño máximo:</span>
+              <span className="ml-1 font-medium text-gray-700 dark:text-neutral-300">
                 {result.limits.max_video_size_mb} MB
               </span>
             </div>
             <div className="col-span-2">
-              <span className="text-gray-500 dark:text-gray-400">Imágenes por post:</span>
-              <span className="ml-1 font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-gray-500 dark:text-neutral-400">Imágenes por post:</span>
+              <span className="ml-1 font-medium text-gray-700 dark:text-neutral-300">
                 {result.limits.max_images_per_post === 0
                   ? 'No soporta imágenes'
                   : `Máximo ${result.limits.max_images_per_post}`}

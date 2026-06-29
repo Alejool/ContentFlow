@@ -216,7 +216,7 @@ TrackingSystemInfo
 ### Container Classes
 ```css
 /* Main container */
-.rounded-xl
+.rounded-lg
 .border
 .bg-gradient-to-br
 .p-6

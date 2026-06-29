@@ -318,7 +318,7 @@ export default function PublishPreviewModal({
       <div className="flex max-h-[90vh] flex-col overflow-hidden rounded-lg bg-white dark:bg-theme-bg-secondary">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-6 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-neutral-100">
             Previsualización de Publicación
           </h2>
           <button
@@ -333,7 +333,7 @@ export default function PublishPreviewModal({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center gap-4 p-16">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500 dark:border-neutral-700" />
-            <p className="text-gray-600 dark:text-gray-400">Generando previsualización...</p>
+            <p className="text-gray-600 dark:text-neutral-400">Generando previsualización...</p>
           </div>
         ) : (
           previewData && (
@@ -357,27 +357,27 @@ export default function PublishPreviewModal({
                   </div>
 
                   <div className="flex flex-1 flex-col gap-3">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-neutral-100">
                       {publication.title}
                     </h3>
                     <div className="flex flex-wrap gap-4">
                       {previewData.media_info.duration && (
-                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-neutral-400">
                           ⏱ {formatDuration(previewData.media_info.duration)}
                         </span>
                       )}
                       {previewData.media_info.quality?.resolution && (
-                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-neutral-400">
                           📐 {previewData.media_info.quality.resolution}
                         </span>
                       )}
                       {previewData.media_info.format?.extension && (
-                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-neutral-400">
                           📄 {previewData.media_info.format.extension}
                         </span>
                       )}
                       {previewData.media_info.quality?.size_mb && (
-                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-neutral-400">
                           💾 {previewData.media_info.quality.size_mb} MB
                         </span>
                       )}
@@ -401,7 +401,7 @@ export default function PublishPreviewModal({
                     </div>
                     <ul className="list-disc space-y-1.5 pl-6">
                       {previewData.global_warnings.map((warning, index) => (
-                        <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                        <li key={index} className="text-sm text-gray-700 dark:text-neutral-300">
                           {warning}
                         </li>
                       ))}
@@ -413,7 +413,7 @@ export default function PublishPreviewModal({
                 {validationData && (
                   <div className="mb-6">
                     <div className="mb-4 flex items-center justify-between">
-                      <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-neutral-100">
                         <span>🔍</span>
                         <span>Validación de Límites por Plataforma</span>
                       </h3>
@@ -438,7 +438,7 @@ export default function PublishPreviewModal({
                                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                                   {summary.compatible}
                                 </div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                <div className="text-xs text-gray-600 dark:text-neutral-400">
                                   Compatible
                                   {summary.compatible !== 1 ? 's' : ''}
                                 </div>
@@ -447,7 +447,7 @@ export default function PublishPreviewModal({
                                 <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                                   {summary.incompatible}
                                 </div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                <div className="text-xs text-gray-600 dark:text-neutral-400">
                                   Incompatible
                                   {summary.incompatible !== 1 ? 's' : ''}
                                 </div>
@@ -456,7 +456,7 @@ export default function PublishPreviewModal({
                                 <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                                   {summary.withWarnings}
                                 </div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                <div className="text-xs text-gray-600 dark:text-neutral-400">
                                   Con advertencias
                                 </div>
                               </div>
@@ -531,7 +531,7 @@ export default function PublishPreviewModal({
                             {validationData.recommendations.map((recommendation, index) => (
                               <li
                                 key={index}
-                                className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+                                className="flex items-start gap-2 text-sm text-gray-700 dark:text-neutral-300"
                               >
                                 <span className="mt-0.5 text-blue-500 dark:text-blue-400">•</span>
                                 <span>{recommendation}</span>
@@ -554,7 +554,7 @@ export default function PublishPreviewModal({
                           </div>
                           <ul className="space-y-2">
                             {suggestions.map((suggestion, index) => (
-                              <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                              <li key={index} className="text-sm text-gray-700 dark:text-neutral-300">
                                 {suggestion}
                               </li>
                             ))}
@@ -590,7 +590,7 @@ export default function PublishPreviewModal({
                       </div>
                       <ul className="list-disc space-y-1.5 pl-6">
                         {previewData.optimization_suggestions.map((suggestion, index) => (
-                          <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                          <li key={index} className="text-sm text-gray-700 dark:text-neutral-300">
                             {suggestion}
                           </li>
                         ))}
@@ -601,7 +601,7 @@ export default function PublishPreviewModal({
                 {/* Platform Configurations */}
                 <div className="mb-6">
                   <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">
                       Configuración por Plataforma
                     </h3>
                     {!isSimpleMode && (
@@ -639,7 +639,7 @@ export default function PublishPreviewModal({
                         onChange={(e) => setIsScheduled(e.target.checked)}
                         className="rounded"
                       />
-                      <span className="text-gray-700 dark:text-gray-300">
+                      <span className="text-gray-700 dark:text-neutral-300">
                         Programar publicación
                       </span>
                     </label>
@@ -661,7 +661,7 @@ export default function PublishPreviewModal({
                 <div className="border-t border-gray-200 pt-4 text-center dark:border-neutral-700">
                   <button
                     onClick={toggleMode}
-                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-xs text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-400 dark:hover:border-neutral-500 dark:hover:bg-neutral-700"
+                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-xs text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-400 dark:hover:border-neutral-500 dark:hover:bg-neutral-700"
                   >
                     {isSimpleMode ? '⚙ Modo avanzado' : '⚡ Modo simplificado'}
                   </button>
@@ -710,7 +710,7 @@ export default function PublishPreviewModal({
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={handleClose}
-                    className="rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-600"
+                    className="rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600"
                   >
                     Cancelar
                   </button>
@@ -730,7 +730,7 @@ export default function PublishPreviewModal({
                     disabled={!canPublish || isPublishing}
                     className={`rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-md transition-all ${
                       !canPublish
-                        ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600'
+                        ? 'cursor-not-allowed bg-gray-400 dark:bg-neutral-600'
                         : 'bg-gradient-to-r from-green-600 to-green-700 hover:-translate-y-0.5 hover:shadow-lg'
                     } disabled:cursor-not-allowed disabled:opacity-50`}
                     title={

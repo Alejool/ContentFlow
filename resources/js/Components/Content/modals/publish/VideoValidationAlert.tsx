@@ -180,7 +180,7 @@ export default function VideoValidationAlert({
                         <p className="font-bold text-gray-900 dark:text-white">
                           {result.platform.toUpperCase()}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600 dark:text-neutral-400">
                           @{result.account_name}
                         </p>
                       </div>
@@ -280,7 +280,7 @@ export default function VideoValidationAlert({
                         <p className="font-bold text-gray-900 dark:text-white">
                           {result.platform.toUpperCase()}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600 dark:text-neutral-400">
                           @{result.account_name}
                         </p>
                       </div>

@@ -84,7 +84,7 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
           {/* Publications */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+              <div className="flex items-center gap-1.5 text-gray-700 dark:text-neutral-300">
                 <FileText className="h-3 w-3" />
                 <span>{t('subscription.usage.publications') || 'Publicaciones'}</span>
               </div>
@@ -95,7 +95,7 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
               </span>
             </div>
             {usage.publications.limit !== -1 && (
-              <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                 <div
                   className={`h-full rounded-full transition-all ${
                     usage.publications.percentage >= 90
@@ -122,7 +122,7 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
           {/* Storage */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
+              <div className="flex items-center gap-1 text-gray-700 dark:text-neutral-300">
                 <HardDrive className="h-3 w-3" />
                 <span>{t('subscription.usage.storage') || 'Almacenamiento'}</span>
               </div>
@@ -134,7 +134,7 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
             </div>
             <div className='text-[10px]'>
               {usage.storage.limit_gb !== -1 && (
-                <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                   <div
                     className={`h-full rounded-full transition-all ${
                       usage.storage.percentage >= 90

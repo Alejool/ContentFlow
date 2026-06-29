@@ -161,7 +161,7 @@ export default function PerformanceTable({
             <tr>
               <th
                 onClick={() => handleSort('title')}
-                className="group cursor-pointer px-6 py-3 text-left text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                className="group cursor-pointer px-6 py-3 text-left text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center gap-2">
                   {t('common.item') || 'Elemento'}
@@ -170,7 +170,7 @@ export default function PerformanceTable({
               </th>
               <th
                 onClick={() => handleSort('total_views')}
-                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <Eye className="h-3 w-3" />
@@ -180,7 +180,7 @@ export default function PerformanceTable({
               </th>
               <th
                 onClick={() => handleSort('total_clicks')}
-                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                className="cursor-pointer px-6 py-3 text-center text-xs font-bold tracking-wider text-gray-500 uppercase transition-colors hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
               >
                 <div className="flex items-center justify-center gap-1">
                   <MousePointer2 className="h-3 w-3" />
@@ -258,23 +258,23 @@ export default function PerformanceTable({
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2 pl-8">
                         <FileText className="h-3.5 w-3.5 text-gray-400" />
-                        <span className="max-w-[250px] truncate text-sm text-gray-600 dark:text-gray-300">
+                        <span className="max-w-[250px] truncate text-sm text-gray-600 dark:text-neutral-300">
                           {item.publication.title}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3 text-center whitespace-nowrap">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-gray-500 dark:text-neutral-400">
                         {item.publication.views.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-3 text-center whitespace-nowrap">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-gray-500 dark:text-neutral-400">
                         {item.publication.clicks.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-3 text-center whitespace-nowrap">
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                      <span className="text-xs font-medium text-gray-700 dark:text-neutral-200">
                         {item.publication.engagement.toLocaleString()}
                       </span>
                     </td>
@@ -285,7 +285,7 @@ export default function PerformanceTable({
 
             {paginatedItems.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={4} className="px-6 py-12 text-center text-gray-500 dark:text-neutral-400">
                   {searchTerm ? t('common.noResults') : t('analytics.emptyState.title')}
                 </td>
               </tr>

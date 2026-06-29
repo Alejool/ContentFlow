@@ -204,7 +204,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
         </div>
 
         <div className="text-center">
-          <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+          <p className="text-xs font-medium text-gray-600 dark:text-neutral-400">
             {previewUrl
               ? t('profile.using_photo', 'Usando foto personalizada')
               : t('profile.using_initials', 'Usando iniciales')}
@@ -246,7 +246,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
             </Button>
           )}
         </div>
-        <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-center text-xs text-gray-500 dark:text-neutral-400">
           {t('profile.avatar_requirements', 'Máximo 2MB. Formatos: JPG, PNG, GIF, WebP')}
         </p>
       </div>

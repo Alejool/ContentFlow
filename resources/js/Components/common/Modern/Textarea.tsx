@@ -127,7 +127,7 @@ export default function Textarea<T extends FieldValues>({
             {isValidElement(Icon) ? (
               Icon
             ) : (
-              <Icon className={`${currentSize.icon} text-gray-500 dark:text-gray-400`} />
+              <Icon className={`${currentSize.icon} text-gray-500 dark:text-neutral-400`} />
             )}
           </div>
         )}

@@ -194,10 +194,10 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
     return (
       <div
-        className={`relative rounded-xl border-2 bg-white p-6 transition-all dark:bg-gray-800 ${
+        className={`relative rounded-lg border-2 bg-white p-6 transition-all dark:bg-neutral-900 ${
           pkg.popular
             ? 'border-primary-500 scale-105 shadow-lg'
-            : 'hover:border-primary-300 dark:hover:border-primary-600 border-gray-200 dark:border-gray-700'
+            : 'hover:border-primary-300 dark:hover:border-primary-600 border-gray-200 dark:border-neutral-700'
         }`}
       >
         {pkg.popular && (
@@ -227,7 +227,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
           {t(`subscription.addons.packages.${pkg.sku}.name`, pkg.name)}
         </h3>
 
-        <p className="mb-4 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mb-4 text-center text-sm text-gray-600 dark:text-neutral-400">
           {t(`subscription.addons.packages.${pkg.sku}.description`, pkg.description)}
         </p>
 
@@ -235,7 +235,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
           <div className="text-primary-600 dark:text-primary-400 text-4xl font-bold">
             {pkg.amount.toLocaleString()}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-gray-600 dark:text-neutral-400">
             {activeTab === 'ai_credits' && t('subscription.addons.credits', 'créditos')}
             {activeTab === 'storage' && 'GB'}
             {activeTab === 'publications' && t('subscription.addons.posts', 'publicaciones')}
@@ -296,7 +296,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
         {quantity > 1 && (
           <div className="border-primary-200 bg-primary-50 dark:border-primary-800 dark:bg-primary-900/20 mb-4 rounded-lg border p-3 text-center">
-            <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+            <div className="mb-2 text-sm text-gray-600 dark:text-neutral-400">
               {t('subscription.addons.total', 'Total')} ({quantity}x):
             </div>
             <AddonPriceDisplay
@@ -334,7 +334,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   return (
     <div className="space-y-6">
       {/* Sección de compra de paquetes */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
         <TabNavigation
           tabs={tabs}
           activeTab={activeTab}
@@ -402,7 +402,7 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
                 currentPackages.map((pkg) => <div key={pkg.sku}>{renderPackageCard(pkg)}</div>)
               ) : (
                 <div className="col-span-full py-12 text-center">
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-500 dark:text-neutral-900">
                     {t(
                       'subscription.addons.noPackages',
                       'No hay paquetes disponibles en esta categoría',

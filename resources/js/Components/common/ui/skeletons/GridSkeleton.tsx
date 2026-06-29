@@ -19,7 +19,7 @@ const GridSkeleton = ({ items = 6, columns = 3, cardHeight = 'h-64' }: GridSkele
       {Array.from({ length: items }).map((_, index) => (
         <div
           key={index}
-          className="overflow-hidden rounded-lg border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800"
+          className="overflow-hidden rounded-lg border border-gray-100 bg-white dark:border-neutral-700 dark:bg-neutral-800"
         >
           <Skeleton className={`${cardHeight} w-full rounded-none`} />
           <div className="space-y-3 p-4">

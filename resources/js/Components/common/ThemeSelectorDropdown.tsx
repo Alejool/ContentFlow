@@ -77,7 +77,7 @@ export default function ThemeSelectorDropdown() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isAnimating}
-        className="group relative flex items-center gap-2 rounded-lg border border-gray-300/50 bg-gray-100/70 p-2 px-3 text-gray-600 shadow-sm transition-all duration-300 hover:border-primary-400/50 hover:bg-gray-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600/50 dark:bg-gray-800/70 dark:text-gray-300 dark:hover:border-primary-600/50 dark:hover:bg-gray-700"
+        className="group relative flex items-center gap-2 rounded-lg border border-gray-300/50 bg-gray-100/70 p-2 px-3 text-gray-600 shadow-sm transition-all duration-300 hover:border-primary-400/50 hover:bg-gray-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600/50 dark:bg-neutral-800/70 dark:text-neutral-300 dark:hover:border-primary-600/50 dark:hover:bg-gray-700"
         aria-label="Select theme"
         aria-expanded={isOpen}
       >
@@ -94,7 +94,7 @@ export default function ThemeSelectorDropdown() {
       </button>
 
       {isOpen && (
-        <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl duration-200 dark:border-gray-700 dark:bg-gray-800">
+        <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl duration-200 dark:border-neutral-700 dark:bg-neutral-800">
           <div className="space-y-1 p-2">
             {themeOptions.map((option) => {
               const Icon = option.icon;
@@ -107,7 +107,7 @@ export default function ThemeSelectorDropdown() {
                   className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 transition-all duration-200 ${
                     isActive
                       ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-neutral-300 dark:hover:bg-gray-700'
                   } group`}
                 >
                   <Icon

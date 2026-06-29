@@ -42,22 +42,22 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
     const variantClasses = {
       default: {
-        border: 'border-gray-300 dark:border-gray-600',
-        checked: 'bg-gray-600 border-gray-600 dark:bg-gray-500 dark:border-gray-500',
+        border: 'border-gray-300 dark:border-neutral-600',
+        checked: 'bg-gray-600 border-gray-600 dark:bg-neutral-500 dark:border-neutral-500',
         hover: 'hover:border-gray-400 dark:hover:border-gray-500',
       },
       primary: {
-        border: 'border-gray-300 dark:border-gray-600',
+        border: 'border-gray-300 dark:border-neutral-600',
         checked: 'bg-primary-600 border-primary-600 dark:bg-primary-500 dark:border-primary-500',
         hover: 'hover:border-primary-400 dark:hover:border-primary-500',
       },
       success: {
-        border: 'border-gray-300 dark:border-gray-600',
+        border: 'border-gray-300 dark:border-neutral-600',
         checked: 'bg-green-600 border-green-600 dark:bg-green-500 dark:border-green-500',
         hover: 'hover:border-green-400 dark:hover:border-green-500',
       },
       danger: {
-        border: 'border-gray-300 dark:border-gray-600',
+        border: 'border-gray-300 dark:border-neutral-600',
         checked: 'bg-red-600 border-red-600 dark:bg-red-500 dark:border-red-500',
         hover: 'hover:border-red-400 dark:hover:border-red-500',
       },
@@ -127,12 +127,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         {(label || description) && (
           <div className="flex-1">
             {label && (
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <div className="text-sm font-medium text-gray-900 dark:text-neutral-100">
                 {label}
               </div>
             )}
             {description && (
-              <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+              <div className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                 {description}
               </div>
             )}

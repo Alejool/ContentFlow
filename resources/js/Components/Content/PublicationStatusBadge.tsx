@@ -68,7 +68,7 @@ export function PublicationStatusBadge({
         {statusInfo.label}
       </span>
       {statusInfo.description && statusInfo.description !== statusInfo.label && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">{statusInfo.description}</span>
+        <span className="text-xs text-gray-500 dark:text-neutral-400">{statusInfo.description}</span>
       )}
     </div>
   );
@@ -88,7 +88,7 @@ export function PlatformStatusList({ publication, className = '' }: PlatformStat
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-neutral-300">
         Estado por plataforma:
       </h4>
       <div className="space-y-1">
@@ -97,14 +97,14 @@ export function PlatformStatusList({ publication, className = '' }: PlatformStat
           return (
             <div
               key={`${platform.platform}-${platform.account_id}-${index}`}
-              className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800"
+              className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-neutral-700 dark:bg-neutral-800"
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium capitalize text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-medium capitalize text-gray-700 dark:text-neutral-300">
                   {platform.platform}
                 </span>
                 {platform.account_name && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-gray-500 dark:text-neutral-400">
                     ({platform.account_name})
                   </span>
                 )}

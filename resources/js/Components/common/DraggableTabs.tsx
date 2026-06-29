@@ -79,7 +79,7 @@ const SortableTab = ({ tab, isActive, onTabChange, isDraggable }: SortableTabPro
             className={`rounded-full px-2 py-0.5 text-xs font-bold ${
               isActive
                 ? 'bg-white/20 text-white'
-                : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                : 'bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-neutral-300'
             }`}
           >
             {badgeValue}

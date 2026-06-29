@@ -149,7 +149,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
                             <h4 className="font-semibold text-gray-900 dark:text-white">
                               {getPlatformName(account.platform)}
                             </h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600 dark:text-neutral-400">
                               {account.account_name}
                             </p>
                           </div>
@@ -169,7 +169,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
 
                       <div className="mb-4 space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">
+                          <span className="text-gray-600 dark:text-neutral-400">
                             {t('socialAccounts.connectedBy', 'Conectado por')}
                           </span>
                           <span className="font-medium text-gray-900 dark:text-white">
@@ -177,7 +177,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">
+                          <span className="text-gray-600 dark:text-neutral-400">
                             {t('socialAccounts.connectedAt', 'Conectado')}
                           </span>
                           <span className="font-medium text-gray-900 dark:text-white">
@@ -236,7 +236,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
                           {getPlatformName(platform)}
                         </h4>
                         {isConnected && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-neutral-400">
                             {t('socialAccounts.alreadyConnected', 'Ya conectado')}
                           </p>
                         )}

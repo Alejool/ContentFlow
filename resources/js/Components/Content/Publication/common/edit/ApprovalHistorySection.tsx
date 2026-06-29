@@ -90,7 +90,7 @@ export default function ApprovalHistorySection({
       case 'rejected':
         return 'bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20';
       case 'cancelled':
-        return 'bg-gray-50 dark:bg-gray-900/10 border-gray-200 dark:border-gray-700/30';
+        return 'bg-gray-50 dark:bg-neutral-900/10 border-gray-200 dark:border-neutral-700/30';
       case 'reassigned':
         return 'bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20';
       case 'auto_advanced':
@@ -145,9 +145,9 @@ export default function ApprovalHistorySection({
     <div className="space-y-6">
       {/* Workflow Flow Visualization - SOLO mostrar si hay solicitud activa (pending) */}
       {hasActiveRequest && workflow && workflowSteps.length > 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-gray-100">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-900 dark:text-neutral-100">
               {t('approvals.workflow_status') || 'Estado del Flujo'}
             </h3>
             {workflow.name && (
@@ -226,7 +226,7 @@ export default function ApprovalHistorySection({
                     <div className="line-clamp-1 text-[11px] font-bold text-gray-900 dark:text-white">
                       {step.name}
                     </div>
-                    <div className="flex items-center justify-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center justify-center gap-1 text-[10px] text-gray-500 dark:text-neutral-400">
                       {step.user ? (
                         <span className="max-w-[80px] truncate">{step.user.name}</span>
                       ) : (
@@ -282,15 +282,15 @@ export default function ApprovalHistorySection({
                   <div className="flex-1 space-y-2">
                     <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                       <div className="flex flex-col gap-1">
-                        <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-bold text-gray-900 dark:text-neutral-100">
                           {getActionLabel(log.action)}
                         </span>
                         {log.approvalStep && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <div className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
                             <span className="font-medium">{t('approvals.step')} {log.approvalStep.level_number}:</span>{' '}
                             {log.approvalStep.level_name}
                             {log.approvalStep.role && (
-                              <span className="ml-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                              <span className="ml-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">
                                 {log.approvalStep.role.name}
                               </span>
                             )}
@@ -298,18 +298,18 @@ export default function ApprovalHistorySection({
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-0.5">
-                        <span className="text-[10px] font-bold text-gray-900 dark:text-gray-100 sm:text-xs">
+                        <span className="text-[10px] font-bold text-gray-900 dark:text-neutral-100 sm:text-xs">
                           {formatDateTimeString(log.created_at || log.requested_at || '')}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 dark:text-neutral-400">
                       {log.user && (
                         <div className="flex items-center gap-1.5">
                           <User className="h-3.5 w-3.5 opacity-70" />
                           <span>{getByLabel(log.action)}:</span>
-                          <span className="font-bold text-gray-700 dark:text-gray-300">
+                          <span className="font-bold text-gray-700 dark:text-neutral-300">
                             {log.user.name}
                           </span>
                         </div>
@@ -324,7 +324,7 @@ export default function ApprovalHistorySection({
                             {t('approvals.rejectionReason') || 'Motivo'}
                           </span>
                         </div>
-                        <p className="text-xs italic text-gray-700 dark:text-gray-300">
+                        <p className="text-xs italic text-gray-700 dark:text-neutral-300">
                           "{log.comment}"
                         </p>
                       </div>

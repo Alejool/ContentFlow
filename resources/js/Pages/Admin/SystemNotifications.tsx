@@ -54,12 +54,12 @@ export default function SystemNotifications() {
   return (
     <AuthenticatedLayout
       header={
-        <div className="mt-2 flex items-center justify-center text-3xl text-gray-900 dark:text-gray-100">
+        <div className="mt-2 flex items-center justify-center text-3xl text-gray-900 dark:text-neutral-100">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-neutral-100">
               {t('admin.system_notifications.page_title')}
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('admin.system_notifications.page_subtitle')}
             </p>
           </div>
@@ -70,7 +70,7 @@ export default function SystemNotifications() {
 
       <AdminNavigation currentRoute="/admin/system-notifications" />
 
-      <div className="min-h-screen bg-gray-50 py-6 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 py-6 dark:bg-neutral-900">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <ModernCard
             title={t('notifications.admin.card_title')}

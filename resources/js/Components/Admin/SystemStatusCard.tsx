@@ -30,10 +30,10 @@ function StatusItem({ label, enabled, total, getColor }: StatusItemProps) {
   const colorClass = getColor(enabled, total);
 
   return (
-    <div className="flex items-center justify-between border-b border-gray-200 py-2 last:border-b-0 dark:border-gray-700">
+    <div className="flex items-center justify-between border-b border-gray-200 py-2 last:border-b-0 dark:border-neutral-700">
       <div className="flex items-center gap-2">
         <Icon className={`h-4 w-4 ${colorClass}`} />
-        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</span>
+        <span className="text-sm font-medium text-gray-900 dark:text-neutral-100">{label}</span>
       </div>
       <Badge variant={enabled === total ? 'default' : enabled === 0 ? 'destructive' : 'secondary'}>
         {enabled}/{total}
@@ -61,12 +61,12 @@ export default function SystemStatusCard({ status }: Props) {
   };
 
   return (
-    <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+    <Card className="border-gray-200 bg-white dark:border-neutral-700 dark:bg-neutral-800">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-gray-100">
+        <CardTitle className="text-gray-900 dark:text-neutral-100">
           {t('admin.system_status.title')}
         </CardTitle>
-        <CardDescription className="text-gray-600 dark:text-gray-400">
+        <CardDescription className="text-gray-600 dark:text-neutral-400">
           {t('admin.system_status.description')}
         </CardDescription>
       </CardHeader>
@@ -126,13 +126,13 @@ export default function SystemStatusCard({ status }: Props) {
           />
         </div>
 
-        <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
+        <div className="border-t border-gray-200 pt-4 dark:border-neutral-700">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {countEnabled(status.features)}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-neutral-400">
                 {t('admin.system_status.stats.active_features')}
               </p>
             </div>
@@ -140,7 +140,7 @@ export default function SystemStatusCard({ status }: Props) {
               <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {countEnabled(status.plans)}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-neutral-400">
                 {t('admin.system_status.stats.available_plans')}
               </p>
             </div>

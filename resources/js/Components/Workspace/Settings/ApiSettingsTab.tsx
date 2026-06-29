@@ -138,7 +138,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               <Button
                 variant="ghost"
                 buttonStyle="ghost"
-                className="ml-2 !border-0 !p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="ml-2 !border-0 !p-1 text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-gray-200"
                 onClick={() => setShowToken(!showToken)}
               >
                 {showToken ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -530,7 +530,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               href={route('workspaces.api-docs.download', [workspace.slug, { type: 'markdown' }])}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex cursor-pointer items-start gap-4 rounded-xl border-2 border-neutral-200 p-5 transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50 dark:border-neutral-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-900/20"
+              className="group flex cursor-pointer items-start gap-4 rounded-lg border-2 border-neutral-200 p-5 transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50 dark:border-neutral-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-900/20"
             >
               <div className="shrink-0 rounded-lg bg-indigo-100 p-3 transition-colors group-hover:bg-indigo-200 dark:bg-indigo-900/40 dark:group-hover:bg-indigo-900/60">
                 <FileText className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
@@ -555,7 +555,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
               href={route('workspaces.api-docs.download', [workspace.slug, { type: 'openapi' }])}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex cursor-pointer items-start gap-4 rounded-xl border-2 border-neutral-200 p-5 transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-50 dark:border-neutral-700 dark:hover:border-emerald-500 dark:hover:bg-emerald-900/20"
+              className="group flex cursor-pointer items-start gap-4 rounded-lg border-2 border-neutral-200 p-5 transition-all duration-200 hover:border-emerald-400 hover:bg-emerald-50 dark:border-neutral-700 dark:hover:border-emerald-500 dark:hover:bg-emerald-900/20"
             >
               <div className="shrink-0 rounded-lg bg-emerald-100 p-3 transition-colors group-hover:bg-emerald-200 dark:bg-emerald-900/40 dark:group-hover:bg-emerald-900/60">
                 <FileCode2 className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />

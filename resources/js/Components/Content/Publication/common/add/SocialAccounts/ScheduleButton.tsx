@@ -29,7 +29,7 @@ const ScheduleButton = memo(
           type="button"
           onClick={onScheduleClick}
           className={`rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10 ${
-            customSchedule ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400'
+            customSchedule ? 'text-primary-500' : 'text-gray-500 dark:text-neutral-400'
           }`}
           title="Set individual time"
         >

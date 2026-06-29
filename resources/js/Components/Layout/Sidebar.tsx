@@ -314,7 +314,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                 className="absolute right-[-10px] bottom-[-10px] w-16 h-16 object-contain opacity-20 dark:opacity-20 pointer-events-none z-0"
                 onError={(e) => e.currentTarget.style.display = 'none'}
               />
-              <div className="relative z-10 flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
+              <div className="relative z-10 flex items-center gap-2 text-[10px] text-gray-400 dark:text-neutral-500">
                 <Command className="h-3 w-3" />
                 <span>
                   <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">

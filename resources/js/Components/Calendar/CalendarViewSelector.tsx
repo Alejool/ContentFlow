@@ -55,7 +55,7 @@ export const CalendarViewSelector: React.FC<CalendarViewSelectorProps> = ({
           className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
             currentView === view.value
               ? 'bg-white text-primary-600 shadow dark:bg-neutral-800 dark:text-primary-400'
-              : 'text-gray-600 hover:bg-white/50 dark:text-gray-300 dark:hover:bg-neutral-800/50'
+              : 'text-gray-600 hover:bg-white/50 dark:text-neutral-300 dark:hover:bg-neutral-800/50'
           } `}
           aria-label={`Vista ${view.label}`}
           aria-pressed={currentView === view.value}

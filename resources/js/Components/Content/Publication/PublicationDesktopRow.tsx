@@ -145,7 +145,7 @@ const PublicationRow = memo(function PublicationRow({
               />
             </div>
 
-            <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-neutral-400">
               {item.description || t('publications.table.noDescription')}
             </p>
             {item.platform_settings &&
@@ -186,7 +186,7 @@ const PublicationRow = memo(function PublicationRow({
                       );
                     })}
                   {Object.keys(item.platform_settings).length > 2 && (
-                    <span className="inline-flex items-center rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:border-white/5 dark:bg-white/10 dark:text-gray-300">
+                    <span className="inline-flex items-center rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:border-white/5 dark:bg-white/10 dark:text-neutral-300">
                       +{Object.keys(item.platform_settings).length - 2}
                     </span>
                   )}
@@ -268,7 +268,7 @@ const PublicationRow = memo(function PublicationRow({
                   </span>
                 </div>
                 {(item as Publication & { type?: string }).type === 'user_event' && item.user && (
-                  <span className="ml-4 text-[9px] font-medium text-gray-500 italic dark:text-gray-400">
+                  <span className="ml-4 text-[9px] font-medium text-gray-500 italic dark:text-neutral-400">
                     {t('publications.table.createdBy')}: {item.user.name}
                   </span>
                 )}

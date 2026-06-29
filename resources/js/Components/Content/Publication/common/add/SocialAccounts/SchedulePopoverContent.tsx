@@ -24,7 +24,7 @@ const SchedulePopoverContent = memo(
     return (
       <>
         <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
             Schedule for {account.platform}
           </h4>
           <Button

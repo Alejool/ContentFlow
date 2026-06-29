@@ -49,7 +49,7 @@ export default function ContentApprovalStatus({
     const statusConfig: Record<string, { color: string; icon: React.ElementType; label: string }> =
       {
         draft: {
-          color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+          color: 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400',
           icon: AlertCircle,
           label: t('approval.status.draft'),
         },
@@ -106,7 +106,7 @@ export default function ContentApprovalStatus({
                   ? 'bg-green-500 text-white'
                   : level === currentLevel
                     ? 'animate-pulse bg-primary-500 text-white'
-                    : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
+                    : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-neutral-400'
               }`}
             >
               {level < currentLevel ? <CheckCircle className="h-4 w-4" /> : level}
@@ -181,7 +181,7 @@ export default function ContentApprovalStatus({
   return (
     <div className="space-y-4">
       {/* Status Badge and Info */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="mb-2 font-bold text-gray-900 dark:text-white">
@@ -198,11 +198,11 @@ export default function ContentApprovalStatus({
 
         {/* Sender details */}
         {approvalStatus.status !== 'draft' && (
-          <div className="mb-4 flex items-start gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+          <div className="mb-4 flex items-start gap-3 rounded-lg bg-gray-50 p-3 dark:bg-neutral-800/50">
             <Clock className="mt-0.5 h-4 w-4 text-gray-500" />
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t('approvals.last_submission') || 'Último envío por'}: <span className="font-semibold text-gray-700 dark:text-gray-300">{approvalStatus.last_action_by || t('common.system')}</span>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">
+                {t('approvals.last_submission') || 'Último envío por'}: <span className="font-semibold text-gray-700 dark:text-neutral-300">{approvalStatus.last_action_by || t('common.system')}</span>
               </p>
               {approvalStatus.last_action_at && (
                 <p className="text-[10px] text-gray-400">
@@ -229,7 +229,7 @@ export default function ContentApprovalStatus({
         {/* Progress Indicator for Multi-Level */}
         {isMultiLevel && approvalStatus.status === 'pending_review' && (
           <div className="mt-4">
-            <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <p className="mb-3 text-sm font-medium text-gray-700 dark:text-neutral-300">
               {t('approval.progress')}
             </p>
             {getProgressIndicator()}
@@ -238,7 +238,7 @@ export default function ContentApprovalStatus({
       </div>
 
       {/* Action Buttons */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex flex-wrap gap-3">
           {/* Submit for Approval */}
           {canSubmit && approvalStatus.status === 'draft' && (
@@ -284,7 +284,7 @@ export default function ContentApprovalStatus({
       {/* Approve Modal */}
       {showApproveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-theme-bg-secondary">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-theme-bg-secondary">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
               {t('approval.approve_content')}
             </h3>
@@ -329,7 +329,7 @@ export default function ContentApprovalStatus({
       {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 dark:bg-theme-bg-secondary">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-theme-bg-secondary">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
               {t('approval.reject_content')}
             </h3>

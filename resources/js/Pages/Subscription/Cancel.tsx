@@ -21,14 +21,14 @@ export default function Cancel({ auth }: Props) {
           {/* Cancel Icon */}
           <div className="mb-8 text-center">
             <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-theme-bg-secondary">
-              <XCircle className="h-12 w-12 text-gray-600 dark:text-gray-400" />
+              <XCircle className="h-12 w-12 text-gray-600 dark:text-neutral-400" />
             </div>
 
             <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl dark:text-white">
               {t('subscription.cancel.heading')}
             </h1>
 
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <p className="text-xl text-gray-600 dark:text-neutral-400">
               {t('subscription.cancel.message')}
             </p>
           </div>
@@ -41,7 +41,7 @@ export default function Cancel({ auth }: Props) {
             </CardHeader>
 
             <CardContent>
-              <p className="mb-4 text-gray-700 dark:text-gray-300">
+              <p className="mb-4 text-gray-700 dark:text-neutral-300">
                 {t('subscription.cancel.noChargeDescription')}
               </p>
 
@@ -75,7 +75,7 @@ export default function Cancel({ auth }: Props) {
                       1
                     </span>
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.cancel.option1')}
                   </span>
                 </li>
@@ -85,7 +85,7 @@ export default function Cancel({ auth }: Props) {
                       2
                     </span>
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.cancel.option2')}
                   </span>
                 </li>
@@ -95,7 +95,7 @@ export default function Cancel({ auth }: Props) {
                       3
                     </span>
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-700 dark:text-neutral-300">
                     {t('subscription.cancel.option3')}
                   </span>
                 </li>
@@ -126,7 +126,7 @@ export default function Cancel({ auth }: Props) {
 
           {/* Support Info */}
           <div className="mt-12 text-center">
-            <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mb-2 text-sm text-gray-600 dark:text-neutral-400">
               {t('subscription.cancel.needHelp')}
             </p>
             <a

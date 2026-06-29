@@ -104,12 +104,12 @@ export default function CampaignPerformance({
       <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h2
-            className={`flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100`}
+            className={`flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-neutral-100`}
           >
             <TrendingUp className="h-5 w-5 text-primary-500" />
             {title || t('analytics.charts.topCampaignPerformance')}
           </h2>
-          {subtitle && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
+          {subtitle && <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">{subtitle}</p>}
         </div>
 
         <div className="flex items-center gap-3">

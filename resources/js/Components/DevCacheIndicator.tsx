@@ -55,9 +55,9 @@ export function DevCacheIndicator() {
   }
 
   return (
-    <div className="w-64 rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
+    <div className="w-64 rounded-lg border border-gray-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-800">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-gray-700">
+      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-neutral-700">
         <div className="flex items-center gap-2">
           <div
             className={`${getColor(cacheInfo.cache_driver)} h-2 w-2 animate-pulse rounded-full`}
@@ -70,14 +70,14 @@ export function DevCacheIndicator() {
             className="rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
             title="Minimizar"
           >
-            <span className="text-gray-500 dark:text-gray-400">−</span>
+            <span className="text-gray-500 dark:text-neutral-400">−</span>
           </button>
           <button
             onClick={() => setIsVisible(false)}
             className="rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
             title="Cerrar"
           >
-            <X className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <X className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
           </button>
         </div>
       </div>
@@ -86,7 +86,7 @@ export function DevCacheIndicator() {
       <div className="space-y-2 p-4 text-sm">
         {/* Cache Driver */}
         <div className="flex items-center justify-between">
-          <span className="text-gray-600 dark:text-gray-400">Cache:</span>
+          <span className="text-gray-600 dark:text-neutral-400">Cache:</span>
           <div className="flex items-center gap-2">
             {getIcon(cacheInfo.cache_driver)}
             <span className="font-mono font-semibold text-gray-900 dark:text-white">
@@ -97,7 +97,7 @@ export function DevCacheIndicator() {
 
         {/* Queue Driver */}
         <div className="flex items-center justify-between">
-          <span className="text-gray-600 dark:text-gray-400">Queue:</span>
+          <span className="text-gray-600 dark:text-neutral-400">Queue:</span>
           <div className="flex items-center gap-2">
             {getIcon(cacheInfo.queue_driver)}
             <span className="font-mono font-semibold text-gray-900 dark:text-white">
@@ -108,7 +108,7 @@ export function DevCacheIndicator() {
 
         {/* Session Driver */}
         <div className="flex items-center justify-between">
-          <span className="text-gray-600 dark:text-gray-400">Session:</span>
+          <span className="text-gray-600 dark:text-neutral-400">Session:</span>
           <div className="flex items-center gap-2">
             {getIcon(cacheInfo.session_driver)}
             <span className="font-mono font-semibold text-gray-900 dark:text-white">
@@ -138,8 +138,8 @@ export function DevCacheIndicator() {
         )}
 
         {/* Environment */}
-        <div className="mt-3 border-t border-gray-200 pt-2 dark:border-gray-700">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-3 border-t border-gray-200 pt-2 dark:border-neutral-700">
+          <span className="text-xs text-gray-500 dark:text-neutral-400">
             Env: {cacheInfo.environment}
           </span>
         </div>

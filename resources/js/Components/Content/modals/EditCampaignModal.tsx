@@ -189,7 +189,7 @@ export default function EditCampaignModal({
             )}
 
             <div className="form-group">
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-neutral-300">
                 {t('campaigns.modal.edit.associatedPublications')}
               </label>
 

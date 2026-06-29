@@ -56,7 +56,7 @@ const StorageUsageDisplay: React.FC<StorageUsageDisplayProps> = ({
     <div className={`space-y-2 ${className}`}>
       {/* Uso en texto */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600 dark:text-gray-400">Almacenamiento</span>
+        <span className="text-sm text-gray-600 dark:text-neutral-400">Almacenamiento</span>
         <span className={`text-sm font-medium ${colorClass}`}>
           {formatStorageUsage(used, total)}
         </span>
@@ -64,7 +64,7 @@ const StorageUsageDisplay: React.FC<StorageUsageDisplayProps> = ({
 
       {/* Barra de progreso */}
       {showProgressBar && (
-        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
           <div
             className={`h-full transition-all duration-300 ${bgColorClass}`}
             style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -74,7 +74,7 @@ const StorageUsageDisplay: React.FC<StorageUsageDisplayProps> = ({
 
       {/* Información adicional */}
       {(showPercentage || showAvailable) && (
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400">
           {showPercentage && <span>{percentage}% utilizado</span>}
           {showAvailable && <span>{formatBytes(remaining)} disponible</span>}
         </div>

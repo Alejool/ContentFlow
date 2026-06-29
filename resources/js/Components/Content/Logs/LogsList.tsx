@@ -123,9 +123,9 @@ const LogsList = memo(
           return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
         case 'deleted':
         case 'removed_on_platform':
-          return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+          return 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-300';
         default:
-          return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+          return 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-300';
       }
     };
 
@@ -140,9 +140,9 @@ const LogsList = memo(
         case 'twitter':
           return 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300';
         case 'tiktok':
-          return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+          return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300';
         default:
-          return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+          return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300';
       }
     };
 
@@ -246,7 +246,7 @@ const LogsList = memo(
                         key={log.id}
                         className="group transition-colors hover:bg-gray-50/30 dark:hover:bg-neutral-700/30"
                       >
-                        <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                        <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-neutral-400">
                           {formatDateTimeString(log.updated_at)}
                         </td>
                         <td className="px-4 py-3">
@@ -261,7 +261,7 @@ const LogsList = memo(
                               </span>
                             </div>
                             {log.account_name && (
-                              <span className="max-w-[120px] truncate text-xs text-gray-500 dark:text-gray-400">
+                              <span className="max-w-[120px] truncate text-xs text-gray-500 dark:text-neutral-400">
                                 {log.account_name}
                               </span>
                             )}
@@ -275,7 +275,7 @@ const LogsList = memo(
                               </span>
                             )}
                             {log.publication && (
-                              <span className="max-w-[150px] truncate text-xs text-gray-600 dark:text-gray-400">
+                              <span className="max-w-[150px] truncate text-xs text-gray-600 dark:text-neutral-400">
                                 {log.publication.title}
                               </span>
                             )}
@@ -375,7 +375,7 @@ const LogsList = memo(
                       className="p-4 transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
                     >
                       <div className="mb-3 flex items-start justify-between">
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-gray-500 dark:text-neutral-400">
                           {formatDateTimeString(log.updated_at)}
                         </div>
                         <div
@@ -397,7 +397,7 @@ const LogsList = memo(
                           {log.social_account?.platform || log.platform}
                         </span>
                         {log.account_name && (
-                          <span className="truncate text-xs text-gray-500 dark:text-gray-400">
+                          <span className="truncate text-xs text-gray-500 dark:text-neutral-400">
                             • {log.account_name}
                           </span>
                         )}
@@ -419,14 +419,14 @@ const LogsList = memo(
                           </div>
                         )}
                         {log.publication && (
-                          <div className="truncate text-xs text-gray-600 dark:text-gray-400">
+                          <div className="truncate text-xs text-gray-600 dark:text-neutral-400">
                             {log.publication.title}
                           </div>
                         )}
                       </div>
 
                       <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-neutral-700/50">
-                        <div className="text-xs text-gray-500 dark:text-gray-400">ID: {log.id}</div>
+                        <div className="text-xs text-gray-500 dark:text-neutral-400">ID: {log.id}</div>
                         {((log.post_url && log.post_url !== '') ||
                           (log.video_url && log.video_url !== '')) &&
                           (log.status === 'published' || log.status === 'orphaned') && (

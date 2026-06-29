@@ -111,7 +111,7 @@ function ApprovalCard({
             </span>
           )}
           <span
-            className="ml-auto flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-gray-400"
+            className="ml-auto flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-400"
             title={formatDateTimeString(request.submitted_at, {
               dateStyle: 'long',
               timeStyle: 'short',
@@ -134,7 +134,7 @@ function ApprovalCard({
           {/* Media Preview */}
           {mediaId && (
             <div className="shrink-0">
-              <div className="relative h-40 w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-md transition-shadow group-hover:shadow-lg lg:w-40 dark:from-neutral-900 dark:to-neutral-800">
+              <div className="relative h-40 w-full overflow-hidden rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 shadow-md transition-shadow group-hover:shadow-lg lg:w-40 dark:from-neutral-900 dark:to-neutral-800">
                 {isLoading ? (
                   <div className="h-full w-full flex items-center justify-center">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
@@ -165,7 +165,7 @@ function ApprovalCard({
                 {publication.title}
               </h3>
               {publication.description && (
-                <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                <p className="line-clamp-2 text-sm text-gray-600 dark:text-neutral-400">
                   {publication.description}
                 </p>
               )}
@@ -179,7 +179,7 @@ function ApprovalCard({
                   <User className="text-primary-600 dark:text-primary-400 h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                     {t('approvals.historyTable.submittedBy')}
                   </p>
                   <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
@@ -195,7 +195,7 @@ function ApprovalCard({
                     <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">
                       {t('common.type') || 'Tipo'}
                     </p>
                     <p className="text-sm font-semibold text-gray-900 capitalize dark:text-white">
@@ -210,7 +210,7 @@ function ApprovalCard({
             {request.workflow?.levels && request.currentStep && (
               <div className="border-t border-gray-200 pt-3 dark:border-neutral-700">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  <span className="text-xs font-semibold text-gray-700 dark:text-neutral-300">
                     {t('approvals.progress') || 'Progreso de Aprobación'}
                   </span>
                   <span className="text-primary-600 dark:text-primary-400 text-xs font-bold">
@@ -367,9 +367,9 @@ export default function ApprovalList({
       case 'rejected':
         return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-700';
       case 'cancelled':
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-700';
+        return 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400 border-gray-200 dark:border-neutral-700';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-700';
+        return 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400 border-gray-200 dark:border-neutral-700';
     }
   };
 
@@ -395,7 +395,7 @@ export default function ApprovalList({
               <div className="flex flex-col gap-6 lg:flex-row">
                 {/* Media skeleton */}
                 <div className="shrink-0">
-                  <div className="h-40 w-full animate-pulse rounded-xl bg-gray-200 lg:w-40 dark:bg-neutral-700" />
+                  <div className="h-40 w-full animate-pulse rounded-lg bg-gray-200 lg:w-40 dark:bg-neutral-700" />
                 </div>
 
                 {/* Details skeleton */}

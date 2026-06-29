@@ -213,7 +213,7 @@ export default function ReelsSection({
                       count: generatedReels.length,
                     })}
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-gray-600 dark:text-neutral-400">
                     {t('reels.section.generatedDescription')}
                   </p>
                 </div>
@@ -272,7 +272,7 @@ export default function ReelsSection({
                       Reel
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-neutral-400">
                     {reel.metadata?.duration && (
                       <span className="flex items-center gap-1">
                         <Film className="h-3 w-3" />
@@ -289,14 +289,14 @@ export default function ReelsSection({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenInNewTab(reel)}
-                    className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400"
+                    className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-neutral-400"
                     title={t('common.openInNewTab')}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDownload(reel)}
-                    className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400"
+                    className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-neutral-400"
                     title={t('common.download')}
                   >
                     <Download className="h-4 w-4" />
@@ -319,7 +319,7 @@ export default function ReelsSection({
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center dark:border-gray-700 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="flex flex-col items-center gap-3">
             <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br">
               <Sparkles className="text-primary-600 dark:text-primary-400 h-8 w-8" />
@@ -328,7 +328,7 @@ export default function ReelsSection({
               <p className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">
                 {t('reels.section.empty')}
               </p>
-              <p className="max-w-sm text-xs text-gray-600 dark:text-gray-400">
+              <p className="max-w-sm text-xs text-gray-600 dark:text-neutral-400">
                 {t('reels.section.emptyDescription')}
               </p>
             </div>
@@ -345,7 +345,7 @@ export default function ReelsSection({
               {generating || hasProcessingReels ? 'Generando reel...' : 'Generar Reel con IA'}
             </Button>
             {(generating || hasProcessingReels) && (
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-2 text-xs text-gray-500 dark:text-neutral-400">
                 ⏳ Esto puede tomar 2-4 minutos. No cierres esta página.
               </p>
             )}
@@ -438,7 +438,7 @@ function ReelListItem({
             Reel
           </span>
         </div>
-        <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-neutral-400">
           {reel.metadata?.duration && (
             <span className="flex items-center gap-1">
               <Film className="h-3 w-3" />
@@ -456,7 +456,7 @@ function ReelListItem({
         <button
           onClick={handleOpen}
           disabled={opening}
-          className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400 disabled:opacity-50"
+          className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-neutral-400 disabled:opacity-50"
           title={t('common.openInNewTab')}
         >
           {opening ? (
@@ -468,7 +468,7 @@ function ReelListItem({
         <button
           onClick={handleDownloadClick}
           disabled={downloading}
-          className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-gray-400 disabled:opacity-50"
+          className="hover:bg-primary-50 hover:text-primary-600 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 rounded-lg p-2 text-gray-600 transition-colors dark:text-neutral-400 disabled:opacity-50"
           title={t('common.download')}
         >
           {downloading ? (

@@ -300,7 +300,7 @@ export default function MobileNavbar({
 
               {/* Accordion Sections */}
               {filteredSections.sections.length === 0 && searchQuery && (
-                <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <div className="py-8 text-center text-sm text-gray-500 dark:text-neutral-400">
                   {t('nav.noResults') || 'No se encontraron rutas'}
                 </div>
               )}
@@ -426,7 +426,7 @@ export default function MobileNavbar({
                   className="absolute left-[-10px] bottom-[-10px] w-12 h-12 object-contain opacity-20 dark:opacity-20 pointer-events-none z-0"
                   onError={(e) => e.currentTarget.style.display = 'none'}
                 />
-                <div className="relative z-10 flex items-center justify-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
+                <div className="relative z-10 flex items-center justify-center gap-2 text-[10px] text-gray-400 dark:text-neutral-500">
                   <Command className="h-3 w-3" />
                   <span>
                     <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">

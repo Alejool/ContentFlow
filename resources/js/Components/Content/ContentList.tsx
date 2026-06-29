@@ -206,7 +206,7 @@ export default function ContentList(props: ContentListProps) {
                 className={`rounded-lg border-0 p-2 transition-all duration-300 ease-out ${
                   viewMode === 'grid'
                     ? 'scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-theme-bg-secondary dark:text-primary-400 dark:ring-white/10'
-                    : 'text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300'
+                    : 'text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300'
                 }`}
                 title={t('common.gridView')}
               >
@@ -224,7 +224,7 @@ export default function ContentList(props: ContentListProps) {
                 className={`rounded-lg border-0 p-2 transition-all duration-300 ease-out ${
                   viewMode === 'list'
                     ? 'scale-[1.05] bg-white text-primary-600 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:bg-theme-bg-secondary dark:text-primary-400 dark:ring-white/10'
-                    : 'text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300'
+                    : 'text-gray-400 hover:bg-white/50 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700/30 dark:hover:text-gray-300'
                 }`}
                 title={t('common.listView')}
               >
@@ -304,7 +304,7 @@ export default function ContentList(props: ContentListProps) {
           )}
         </div>
       ) : (
-        <div className="w-full rounded-lg border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div className="w-full rounded-lg border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           {mode === 'campaigns' ? (
             <CampaignTable
               items={props.items}

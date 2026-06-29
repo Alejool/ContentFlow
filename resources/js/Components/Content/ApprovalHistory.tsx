@@ -102,7 +102,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
         label: t('approvals.status.rejected'),
       },
       cancelled: {
-        color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+        color: 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400',
         icon: XCircle,
         label: t('approvals.status.cancelled'),
       },
@@ -150,7 +150,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="border-b border-gray-100 bg-gray-50/50 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-            <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-neutral-400">
               {!publicationId && (
                 <th className="w-[20%] px-6 py-4 text-left font-bold">
                   {t('approvals.historyTable.publication')}
@@ -188,7 +188,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
                       alt="No History"
                       className="mb-4 h-auto w-40 object-contain opacity-80"
                     />
-                    <p className="font-medium text-gray-500 dark:text-gray-400">
+                    <p className="font-medium text-gray-500 dark:text-neutral-400">
                       {t('approvals.noHistory')}
                     </p>
                   </div>
@@ -234,7 +234,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
                           </span>
                         </div>
                         {request.currentStep.role && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-gray-500 dark:text-neutral-400">
                             {request.currentStep.role.name}
                           </span>
                         )}

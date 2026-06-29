@@ -150,8 +150,8 @@ export const PendingOperationsList: React.FC = () => {
     return (
       <div className="py-8 text-center">
         <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">All caught up!</p>
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">No pending operations</p>
+        <p className="text-sm font-medium text-gray-900 dark:text-neutral-100">All caught up!</p>
+        <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">No pending operations</p>
       </div>
     );
   }
@@ -162,8 +162,8 @@ export const PendingOperationsList: React.FC = () => {
     <div className="space-y-4">
       {/* Header with clear failed button */}
       {failedOps.length > 0 && (
-        <div className="flex items-center justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="flex items-center justify-between border-b border-gray-200 pb-3 dark:border-neutral-700">
+          <p className="text-sm font-medium text-gray-700 dark:text-neutral-300">
             {failedOps.length} failed operation
             {failedOps.length !== 1 ? 's' : ''}
           </p>
@@ -181,24 +181,24 @@ export const PendingOperationsList: React.FC = () => {
         {operations.map((operation) => (
           <div
             key={operation.id}
-            className="rounded-lg border border-gray-200 bg-white p-3 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
+            className="rounded-lg border border-gray-200 bg-white p-3 transition-colors hover:border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-gray-600"
           >
             <div className="flex items-start gap-3">
               {/* Resource icon */}
-              <div className="mt-1 shrink-0 text-gray-500 dark:text-gray-400">
+              <div className="mt-1 shrink-0 text-gray-500 dark:text-neutral-400">
                 {getResourceIcon(operation.resource)}
               </div>
 
               {/* Operation details */}
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-start justify-between gap-2">
-                  <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <p className="truncate text-sm font-medium text-gray-900 dark:text-neutral-100">
                     {operation.description || `${operation.method} ${operation.resource}`}
                   </p>
                   {getStatusBadge(operation.status)}
                 </div>
 
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-neutral-400">
                   {formatTimestamp(operation.timestamp)}
                 </p>
 
@@ -211,7 +211,7 @@ export const PendingOperationsList: React.FC = () => {
 
                 {/* Retry count */}
                 {operation.retryCount > 0 && (
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
                     Retry {operation.retryCount}/{operation.maxRetries}
                   </p>
                 )}
@@ -223,7 +223,7 @@ export const PendingOperationsList: React.FC = () => {
                   <button
                     onClick={() => handleRetry(operation.id)}
                     disabled={!isOnline || retryingId === operation.id}
-                    className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                    className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400 dark:hover:bg-gray-700"
                     title="Retry operation"
                     aria-label="Retry operation"
                   >

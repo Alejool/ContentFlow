@@ -231,7 +231,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     <AuthenticatedLayout
       user={auth.user}
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-neutral-200">
           Planificador
         </h2>
       }
@@ -240,7 +240,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
       <div className="py-8">
         <div className="mx-auto max-w-[1600px] sm:px-6 lg:px-8">
-          <div className="overflow-hidden border border-gray-100 bg-white shadow-xl dark:border-gray-800 dark:bg-black sm:rounded-lg">
+          <div className="overflow-hidden border border-gray-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-black sm:rounded-lg">
             <div className="p-6">
               {/* Toolbar */}
               <div className="mb-8 flex flex-col items-center justify-between gap-6 md:flex-row">
@@ -260,12 +260,12 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                   <CalendarViewSelector currentView={view} onViewChange={setView} />
 
                   {/* Platform filters */}
-                  <div className="mr-2 flex flex-wrap items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+                  <div className="mr-2 flex flex-wrap items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800">
                     {platforms.map((p) => (
                       <button
                         key={p}
                         onClick={() => setPlatformFilter(p)}
-                        className={`flex items-center gap-2 rounded-md p-2 transition-all ${platformFilter === p ? 'bg-white text-primary-600 shadow dark:bg-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`flex items-center gap-2 rounded-md p-2 transition-all ${platformFilter === p ? 'bg-white text-primary-600 shadow dark:bg-neutral-700' : 'text-gray-400 hover:text-gray-600'}`}
                         title={p}
                       >
                         {p === 'all' ? (
@@ -416,7 +416,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         size="md"
       >
         <div className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-neutral-300">
             {t('calendar.userEvents.modal.actions.deleteConfirm')}
           </p>
 

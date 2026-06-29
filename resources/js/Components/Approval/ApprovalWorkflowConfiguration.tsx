@@ -83,14 +83,14 @@ export default function ApprovalWorkflowConfiguration({
   if (!hasBasicAccess) {
     return (
       <div className="mx-auto max-w-4xl">
-        <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-8 text-center dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
+        <div className="rounded-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-8 text-center dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
             <Settings className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             {t('approvals.upgrade.title') || 'Aprobaciones no disponibles'}
           </h3>
-          <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
+          <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-neutral-400">
             {t('approvals.upgrade.description') ||
               'Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido.'}
           </p>
@@ -281,7 +281,7 @@ export default function ApprovalWorkflowConfiguration({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-primary-100 p-2 dark:bg-primary-900/20">
@@ -291,7 +291,7 @@ export default function ApprovalWorkflowConfiguration({
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 {t('approval.configuration.title')}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-neutral-400">
                 {t('approval.configuration.subtitle')}
               </p>
             </div>
@@ -321,13 +321,13 @@ export default function ApprovalWorkflowConfiguration({
       )}
 
       {/* Enable/Disable Workflow */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
               {t('approval.enable_workflow')}
             </h4>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-neutral-400">
               {t('approval.enable_workflow_description')}
             </p>
           </div>
@@ -349,13 +349,13 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Multi-Level Toggle */}
       {workflow.is_enabled && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
                 {t('approval.multi_level_workflow')}
               </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-neutral-400">
                 {t('approval.multi_level_description')}
               </p>
             </div>
@@ -378,7 +378,7 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Multi-Level Configuration */}
       {workflow.is_enabled && workflow.is_multi_level && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center justify-between">
             <h4 className="font-bold text-gray-900 dark:text-white">
               {t('approval.approval_levels')}
@@ -470,7 +470,7 @@ export default function ApprovalWorkflowConfiguration({
           </div>
 
           {workflow.levels.length === 0 && (
-            <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+            <div className="py-8 text-center text-gray-500 dark:text-neutral-400">
               <p>{t('approval.no_levels_configured')}</p>
               <p className="mt-1 text-sm">{t('approval.click_add_level')}</p>
             </div>

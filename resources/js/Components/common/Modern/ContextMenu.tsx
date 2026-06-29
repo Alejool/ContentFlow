@@ -65,7 +65,7 @@ export function ContextMenu({ trigger, triggerClassName, sections, placement = '
                     ? 'cursor-not-allowed opacity-50'
                     : item.variant === 'danger'
                       ? 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/10'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-neutral-300 dark:hover:bg-neutral-800'
                 }`}
               >
                 {item.icon && <span className="shrink-0">{item.icon}</span>}
@@ -102,7 +102,7 @@ export function ContentActionsMenu({
   return (
     <ContextMenu
       trigger={
-        <button className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800">
+        <button className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800">
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"

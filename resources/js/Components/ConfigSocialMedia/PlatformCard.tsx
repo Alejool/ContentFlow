@@ -35,13 +35,13 @@ export default function PlatformCard({
       </div>
       <span className="text-center font-medium text-gray-900 dark:text-white">{label}</span>
       {description && (
-        <span className="mt-1 text-center text-sm text-gray-500 dark:text-gray-400">
+        <span className="mt-1 text-center text-sm text-gray-500 dark:text-neutral-400">
           {description}
         </span>
       )}
       <div
         className={`mt-3 flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-          selected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 dark:border-gray-600'
+          selected ? 'border-primary-500 bg-primary-500' : 'border-gray-300 dark:border-neutral-600'
         }`}
       >
         {selected && <Check className="h-3 w-3 text-white" />}

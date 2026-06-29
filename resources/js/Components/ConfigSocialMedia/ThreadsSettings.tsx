@@ -46,7 +46,7 @@ export default function ThreadsSettings({
             label={t('platformSettings.threads.text', 'Texto')}
             icon={MessageCircle}
             iconColor="text-gray-700"
-            iconBgColor="bg-gray-100 dark:bg-gray-800"
+            iconBgColor="bg-gray-100 dark:bg-neutral-800"
             selected={
               settings?.type === 'text' || (!settings?.type && defaultSettings.type === 'text')
             }
@@ -57,7 +57,7 @@ export default function ThreadsSettings({
             label={t('platformSettings.threads.image', 'Imagen')}
             icon={Image}
             iconColor="text-gray-700"
-            iconBgColor="bg-gray-100 dark:bg-gray-800"
+            iconBgColor="bg-gray-100 dark:bg-neutral-800"
             selected={settings?.type === 'image'}
             onSelect={(val) => handleChange('type', val)}
           />
@@ -66,7 +66,7 @@ export default function ThreadsSettings({
             label={t('platformSettings.threads.video', 'Video')}
             icon={Video}
             iconColor="text-gray-700"
-            iconBgColor="bg-gray-100 dark:bg-gray-800"
+            iconBgColor="bg-gray-100 dark:bg-neutral-800"
             selected={settings?.type === 'video'}
             onSelect={(val) => handleChange('type', val)}
           />

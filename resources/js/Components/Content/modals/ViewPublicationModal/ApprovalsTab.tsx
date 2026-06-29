@@ -40,7 +40,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
                         ? 'bg-primary-500 text-white ring-2 ring-primary-300 dark:ring-primary-700'
                         : isPast
                           ? 'bg-green-500 text-white'
-                          : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                          : 'bg-gray-300 text-gray-600 dark:bg-neutral-600 dark:text-neutral-300'
                     }`}
                   >
                     {isPast ? <Check className="h-4 w-4" /> : index + 1}
@@ -49,7 +49,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
                     <div className="text-sm font-semibold text-gray-900 dark:text-white">
                       {step.name}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="text-xs text-gray-600 dark:text-neutral-400">
                       {step.role?.name || 'Sin rol asignado'}
                     </div>
                   </div>
@@ -101,7 +101,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
                   <div className="text-xs font-semibold text-gray-900 dark:text-white">
                     {step.name}
                   </div>
-                  <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                  <div className="text-[10px] text-gray-600 dark:text-neutral-400">
                     {step.role?.name || 'Sin rol asignado'}
                   </div>
                 </div>
@@ -134,7 +134,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
       {!item.approval_logs?.length &&
         item.status !== 'pending_review' &&
         item.status !== 'approved' && (
-          <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+          <div className="py-12 text-center text-gray-500 dark:text-neutral-400">
             <p>{t('approvals.noHistory') || 'No hay historial de aprobaciones'}</p>
           </div>
         )}

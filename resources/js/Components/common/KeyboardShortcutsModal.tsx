@@ -122,7 +122,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
             </DialogTitle>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
+              className="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
             >
               <X className="h-5 w-5" />
             </button>
@@ -131,7 +131,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
           <div className="custom-scrollbar max-h-[60vh] overflow-y-auto p-6">
             {Object.entries(groupedShortcuts).map(([category, categoryShortcuts]) => (
               <div key={category} className="mb-6 last:mb-0">
-                <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                   {category}
                 </h3>
                 <div className="space-y-2">
@@ -140,7 +140,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
                       key={index}
                       className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-theme-bg-secondary dark:hover:bg-neutral-900"
                     >
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-sm text-gray-700 dark:text-neutral-300">
                         {shortcut.description}
                       </span>
                       <div className="flex items-center gap-1">
@@ -150,7 +150,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
                               {key}
                             </kbd>
                             {keyIndex < shortcut.keys.length - 1 && (
-                              <span className="text-xs font-bold text-gray-400 dark:text-gray-600">
+                              <span className="text-xs font-bold text-gray-400 dark:text-neutral-600">
                                 +
                               </span>
                             )}

@@ -185,7 +185,7 @@ const ContentSection = memo(
           )}
 
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
               {t('publications.modal.edit.campaigns') || 'Add to Campaign'}
             </label>
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-black/20">

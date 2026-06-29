@@ -28,17 +28,17 @@ const PLAN_LABELS: Record<string, { label: string; color: string; icon: typeof Z
   },
   starter: {
     label: 'Prioridad Estándar',
-    color: 'text-gray-600 dark:text-gray-400',
+    color: 'text-gray-600 dark:text-neutral-400',
     icon: Clock,
   },
   free: {
     label: '',
-    color: 'text-gray-500 dark:text-gray-500',
+    color: 'text-gray-500 dark:text-neutral-500',
     icon: Clock,
   },
   demo: {
     label: '',
-    color: 'text-gray-500 dark:text-gray-500',
+    color: 'text-gray-500 dark:text-neutral-500',
     icon: Clock,
   },
 };
@@ -91,12 +91,12 @@ export default function QueueStatusIndicator({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <PlanIcon className={`h-5 w-5 ${planInfo.color}`} />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
               {isBulk
                 ? `Publicación en Lote (${publicationCount} publicaciones)`
                 : 'Publicación en Cola'}
@@ -107,10 +107,10 @@ export default function QueueStatusIndicator({
             <p className={`mt-1 text-xs font-medium ${planInfo.color}`}>{planInfo.label}</p>
           )}
 
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{getStatusMessage()}</p>
+          <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">{getStatusMessage()}</p>
 
           {queuePosition > 1 && (
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+            <p className="mt-1 text-xs text-gray-500 dark:text-neutral-500">
               Posición en cola: #{queuePosition}
             </p>
           )}
@@ -124,14 +124,14 @@ export default function QueueStatusIndicator({
               {effectivePriority}
             </span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-500">Prioridad</span>
+          <span className="text-xs text-gray-500 dark:text-neutral-500">Prioridad</span>
         </div>
       </div>
 
       {/* Barra de progreso */}
       {estimatedWaitMinutes > 0 && (
         <div className="mt-4">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
             <div
               className={`h-full transition-all duration-1000 ease-linear ${getStatusColor()}`}
               style={{ width: `${progress}%` }}

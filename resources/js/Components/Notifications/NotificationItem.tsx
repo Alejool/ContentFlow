@@ -31,7 +31,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
       case 'published':
         return 'text-green-600 dark:text-green-400';
       case 'deleted':
-        return 'text-gray-600 dark:text-gray-400';
+        return 'text-gray-600 dark:text-neutral-400';
       case 'rejected':
       case 'failed':
       case 'error':
@@ -96,7 +96,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
             }}
           >
             {data.title && (
-              <p className="mb-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <p className="mb-1 text-sm font-semibold text-gray-900 dark:text-neutral-100">
                 {data.title}
               </p>
             )}
@@ -108,7 +108,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.15 }}
-                  className={`mb-1 text-sm break-words text-gray-700 dark:text-gray-200 ${
+                  className={`mb-1 text-sm break-words text-gray-700 dark:text-neutral-200 ${
                     isExpanded ? '' : 'line-clamp-2'
                   }`}
                 >
@@ -126,7 +126,7 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
 
           <div className="mt-1 flex flex-wrap items-center gap-2">
             {data.description && (
-              <p className="mb-1.5 text-xs text-gray-500 dark:text-gray-400">{data.description}</p>
+              <p className="mb-1.5 text-xs text-gray-500 dark:text-neutral-400">{data.description}</p>
             )}
 
             {data.account_name && (
@@ -137,28 +137,28 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
 
             {data.publication_title && (
               <>
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <span className="text-xs font-medium text-gray-600 dark:text-neutral-400">
                   {data.publication_title}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400 dark:text-neutral-600">•</span>
               </>
             )}
 
             {data.campaign_name && (
               <>
                 <span className="text-xs text-gray-500 italic">{data.campaign_name}</span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400 dark:text-neutral-600">•</span>
               </>
             )}
 
             {data.platform && (
               <>
                 <span className={`text-xs capitalize ${getStatusColor()}`}>{data.platform}</span>
-                <span className="text-xs text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400 dark:text-neutral-600">•</span>
               </>
             )}
 
-            <span className="text-xs text-gray-400 dark:text-gray-500">
+            <span className="text-xs text-gray-400 dark:text-neutral-500">
               {created_at && !isNaN(new Date(created_at).getTime())
                 ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
                 : ''}
@@ -167,10 +167,10 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
 
           {data.orphaned_posts_list && data.orphaned_posts_list.length > 0 && (
             <div className="mt-2 rounded bg-gray-100 p-2 text-xs dark:bg-theme-bg-secondary">
-              <p className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
+              <p className="mb-1 font-semibold text-gray-700 dark:text-neutral-300">
                 {t('common.affected_publications')}
               </p>
-              <ul className="list-inside list-disc text-gray-600 dark:text-gray-400">
+              <ul className="list-inside list-disc text-gray-600 dark:text-neutral-400">
                 {data.orphaned_posts_list.slice(0, 3).map((title: string, index: number) => (
                   <li key={index} className="truncate">
                     {title}

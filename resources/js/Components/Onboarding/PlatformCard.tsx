@@ -218,7 +218,7 @@ export default function PlatformCard({
 
   return (
     <div
-      className={`relative rounded-xl border-2 p-6 transition-all ${
+      className={`relative rounded-lg border-2 p-6 transition-all ${
         isConnected
           ? 'border-green-500 bg-green-50 dark:bg-green-900/10'
           : 'hover:border-primary-500 border-gray-200 bg-white hover:shadow-md dark:border-neutral-700 dark:border-neutral-900 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-900'
@@ -226,7 +226,7 @@ export default function PlatformCard({
     >
       {/* Platform Icon */}
       <div
-        className={`mb-4 flex h-14 w-14 items-center justify-center rounded-xl ${
+        className={`mb-4 flex h-14 w-14 items-center justify-center rounded-lg ${
           isConnected
             ? 'bg-green-100 dark:bg-green-900/20'
             : `bg-${platform.color}-100 dark:bg-${platform.color}-900/20`
@@ -256,7 +256,7 @@ export default function PlatformCard({
         <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
           {platform.name}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{platform.description}</p>
+        <p className="text-sm text-gray-600 dark:text-neutral-400">{platform.description}</p>
       </div>
 
       {/* Connected Status or Connect Button */}
@@ -267,7 +267,7 @@ export default function PlatformCard({
             <span className="font-medium">{t('platform.connected')}</span>
           </div>
           {connectedAccount && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {connectedAccount.account_name}
             </p>
           )}

@@ -55,7 +55,7 @@ export default function PollFields({
       </div>
 
       <div className="space-y-3">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
           {t('publications.modal.poll.options') || 'Poll Options (2-4 options)'}
         </label>
 
@@ -106,7 +106,7 @@ export default function PollFields({
       </div>
 
       <div className="space-y-2">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-neutral-300">
           {t('publications.modal.poll.duration') || 'Poll Duration'}
         </label>
 
@@ -122,7 +122,7 @@ export default function PollFields({
             sizeType="md"
             className="w-24"
           />
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-neutral-400">
             {t('publications.modal.poll.hours') || 'hours'}
           </span>
           <div className="group relative">

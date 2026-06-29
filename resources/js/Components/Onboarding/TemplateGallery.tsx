@@ -98,7 +98,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
       aria-labelledby="template-gallery-title"
       aria-describedby="template-gallery-description"
     >
-      <div className="flex max-h-[95vh] w-full max-w-6xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl md:max-h-[90vh] dark:bg-theme-bg-secondary">
+      <div className="flex max-h-[95vh] w-full max-w-6xl flex-col overflow-hidden rounded-lg bg-white shadow-2xl md:max-h-[90vh] dark:bg-theme-bg-secondary">
         {/* Header - Responsive layout (Requirement 7.1, 7.2) */}
         <div className="flex items-start justify-between gap-2 border-b border-gray-200 bg-white px-4 py-3 md:items-center md:gap-4 md:px-6 md:py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <div className="min-w-0 flex-1">
@@ -110,7 +110,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
             </h2>
             <p
               id="template-gallery-description"
-              className="mt-1 line-clamp-2 text-xs text-gray-500 md:text-sm dark:text-gray-400"
+              className="mt-1 line-clamp-2 text-xs text-gray-500 md:text-sm dark:text-neutral-400"
             >
               {t('templates.description')}
             </p>
@@ -161,7 +161,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
                   className={`focus:ring-primary-500 min-h-[44px] rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none md:px-4 md:text-base ${
                     selectedCategory === category
                       ? 'bg-primary-600 text-white'
-                      : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-gray-300 dark:hover:bg-neutral-700'
+                      : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700'
                   }`}
                   aria-pressed={selectedCategory === category}
                   aria-label={t('templates.filterBy', { category })}
@@ -200,7 +200,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
         {/* Footer - Responsive layout (Requirement 7.1) */}
         <div className="flex flex-col items-center justify-between gap-2 border-t border-gray-200 bg-gray-50 px-4 py-3 md:flex-row md:gap-0 md:px-6 md:py-4 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <p
-            className="text-center text-xs text-gray-500 md:text-left md:text-sm dark:text-gray-400"
+            className="text-center text-xs text-gray-500 md:text-left md:text-sm dark:text-neutral-400"
             role="status"
             aria-live="polite"
             aria-atomic="true"
@@ -214,7 +214,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
           <button
             onClick={handleSkip}
             disabled={isSkipping}
-            className="focus:ring-primary-500 min-h-[44px] w-full rounded-lg px-6 py-2 font-medium text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:text-gray-400 dark:hover:text-white"
+            className="focus:ring-primary-500 min-h-[44px] w-full rounded-lg px-6 py-2 font-medium text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:text-neutral-400 dark:hover:text-white"
             aria-label={t('templates.skipAndCreate')}
           >
             {isSkipping ? t('templates.skipping') : t('templates.skip')}

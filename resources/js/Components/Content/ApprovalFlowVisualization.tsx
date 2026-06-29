@@ -90,7 +90,7 @@ export default function ApprovalFlowVisualization({
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="text-primary-600 h-8 w-8 animate-spin" />
-        <span className="ml-3 text-gray-600 dark:text-gray-400">{t('common.loading')}...</span>
+        <span className="ml-3 text-gray-600 dark:text-neutral-400">{t('common.loading')}...</span>
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function ApprovalFlowVisualization({
 
   if (!approvalRequest) {
     return (
-      <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+      <div className="py-8 text-center text-gray-500 dark:text-neutral-400">
         {t('approvals.noActiveRequest') || 'No hay solicitud de aprobación activa.'}
       </div>
     );
@@ -124,7 +124,7 @@ export default function ApprovalFlowVisualization({
   return (
     <div className="space-y-5">
       {/* Información del envío original */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
         <h4 className="mb-3 font-semibold text-gray-900 dark:text-white">
           {t('approvals.submissionDetails') || 'Detalles del Envío'}
         </h4>
@@ -138,7 +138,7 @@ export default function ApprovalFlowVisualization({
                 {t('approvals.submittedBy') || 'Enviado por'}:{' '}
                 <span className="font-bold">{approvalRequest.submitter?.name || t('common.system')}</span>
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-neutral-400">
                 {formatDateTimeString(approvalRequest.submitted_at)}
               </p>
             </div>
@@ -152,8 +152,8 @@ export default function ApprovalFlowVisualization({
       </div>
 
       {/* Barra de progreso */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
-        <div className="mb-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+      <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+        <div className="mb-2 flex items-center justify-between text-sm text-gray-600 dark:text-neutral-400">
           <span>
             {t('approvals.flowVisualization.completedLevels') || 'Niveles completados'}:{' '}
             {completedLevels} / {totalLevels}
@@ -169,7 +169,7 @@ export default function ApprovalFlowVisualization({
 
         {/* Estado actual */}
         <div className="mt-3 flex items-center gap-2 text-sm">
-          <span className="text-gray-500 dark:text-gray-400">
+          <span className="text-gray-500 dark:text-neutral-400">
             {t('approvals.currentStatus') || 'Estado'}:
           </span>
           <StatusBadge status={approvalRequest.status} t={t} />
@@ -178,7 +178,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Línea de tiempo de niveles */}
       {levels.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">
             {t('approvals.flowVisualization.title') || 'Flujo de aprobación'}
           </h4>
@@ -218,7 +218,7 @@ export default function ApprovalFlowVisualization({
                             ? 'bg-red-500 text-white'
                             : isCurrent
                               ? 'bg-primary-500 ring-primary-200 dark:ring-primary-900 text-white ring-4'
-                              : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-gray-400'
+                              : 'bg-gray-200 text-gray-500 dark:bg-neutral-700 dark:text-neutral-400'
                       }`}
                     >
                       {isDone ? (
@@ -250,8 +250,8 @@ export default function ApprovalFlowVisualization({
                         )}
                       </div>
                       {level.role && (
-                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                          {t('approvals.approverRole') || 'Revisado por Rol'}: <span className="font-medium text-gray-700 dark:text-gray-300">{level.role.name}</span>
+                        <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
+                          {t('approvals.approverRole') || 'Revisado por Rol'}: <span className="font-medium text-gray-700 dark:text-neutral-300">{level.role.name}</span>
                         </p>
                       )}
                       {level.timeout_hours > 0 && (
@@ -274,7 +274,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Historial de logs */}
       {logs.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+        <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h4 className="mb-3 font-semibold text-gray-900 dark:text-white">
             {t('approvals.auditTrail') || 'Historial de acciones'}
           </h4>
@@ -289,14 +289,14 @@ export default function ApprovalFlowVisualization({
                   <span className="font-medium text-gray-900 dark:text-white">
                     {log.user?.name || t('common.system')}
                   </span>
-                  <span className="ml-1 text-gray-500 dark:text-gray-400">
+                  <span className="ml-1 text-gray-500 dark:text-neutral-400">
                     — {t(`approvals.actions.${log.action}`) || log.action}
                     {log.level_number
                       ? ` (${t('approvals.level') || 'Nivel'} ${log.level_number})`
                       : ''}
                   </span>
                   {log.comment && (
-                    <p className="mt-0.5 text-gray-600 italic dark:text-gray-400">
+                    <p className="mt-0.5 text-gray-600 italic dark:text-neutral-400">
                       "{log.comment}"
                     </p>
                   )}
@@ -312,7 +312,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Acciones: Aprobar / Rechazar */}
       {isPending && (
-        <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
+        <div className="space-y-3 rounded-lg border border-gray-200 bg-white p-5 dark:border-neutral-700 dark:bg-theme-bg-secondary">
           <h4 className="font-semibold text-gray-900 dark:text-white">
             {t('approvals.yourAction') || 'Tu acción'}
           </h4>
@@ -356,7 +356,7 @@ export default function ApprovalFlowVisualization({
                     setShowRejectInput(false);
                     setRejectionReason('');
                   }}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-700"
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
                 >
                   {t('common.cancel')}
                 </button>
@@ -389,7 +389,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Aprobado final */}
       {approvalRequest.status === 'approved' && (
-        <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+        <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
           <CheckCircle className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
           <p className="text-sm font-medium text-green-800 dark:text-green-200">
             {t('approvals.approvedReadyToPublish') || 'Aprobado. Listo para publicar.'}
@@ -399,7 +399,7 @@ export default function ApprovalFlowVisualization({
 
       {/* Rechazado */}
       {approvalRequest.status === 'rejected' && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <div className="flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
             <div>
@@ -436,7 +436,7 @@ function StatusBadge({ status, t }: { status: string; t: any }) {
       label: t('approvals.status.rejected') || 'Rechazado',
     },
     cancelled: {
-      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+      color: 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400',
       label: t('approvals.status.cancelled') || 'Cancelado',
     },
   };
@@ -446,7 +446,7 @@ function StatusBadge({ status, t }: { status: string; t: any }) {
 
 function LogEntry({ log, t }: { log: ApprovalLog; t: any }) {
   return (
-    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+    <div className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
       {log.user?.name && <span>{log.user.name} · </span>}
       {formatDateTimeString(log.created_at)}
       {log.comment && <span className="ml-1 italic">"{log.comment}"</span>}

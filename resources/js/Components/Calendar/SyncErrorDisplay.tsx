@@ -120,12 +120,12 @@ export const SyncErrorList: React.FC<SyncErrorListProps> = ({
     <div className={`space-y-3 ${className}`}>
       {errors.length > 1 && onDismissAll && (
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <p className="text-sm font-medium text-gray-700 dark:text-neutral-300">
             {t('calendar.sync.error.multiple', `${errors.length} synchronization errors`)}
           </p>
           <button
             onClick={onDismissAll}
-            className="text-sm text-gray-600 underline hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-sm text-gray-600 underline hover:text-gray-900 dark:text-neutral-400 dark:hover:text-gray-200"
           >
             {t('calendar.sync.error.dismiss_all', 'Dismiss all')}
           </button>

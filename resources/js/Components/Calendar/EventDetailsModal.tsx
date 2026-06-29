@@ -38,7 +38,7 @@ interface EventDetailsModalProps {
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
   scheduled:   { label: 'Programado',      bg: 'bg-blue-100 dark:bg-blue-900/30',    text: 'text-blue-700 dark:text-blue-300',   dot: 'bg-blue-500' },
   published:   { label: 'Publicado',        bg: 'bg-green-100 dark:bg-green-900/30',  text: 'text-green-700 dark:text-green-300', dot: 'bg-green-500' },
-  draft:       { label: 'Borrador',         bg: 'bg-gray-100 dark:bg-neutral-900',       text: 'text-gray-600 dark:text-gray-400',   dot: 'bg-gray-400' },
+  draft:       { label: 'Borrador',         bg: 'bg-gray-100 dark:bg-neutral-900',       text: 'text-gray-600 dark:text-neutral-400',   dot: 'bg-gray-400' },
   failed:      { label: 'Fallido',          bg: 'bg-red-100 dark:bg-red-900/30',      text: 'text-red-700 dark:text-red-300',     dot: 'bg-red-500' },
   pending:     { label: 'Pendiente',        bg: 'bg-yellow-100 dark:bg-yellow-900/30',text: 'text-yellow-700 dark:text-yellow-300',dot: 'bg-yellow-500' },
   approved:    { label: 'Aprobado',         bg: 'bg-emerald-100 dark:bg-emerald-900/30',text: 'text-emerald-700 dark:text-emerald-300',dot: 'bg-emerald-500' },
@@ -186,9 +186,9 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Reschedule section */}
         {canEdit && onUpdateDate && (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-neutral-300">
                 <CalendarClock className="h-4 w-4 text-primary-500" />
                 Reprogramar
               </div>
@@ -227,9 +227,9 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-neutral-400">
                 Actualmente programado para el{' '}
-                <span className="font-semibold text-gray-800 dark:text-gray-200">
+                <span className="font-semibold text-gray-800 dark:text-neutral-200">
                   {format(eventDate, "EEEE d 'de' MMMM 'a las' HH:mm", { locale: es })}
                 </span>
               </p>
@@ -239,11 +239,11 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Description */}
         {event.extendedProps?.description && (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-neutral-500">
               Descripción
             </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-700 dark:text-neutral-300">
               {event.extendedProps.description as string}
             </p>
           </div>
@@ -251,26 +251,26 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Campaign */}
         {event.campaign && (
-          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <Megaphone className="h-5 w-5 shrink-0 text-primary-500" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-neutral-500">
                 Campaña
               </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{event.campaign}</p>
+              <p className="text-sm font-medium text-gray-800 dark:text-neutral-200">{event.campaign}</p>
             </div>
           </div>
         )}
 
         {/* Creator */}
         {(event.user?.name || event.extendedProps?.user_name) && (
-          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <User className="h-5 w-5 shrink-0 text-gray-400" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-neutral-500">
                 Creado por
               </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+              <p className="text-sm font-medium text-gray-800 dark:text-neutral-200">
                 {event.user?.name || (event.extendedProps?.user_name as string)}
               </p>
             </div>
@@ -281,7 +281,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         {event.extendedProps?.slug && (
           <a
             href={`${event.extendedProps.slug}?id=${event.publicationId || event.extendedProps.publication_id}`}
-            className="flex items-center gap-3 rounded-xl border border-primary-200 bg-primary-50 p-4 transition hover:bg-primary-100 dark:border-primary-800/40 dark:bg-primary-900/20 dark:hover:bg-primary-900/30"
+            className="flex items-center gap-3 rounded-lg border border-primary-200 bg-primary-50 p-4 transition hover:bg-primary-100 dark:border-primary-800/40 dark:bg-primary-900/20 dark:hover:bg-primary-900/30"
           >
             <Pencil className="h-5 w-5 shrink-0 text-primary-600 dark:text-primary-400" />
             <div className="flex-1">
@@ -302,7 +302,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
             href={event.extendedProps.post_url as string}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 transition hover:bg-green-100 dark:border-green-800/40 dark:bg-green-900/20 dark:hover:bg-green-900/30"
+            className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 transition hover:bg-green-100 dark:border-green-800/40 dark:bg-green-900/20 dark:hover:bg-green-900/30"
           >
             <ExternalLink className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
             <div className="flex-1">
@@ -319,7 +319,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
         {/* Error message */}
         {event.status === 'failed' && event.extendedProps?.error_message && (
-          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800/40 dark:bg-red-900/20">
+          <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800/40 dark:bg-red-900/20">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
             <div>
               <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">

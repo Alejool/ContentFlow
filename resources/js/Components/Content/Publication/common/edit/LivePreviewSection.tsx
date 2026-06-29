@@ -26,7 +26,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-12">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">Cargando publicación...</p>
+        <p className="text-sm text-gray-500 dark:text-neutral-400">Cargando publicación...</p>
       </div>
     );
   }
@@ -69,10 +69,10 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
               </svg>
             </div>
             <div>
-              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <p className="mb-1 text-sm font-medium text-gray-700 dark:text-neutral-300">
                 Publicación de Facebook
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-neutral-400">
                 Facebook no permite previsualizar posts embebidos desde localhost o dominios no
                 verificados
               </p>
@@ -120,7 +120,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
     case 'linkedin':
       return (
         <div className="space-y-3 py-8 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             LinkedIn no permite embeber publicaciones directamente.
           </p>
           <a
@@ -139,7 +139,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
 
     default:
       return (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-500 dark:text-neutral-400">
           Vista previa no disponible para esta plataforma
         </p>
       );
@@ -297,7 +297,7 @@ export const LivePreviewSection = ({
               className={`relative flex flex-1 items-center justify-center gap-2 rounded-md py-2 text-sm font-medium transition-all duration-200 ${
                 activePlatform === tab.id
                   ? 'bg-white text-primary-600 shadow-sm dark:bg-neutral-700 dark:text-primary-400'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-gray-200'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -399,7 +399,7 @@ export const LivePreviewSection = ({
         )}
       </div>
 
-      <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-center text-xs text-gray-500 dark:text-neutral-400">
         {t('publications.modal.preview.disclaimer') ||
           'Preview is an approximation. Actual appearance may vary by platform.'}
       </p>

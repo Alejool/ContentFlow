@@ -60,8 +60,8 @@ export default function CampaignMobileTable({
             <div className="p-4">
               <div className="mb-2 flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+                  <h3 className="font-medium text-gray-900 dark:text-neutral-100">{item.name}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-neutral-400">
                     {item.description && item.description.length > 100
                       ? `${item.description.substring(0, 100)}...`
                       : item.description || 'Sin descripción'}
@@ -80,13 +80,13 @@ export default function CampaignMobileTable({
               {(item.goal || item.budget) && (
                 <div className="mb-3 flex flex-wrap gap-2">
                   {item.goal && (
-                    <div className="flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-xs text-gray-500 dark:bg-theme-bg-secondary dark:text-gray-400">
+                    <div className="flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-xs text-gray-500 dark:bg-theme-bg-secondary dark:text-neutral-400">
                       <Target className="text-primary-500 h-3 w-3" />
                       <span className="line-clamp-1">{item.goal}</span>
                     </div>
                   )}
                   {item.budget && (
-                    <div className="flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs text-gray-500 dark:bg-green-900/10 dark:text-gray-400">
+                    <div className="flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs text-gray-500 dark:bg-green-900/10 dark:text-neutral-400">
                       <DollarSign className="h-3 w-3 text-green-600 dark:text-green-400" />
                       <span>{formatCurrency(item.budget)}</span>
                     </div>
@@ -94,7 +94,7 @@ export default function CampaignMobileTable({
                 </div>
               )}
 
-              <div className="mb-3 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+              <div className="mb-3 flex items-center gap-4 text-sm text-gray-500 dark:text-neutral-400">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>
@@ -127,7 +127,7 @@ export default function CampaignMobileTable({
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
                           ? 'bg-primary-50 text-primary-700 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800 ring-1'
-                          : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-theme-bg-secondary dark:text-gray-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
+                          : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
                       }`}
                     >
                       {expandedCampaigns.includes(item.id) ? (
@@ -205,7 +205,7 @@ export default function CampaignMobileTable({
                             </div>
                           </div>
                           <div className="min-w-0">
-                            <div className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <div className="truncate text-sm font-medium text-gray-900 dark:text-neutral-100">
                               {pub.title}
                             </div>
                             <div className="text-xs text-gray-500">

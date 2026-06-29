@@ -12,12 +12,12 @@ export default function PrivacyPolicy() {
     <>
       <Head title={`${t('legal.privacyPolicy.title')} - Intellipost`} />
 
-      <div className="min-h-screen bg-white px-4 py-12 dark:bg-gray-900 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white px-4 py-12 dark:bg-neutral-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">
             <button
               onClick={() => window.history.back()}
-              className="inline-flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
+              className="inline-flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t('legal.common.back')}
@@ -33,15 +33,15 @@ export default function PrivacyPolicy() {
               <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                 {t('legal.privacyPolicy.title')}
               </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-600 dark:text-gray-300">
+              <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-600 dark:text-neutral-300">
                 {t('legal.privacyPolicy.subtitle')}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-neutral-400">
                 {t('legal.common.lastUpdated', { date })}
               </p>
             </div>
 
-            <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+            <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-neutral-300">
               <Section title={t('legal.privacyPolicy.sections.intro.title')}>
                 <p>{t('legal.privacyPolicy.sections.intro.content.0')}</p>
                 <p>{t('legal.privacyPolicy.sections.intro.content.1')}</p>
@@ -163,7 +163,7 @@ export default function PrivacyPolicy() {
 
               <Section title={t('legal.privacyPolicy.sections.contact.title')}>
                 <p>{t('legal.privacyPolicy.sections.contact.content')}</p>
-                <div className="mt-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="mt-4 rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
                   <p className="font-medium">{t('legal.common.team')}</p>
                   <p>
                     Email:{' '}
@@ -186,7 +186,7 @@ export default function PrivacyPolicy() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-8 border-b border-gray-100 pb-8 last:border-0 last:pb-0 dark:border-gray-800">
+    <section className="mb-8 border-b border-gray-100 pb-8 last:border-0 last:pb-0 dark:border-neutral-800">
       <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
       <div className="space-y-4 leading-relaxed">{children}</div>
     </section>
