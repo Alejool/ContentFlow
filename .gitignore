@@ -179,4 +179,5 @@ verifyFrontendMigration.cjs
 MIGRATION_COMPLETED.md
 
 
-graphify-outresources/js/Components/common/Modern/examples/
+graphify-out/
+resources/js/Components/common/Modern/examples/
