@@ -18,6 +18,7 @@ use App\Notifications\Publication\PublicationPostFailedNotification;
 use App\Models\Social\SocialPostLog;
 use App\Models\User;
 use App\Helpers\System\LogHelper;
+use Carbon\Carbon;
 
 class PublishToSocialMedia implements ShouldQueue
 {
@@ -42,7 +43,8 @@ class PublishToSocialMedia implements ShouldQueue
 
   public function __construct(
     public int $publicationId,
-    public array $socialAccountIds
+    public array $socialAccountIds,
+    public ?Carbon $targetPublishAt = null
   ) {}
 
   public function handle(PlatformPublishService $publishService): void
@@ -144,15 +146,31 @@ class PublishToSocialMedia implements ShouldQueue
     // Update social accounts to only compatible ones
     $socialAccounts = $compatibleAccounts;
 
+    // Wait until the exact scheduled time when pre-dispatched early for large files.
+    // During this window the publication stays in 'scheduled' state — correct, since
+    // we haven't started uploading yet. The job holds a worker slot so it can begin
+    // the upload immediately when the target time arrives.
+    if ($this->targetPublishAt && $this->targetPublishAt->isFuture()) {
+      $secondsToWait = (int) now()->diffInSeconds($this->targetPublishAt, false);
+      if ($secondsToWait > 0 && $secondsToWait <= 1800) {
+        Log::info('Pre-dispatch: holding until scheduled publish time', [
+          'publication_id' => $this->publicationId,
+          'seconds_to_wait' => $secondsToWait,
+          'target_at' => $this->targetPublishAt->toISOString(),
+        ]);
+        sleep($secondsToWait);
+      }
+    }
+
     $publication->update(['status' => 'publishing']);
-    
+
     // Reset any stale 'publishing' logs from previous failed attempts to 'pending'
     // This prevents duplicate detection issues on retries
     SocialPostLog::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $this->socialAccountIds)
       ->where('status', 'publishing')
       ->update(['status' => 'pending']);
-    
+
     // Update all pending logs to publishing status
     SocialPostLog::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $this->socialAccountIds)
