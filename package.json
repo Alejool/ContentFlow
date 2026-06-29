@@ -11,7 +11,8 @@
     "format:all": "prettier --write \"resources/**/*.{js,ts,tsx,jsx,json,css,blade.php}\"",
     "lint": "eslint resources/js",
     "lint:fix": "eslint resources/js --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "locales:merge": "node scripts/merge-locales.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
