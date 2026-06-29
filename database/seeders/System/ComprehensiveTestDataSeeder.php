@@ -41,7 +41,7 @@ class ComprehensiveTestDataSeeder extends Seeder
         $viewerRole = Role::where('slug', 'viewer')->first();
 
         // ── 2. Users ──────────────────────────────────────────────────────────
-        $owner      = $this->upsertUser('owner@test.com',      'Laura Pérez',       'América/Bogota');
+        $owner      = $this->upsertUser('owner@test.com',      'Laura Pérez',       'America/Bogota');
         $admin      = $this->upsertUser('admin@test.com',      'Carlos Rodríguez',  'America/Mexico_City');
         $editor     = $this->upsertUser('editor@test.com',     'Ana Martínez',      'Europe/Madrid');
         $viewer     = $this->upsertUser('viewer@test.com',     'David López',       'America/Lima');

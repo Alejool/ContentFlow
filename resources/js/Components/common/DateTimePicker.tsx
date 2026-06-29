@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { fromZonedTime } from 'date-fns-tz';
 import { useTimezoneStore } from '@/stores/common/timezoneStore';
-import { toLocalDate, toUTC } from '@/Utils/common/timezoneUtils';
+import { toLocalDate } from '@/Utils/common/timezoneUtils';
 
 interface DateTimePickerProps {
   value: string | null;
@@ -50,15 +51,18 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     ? format(max instanceof Date ? max : toLocalDate(max) || new Date(), "yyyy-MM-dd'T'HH:mm")
     : '';
 
-  // Manejar cambio
+  // Manejar cambio — parse the raw string as workspace timezone, then convert to UTC.
+  // Using new Date(string) would interpret the string as browser-local time,
+  // causing a double-conversion bug when browser timezone ≠ workspace timezone.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+    const newValue = e.target.value; // "2026-03-08T15:30" — no timezone suffix
     setLocalValue(newValue);
 
     if (newValue) {
-      // Convertir a UTC y emitir
-      const utcDate = toUTC(new Date(newValue));
-      onChange(utcDate);
+      const timezone = useTimezoneStore.getState().effectiveTimezone();
+      // fromZonedTime treats the string as-is in the workspace timezone → UTC
+      const utcDate = fromZonedTime(newValue, timezone);
+      onChange(utcDate.toISOString());
     } else {
       onChange(null);
     }

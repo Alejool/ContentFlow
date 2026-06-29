@@ -2,6 +2,25 @@ import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { create } from 'zustand';
 
+/**
+ * Normalize a timezone string: strip diacritics and validate against Intl.
+ * Handles DB values like "América/Bogota" → "America/Bogota".
+ * Falls back to UTC for completely invalid strings.
+ */
+function sanitizeTimezone(tz: string | null | undefined): string | null {
+  if (!tz) return null;
+  // Strip diacritics: NFD decomposition + remove combining marks
+  const normalized = tz.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  try {
+    // Intl throws RangeError for invalid IANA zone identifiers
+    Intl.DateTimeFormat(undefined, { timeZone: normalized });
+    return normalized;
+  } catch {
+    console.warn(`Invalid timezone "${tz}" → falling back to UTC`);
+    return null; // caller will fall through to browser/UTC
+  }
+}
+
 interface TimezoneState {
   workspaceTimezone: string | null;
   userTimezone: string | null;
@@ -29,7 +48,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   effectiveTimezone: () => {
     const state = get();
     return (
-      state.userTimezone ||
+      sanitizeTimezone(state.userTimezone) ||
       Intl.DateTimeFormat().resolvedOptions().timeZone ||
       'UTC'
     );
@@ -51,8 +70,8 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Inicializar desde props de Inertia (más rápido)
   initializeFromInertia: (workspaceTimezone?: string, userTimezone?: string) => {
     set({
-      workspaceTimezone: workspaceTimezone || null,
-      userTimezone: userTimezone || null,
+      workspaceTimezone: sanitizeTimezone(workspaceTimezone) || null,
+      userTimezone: sanitizeTimezone(userTimezone) || null,
       isLoaded: true,
     });
 
@@ -72,8 +91,8 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
       ]);
 
       set({
-        workspaceTimezone: workspaceRes.data.timezone,
-        userTimezone: userRes.data.timezone,
+        workspaceTimezone: sanitizeTimezone(workspaceRes.data.timezone) || null,
+        userTimezone: sanitizeTimezone(userRes.data.timezone) || null,
         isLoaded: true,
       });
 
