@@ -20,6 +20,7 @@ use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use App\Models\Social\SocialPostLog;
 use App\Services\Log\SocialPostLogService;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 
 use App\Events\Publication\PublicationStatusUpdated;
 use App\Jobs\Social\VerifyYouTubeVideoStatus;
@@ -30,7 +31,8 @@ use App\DTOs\Publications\SocialPostDTO;
 class PlatformPublishService
 {
   public function __construct(
-    private SocialPostLogService $logService
+    private SocialPostLogService $logService,
+    private SocialTokenManager $tokenManager
   ) {}
 
   /**
@@ -691,21 +693,32 @@ class PlatformPublishService
 
   private function getPlatformService(SocialAccount $socialAccount)
   {
-    // Validate that access token exists
-    if (empty($socialAccount->access_token)) {
+    // Always attempt to get/auto-refresh a valid token before building the service.
+    // This ensures expiring tokens are renewed transparently — the user never sees
+    // an auth error just because a token was close to expiry.
+    try {
+      $validToken = $this->tokenManager->getValidToken($socialAccount);
+      // Refresh the in-memory token so the platform service receives the latest value.
+      $socialAccount->access_token = $validToken;
+    } catch (\Exception $e) {
+      LogHelper::socialError('platform_service.token_refresh_failed', $e->getMessage(), [
+        'account_id' => $socialAccount->id,
+        'platform'   => $socialAccount->platform,
+      ]);
+      // Re-throw with a clear, user-facing message only after refresh was attempted.
       throw new \Exception(
-        "Access token is missing or invalid for {$socialAccount->platform} account (ID: {$socialAccount->id}). " .
-          "Please reconnect the account."
+        "Could not obtain a valid token for {$socialAccount->platform} (ID: {$socialAccount->id}). " .
+        "Please reconnect the account from Settings → Social Accounts. Reason: " . $e->getMessage()
       );
     }
 
     return match ($socialAccount->platform) {
-      'youtube' => new YouTubeService($socialAccount->access_token, $socialAccount),
-      'instagram' => new InstagramService($socialAccount->access_token, $socialAccount),
-      'facebook' => new FacebookService($socialAccount->access_token, $socialAccount),
-      'tiktok' => new TikTokService($socialAccount->access_token, $socialAccount),
+      'youtube'      => new YouTubeService($socialAccount->access_token, $socialAccount),
+      'instagram'    => new InstagramService($socialAccount->access_token, $socialAccount),
+      'facebook'     => new FacebookService($socialAccount->access_token, $socialAccount),
+      'tiktok'       => new TikTokService($socialAccount->access_token, $socialAccount),
       'twitter', 'x' => new TwitterService($socialAccount->access_token, $socialAccount),
-      default => throw new \Exception("Unsupported platform: {$socialAccount->platform}"),
+      default        => throw new \Exception("Unsupported platform: {$socialAccount->platform}"),
     };
   }
   /**

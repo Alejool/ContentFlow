@@ -17,6 +17,7 @@ use App\Models\Social\SocialPostLog;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
 use App\Services\Subscription\PlanLimitValidator;
+use App\Services\ConfigSocialMedia\SocialTokenManager;
 use App\Helpers\System\LogHelper;
 use Inertia\Inertia;
 
@@ -1080,6 +1081,72 @@ class SocialAccountController extends Controller
    * current workspace. Used by the frontend to disable accounts whose
    * tokens are invalid or about to expire.
    */
+  /**
+   * POST /api/v1/social-accounts/{id}/refresh-token
+   *
+   * Attempt a silent token refresh.  The client should call this BEFORE
+   * starting a full OAuth re-auth flow.  Only if this returns
+   * `requires_reconnect: true` should the UI open the OAuth popup.
+   */
+  public function refreshToken(Request $request, $id): \Illuminate\Http\JsonResponse
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+
+    $account = SocialAccount::where('id', $id)
+      ->where('workspace_id', $workspaceId)
+      ->first();
+
+    if (!$account) {
+      return response()->json(['success' => false, 'message' => 'Account not found'], 404);
+    }
+
+    $tokenManager = app(SocialTokenManager::class);
+
+    try {
+      // Force a refresh attempt regardless of current expiry state
+      $newToken = $tokenManager->refreshToken($account);
+
+      if ($newToken) {
+        // Refresh succeeded — mark the account active again
+        $account->update(['is_active' => true, 'failure_count' => 0]);
+
+        LogHelper::social('token.silent_refresh_success', [
+          'account_id' => $account->id,
+          'platform'   => $account->platform,
+        ]);
+
+        return response()->json([
+          'success'            => true,
+          'refreshed'          => true,
+          'requires_reconnect' => false,
+          'message'            => 'Token renovado automáticamente.',
+        ]);
+      }
+
+      // Refresh returned null — no retry possible
+      return response()->json([
+        'success'            => false,
+        'refreshed'          => false,
+        'requires_reconnect' => true,
+        'reason'             => $account->account_metadata['reconnection_reason'] ?? 'refresh_failed',
+        'message'            => 'No fue posible renovar el token automáticamente. Reconecta la cuenta.',
+      ]);
+    } catch (\Exception $e) {
+      LogHelper::socialError('token.silent_refresh_error', $e->getMessage(), [
+        'account_id' => $account->id,
+        'platform'   => $account->platform,
+      ]);
+
+      return response()->json([
+        'success'            => false,
+        'refreshed'          => false,
+        'requires_reconnect' => true,
+        'reason'             => 'exception',
+        'message'            => 'Error al renovar el token. Reconecta la cuenta.',
+      ]);
+    }
+  }
+
   public function tokenHealth(): \Illuminate\Http\JsonResponse
   {
     $workspaceId = Auth::user()->current_workspace_id;

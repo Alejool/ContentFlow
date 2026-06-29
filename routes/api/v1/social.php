@@ -25,6 +25,8 @@ Route::middleware('auth:sanctum')->group(function () {
   // ── Manage ─────────────────────────────────────────────────────────────────
   Route::middleware('token.ability:social:manage')->group(function () {
     Route::apiResource('social-accounts', SocialAccountController::class)->only(['store', 'destroy'])->names(['store' => 'store', 'destroy' => 'destroy']);
+    // Silent token refresh — try automatic renewal before prompting full OAuth re-auth.
+    Route::post('/social-accounts/{id}/refresh-token', [SocialAccountController::class, 'refreshToken'])->name('social-accounts.refresh-token');
     Route::prefix('social-accounts/capabilities')->name('social-accounts.capabilities.')->group(function () {
       Route::post('/{account}/refresh', [\App\Http\Controllers\Api\SocialAccountCapabilitiesController::class, 'refresh'])->name('refresh');
       Route::post('/validate-video', [\App\Http\Controllers\Api\SocialAccountCapabilitiesController::class, 'validateVideo'])->name('validate-video');

@@ -4,6 +4,7 @@ import DisconnectBlockerModal from '@/Components/Content/modals/DisconnectBlocke
 import DisconnectWarningModal from '@/Components/Content/modals/DisconnectWarningModal';
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatforms';
 import { useSocialMediaAuth } from '@/Hooks/ConfigSocialMedia/useSocialMediaAuth';
+import { useSocialAccountReconnect } from '@/Hooks/social/useSocialAccountReconnect';
 import { getPlatformSchema } from '@/schemas/ConfigSocialMedia/platformSettings';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { router, usePage } from '@inertiajs/react';
@@ -56,6 +57,9 @@ interface SocialMediaAccountsProps {
 const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: SocialMediaAccountsProps) => {
   const { t } = useTranslation();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
+  const { isReconnecting, reconnect } = useSocialAccountReconnect({
+    onRefreshed: () => fetchConnectedAccounts(),
+  });
   const { auth } = usePage<any>().props;
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
   const [localSettings, setLocalSettings] = useState<any>({});
@@ -576,50 +580,17 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                     </div>
                                     <motion.button
                                       whileTap={{ scale: 0.97 }}
-                                      onClick={async (e) => {
+                                      disabled={isReconnecting}
+                                      onClick={(e) => {
                                         e.stopPropagation();
-                                        const toastId = toast.loading(
-                                          t('manageContent.socialMedia.reconnecting') ||
-                                            'Reconectando...',
-                                        );
-                                        try {
-                                          const response = await axios.get(
-                                            `/api/v1/social-accounts/auth-url/${account.platform}`,
-                                          );
-                                          if (response.data?.url) {
-                                            toast.success(
-                                              t('manageContent.socialMedia.reconnectWindow') ||
-                                                'Abriendo ventana...',
-                                              { id: toastId },
-                                            );
-                                            const width = 600;
-                                            const height = 700;
-                                            const left = window.screen.width / 2 - width / 2;
-                                            const top = window.screen.height / 2 - height / 2;
-                                            window.open(
-                                              response.data.url,
-                                              'oauth',
-                                              `width=${width},height=${height},left=${left},top=${top}`,
-                                            );
-                                          } else {
-                                            toast.error(
-                                              t('manageContent.socialMedia.reconnectError') ||
-                                                'Error',
-                                              { id: toastId },
-                                            );
-                                          }
-                                        } catch (error) {
-                                          toast.error(
-                                            t('manageContent.socialMedia.reconnectError') ||
-                                              'Error',
-                                            { id: toastId },
-                                          );
-                                        }
+                                        reconnect(account.accountDetails?.id ?? account.id, account.platform);
                                       }}
-                                      className="flex w-full items-center justify-center gap-1.5 rounded-md bg-amber-600 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+                                      className="flex w-full items-center justify-center gap-1.5 rounded-md bg-amber-600 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-amber-700 disabled:opacity-60 dark:bg-amber-700 dark:hover:bg-amber-600"
                                     >
-                                      <RefreshCw className="h-3 w-3" />
-                                      {t('manageContent.socialMedia.reconnect') || 'Reconectar'}
+                                      <RefreshCw className={`h-3 w-3 ${isReconnecting ? 'animate-spin' : ''}`} />
+                                      {isReconnecting
+                                        ? 'Verificando…'
+                                        : (t('manageContent.socialMedia.reconnect') || 'Reconectar')}
                                     </motion.button>
                                   </div>
                                 );

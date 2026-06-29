@@ -1,9 +1,10 @@
 ﻿import Button from '@/Components/common/Modern/Button';
 import Switch from '@/Components/common/Modern/Switch';
 import YouTubeThumbnailUploader from '@/Components/common/YouTubeThumbnailUploader';
+import { useSocialAccountReconnect } from '@/Hooks/social/useSocialAccountReconnect';
 import { formatDateTimeStyled } from '@/Utils/formatters';
 import { validateVideoDuration } from '@/Utils/common/validationUtils';
-import { AlertTriangle, Check, ChevronDown, Clock, Info, X } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, Clock, Info, RefreshCw, X } from 'lucide-react';
 import React, { memo } from 'react';
 import { isPlatformCompatible } from '@/Utils/Content/socialAccounts.helpers';
 import ScheduleButton from '@/Components/Content/Publication/common/add/SocialAccounts/ScheduleButton';
@@ -43,6 +44,7 @@ const SocialAccountItem = memo(
     isTokenInvalid = false,
     isTokenExpiringSoon = false,
   }: SocialAccountItemProps) => {
+    const { isReconnecting, reconnect } = useSocialAccountReconnect();
     const isPlatformIncompatible = !isPlatformCompatible(account.platform, contentType);
     const isInternalDisabled =
       isPublished ||
@@ -267,25 +269,20 @@ const SocialAccountItem = memo(
                       </div>
                       {/* Botón de reconexión si el error es de OAuth 1.0a */}
                       {(errorMessage.includes('OAuth 1.0a') ||
-                        errorMessage.includes('credenciales')) &&
+                        errorMessage.includes('OAUTH1_MISSING') ||
+                        errorMessage.includes('credenciales') ||
+                        errorMessage.includes('reconnect')) &&
                         account.platform === 'twitter' && (
                           <button
-                            onClick={async (e) => {
+                            disabled={isReconnecting}
+                            onClick={(e) => {
                               e.stopPropagation();
-                              try {
-                                const response = await fetch(`/social-accounts/auth-url/twitter`);
-                                const data = await response.json();
-                                if (data.success && data.url) {
-                                  window.location.href = data.url;
-                                }
-                              } catch (error) {
-                                console.error('Error al obtener URL de reconexión:', error);
-                              }
+                              reconnect(account.id, account.platform);
                             }}
-                            className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                            className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-60 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
                           >
                             <svg
-                              className="h-3 w-3"
+                              className={`h-3 w-3 ${isReconnecting ? 'animate-spin' : ''}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -297,7 +294,7 @@ const SocialAccountItem = memo(
                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                               />
                             </svg>
-                            Reconectar cuenta ahora
+                            {isReconnecting ? 'Verificando…' : 'Reconectar cuenta'}
                           </button>
                         )}
                     </div>

@@ -49,8 +49,9 @@ class TwitterService extends BaseSocialService
           ]);
           
           return PostResultDTO::failure(
-            'Esta cuenta de Twitter no puede subir videos porque le faltan credenciales OAuth 1.0a. ' .
-            'Por favor, desconecta y vuelve a conectar esta cuenta desde la configuración de tu workspace para habilitar la subida de videos.'
+            'OAUTH1_MISSING: Esta cuenta de Twitter requiere reconexión para subir videos. ' .
+            'Ve a Configuración → Cuentas Sociales y reconecta la cuenta de Twitter. ' .
+            'El proceso toma menos de un minuto y habilitará la subida de videos de forma permanente.'
           );
         }
       }

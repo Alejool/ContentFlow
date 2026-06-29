@@ -1,6 +1,6 @@
 import PieChart from '@/Components/Statistics/PieChart';
+import { useSocialAccountReconnect } from '@/Hooks/social/useSocialAccountReconnect';
 import { SeededRandom } from '@/Utils/common/stableMock';
-import { Link } from '@inertiajs/react';
 import { AlertTriangle, ChevronLeft, ChevronRight, Plus, RefreshCw, Share2 } from 'lucide-react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +32,7 @@ export default function SocialMediaAccounts({
 }: SocialMediaAccountsProps) {
   const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { isReconnecting, reconnect } = useSocialAccountReconnect();
 
   const mockAccounts: SocialMediaAccount[] = [
     {
@@ -286,17 +287,20 @@ export default function SocialMediaAccounts({
                       theme === 'dark' ? 'border-amber-700/30' : 'border-amber-200'
                     }`}
                   >
-                    <Link
-                      href="/content"
-                      className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    <button
+                      disabled={isReconnecting}
+                      onClick={() => reconnect(account.id, account.platform)}
+                      className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
                         theme === 'dark'
                           ? 'bg-amber-900/30 text-amber-300 hover:bg-amber-900/50'
                           : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
                       }`}
                     >
-                      <RefreshCw className="h-3.5 w-3.5" />
-                      {t('socialAccounts.reconnectButton', 'Reconectar cuenta')}
-                    </Link>
+                      <RefreshCw className={`h-3.5 w-3.5 ${isReconnecting ? 'animate-spin' : ''}`} />
+                      {isReconnecting
+                        ? t('socialAccounts.reconnecting', 'Verificando…')
+                        : t('socialAccounts.reconnectButton', 'Reconectar cuenta')}
+                    </button>
                   </div>
                 )}
               </div>
