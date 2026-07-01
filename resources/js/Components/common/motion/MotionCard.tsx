@@ -62,7 +62,7 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
     },
     ref,
   ) => {
-    const { prefersReducedMotion } = useReducedMotion();
+    const prefersReducedMotion = useReducedMotion();
     const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
 
     // Get hover variants based on selected effect

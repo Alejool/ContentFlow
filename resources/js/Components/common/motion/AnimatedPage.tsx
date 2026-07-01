@@ -42,7 +42,7 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
   respectReducedMotion = true,
   pageKey,
 }) => {
-  const { prefersReducedMotion } = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion();
 
   // Determine if animations should be disabled
   const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
