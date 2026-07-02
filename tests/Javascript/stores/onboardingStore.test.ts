@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import fc from "fast-check";
-import { useOnboardingStore } from "@/stores/onboardingStore";
+import { useOnboardingStore } from "@/stores/Onboarding/onboardingStore";
 
 describe("Onboarding Store Property Tests", () => {
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("Onboarding Store Property Tests", () => {
       // Validates: Requirements 1.4
       fc.assert(
         fc.property(
-          fc.integer({ min: 0, max: 8 }), // current step (not last, assuming 10 total steps)
+          fc.integer({ min: 0, max: 5 }), // tour has 6 steps (indices 0-5); advancing is a no-op at >= 6
           (currentStep) => {
             const store = useOnboardingStore.getState();
             
@@ -58,7 +58,9 @@ describe("Onboarding Store Property Tests", () => {
       // Validates: Requirements 1.4
       fc.assert(
         fc.property(
-          fc.integer({ min: 0, max: 100 }),
+          // 0-20: steps >= 6 are a clamped no-op; > 20 triggers the corrupted-state
+          // reset path (backend restart + page reload), which is out of scope here
+          fc.integer({ min: 0, max: 20 }),
           (currentStep) => {
             const store = useOnboardingStore.getState();
             
@@ -74,8 +76,8 @@ describe("Onboarding Store Property Tests", () => {
             // Get state after action
             const stateAfter = useOnboardingStore.getState().tourCurrentStep;
             
-            // Verify property: step should always increase
-            expect(stateAfter).toBeGreaterThan(stateBefore);
+            // Verify property: step never decreases (advance past the last step is a no-op)
+            expect(stateAfter).toBeGreaterThanOrEqual(stateBefore);
           }
         ),
         { numRuns: 10 }

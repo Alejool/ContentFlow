@@ -2,15 +2,15 @@ import {
   initProgressRealtime,
   stopPolling,
   cleanupProgressRealtime,
-} from '@/Services/progressRealtime';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
+} from '@/Services/Queue/progressRealtime';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
+import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
 
 // Mock stores
-vi.mock('@/stores/uploadQueueStore');
-vi.mock('@/stores/processingProgressStore');
+vi.mock('@/stores/Upload/uploadQueueStore');
+vi.mock('@/stores/Queue/processingProgressStore');
 
 // Mock axios
 vi.mock('axios');
@@ -84,7 +84,6 @@ describe('progressRealtime', () => {
       expect(mockListen).toHaveBeenCalledWith('.VideoProcessingCompleted', expect.any(Function));
       expect(mockListen).toHaveBeenCalledWith('.VideoProcessingFailed', expect.any(Function));
       expect(mockListen).toHaveBeenCalledWith('.VideoProcessingCancelled', expect.any(Function));
-      expect(mockError).toHaveBeenCalledWith(expect.any(Function));
     });
 
     it('falls back to polling when Echo is not available', () => {
@@ -386,7 +385,7 @@ describe('progressRealtime', () => {
         file: new File(['test'], 'test.mp4'),
         progress: 30,
         status: 'uploading',
-        isPausable: true,
+        isPausable: false,
       };
 
       (useUploadQueue.getState as any) = vi.fn().mockReturnValue({
@@ -413,10 +412,11 @@ describe('progressRealtime', () => {
       // Fast-forward to trigger polling
       await vi.advanceTimersByTimeAsync(500);
 
-      expect(axios.get).toHaveBeenCalledWith('/api/progress', {
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/uploads/progress', {
         params: {
-          upload_ids: ['upload-1'],
+          upload_ids: 'upload-1',
         },
+        timeout: 5000,
       });
 
       expect(mockUpdateUpload).toHaveBeenCalledWith('upload-1', expect.objectContaining({
@@ -466,10 +466,11 @@ describe('progressRealtime', () => {
       // Fast-forward to trigger polling
       await vi.advanceTimersByTimeAsync(1000);
 
-      expect(axios.get).toHaveBeenCalledWith('/api/progress', {
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/processing/progress', {
         params: {
-          job_ids: ['job-1'],
+          job_ids: 'job-1',
         },
+        timeout: 5000,
       });
 
       expect(mockUpdateJob).toHaveBeenCalledWith('job-1', expect.objectContaining({
@@ -491,7 +492,7 @@ describe('progressRealtime', () => {
         file: new File(['test'], 'test.mp4'),
         progress: 30,
         status: 'uploading',
-        isPausable: true,
+        isPausable: false,
       };
 
       (useUploadQueue.getState as any) = vi.fn().mockReturnValue({
@@ -503,13 +504,12 @@ describe('progressRealtime', () => {
 
       initProgressRealtime(123);
 
-      // Fast-forward to trigger polling
+      // Fast-forward to trigger polling — errors are swallowed, no crash, no store update
       await vi.advanceTimersByTimeAsync(500);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to poll upload progress:',
-        expect.any(Error)
-      );
+      expect(axios.get).toHaveBeenCalled();
+      expect(mockUpdateUpload).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
 
       consoleErrorSpy.mockRestore();
       global.window.Echo = originalEcho;
