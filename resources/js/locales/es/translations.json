@@ -1460,6 +1460,28 @@
     "errors": "Errores encontrados",
     "row": "Fila"
   },
+  "jsonImport": {
+    "title": "Importar desde JSON",
+    "menuDescription": "Publicaciones y campañas en lote",
+    "downloadTemplateTitle": "Paso 1: Descarga la plantilla",
+    "downloadTemplateDesc": "Descarga el JSON de ejemplo con publicaciones únicas y campañas con publicaciones anidadas.",
+    "downloadTemplate": "Descargar Plantilla",
+    "uploadFileTitle": "Paso 2: Sube tu archivo JSON",
+    "dragDropText": "Arrastra tu archivo .json aquí",
+    "supportedFormats": "Formato: .json (Máx. 10MB)",
+    "import": "Importar",
+    "templateDownloaded": "Plantilla descargada correctamente",
+    "downloadError": "Error al descargar la plantilla",
+    "invalidFileType": "Tipo de archivo inválido. Use .json",
+    "fileTooLarge": "El archivo es demasiado grande. Máximo 10MB",
+    "noFileSelected": "Selecciona un archivo",
+    "importSuccess": "Importación exitosa",
+    "importPartial": "Importación completada con errores",
+    "importError": "Error al importar el archivo",
+    "successful": "Exitosos",
+    "failed": "Fallidos",
+    "total": "Total"
+  },
   "formats": {
     "excel": {
       "importPublications": "Importar Publicaciones",

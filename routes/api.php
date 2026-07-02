@@ -93,6 +93,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     require __DIR__ . '/api/v1/files.php';
     require __DIR__ . '/api/v1/excel-import.php';
+    require __DIR__ . '/api/v1/json-import.php';
   });
 
   // Rutas que NO requieren un plan específico para ser accedidas (Upgrade/Check active)

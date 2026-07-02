@@ -1,4 +1,5 @@
 import ExcelImporter from '@/Components/Content/ExcelImporter';
+import JsonImporter from '@/Components/Content/JsonImporter';
 import LogsList from '@/Components/Content/Logs/LogsList';
 import ModalManager from '@/Components/Content/ModalManager';
 import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
@@ -14,6 +15,7 @@ import {
   Calendar as CalendarIcon,
   CheckCircle,
   Clock,
+  FileJson,
   FileText,
   Filter,
   Folder,
@@ -304,6 +306,8 @@ export default function ManageContentPage() {
     type: 'publications' | 'campaigns';
   }>({ isOpen: false, type: 'publications' });
 
+  const [jsonImporterOpen, setJsonImporterOpen] = useState(false);
+
   const handleRefreshWrapped = useCallback(() => {
     handleRefresh();
     setRefreshTrigger((prev) => prev + 1);
@@ -496,6 +500,38 @@ export default function ManageContentPage() {
                           </button>
                         )}
                       </MenuItem>
+
+                      <MenuItem>
+                        {({ focus }) => (
+                          <button
+                            onClick={() => setJsonImporterOpen(true)}
+                            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
+                              focus
+                                ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                                : 'text-gray-700 hover:bg-gray-50 dark:text-neutral-200 dark:hover:bg-neutral-800'
+                            }`}
+                          >
+                            <span
+                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                                focus
+                                  ? 'bg-primary-100 dark:bg-primary-900/50'
+                                  : 'bg-gray-100 dark:bg-theme-bg-secondary'
+                              }`}
+                            >
+                              <FileJson className="h-4 w-4" />
+                            </span>
+                            <div className="flex min-w-0 flex-col">
+                              <span className="truncate">
+                                {t('jsonImport.title') || 'Importar desde JSON'}
+                              </span>
+                              <span className="truncate text-[11px] font-normal text-gray-400 dark:text-neutral-500">
+                                {t('jsonImport.menuDescription') ||
+                                  'Publicaciones y campañas en lote'}
+                              </span>
+                            </div>
+                          </button>
+                        )}
+                      </MenuItem>
                     </div>
                   </MenuItems>
                 </Menu>
@@ -669,6 +705,13 @@ export default function ManageContentPage() {
         type={excelImporter.type}
         isOpen={excelImporter.isOpen}
         onClose={() => setExcelImporter({ ...excelImporter, isOpen: false })}
+        onSuccess={handleRefreshWrapped}
+        t={t}
+      />
+
+      <JsonImporter
+        isOpen={jsonImporterOpen}
+        onClose={() => setJsonImporterOpen(false)}
         onSuccess={handleRefreshWrapped}
         t={t}
       />

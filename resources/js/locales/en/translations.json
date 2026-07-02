@@ -1514,6 +1514,28 @@
     "errors": "Errors found",
     "row": "Row"
   },
+  "jsonImport": {
+    "title": "Import from JSON",
+    "menuDescription": "Bulk publications and campaigns",
+    "downloadTemplateTitle": "Step 1: Download the template",
+    "downloadTemplateDesc": "Download the example JSON with standalone publications and campaigns with nested publications.",
+    "downloadTemplate": "Download Template",
+    "uploadFileTitle": "Step 2: Upload your JSON file",
+    "dragDropText": "Drag your .json file here",
+    "supportedFormats": "Format: .json (Max. 10MB)",
+    "import": "Import",
+    "templateDownloaded": "Template downloaded successfully",
+    "downloadError": "Error downloading template",
+    "invalidFileType": "Invalid file type. Use .json",
+    "fileTooLarge": "File is too large. Maximum 10MB",
+    "noFileSelected": "Select a file",
+    "importSuccess": "Import successful",
+    "importPartial": "Import completed with errors",
+    "importError": "Error importing file",
+    "successful": "Successful",
+    "failed": "Failed",
+    "total": "Total"
+  },
   "formats": {
     "excel": {
       "importPublications": "Import Publications",
