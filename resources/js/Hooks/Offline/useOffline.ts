@@ -149,7 +149,7 @@ export function useOffline(options?: OfflineOptions) {
       }
 
       // Import axios dynamically to avoid circular dependencies
-      const { default: axiosInstance } = await import('../config/axios');
+      const { default: axiosInstance } = await import('@/config/axios');
 
       // Process operations in order (FIFO)
       for (const operation of operations) {
