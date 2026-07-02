@@ -65,6 +65,14 @@ vi.mock('react-i18next', () => ({
 
 const FUTURE = new Date(Date.now() + 24 * 3600 * 1000); // tomorrow
 
+// Always-future date with a specific time, so past-date validation never fires
+function futureDateAt(hours: number, minutes: number): Date {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  d.setHours(hours, minutes, 0, 0);
+  return d;
+}
+
 function setup(date = FUTURE, onChange = vi.fn()) {
   return { onChange, ...render(<DateTimePicker selectedDate={date} onChange={onChange} />) };
 }
@@ -78,7 +86,7 @@ describe('DateTimePicker — rendering', () => {
   });
 
   it('renders time inputs with correct initial values', () => {
-    const date = new Date(2025, 5, 15, 14, 35); // 14:35
+    const date = futureDateAt(14, 35); // 14:35
     setup(date);
     const inputs = screen.getAllByRole('spinbutton');
     // hours + minutes inputs
@@ -94,8 +102,8 @@ describe('DateTimePicker — rendering', () => {
 
 describe('DateTimePicker — time inputs', () => {
   it('syncs hours state when selectedDate prop changes', () => {
-    const date1 = new Date(2025, 5, 15, 10, 0);
-    const date2 = new Date(2025, 5, 15, 18, 45);
+    const date1 = futureDateAt(10, 0);
+    const date2 = futureDateAt(18, 45);
     const onChange = vi.fn();
 
     const { rerender } = render(<DateTimePicker selectedDate={date1} onChange={onChange} />);
@@ -111,8 +119,8 @@ describe('DateTimePicker — time inputs', () => {
   });
 
   it('syncs minutes state when selectedDate prop changes', () => {
-    const date1 = new Date(2025, 5, 15, 10, 5);
-    const date2 = new Date(2025, 5, 15, 10, 55);
+    const date1 = futureDateAt(10, 5);
+    const date2 = futureDateAt(10, 55);
     const onChange = vi.fn();
 
     const { rerender } = render(<DateTimePicker selectedDate={date1} onChange={onChange} />);
@@ -126,8 +134,7 @@ describe('DateTimePicker — time inputs', () => {
   });
 
   it('calls onChange with correct hours when hours input changes', async () => {
-    const date = new Date(2025, 5, 15, 10, 30);
-    date.setFullYear(2099); // ensure future
+    const date = futureDateAt(10, 30);
     const onChange = vi.fn();
 
     render(<DateTimePicker selectedDate={date} onChange={onChange} />);
