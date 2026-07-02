@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useOffline } from '../../../resources/js/Hooks/useOffline';
+import { useOffline } from '@/Hooks/Offline/useOffline';
 import type { QueuedOperation } from '../../../resources/js/types/optimistic';
 
 // Mock the indexedDBQueue module
-vi.mock('../../../resources/js/Utils/indexedDBQueue', () => ({
+vi.mock('@/Utils/Offline/indexedDBQueue', () => ({
   indexedDBQueue: {
     add: vi.fn().mockResolvedValue(undefined),
     getAll: vi.fn().mockResolvedValue([]),
@@ -132,7 +132,7 @@ describe('useOffline Hook', () => {
 
   describe('Queue Operations (Subtask 8.2)', () => {
     it('should queue an operation', async () => {
-      const { indexedDBQueue } = await import('../../../resources/js/Utils/indexedDBQueue');
+      const { indexedDBQueue } = await import('@/Utils/Offline/indexedDBQueue');
       const { result } = renderHook(() => useOffline());
       
       const operation: QueuedOperation = {
@@ -164,7 +164,7 @@ describe('useOffline Hook', () => {
     });
 
     it('should get queued operations', async () => {
-      const { indexedDBQueue } = await import('../../../resources/js/Utils/indexedDBQueue');
+      const { indexedDBQueue } = await import('@/Utils/Offline/indexedDBQueue');
       const { result } = renderHook(() => useOffline());
       
       const mockOperations: QueuedOperation[] = [
@@ -209,7 +209,7 @@ describe('useOffline Hook', () => {
     });
 
     it('should sort operations by timestamp (FIFO)', async () => {
-      const { indexedDBQueue } = await import('../../../resources/js/Utils/indexedDBQueue');
+      const { indexedDBQueue } = await import('@/Utils/Offline/indexedDBQueue');
       const { result } = renderHook(() => useOffline());
       
       const mockOperations: QueuedOperation[] = [
@@ -272,7 +272,7 @@ describe('useOffline Hook', () => {
     });
 
     it('should clear failed operations', async () => {
-      const { indexedDBQueue } = await import('../../../resources/js/Utils/indexedDBQueue');
+      const { indexedDBQueue } = await import('@/Utils/Offline/indexedDBQueue');
       const { result } = renderHook(() => useOffline());
       
       const failedOps: QueuedOperation[] = [

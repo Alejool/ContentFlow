@@ -1,17 +1,30 @@
 import EditPublicationModal from "@/Components/Content/modals/EditPublicationModal";
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { usePublicationLock } from "@/Hooks/usePublicationLock";
-import { useCampaignStore } from "@/stores/campaignStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { usePublicationForm } from "@/Hooks/Publications/usePublicationForm";
+import { usePublicationLock } from "@/Hooks/Publications/usePublicationLock";
+import { usePublicationPermissions } from "@/Hooks/Publications/usePublicationPermissions";
+import { useCampaignStore } from "@/stores/Campaign/campaignStore";
+import { useAccountsStore } from "@/stores/ConfigSocialMedia/socialAccountsStore";
 import { usePage } from "@inertiajs/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const renderWithQueryClient = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+  );
+};
+
 // Mocks
-vi.mock("@/Hooks/publication/usePublicationForm");
-vi.mock("@/Hooks/usePublicationLock");
-vi.mock("@/stores/campaignStore");
-vi.mock("@/stores/socialAccountsStore");
+vi.mock("@/Hooks/Publications/usePublicationForm");
+vi.mock("@/Hooks/Publications/usePublicationLock");
+// The real hook needs an AbilityProvider (CASL); mock its output directly
+vi.mock("@/Hooks/Publications/usePublicationPermissions");
+vi.mock("@/stores/Campaign/campaignStore");
+vi.mock("@/stores/ConfigSocialMedia/socialAccountsStore");
 vi.mock("@inertiajs/react", () => ({
   usePage: vi.fn(),
   useWatch: vi.fn(),
@@ -65,6 +78,11 @@ describe("EditPublicationModal", () => {
       activeUsers: [{ id: 1, name: "Test User" }],
     });
 
+    (usePublicationPermissions as any).mockReturnValue({
+      canManageContent: true,
+      canPublish: true,
+    });
+
     (usePublicationForm as any).mockReturnValue({
       t: (s: string) => s,
       form: {
@@ -103,7 +121,7 @@ describe("EditPublicationModal", () => {
   });
 
   it("renders correctly when open", () => {
-    render(
+    renderWithQueryClient(
       <EditPublicationModal
         isOpen={true}
         onClose={mockOnClose}
@@ -127,7 +145,7 @@ describe("EditPublicationModal", () => {
       ],
     });
 
-    render(
+    renderWithQueryClient(
       <EditPublicationModal
         isOpen={true}
         onClose={mockOnClose}
@@ -141,14 +159,12 @@ describe("EditPublicationModal", () => {
     ).toBeDefined();
   });
 
-  it("shows configuration locked alert when user lacks permissions", () => {
-    (usePage as any).mockReturnValue({
-      props: {
-        auth: {
-          user: { id: 1, name: "Test User" },
-          current_workspace: { permissions: ["manage-content"] }, // No publish permission
-        },
-      },
+  it("shows view-only title when user cannot manage content", () => {
+    // The old "configuration locked" alert was removed in the modal UX
+    // refactor; lacking manage permission now renders the read-only header
+    (usePublicationPermissions as any).mockReturnValue({
+      canManageContent: false,
+      canPublish: false,
     });
 
     // Publication is not owned by user and not approved
@@ -159,7 +175,7 @@ describe("EditPublicationModal", () => {
       status: "draft",
     };
 
-    render(
+    renderWithQueryClient(
       <EditPublicationModal
         isOpen={true}
         onClose={mockOnClose}
@@ -168,8 +184,8 @@ describe("EditPublicationModal", () => {
       />,
     );
 
-    expect(
-      screen.getByText("publications.modal.edit.configurationLocked"),
-    ).toBeDefined();
+    expect(screen.getByTestId("modal-header")).toHaveTextContent(
+      "publications.modal.show.title",
+    );
   });
 });

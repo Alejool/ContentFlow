@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { setupOptimisticInterceptor } from '../../../resources/js/plugins/optimisticAxios';
-import useOptimisticStore from '../../../resources/js/stores/optimisticStore';
+import { setupOptimisticInterceptor } from '@/plugins/common/optimisticAxios';
+import useOptimisticStore from '@/stores/common/optimisticStore';
 
 describe('OptimisticAxios Interceptor', () => {
   let axiosInstance: AxiosInstance;

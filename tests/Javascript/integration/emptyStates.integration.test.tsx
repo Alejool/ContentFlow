@@ -14,8 +14,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import EmptyState, { EmptyStateConfig } from '@/Components/common/EmptyState';
-import { emptyStateConfigs } from '@/Constants/emptyStateConfigs';
-import { getEmptyStateConfig } from '@/Utils/emptyStateMapper';
+import { emptyStateConfigs } from '@/Constants/common/emptyStateConfigs';
+import { getEmptyStateConfig } from '@/Utils/Content/emptyStateMapper';
 import { FileVideo, Calendar, BarChart3, Search, Plus } from 'lucide-react';
 
 describe('Empty States - Integration Tests', () => {

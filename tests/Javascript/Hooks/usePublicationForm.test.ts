@@ -1,8 +1,10 @@
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { useMediaStore } from "@/stores/mediaStore";
-import { usePublicationStore } from "@/stores/publicationStore";
+import { usePublicationForm } from "@/Hooks/Publications/usePublicationForm";
+import { useMediaStore } from "@/stores/Upload/mediaStore";
+import { usePublicationStore } from "@/stores/Publications/publicationStore";
 import { usePage } from "@inertiajs/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
+import { createElement, type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mocks
@@ -39,6 +41,14 @@ global.window.Echo = {
 global.URL.createObjectURL = vi.fn().mockReturnValue("blob:test");
 global.URL.revokeObjectURL = vi.fn();
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return ({ children }: { children: ReactNode }) =>
+    createElement(QueryClientProvider, { client: queryClient }, children);
+};
+
 describe("usePublicationForm", () => {
   const mockOnClose = vi.fn();
   const mockUser = {
@@ -69,6 +79,7 @@ describe("usePublicationForm", () => {
         onClose: mockOnClose,
         isOpen: true,
       }),
+      { wrapper: createWrapper() },
     );
 
     expect(result.current.isDataReady).toBe(true);
@@ -95,6 +106,7 @@ describe("usePublicationForm", () => {
         onClose: mockOnClose,
         isOpen: true,
       }),
+      { wrapper: createWrapper() },
     );
 
     // Wait for useEffect to process
@@ -116,6 +128,7 @@ describe("usePublicationForm", () => {
         onClose: mockOnClose,
         isOpen: true,
       }),
+      { wrapper: createWrapper() },
     );
 
     act(() => {

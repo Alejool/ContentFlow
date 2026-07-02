@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
+import { useUploadQueue } from "@/stores/Upload/uploadQueueStore";
 
 describe("Upload Queue Store - State Recovery", () => {
   const STORAGE_KEY = "upload_queue_state";

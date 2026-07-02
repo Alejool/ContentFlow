@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { CacheLogger } from '../../../resources/js/Utils/cacheLogger';
+import { CacheLogger } from '@/Utils/common/cacheLogger';
 
 // Mock import.meta.env
 vi.stubGlobal('import', {

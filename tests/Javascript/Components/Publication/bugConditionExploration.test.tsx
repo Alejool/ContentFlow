@@ -15,8 +15,8 @@
 import ContentTypeIconSelector from '@/Components/Content/Publication/common/ContentTypeIconSelector';
 import ContentTypeSelector from '@/Components/Content/Publication/common/ContentTypeSelector';
 import SocialAccountsSection from '@/Components/Content/Publication/common/add/SocialAccountsSection';
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 // Mock translation function
 const mockT = (key: string) => key;
@@ -147,28 +147,36 @@ describe('Bug Condition Exploration: Incompatible Content Type and Platform Comb
         { id: 1, platform: 'instagram', name: 'test_instagram', account_name: 'test_instagram' },
         { id: 2, platform: 'twitter', name: 'test_twitter', account_name: 'test_twitter' },
       ];
-      
+
+      const onAccountToggle = vi.fn();
+
       const { container } = render(
         <SocialAccountsSection
           socialAccounts={mockAccounts}
           selectedAccounts={[]}
           accountSchedules={{}}
           t={mockT}
-          onAccountToggle={() => {}}
+          onAccountToggle={onAccountToggle}
           onScheduleChange={() => {}}
           onScheduleRemove={() => {}}
           onPlatformSettingsClick={() => {}}
           contentType="poll"
         />
       );
-      
-      // Instagram should be disabled (Poll only supports Twitter)
-      const instagramCheckbox = container.querySelector('[data-platform="instagram"]');
-      
-      // EXPECTED: Instagram checkbox should be disabled or have disabled styling
-      // ACTUAL (unfixed): Instagram checkbox is enabled and selectable
-      // Note: This will fail because contentType prop doesn't exist yet
-      expect(instagramCheckbox).toHaveAttribute('disabled');
+
+      // Instagram should be disabled (Poll only supports Twitter).
+      // The item is a div, not a native input, so "disabled" means
+      // clicking it must not fire the toggle callback.
+      const instagramItem = container.querySelector('[data-platform="instagram"]');
+      expect(instagramItem).not.toBeNull();
+
+      fireEvent.click(instagramItem!);
+      expect(onAccountToggle).not.toHaveBeenCalled();
+
+      // Positive control: Twitter supports Poll, so its item stays clickable
+      const twitterItem = container.querySelector('[data-platform="twitter"]');
+      fireEvent.click(twitterItem!);
+      expect(onAccountToggle).toHaveBeenCalledWith(2);
     });
 
     it('should disable YouTube when Story type is selected (YouTube does not support Story)', () => {
@@ -179,27 +187,35 @@ describe('Bug Condition Exploration: Incompatible Content Type and Platform Comb
         { id: 1, platform: 'instagram', name: 'test_instagram', account_name: 'test_instagram' },
         { id: 2, platform: 'youtube', name: 'test_youtube', account_name: 'test_youtube' },
       ];
-      
+
+      const onAccountToggle = vi.fn();
+
       const { container } = render(
         <SocialAccountsSection
           socialAccounts={mockAccounts}
           selectedAccounts={[]}
           accountSchedules={{}}
           t={mockT}
-          onAccountToggle={() => {}}
+          onAccountToggle={onAccountToggle}
           onScheduleChange={() => {}}
           onScheduleRemove={() => {}}
           onPlatformSettingsClick={() => {}}
           contentType="story"
         />
       );
-      
-      // YouTube should be disabled (Story only supports Instagram and Facebook)
-      const youtubeCheckbox = container.querySelector('[data-platform="youtube"]');
-      
-      // EXPECTED: YouTube checkbox should be disabled
-      // ACTUAL (unfixed): YouTube checkbox is enabled and selectable
-      expect(youtubeCheckbox).toHaveAttribute('disabled');
+
+      // YouTube should be disabled (Story only supports Instagram and Facebook):
+      // clicking its item must not fire the toggle callback
+      const youtubeItem = container.querySelector('[data-platform="youtube"]');
+      expect(youtubeItem).not.toBeNull();
+
+      fireEvent.click(youtubeItem!);
+      expect(onAccountToggle).not.toHaveBeenCalled();
+
+      // Positive control: Instagram supports Story, so its item stays clickable
+      const instagramItem = container.querySelector('[data-platform="instagram"]');
+      fireEvent.click(instagramItem!);
+      expect(onAccountToggle).toHaveBeenCalledWith(1);
     });
   });
 

@@ -1,6 +1,6 @@
-import { usePublishPublication } from '@/Hooks/publication/usePublishPublication';
-import { usePublicationStore } from '@/stores/publicationStore';
-import type { Publication } from '@/types/Publication';
+import { usePublishPublication } from '@/Hooks/Publications/usePublishPublication';
+import { usePublicationStore } from '@/stores/Publications/publicationStore';
+import type { Publication } from '@/types/Publications/Publication';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +19,7 @@ vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock('@/Hooks/useSocialAccounts', () => ({
+vi.mock('@/Hooks/ConfigSocialMedia/useSocialAccounts', () => ({
   useSocialAccounts: vi.fn().mockReturnValue({
     data: [
       { id: 1, platform: 'instagram', account_name: 'my_ig', is_active: true },
@@ -32,7 +32,7 @@ vi.mock('@/Hooks/useSocialAccounts', () => ({
   }),
 }));
 
-vi.mock('@/stores/campaignStore', () => ({
+vi.mock('@/stores/Campaign/campaignStore', () => ({
   useCampaignStore: vi.fn().mockImplementation((selector: any) =>
     selector({
       campaigns: [],

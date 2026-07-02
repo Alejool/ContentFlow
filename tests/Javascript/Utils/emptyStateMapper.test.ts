@@ -4,8 +4,8 @@ import {
   getEmptyStateByKey,
   isDataEmpty,
   emptyStateContexts,
-} from '@/Utils/emptyStateMapper';
-import { emptyStateConfigs } from '@/Constants/emptyStateConfigs';
+} from '@/Utils/Content/emptyStateMapper';
+import { emptyStateConfigs } from '@/Constants/common/emptyStateConfigs';
 
 describe('emptyStateMapper', () => {
   describe('emptyStateContexts', () => {
@@ -32,34 +32,34 @@ describe('emptyStateMapper', () => {
     });
 
     it('should return null when data exists (array with items)', () => {
-      const props = { reels: [{ id: 1, title: 'Test Reel' }] };
-      const result = getEmptyStateConfig('reels.gallery', props);
-      
+      const props = { publications: [{ id: 1, title: 'Test Publication' }] };
+      const result = getEmptyStateConfig('content.index', props);
+
       expect(result).toBeNull();
     });
 
     it('should return config when data is empty array', () => {
-      const props = { reels: [] };
-      const result = getEmptyStateConfig('reels.gallery', props);
-      
+      const props = { publications: [] };
+      const result = getEmptyStateConfig('content.index', props);
+
       expect(result).toBeDefined();
-      expect(result).toEqual(emptyStateConfigs.reels);
+      expect(result).toEqual(emptyStateConfigs.scheduledPosts);
     });
 
     it('should return config when data is null', () => {
-      const props = { reels: null };
-      const result = getEmptyStateConfig('reels.gallery', props);
-      
+      const props = { publications: null };
+      const result = getEmptyStateConfig('content.index', props);
+
       expect(result).toBeDefined();
-      expect(result).toEqual(emptyStateConfigs.reels);
+      expect(result).toEqual(emptyStateConfigs.scheduledPosts);
     });
 
     it('should return config when data is undefined', () => {
       const props = {};
-      const result = getEmptyStateConfig('reels.gallery', props);
-      
+      const result = getEmptyStateConfig('content.index', props);
+
       expect(result).toBeDefined();
-      expect(result).toEqual(emptyStateConfigs.reels);
+      expect(result).toEqual(emptyStateConfigs.scheduledPosts);
     });
 
     it('should return null when data is non-empty object', () => {

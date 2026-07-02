@@ -10,15 +10,21 @@ i18n.init({
   resources: {
     en: {
       translation: {
-        "publications.modal.upload.progress": "Upload progress",
-        "publications.modal.upload.left": "remaining",
-        "publications.modal.upload.pause": "Pause",
-        "publications.modal.upload.resume": "Resume",
-        "publications.modal.upload.cancel": "Cancel",
-        "publications.modal.upload.done": "Done",
-        "publications.modal.upload.paused": "Paused",
-        "publications.modal.upload.cancelled": "Cancelled",
-        "publications.modal.upload.pending": "Pending",
+        common: {
+          cancel: "Cancel",
+          upload: {
+            progress: "Upload progress",
+            left: "remaining",
+            eta: "Estimated time remaining",
+            speed: "Upload speed",
+            pause: "Pause",
+            resume: "Resume",
+            done: "Done",
+            paused: "Paused",
+            cancelled: "Cancelled",
+            pending: "Pending",
+          },
+        },
       },
     },
   },
@@ -68,7 +74,7 @@ describe("ProgressDisplay", () => {
       />
     );
 
-    expect(screen.getByLabelText("Upload speed")).toHaveTextContent("1 MB/s");
+    expect(screen.getByLabelText("Upload speed")).toHaveTextContent("1.00 MB/s");
   });
 
   it("shows pause button when pausable and uploading", () => {
