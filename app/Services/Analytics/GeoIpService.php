@@ -2,8 +2,8 @@
 
 namespace App\Services\Analytics;
 
+use App\Integrations\GeoIp\IpApiClient;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -14,6 +14,10 @@ class GeoIpService
 {
     private const CACHE_TTL_DAYS = 7;
     private const LOCAL_IPS = ['127.0.0.1', '::1', 'localhost'];
+
+    public function __construct(private IpApiClient $client)
+    {
+    }
 
     /**
      * Obtiene datos de geolocalización para una IP.
@@ -29,13 +33,11 @@ class GeoIpService
 
         return Cache::remember($cacheKey, now()->addDays(self::CACHE_TTL_DAYS), function () use ($ip) {
             try {
-                $response = Http::timeout(5)->get("https://ipapi.co/{$ip}/json/");
+                $data = $this->client->lookup($ip);
 
-                if (!$response->successful()) {
+                if ($data === null) {
                     return null;
                 }
-
-                $data = $response->json();
 
                 // ipapi.co devuelve error en el campo 'error' si la IP no es válida
                 if (!empty($data['error'])) {

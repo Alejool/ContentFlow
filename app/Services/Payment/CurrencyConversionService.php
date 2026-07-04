@@ -5,7 +5,7 @@ namespace App\Services\Payment;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
+use App\Integrations\Payment\ExchangeRateApiClient;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -146,20 +146,9 @@ class CurrencyConversionService
     private function fetchExchangeRateFromApi(string $currency): ?float
     {
         try {
-            // Usar API gratuita de exchangerate-api.com
-            // Puedes cambiar a otra API como fixer.io, currencyapi.com, etc.
-            $apiKey = env('EXCHANGE_RATE_API_KEY');
-            
-            if (!$apiKey) {
-                return null; // Sin API key, usar fallback
-            }
+            $rates = app(ExchangeRateApiClient::class)->latestUsdRates();
 
-            $response = Http::timeout(5)->get("https://v6.exchangerate-api.com/v6/{$apiKey}/latest/USD");
-
-            if ($response->successful()) {
-                $data = $response->json();
-                return $data['conversion_rates'][$currency] ?? null;
-            }
+            return $rates[$currency] ?? null;
         } catch (\Exception $e) {
             Log::warning("Error fetching exchange rate for {$currency}: {$e->getMessage()}");
         }

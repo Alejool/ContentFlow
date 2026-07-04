@@ -2,9 +2,9 @@
 
 namespace App\Services\Payment;
 
+use App\Integrations\GeoIp\IpApiClient;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -100,16 +100,10 @@ class CountryDetectionService
         
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($ipAddress) {
             try {
-                // Usar servicio gratuito de geolocalización
-                // Alternativas: ipapi.co, ip-api.com, ipinfo.io
-                $response = Http::timeout(5)->get("https://ipapi.co/{$ipAddress}/country/");
+                $country = app(IpApiClient::class)->lookupCountry($ipAddress);
 
-                if ($response->successful()) {
-                    $country = trim($response->body());
-                    
-                    if (strlen($country) === 2) {
-                        return strtoupper($country);
-                    }
+                if ($country !== null) {
+                    return $country;
                 }
             } catch (\Exception $e) {
                 Log::warning('IP geolocation failed', [
