@@ -2,7 +2,7 @@ import StatCard from '@/Components/common/Modern/StatCard';
 import Button from '@/Components/common/Modern/Button';
 import Select from '@/Components/common/Modern/Select';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
-import axios from 'axios';
+import { workspaceService } from '@/Services/Workspace/workspaceService';
 import {
   Activity,
   Bell,
@@ -40,16 +40,13 @@ export default function NotificationsSettingsTab({ workspace }: NotificationsSet
     async (page = 1, perPage = 15, channel = 'all', status = 'all') => {
       try {
         setLoadingActivity(true);
-        const response = await axios.get(route('api.v1.workspaces.activity', workspace.id), {
-          params: {
-            page,
-            per_page: perPage,
-            channel: channel !== 'all' ? channel : undefined,
-            status: status !== 'all' ? status : undefined,
-          },
-        });
         // Correctly handle the paginated response structure from ApiResponse trait
-        const data = response.data;
+        const data = await workspaceService.getActivity(workspace.id, {
+          page,
+          per_page: perPage,
+          channel: channel !== 'all' ? channel : undefined,
+          status: status !== 'all' ? status : undefined,
+        });
         setActivityData({
           data: data.data || [],
           current_page: data.current_page || 1,

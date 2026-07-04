@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import ColorArea from '@/Components/common/Modern/ColorArea';
 import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { router, useForm } from '@inertiajs/react';
-import axios from 'axios';
+import { profileService } from '@/Services/Auth/profileService';
 import { Image as ImageIcon, Palette, ShieldCheck, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -88,9 +88,7 @@ export default function WhiteLabelSettingsTab({
         // Apply the branding color to the user's theme
         if (data.primary_color) {
           try {
-            await axios.patch(route('api.v1.profile.theme.update'), {
-              theme_color: data.primary_color,
-            });
+            await profileService.updateTheme(data.primary_color);
           } catch (error) {
             console.error('Error updating user theme:', error);
           }

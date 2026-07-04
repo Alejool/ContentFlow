@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import Textarea from '@/Components/common/Modern/Textarea';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { aiAssistantService } from '@/Services/AI/aiAssistantService';
 import { Sparkles, Wand2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -79,18 +79,18 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
               goal: { min: 1, max: 200 },
             };
 
-      const response = await axios.post(route('api.v1.ai.suggest-fields'), {
+      const response = await aiAssistantService.suggestFields({
         fields: { ...currentFields, ai_prompt: prompt },
         type,
         language: auth.user?.locale || 'es',
         field_limits: fieldLimits,
       });
 
-      if (response.data.success && response.data.data) {
-        onSuggest(response.data.data);
+      if (response.success && response.data) {
+        onSuggest(response.data);
 
         // Only show success message if there's actual data
-        const message = response.data.message;
+        const message = response.message;
         if (!message || message === 'OK' || message.trim() === '') {
           toast.success(t('common.ai.suggestions_generated') || 'Sugerencias generadas con éxito', {
             id: 'ai-suggestions',
@@ -103,7 +103,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
         setError('');
       } else {
         toast.error(
-          response.data.message ||
+          response.message ||
             t('common.ai.suggestion_failed') ||
             'No se pudieron generar sugerencias',
         );

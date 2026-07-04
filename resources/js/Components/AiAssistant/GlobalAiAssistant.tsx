@@ -1,6 +1,6 @@
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { aiAssistantService } from '@/Services/AI/aiAssistantService';
 import { Brain, Loader2, Maximize2, Minimize2, Send, Sparkles, X, Zap } from 'lucide-react';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -63,7 +63,7 @@ export default function GlobalAiAssistant() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/ai-chat/process', {
+      const response = await aiAssistantService.chatProcess({
         message: userMessage.content,
         source: 'assistant',
         context: {
@@ -72,12 +72,12 @@ export default function GlobalAiAssistant() {
         },
       });
 
-      if (response.data.success) {
+      if (response.success) {
         const aiMessage: Message = {
           id: Date.now() + 1,
           role: 'assistant',
-          content: response.data.message,
-          suggestion: response.data.suggestion,
+          content: response.message,
+          suggestion: response.suggestion,
         };
         setMessages((prev) => [...prev, aiMessage]);
       }

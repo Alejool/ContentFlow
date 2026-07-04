@@ -7,4 +7,18 @@ export const workspaceService = {
     data: Record<string, unknown>,
   ): Promise<{ message?: string }> =>
     axios.post(route('api.v1.workspaces.invite', workspaceId), data).then((r) => r.data),
+
+  getActivity: (
+    workspaceId: number | string,
+    params: Record<string, unknown>,
+  ): Promise<PaginatedActivity> =>
+    axios.get(route('api.v1.workspaces.activity', workspaceId), { params }).then((r) => r.data),
 };
+
+export interface PaginatedActivity {
+  data?: Record<string, unknown>[];
+  current_page?: number;
+  last_page?: number;
+  total?: number;
+  per_page?: number;
+}

@@ -21,4 +21,7 @@ export const profileService = {
 
   getConnectedAccounts: <TAccount = unknown>(): Promise<TAccount[]> =>
     axios.get('/social-accounts').then((r) => r.data?.accounts ?? []),
+
+  updateTheme: (themeColor: string): Promise<void> =>
+    axios.patch('/api/v1/profile/theme', { theme_color: themeColor }).then(() => undefined),
 };
