@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers\Workspace;
 
+use App\Http\Requests\Workspace\InviteMemberRequest;
+use App\Http\Requests\Workspace\StoreWorkspaceRequest;
+use App\Http\Requests\Workspace\StoreWorkspaceRoleRequest;
+use App\Http\Requests\Workspace\TestWebhookRequest;
+use App\Http\Requests\Workspace\UpdateMemberRoleRequest;
+use App\Http\Requests\Workspace\UpdateWhiteLabelRequest;
+use App\Http\Requests\Workspace\UpdateWorkspaceRequest;
 use App\Traits\System\ApiResponse;
 use App\Services\Storage\S3PathService;
 use Illuminate\Http\Request;
@@ -56,13 +63,8 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function store(Request $request)
+  public function store(StoreWorkspaceRequest $request)
   {
-    $request->validate([
-      'name' => 'required|string|max:255',
-      'description' => 'nullable|string|max:1000',
-    ]);
-
     try {
       $workspace = Workspace::create([
         'name' => $request->name,
@@ -185,7 +187,7 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function update(Request $request, $idOrSlug)
+  public function update(UpdateWorkspaceRequest $request, $idOrSlug)
   {
     $workspace = Workspace::where(function ($q) use ($idOrSlug) {
       if (is_numeric($idOrSlug)) {
@@ -198,14 +200,7 @@ class WorkspaceController extends Controller
       abort(403, 'Only the workspace owner or administrators can update workspace settings');
     }
 
-    $validated = $request->validate([
-      'name' => 'required|string|max:255',
-      'description' => 'nullable|string|max:1000',
-      'public' => 'nullable|boolean',
-      'allow_public_invites' => 'nullable|boolean',
-    ]);
-
-    $workspace->update($validated);
+    $workspace->update($request->validated());
 
     if ($request->wantsJson() || $request->is('api/*')) {
       return $this->successResponse(['workspace' => $workspace], 'Workspace updated successfully.');
@@ -217,7 +212,7 @@ class WorkspaceController extends Controller
   /**
    * Update white-label settings for enterprise workspaces.
    */
-  public function updateWhiteLabel(Request $request, $idOrSlug)
+  public function updateWhiteLabel(UpdateWhiteLabelRequest $request, $idOrSlug)
   {
     $workspace = Workspace::where(function ($q) use ($idOrSlug) {
       if (is_numeric($idOrSlug)) {
@@ -241,12 +236,6 @@ class WorkspaceController extends Controller
     if ($workspace->getPlanName() !== 'enterprise') {
       return $this->errorResponse('This feature is only available for Enterprise plans.', 403);
     }
-
-    $request->validate([
-      'logo_key' => 'nullable|string',
-      'favicon_key' => 'nullable|string',
-      'primary_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-    ]);
 
     $data = [
       'white_label_primary_color' => $request->primary_color,
@@ -343,7 +332,7 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function updateMemberRole(Request $request, $idOrSlug, $userId)
+  public function updateMemberRole(UpdateMemberRoleRequest $request, $idOrSlug, $userId)
   {
     $workspace = Workspace::where(function ($q) use ($idOrSlug) {
       if (is_numeric($idOrSlug)) {
@@ -356,9 +345,7 @@ class WorkspaceController extends Controller
       abort(403, 'You do not have permission to manage members');
     }
 
-    $validated = $request->validate([
-      'role_id' => 'required|exists:roles,id'
-    ]);
+    $validated = $request->validated();
 
     // Prevent changing workspace creator's role
     if ($workspace->created_by === $userId) {
@@ -473,7 +460,7 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function invite(Request $request, $idOrSlug)
+  public function invite(InviteMemberRequest $request, $idOrSlug)
   {
     $workspace = Workspace::where(function ($q) use ($idOrSlug) {
       if (is_numeric($idOrSlug)) {
@@ -495,13 +482,7 @@ class WorkspaceController extends Controller
       ], 422);
     }
 
-    $validated = $request->validate([
-      'email' => 'required|email|exists:users,email',
-      'role_id' => 'required|exists:roles,id'
-    ], [
-      'email.exists' => __('passwords.workspace_email_not_found'),
-      'role_id.required' => __('passwords.workspace_role_required'),
-    ]);
+    $validated = $request->validated();
 
     // Prevent inviting with Owner role
     $role = Role::find($validated['role_id']);
@@ -537,7 +518,7 @@ class WorkspaceController extends Controller
   /**
    * Test Slack/Discord webhook connections for a workspace
    */
-  public function testWebhook(Request $request, $idOrSlug)
+  public function testWebhook(TestWebhookRequest $request, $idOrSlug)
   {
     $workspace = Workspace::where(function ($q) use ($idOrSlug) {
       if (is_numeric($idOrSlug)) {
@@ -550,10 +531,7 @@ class WorkspaceController extends Controller
       abort(403);
     }
 
-    $validated = $request->validate([
-      'type' => 'required|in:slack,discord',
-      'url' => 'required|url'
-    ]);
+    $validated = $request->validated();
 
     $url = $validated['url'];
     $isDiscordInvite = $validated['type'] === 'discord' && (str_contains($url, 'discord.gg') || str_contains($url, 'discord.com/invite'));
@@ -696,7 +674,7 @@ class WorkspaceController extends Controller
     return redirect()->route('dashboard')->with('message', "Switched to workspace: {$workspace->name}");
   }
 
-  public function storeRole(Request $request, $idOrSlug)
+  public function storeRole(StoreWorkspaceRoleRequest $request, $idOrSlug)
   {
     $workspace = Workspace::where(function ($q) use ($idOrSlug) {
       if (is_numeric($idOrSlug)) {
@@ -709,13 +687,7 @@ class WorkspaceController extends Controller
       abort(403, 'You do not have permission to create roles');
     }
 
-    $validated = $request->validate([
-      'name' => 'required|string|max:255|unique:roles,name',
-      'description' => 'nullable|string|max:1000',
-      'permissions' => 'nullable|array',
-      'permissions.*' => 'exists:permissions,id',
-      'approval_participant' => 'nullable|boolean',
-    ]);
+    $validated = $request->validated();
 
     return DB::transaction(function () use ($validated) {
       $role = Role::create([
