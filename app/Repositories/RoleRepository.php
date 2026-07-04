@@ -41,6 +41,23 @@ class RoleRepository
         return Role::systemRoles()->with('permissions')->get();
     }
 
+    /** All roles with their permissions eager-loaded. */
+    public function allRolesWithPermissions()
+    {
+        return Role::with('permissions')->get();
+    }
+
+    /** Resolve a workspace by numeric id or slug. */
+    public function findWorkspaceFlexible(string $idOrSlug): Workspace
+    {
+        return Workspace::where(function ($q) use ($idOrSlug) {
+            if (is_numeric($idOrSlug)) {
+                $q->where('id', $idOrSlug);
+            }
+            $q->orWhere('slug', $idOrSlug);
+        })->firstOrFail();
+    }
+
     /** Pivot row for a user's role in a workspace, or null. */
     public function userRolePivot(int $userId, int $workspaceId): ?object
     {

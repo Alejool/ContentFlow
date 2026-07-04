@@ -372,6 +372,22 @@ class RoleService
     /**
      * System roles mapped for the index endpoint.
      */
+    /**
+     * All roles mapped with permission names (for the API index endpoint).
+     */
+    public function listAllRoles(): Collection
+    {
+        return $this->roles->allRolesWithPermissions()->map(fn (Role $role) => [
+            'id' => $role->id,
+            'name' => $role->name,
+            'display_name' => $role->display_name,
+            'description' => $role->description,
+            'is_system_role' => $role->is_system_role,
+            'approval_participant' => $role->approval_participant,
+            'permissions' => $role->permissions->pluck('name')->toArray(),
+        ]);
+    }
+
     public function listSystemRoles(): Collection
     {
         return $this->roles->systemRolesWithPermissions()->map(fn (Role $role) => [
