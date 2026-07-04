@@ -1,7 +1,7 @@
 import enFlag from '@assets/Icons/Flags/en.svg';
 import esFlag from '@assets/Icons/Flags/es.svg';
+import { profileService } from '@/Services/Auth/profileService';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,8 +41,10 @@ export default function LanguageSwitcher() {
 
     if (auth?.user) {
       try {
-        await axios.patch(route('settings.locale'), { locale: newLang });
-      } catch (error) {}
+        await profileService.updateLocale(newLang);
+      } catch {
+        // Locale persists client-side; server sync is best-effort
+      }
     }
   };
 

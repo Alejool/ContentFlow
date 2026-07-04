@@ -5,7 +5,7 @@ import Modal from '@/Components/common/ui/Modal';
 import { buildRoleSelectOptions, getRoleConfig, getRoleLabel } from '@/Utils/Roles/roleHelpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getInviteMemberSchema, type InviteMemberFormData } from '@/schemas/Workspace/inviteMember';
-import axios from 'axios';
+import { workspaceService } from '@/Services/Workspace/workspaceService';
 import { Mail, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -60,8 +60,8 @@ export default function InviteMemberModal({
     }
     setIsSubmitting(true);
     try {
-      const response = await axios.post(route('api.v1.workspaces.invite', workspace.id), data);
-      toast.success(response.data.message || t('workspace.invite_modal.messages.success'));
+      const response = await workspaceService.inviteMember(workspace.id, data);
+      toast.success(response.message || t('workspace.invite_modal.messages.success'));
       reset();
       onSuccess();
       onClose();

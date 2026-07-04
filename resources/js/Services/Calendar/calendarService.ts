@@ -11,6 +11,11 @@ export interface BulkOperationResponse {
   data?: Record<string, unknown> | null;
 }
 
+export interface CalendarExportResponse {
+  url?: string;
+  data?: { url?: string };
+}
+
 export interface CalendarExportEvent {
   title: string;
   start: string | Date;
@@ -47,10 +52,10 @@ export const calendarService = {
   deleteScheduledPost: (resourceId: string): Promise<void> =>
     axios.delete(`/api/v1/scheduled-posts/${resourceId}`).then(() => undefined),
 
-  exportToGoogle: (events: CalendarExportEvent[]): Promise<{ url?: string }> =>
+  exportToGoogle: (events: CalendarExportEvent[]): Promise<CalendarExportResponse> =>
     axios.post('/api/v1/calendar/export/google', { events }).then((r) => r.data),
 
-  exportToOutlook: (events: CalendarExportEvent[]): Promise<{ url?: string }> =>
+  exportToOutlook: (events: CalendarExportEvent[]): Promise<CalendarExportResponse> =>
     axios.post('/api/v1/calendar/export/outlook', { events }).then((r) => r.data),
 
   resolveConflict: (

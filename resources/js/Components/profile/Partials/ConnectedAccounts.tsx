@@ -1,6 +1,6 @@
 import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsConfig';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { profileService } from '@/Services/Auth/profileService';
 import { CheckCircle, Settings, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,10 +50,8 @@ export default function ConnectedAccounts({ className = '' }) {
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/social-accounts');
-      if (response.data && response.data.accounts) {
-        updateAccountsStatus(response.data.accounts);
-      }
+      const accounts = await profileService.getConnectedAccounts<any>();
+      updateAccountsStatus(accounts);
     } catch (error) {
       console.error('Error fetching connected accounts:', error);
     } finally {

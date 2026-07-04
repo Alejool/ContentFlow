@@ -12,4 +12,13 @@ export const profileService = {
 
   updatePassword: (data: Record<string, unknown>): Promise<ProfileResponse> =>
     axios.put('/api/v1/profile/password', data).then((r) => r.data),
+
+  updateLocale: (locale: string): Promise<void> =>
+    axios.patch('/settings/locale', { locale }).then(() => undefined),
+
+  deleteAccount: (data: Record<string, unknown>): Promise<void> =>
+    axios.delete('/profile', { data }).then(() => undefined),
+
+  getConnectedAccounts: <TAccount = unknown>(): Promise<TAccount[]> =>
+    axios.get('/social-accounts').then((r) => r.data?.accounts ?? []),
 };

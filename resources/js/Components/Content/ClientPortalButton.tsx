@@ -1,5 +1,5 @@
 import Button from '@/Components/common/Modern/Button';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { Copy, ExternalLink, Link } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -22,11 +22,7 @@ export default function ClientPortalButton({ publicationId, status }: Props) {
   const generateLink = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(
-        route('api.v1.publications.portal-token', { publication: publicationId }),
-      );
-      // La respuesta puede venir en res.data.data o directamente en res.data
-      const url: string = res.data.data?.portal_url || res.data.portal_url;
+      const url = await publicationService.getPortalToken(publicationId);
       setPortalUrl(url);
       await navigator.clipboard.writeText(url);
       toast.success(t('portal.linkCopied', 'Link copiado al portapapeles'));

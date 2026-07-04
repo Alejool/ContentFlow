@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { checkoutService } from '@/Services/Subscription/checkoutService';
 import { CreditCard, Loader2 } from 'lucide-react';
-import axios from 'axios';
+import { useState } from 'react';
 
 interface CheckoutButtonProps {
   className?: string;
@@ -14,11 +14,11 @@ export default function CheckoutButton({ className = '', children }: CheckoutBut
     setLoading(true);
 
     try {
-      const response = await axios.post('/checkout/create-session');
+      const response = await checkoutService.createSession();
 
       // Redirigir a la página de checkout de Stripe
-      if (response.data.url) {
-        window.location.href = response.data.url;
+      if (response.url) {
+        window.location.href = response.url;
       }
     } catch (error) {
       console.error('Error al crear sesión de checkout:', error);

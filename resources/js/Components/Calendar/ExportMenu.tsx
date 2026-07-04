@@ -1,5 +1,5 @@
 ﻿import Button from '@/Components/common/Modern/Button';
-import axios from 'axios';
+import { calendarService } from '@/Services/Calendar/calendarService';
 import { Calendar as CalendarIcon, Download } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -23,17 +23,20 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ events }) => {
   const handleExport = async (type: 'google' | 'outlook') => {
     setIsExporting(true);
     try {
-      const response = await axios.post(route(`api.v1.calendar.export.${type}`), {
-        events: events.map((e) => ({
+      const exportFn =
+        type === 'google' ? calendarService.exportToGoogle : calendarService.exportToOutlook;
+      const response = await exportFn(
+        events.map((e) => ({
           title: e.title,
           start: e.start,
           end: e.end,
           description: `Status: ${e.status}`,
         })),
-      });
+      );
 
-      if (response.data.data?.url) {
-        window.open(response.data.data.url, '_blank');
+      const url = response.data?.url ?? response.url;
+      if (url) {
+        window.open(url, '_blank');
         toast.success(
           `Calendario exportado exitosamente a ${type === 'google' ? 'Google Calendar' : 'Outlook'}`,
         );

@@ -144,4 +144,9 @@ export const publicationService = {
 
   deleteMedia: (mediaId: number): Promise<void> =>
     axios.delete(`/api/v1/media/${mediaId}`).then(() => undefined),
+
+  getPortalToken: (publicationId: number): Promise<string> =>
+    axios
+      .post(route('api.v1.publications.portal-token', { publication: publicationId }))
+      .then((r) => r.data.data?.portal_url || r.data.portal_url),
 };

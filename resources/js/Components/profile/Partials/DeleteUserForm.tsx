@@ -4,8 +4,8 @@ import Input from '@/Components/common/Modern/Input';
 import Modal from '@/Components/common/ui/Modal';
 import type { DeleteUserFormData } from '@/schemas/Auth/user';
 import { deleteUserSchema } from '@/schemas/Auth/user';
+import { profileService } from '@/Services/Auth/profileService';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm as useHookForm } from 'react-hook-form';
@@ -35,9 +35,7 @@ export default function DeleteUserForm({ className = '' }: DeleteUserFormProps) 
 
   const deleteUser = async (data: DeleteUserFormData) => {
     try {
-      await axios.delete(route('profile.destroy'), {
-        data,
-      });
+      await profileService.deleteAccount(data);
       window.location.assign('/');
     } catch (error: any) {
       if (error.response?.data?.errors) {
