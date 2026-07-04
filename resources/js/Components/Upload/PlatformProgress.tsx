@@ -98,7 +98,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                   </button>
                 )}
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${
+                  className={`rounded-full px-2 py-0.5 text-3xs font-semibold uppercase tracking-wider ${
                     isDone
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
                       : isFailed

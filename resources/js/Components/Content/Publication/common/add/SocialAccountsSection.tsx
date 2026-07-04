@@ -94,7 +94,7 @@ const SocialAccountsSection = memo(
                         <span className="capitalize">{acc.platform}</span>
                         <span className="opacity-75">@{acc.account_name || acc.name}</span>
                         {acc.isDisconnected && (
-                          <span className="ml-1 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold text-amber-800 dark:bg-amber-800 dark:text-amber-200">
+                          <span className="ml-1 rounded bg-amber-200 px-1 py-0.5 text-3xs font-bold text-amber-800 dark:bg-amber-800 dark:text-amber-200">
                             {t('common.disconnected') || 'Desconectada'}
                           </span>
                         )}

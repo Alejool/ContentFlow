@@ -82,7 +82,7 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
             <div className="min-w-0 flex-1">
               {formatTitle(post.title)}
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[9px] uppercase font-bold text-gray-500 bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 px-1.5 py-0.5 rounded">
+                <span className="text-3xs uppercase font-bold text-gray-500 bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 px-1.5 py-0.5 rounded">
                   {post.type}
                 </span>
                 <p className="text-[11px] text-gray-500 dark:text-neutral-400 truncate">

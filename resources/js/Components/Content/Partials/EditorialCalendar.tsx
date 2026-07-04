@@ -153,7 +153,7 @@ export default function EditorialCalendar() {
                       </span>
                     </div>
                     {event.start && (
-                      <div className="hidden items-center gap-1 text-[9px] text-gray-500 sm:flex">
+                      <div className="hidden items-center gap-1 text-3xs text-gray-500 sm:flex">
                         <Clock className="h-2.5 w-2.5" />
                         {formatTimeString(event.start)}
                       </div>

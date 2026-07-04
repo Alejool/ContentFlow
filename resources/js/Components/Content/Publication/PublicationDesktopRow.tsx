@@ -216,7 +216,7 @@ const PublicationRow = memo(function PublicationRow({
                     {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                   </span>
                   {item.current_approval_step?.name && (
-                    <span className="text-[9px] text-yellow-600 dark:text-yellow-500">
+                    <span className="text-3xs text-yellow-600 dark:text-yellow-500">
                       {t('approvals.approver_role')}: {item.current_approval_step.name}
                     </span>
                   )}
@@ -268,7 +268,7 @@ const PublicationRow = memo(function PublicationRow({
                   </span>
                 </div>
                 {(item as Publication & { type?: string }).type === 'user_event' && item.user && (
-                  <span className="ml-4 text-[9px] font-medium text-gray-500 italic dark:text-neutral-400">
+                  <span className="ml-4 text-3xs font-medium text-gray-500 italic dark:text-neutral-400">
                     {t('publications.table.createdBy')}: {item.user.name}
                   </span>
                 )}

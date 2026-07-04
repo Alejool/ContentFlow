@@ -134,19 +134,19 @@ const SocialAccountItem = memo(
                 )}
                 {/* Token health badges */}
                 {isTokenInvalid && (
-                  <span className="flex items-center gap-1 rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                  <span className="flex items-center gap-1 rounded-full bg-red-100 px-1.5 py-0.5 text-3xs font-bold uppercase text-red-700 dark:bg-red-900/40 dark:text-red-300">
                     <AlertTriangle className="h-2.5 w-2.5" />
                     Token inválido
                   </span>
                 )}
                 {!isTokenInvalid && isTokenExpiringSoon && (
-                  <span className="flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  <span className="flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-3xs font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                     <Clock className="h-2.5 w-2.5" />
                     Token por vencer
                   </span>
                 )}
                 {account.isDisconnected && (
-                  <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-3xs font-bold uppercase text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                     {t('common.disconnected') || 'Desconectada'}
                   </span>
                 )}

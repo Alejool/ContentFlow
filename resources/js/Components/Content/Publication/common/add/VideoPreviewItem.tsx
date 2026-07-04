@@ -132,7 +132,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
             </div>
           </div>
           {isTooLong && (
-            <div className="flex items-center gap-1 text-[9px] text-yellow-300">
+            <div className="flex items-center gap-1 text-3xs text-yellow-300">
               <AlertTriangle className="h-2.5 w-2.5" />
               Too long for Short
             </div>

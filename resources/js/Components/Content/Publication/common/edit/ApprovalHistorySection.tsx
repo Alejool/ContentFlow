@@ -240,17 +240,17 @@ export default function ApprovalHistorySection({
                   {/* Status Badges */}
                   <div className="mt-1 flex flex-col items-center gap-1">
                     {isCurrent && (
-                      <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[9px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                      <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-3xs font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                         {t('approvals.in_progress') || 'En Proceso'}
                       </span>
                     )}
                     {stepLog?.action === 'approved' && (
-                      <span className="text-[9px] font-bold text-green-600 dark:text-green-400">
+                      <span className="text-3xs font-bold text-green-600 dark:text-green-400">
                         {t('common.approved') || 'Aprobado'}
                       </span>
                     )}
                     {stepLog?.action === 'rejected' && (
-                      <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400">
+                      <span className="text-3xs font-bold text-rose-600 dark:text-rose-400">
                         {t('common.rejected') || 'Rechazado'}
                       </span>
                     )}
@@ -320,7 +320,7 @@ export default function ApprovalHistorySection({
                       <div className="mt-2 rounded border border-rose-200 bg-white/50 p-2 dark:border-rose-900/30 dark:bg-theme-bg-secondary">
                         <div className="mb-1 flex items-center gap-2">
                           <MessageSquare className="h-3 w-3 text-rose-500" />
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                          <span className="text-3xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
                             {t('approvals.rejectionReason') || 'Motivo'}
                           </span>
                         </div>

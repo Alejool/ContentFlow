@@ -115,7 +115,7 @@ export function PublicationItem({
 
     return (
       <span
-        className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${badge.className}`}
+        className={`rounded-full px-2 py-0.5 text-3xs font-semibold uppercase tracking-wider ${badge.className}`}
       >
         {badge.text}
       </span>

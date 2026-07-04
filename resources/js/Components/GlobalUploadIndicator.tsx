@@ -213,7 +213,7 @@ export default function GlobalUploadIndicator() {
           >
             {statusIcon}
             {totalActive > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-bold text-gray-800 shadow">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-3xs font-bold text-gray-800 shadow">
                 {totalActive}
               </span>
             )}

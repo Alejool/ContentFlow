@@ -258,7 +258,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                           }`}
                       >
                         <span className="truncate">{t(section.labelKey)}</span>
-                        <span className={`rounded px-1 py-0.5 text-[9px] font-mono ${isDark ? 'bg-neutral-800 text-neutral-500' : 'bg-gray-200 text-gray-400'
+                        <span className={`rounded px-1 py-0.5 text-3xs font-mono ${isDark ? 'bg-neutral-800 text-neutral-500' : 'bg-gray-200 text-gray-400'
                           }`}>
                           Alt+{SECTION_SHORTCUT_KEYS[section.shortcutIndex]}
                         </span>
@@ -317,17 +317,17 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               <div className="relative z-10 flex items-center gap-2 text-2xs text-gray-400 dark:text-neutral-500">
                 <Command className="h-3 w-3" />
                 <span>
-                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-3xs dark:border-neutral-600 dark:bg-theme-bg-secondary">
                     Alt
                   </kbd>
                   <span className="mx-1">+</span>
-                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
+                  <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-3xs dark:border-neutral-600 dark:bg-theme-bg-secondary">
                     #
                   </kbd>
                   <span className="ml-1">{t('nav.section.quickNavHint') || 'para navegar'}</span>
                 </span>
                 <span className="mx-1 text-gray-300 dark:text-neutral-600">·</span>
-                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">
+                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-3xs dark:border-neutral-600 dark:bg-theme-bg-secondary">
                   ⌘K
                 </kbd>
               </div>

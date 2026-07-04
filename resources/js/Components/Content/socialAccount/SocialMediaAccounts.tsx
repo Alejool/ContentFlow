@@ -461,7 +461,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                       : `ID: ${account.accountDetails.account_id}`}
                                   </p>
                                   {account.connectedBy && (
-                                    <p className="text-primary-500 text-[9px] font-bold tracking-wider uppercase">
+                                    <p className="text-primary-500 text-3xs font-bold tracking-wider uppercase">
                                       {t('manageContent.socialMedia.connectedBy') ||
                                         'Conectado por'}
                                       : {account.connectedBy}
@@ -482,7 +482,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                             if (!apiLimits) return null;
                             return (
                               <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50/80 px-3 py-2.5 dark:border-neutral-700/50 dark:bg-theme-bg-secondary">
-                                <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
+                                <p className="mb-1.5 text-3xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                                   {t('manageContent.socialMedia.apiLimits')}
                                 </p>
                                 <div className="space-y-1">
@@ -554,7 +554,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                           {t('manageContent.socialMedia.oauth1Required') ||
                                             'OAuth 1.0a requerido'}
                                         </p>
-                                        <p className="mt-0.5 text-[9px] leading-tight text-amber-700 dark:text-amber-400">
+                                        <p className="mt-0.5 text-3xs leading-tight text-amber-700 dark:text-amber-400">
                                           {t('manageContent.socialMedia.oauth1Message') ||
                                             'Necesario para subir videos'}
                                         </p>
