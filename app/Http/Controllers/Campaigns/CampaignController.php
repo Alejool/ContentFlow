@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Campaigns;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Campaigns\CampaignPublicationsRequest;
+use App\Http\Requests\Campaigns\StoreCampaignRequest;
+use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Services\Statistics\StatisticsService;
 use App\Models\Campaigns\Campaign;
 use App\Traits\System\ApiResponse;
@@ -108,19 +111,9 @@ class CampaignController extends Controller
   /**
    * Store a new campaign
    */
-  public function store(Request $request)
+  public function store(StoreCampaignRequest $request)
   {
-    $validatedData = $request->validate([
-      'name' => 'required|string|max:255',
-      'description' => 'nullable|string',
-      'status' => 'nullable|in:draft,active,paused,completed',
-      'start_date' => 'nullable|date',
-      'end_date' => 'nullable|date|after_or_equal:start_date',
-      'goal' => 'nullable|string',
-      'budget' => 'nullable|numeric|min:0',
-      'publication_ids' => 'nullable|array',
-      'publication_ids.*' => 'exists:publications,id',
-    ]);
+    $validatedData = $request->validated();
 
     $campaign = Campaign::create([
       'user_id' => Auth::id(),
@@ -166,21 +159,11 @@ class CampaignController extends Controller
   /**
    * Update the specified campaign
    */
-  public function update(Request $request, $id)
+  public function update(UpdateCampaignRequest $request, $id)
   {
     $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-    $validatedData = $request->validate([
-      'name' => 'required|string|max:255',
-      'description' => 'nullable|string',
-      'status' => 'nullable|in:draft,active,paused,completed',
-      'start_date' => 'nullable|date',
-      'end_date' => 'nullable|date|after_or_equal:start_date',
-      'goal' => 'nullable|string',
-      'budget' => 'nullable|numeric|min:0',
-      'publication_ids' => 'nullable|array',
-      'publication_ids.*' => 'exists:publications,id',
-    ]);
+    $validatedData = $request->validated();
 
     // Check if campaign has published publications before allowing name change
     if ($request->has('name') && $request->name !== $campaign->name) {
@@ -270,14 +253,11 @@ class CampaignController extends Controller
   /**
    * Add publications to a campaign
    */
-  public function addPublications(Request $request, $id)
+  public function addPublications(CampaignPublicationsRequest $request, $id)
   {
     $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-    $validatedData = $request->validate([
-      'publication_ids' => 'required|array',
-      'publication_ids.*' => 'exists:publications,id',
-    ]);
+    $validatedData = $request->validated();
 
     $currentMax = $campaign->publications()->max('order') ?? 0;
 
@@ -293,14 +273,11 @@ class CampaignController extends Controller
   /**
    * Remove publications from a campaign
    */
-  public function removePublications(Request $request, $id)
+  public function removePublications(CampaignPublicationsRequest $request, $id)
   {
     $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-    $validatedData = $request->validate([
-      'publication_ids' => 'required|array',
-      'publication_ids.*' => 'exists:publications,id',
-    ]);
+    $validatedData = $request->validated();
 
     $campaign->publications()->detach($validatedData['publication_ids']);
 
