@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Workspace;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ApprovalWorkflow\StoreWorkflowRequest;
+use App\Http\Requests\ApprovalWorkflow\UpdateWorkflowRequest;
 use App\Models\Approval\ApprovalWorkflow;
 use App\Models\Approval\ApprovalLevel;
 use App\Models\Approval\ApprovalRequest;
@@ -53,19 +55,11 @@ class WorkspaceApprovalWorkflowController extends Controller
     }
   }
 
-  public function store(Request $request, $idOrSlug)
+  public function store(StoreWorkflowRequest $request, $idOrSlug)
   {
     $workspace = $this->getWorkspace($idOrSlug);
     $this->checkFeature($workspace);
 
-    $request->validate([
-      'name' => 'required|string|max:255',
-      'is_multi_level' => 'sometimes|boolean',
-      'steps' => 'required|array|min:1',
-      'steps.*.role_id' => 'nullable|exists:roles,id',
-      'steps.*.user_id' => 'nullable|exists:users,id',
-      'steps.*.name' => 'nullable|string|max:255',
-    ]);
 
     // Enforce tiered limits
     $plan = $workspace->subscription?->plan ?? 'free';
@@ -114,7 +108,7 @@ class WorkspaceApprovalWorkflowController extends Controller
     });
   }
 
-  public function update(Request $request, $idOrSlug, ApprovalWorkflow $workflow)
+  public function update(UpdateWorkflowRequest $request, $idOrSlug, ApprovalWorkflow $workflow)
   {
     $workspace = $this->getWorkspace($idOrSlug);
     $this->checkFeature($workspace);
@@ -123,16 +117,6 @@ class WorkspaceApprovalWorkflowController extends Controller
       return $this->errorResponse('Unauthorized', 403);
     }
 
-    $request->validate([
-      'name' => 'sometimes|string|max:255',
-      'is_multi_level' => 'sometimes|boolean',
-      'steps' => 'sometimes|array|min:1',
-      'steps.*.role_id' => 'nullable|exists:roles,id',
-      'steps.*.user_id' => 'nullable|exists:users,id',
-      'steps.*.name' => 'nullable|string|max:255',
-      'is_enabled' => 'sometimes|boolean',
-      'is_active' => 'sometimes|boolean', // Keep for backward compatibility
-    ]);
 
     // Enforce tiered limits
     if ($request->has('steps')) {

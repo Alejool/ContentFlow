@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PlatformConfiguration\AvailablePlatformsRequest;
+use App\Http\Requests\PlatformConfiguration\ValidateContentRequest;
 use App\Services\PlatformConfigurationService;
 use App\Services\ContentValidator;
 use App\Models\Publications\Publication;
@@ -235,12 +237,8 @@ class PlatformConfigurationController extends Controller
      * - content_type: string (requerido)
      * - user_plan: string (default: 'free')
      */
-    public function getAvailablePlatformsForContent(Request $request): JsonResponse
+    public function getAvailablePlatformsForContent(AvailablePlatformsRequest $request): JsonResponse
     {
-        $request->validate([
-            'content_type' => 'required|string',
-            'user_plan' => 'sometimes|string',
-        ]);
 
         $contentType = $request->get('content_type');
         $userPlan = $request->get('user_plan', 'free');
@@ -287,14 +285,8 @@ class PlatformConfigurationController extends Controller
      *   "user_plan": "pro"
      * }
      */
-    public function validateContent(Request $request): JsonResponse
+    public function validateContent(ValidateContentRequest $request): JsonResponse
     {
-        $request->validate([
-            'publication_id' => 'required|integer|exists:publications,id',
-            'platforms' => 'required|array|min:1',
-            'platforms.*' => 'string',
-            'user_plan' => 'sometimes|string',
-        ]);
 
         $publication = Publication::findOrFail($request->get('publication_id'));
         $platforms = $request->get('platforms');

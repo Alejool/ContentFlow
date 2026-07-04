@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Reports\StoreScheduledReportRequest;
+use App\Http\Requests\Reports\UpdateScheduledReportRequest;
 use App\Models\Reports\ScheduledReport;
 use App\Services\Reports\ReportGeneratorService;
 use Illuminate\Http\Request;
@@ -20,16 +22,9 @@ class ScheduledReportController extends Controller
         return response()->json($reports);
     }
 
-    public function store(Request $request)
+    public function store(StoreScheduledReportRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:publications,analytics,campaigns',
-            'frequency' => 'required|in:daily,weekly,monthly',
-            'recipients' => 'required|array',
-            'recipients.*' => 'email',
-            'filters' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
         $report = ScheduledReport::create([
             ...$validated,
@@ -41,19 +36,11 @@ class ScheduledReportController extends Controller
         return response()->json($report, 201);
     }
 
-    public function update(Request $request, ScheduledReport $report)
+    public function update(UpdateScheduledReportRequest $request, ScheduledReport $report)
     {
         $this->authorize('update', $report);
 
-        $validated = $request->validate([
-            'name' => 'string|max:255',
-            'type' => 'in:publications,analytics,campaigns',
-            'frequency' => 'in:daily,weekly,monthly',
-            'recipients' => 'array',
-            'recipients.*' => 'email',
-            'filters' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         if (isset($validated['frequency'])) {
             $validated['next_send_at'] = $this->calculateNextSendDate($validated['frequency']);
