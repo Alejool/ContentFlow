@@ -2,7 +2,7 @@
 
 namespace App\Services\AI;
 
-use Illuminate\Support\Facades\Http;
+use App\Integrations\AI\LlmApiClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +10,10 @@ use App\Models\User;
 
 class AIService
 {
+  public function __construct(private LlmApiClient $llmClient)
+  {
+  }
+
   /**
    * Available AI providers in order of preference
    */
@@ -208,30 +212,32 @@ class AIService
 
     $messages = $this->prepareDeepSeekMessages($context);
 
-    $response = Http::withoutVerifying()
-      ->withHeaders([
+    $response = $this->llmClient->postJson(
+      'https://api.deepseek.com/chat/completions',
+      [
         'Authorization' => 'Bearer ' . $apiKey,
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
-      ])
-      ->timeout(config('services.deepseek.timeout', 90))
-      ->post('https://api.deepseek.com/chat/completions', [
+      ],
+      [
         'model' => config('services.deepseek.model', 'deepseek-chat'),
         'messages' => $messages,
         'temperature' => (float) config('services.deepseek.temperature', 0.3),
         'max_tokens' => (int) config('services.deepseek.max_tokens', 1000),
         'response_format' => ['type' => 'json_object']
-      ]);
+      ],
+      config('services.deepseek.timeout', 90)
+    );
 
-    if (!$response->successful()) {
+    if (!$response['successful']) {
       Log::error('DeepSeek API Error', [
-        'status' => $response->status(),
-        'body' => $response->json() ?? $response->body()
+        'status' => $response['status'],
+        'body' => $response['json'] ?: $response['body']
       ]);
-      throw new \Exception("DeepSeek API error: " . ($response->json()['message'] ?? 'Request failed'));
+      throw new \Exception("DeepSeek API error: " . ($response['json']['message'] ?? 'Request failed'));
     }
 
-    $data = $response->json();
+    $data = $response['json'];
     $content = $data['choices'][0]['message']['content'] ?? '{}';
 
     return $this->parseAIResponse($content, 'deepseek', config('services.deepseek.model'));
@@ -270,9 +276,10 @@ class AIService
 
     $model = config('services.gemini.model', 'gemini-1.5-flash');
 
-    $response = Http::withoutVerifying()
-      ->timeout(60)
-      ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey, [
+    $response = $this->llmClient->postJson(
+      "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey,
+      [],
+      [
         'contents' => [
           [
             'role' => 'user',
@@ -285,17 +292,19 @@ class AIService
           'temperature' => (float) config('services.gemini.temperature', 0.7),
           'maxOutputTokens' => 1000,
         ]
-      ]);
+      ],
+      60
+    );
 
-    if (!$response->successful()) {
+    if (!$response['successful']) {
       Log::error('Gemini API Error', [
-        'status' => $response->status(),
-        'body' => $response->json() ?? $response->body()
+        'status' => $response['status'],
+        'body' => $response['json'] ?: $response['body']
       ]);
-      throw new \Exception("Gemini API error: " . ($response->json()[0]['error']['message'] ?? 'Request failed'));
+      throw new \Exception("Gemini API error: " . ($response['json'][0]['error']['message'] ?? 'Request failed'));
     }
 
-    $data = $response->json();
+    $data = $response['json'];
     $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
 
     return $this->parseAIResponse($text, 'gemini', $model);
@@ -315,13 +324,13 @@ class AIService
       throw new \Exception('OpenAI API key not configured');
     }
 
-    $response = Http::withoutVerifying()
-      ->withHeaders([
+    $response = $this->llmClient->postJson(
+      'https://api.openai.com/v1/chat/completions',
+      [
         'Authorization' => 'Bearer ' . $apiKey,
         'Content-Type' => 'application/json',
-      ])
-      ->timeout(60)
-      ->post('https://api.openai.com/v1/chat/completions', [
+      ],
+      [
         'model' => config('services.openai.model', 'gpt-4o-mini'),
         'messages' => [
           ['role' => 'system', 'content' => $this->getSystemPrompt($context)],
@@ -329,14 +338,16 @@ class AIService
         ],
         'temperature' => (float) config('services.openai.temperature', 0.7),
         'response_format' => ['type' => 'json_object']
-      ]);
+      ],
+      60
+    );
 
-    if (!$response->successful()) {
-      Log::error('OpenAI API Error', ['status' => $response->status()]);
+    if (!$response['successful']) {
+      Log::error('OpenAI API Error', ['status' => $response['status']]);
       throw new \Exception('OpenAI request failed');
     }
 
-    $data = $response->json();
+    $data = $response['json'];
     $content = $data['choices'][0]['message']['content'] ?? '{}';
 
     return $this->parseAIResponse($content, 'openai', config('services.openai.model'));
@@ -356,27 +367,29 @@ class AIService
       throw new \Exception('Anthropic API key not configured');
     }
 
-    $response = Http::withoutVerifying()
-      ->withHeaders([
+    $response = $this->llmClient->postJson(
+      'https://api.anthropic.com/v1/messages',
+      [
         'x-api-key' => $apiKey,
         'anthropic-version' => '2023-06-01',
         'Content-Type' => 'application/json',
-      ])
-      ->timeout(60)
-      ->post('https://api.anthropic.com/v1/messages', [
+      ],
+      [
         'model' => config('services.anthropic.model', 'claude-3-haiku-20240307'),
         'max_tokens' => 1000,
         'messages' => [
           ['role' => 'user', 'content' => $this->getSystemPrompt($context) . "\n\nUser Message: " . $context['message']]
         ]
-      ]);
+      ],
+      60
+    );
 
-    if (!$response->successful()) {
-      Log::error('Anthropic API Error', ['status' => $response->status()]);
+    if (!$response['successful']) {
+      Log::error('Anthropic API Error', ['status' => $response['status']]);
       throw new \Exception('Anthropic request failed');
     }
 
-    $data = $response->json();
+    $data = $response['json'];
     $content = $data['content'][0]['text'] ?? '{}';
 
     return $this->parseAIResponse($content, 'anthropic', config('services.anthropic.model'));

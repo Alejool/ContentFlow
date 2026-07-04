@@ -2,9 +2,9 @@
 
 namespace App\Services\Integrations;
 
+use App\Integrations\Webhooks\WebhookClient;
 use App\Models\Integrations\IntegrationDeliveryLog;
 use App\Models\Integrations\IntegrationEventSubscription;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -93,7 +93,7 @@ class IntegrationEventDispatcher
 
         $message = self::buildMessage($eventType, $payload);
 
-        $response = Http::post($webhookUrl, [
+        return app(WebhookClient::class)->post($webhookUrl, [
             'embeds' => [[
                 'title'       => $message['title'],
                 'description' => $message['body'],
@@ -102,8 +102,6 @@ class IntegrationEventDispatcher
                 'footer'      => ['text' => 'Intellipost'],
             ]],
         ]);
-
-        return ['http_status' => $response->status()];
     }
 
     private static function deliverSlack(IntegrationEventSubscription $sub, string $eventType, array $payload): array
@@ -113,7 +111,7 @@ class IntegrationEventDispatcher
 
         $message = self::buildMessage($eventType, $payload);
 
-        $response = Http::post($webhookUrl, [
+        return app(WebhookClient::class)->post($webhookUrl, [
             'text'        => "*{$message['title']}*",
             'attachments' => [[
                 'text'    => $message['body'],
@@ -122,8 +120,6 @@ class IntegrationEventDispatcher
                 'ts'      => time(),
             ]],
         ]);
-
-        return ['http_status' => $response->status()];
     }
 
     private static function deliverTelegram(IntegrationEventSubscription $sub, string $eventType, array $payload): array
@@ -138,13 +134,11 @@ class IntegrationEventDispatcher
         $message = self::buildMessage($eventType, $payload);
         $text = "*{$message['title']}*\n{$message['body']}";
 
-        $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+        return app(WebhookClient::class)->post("https://api.telegram.org/bot{$botToken}/sendMessage", [
             'chat_id'    => $chatId,
             'text'       => $text,
             'parse_mode' => 'Markdown',
         ]);
-
-        return ['http_status' => $response->status()];
     }
 
     private static function deliverTeams(IntegrationEventSubscription $sub, string $eventType, array $payload): array
@@ -154,7 +148,7 @@ class IntegrationEventDispatcher
 
         $message = self::buildMessage($eventType, $payload);
 
-        $response = Http::post($webhookUrl, [
+        return app(WebhookClient::class)->post($webhookUrl, [
             '@type'      => 'MessageCard',
             '@context'   => 'http://schema.org/extensions',
             'themeColor' => '6366f1',
@@ -164,8 +158,6 @@ class IntegrationEventDispatcher
                 'activityText'  => $message['body'],
             ]],
         ]);
-
-        return ['http_status' => $response->status()];
     }
 
     private static function deliverWebhook(IntegrationEventSubscription $sub, string $eventType, array $payload): array
@@ -181,15 +173,14 @@ class IntegrationEventDispatcher
             'payload'   => $payload,
         ];
 
-        $request = Http::withHeaders(['Content-Type' => 'application/json']);
+        $headers = ['Content-Type' => 'application/json'];
 
         if ($secret) {
             $signature = hash_hmac('sha256', json_encode($body), $secret);
-            $request   = $request->withHeaders(['X-Signature' => $signature]);
+            $headers['X-Signature'] = $signature;
         }
 
-        $response = $request->post($url, $body);
-        return ['http_status' => $response->status()];
+        return app(WebhookClient::class)->post($url, $body, $headers);
     }
 
     private static function deliverEmail(IntegrationEventSubscription $sub, string $eventType, array $payload): array

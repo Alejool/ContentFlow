@@ -222,20 +222,15 @@ class CDNService
     {
         try {
             $urls = array_map(fn($p) => $this->getPublicUrl($p), $paths);
-            
-            $response = \Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('cdn.cloudflare_api_token'),
-                'Content-Type' => 'application/json',
-            ])->post("https://api.cloudflare.com/client/v4/zones/" . config('cdn.cloudflare_zone_id') . "/purge_cache", [
-                'files' => $urls,
-            ]);
-            
-            if ($response->successful()) {
+
+            $response = app(\App\Integrations\CDN\CloudflareClient::class)->purgeFiles($urls);
+
+            if ($response['successful']) {
                 Log::info('Cloudflare cache purged', ['paths' => $paths]);
                 return true;
             }
-            
-            Log::error('Cloudflare purge failed', ['response' => $response->body()]);
+
+            Log::error('Cloudflare purge failed', ['response' => $response['body']]);
             return false;
         } catch (\Exception $e) {
             Log::error('Cloudflare purge failed', ['error' => $e->getMessage()]);
