@@ -57,6 +57,9 @@ export const onboardingService = {
   restart: (): Promise<OnboardingActionResponse> =>
     axios.post('/api/v1/onboarding/restart').then((r) => r.data),
 
+  getState: (): Promise<Record<string, unknown> | undefined> =>
+    axios.get('/api/v1/onboarding/state').then((r) => r.data?.state),
+
   updateTourStep: (step: number): Promise<void> =>
     axios.post('/api/v1/onboarding/tour/step', { step }).then(() => undefined),
 

@@ -84,8 +84,10 @@ export const publicationService = {
       .post(route('api.v1.publications.unpublish', id), payload)
       .then((r) => r.data),
 
-  cancel: (id: number): Promise<void> =>
-    axios.post(route('api.v1.publications.cancel', id)).then(() => undefined),
+  cancel: (id: number, platformIds?: number[]): Promise<void> =>
+    axios
+      .post(route('api.v1.publications.cancel', id), platformIds ? { platform_ids: platformIds } : {})
+      .then(() => undefined),
 
   lock: (id: number, reason: string) =>
     axios

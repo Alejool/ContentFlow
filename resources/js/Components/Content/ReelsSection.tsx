@@ -3,7 +3,8 @@ import Label from '@/Components/common/Modern/Label';
 import { useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
 import { useFileAccess } from '@/Hooks/Upload/useSignedUrls';
 import { ReelVideoThumbnail } from '@/Components/Content/ReelVideoThumbnail';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
+import { reelService } from '@/Services/Reels/reelService';
 import { Download, ExternalLink, Film, Loader2, Play, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -76,7 +77,7 @@ export default function ReelsSection({
 
     setDeletingId(reelId);
     try {
-      await axios.delete(`/api/v1/media/${reelId}`);
+      await publicationService.deleteMedia(reelId);
       toast.success(t('reels.messages.reelDeleted'));
       onReelsDeleted?.();
     } catch (error) {
@@ -143,7 +144,7 @@ export default function ReelsSection({
     setGenerating(true);
 
     try {
-      await axios.post('/api/v1/reels/generate', {
+      await reelService.generate({
         media_file_id: videoFile.id,
         publication_id: publicationId,
         platforms: ['instagram'], // Single platform by default
@@ -175,7 +176,7 @@ export default function ReelsSection({
 
     try {
       // Delete all reels
-      await Promise.all(generatedReels.map((reel) => axios.delete(`/api/v1/media/${reel.id}`)));
+      await Promise.all(generatedReels.map((reel) => publicationService.deleteMedia(reel.id)));
 
       toast.success(t('reels.messages.deleted'));
       onReelsDeleted?.();

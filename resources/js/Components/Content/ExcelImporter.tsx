@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import Modal from '@/Components/common/ui/Modal';
 import ModalFooter from '@/Components/Content/modals/common/ModalFooter';
 import ModalHeader from '@/Components/Content/modals/common/ModalHeader';
-import axios from 'axios';
+import { excelImportService } from '@/Services/Imports/excelImportService';
 import { AlertCircle, CheckCircle, Download, FileSpreadsheet, Upload, X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -38,12 +38,9 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
 
   const handleDownloadTemplate = async () => {
     try {
-      const endpoint = `/api/v1/excel/templates/${type}`;
-      const response = await axios.get(endpoint, {
-        responseType: 'blob',
-      });
+      const blob = await excelImportService.downloadTemplate(type);
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `plantilla_${type}.xlsx`);
@@ -114,30 +111,23 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
     }
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
 
     try {
-      const endpoint = `/api/v1/excel/import/${type}`;
-      const response = await axios.post<ImportResult>(endpoint, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const importResult = await excelImportService.import<ImportResult>(type, file);
 
-      setResult(response.data);
+      setResult(importResult);
 
-      if (response.data.success && response.data.data?.failed_count === 0) {
+      if (importResult.success && importResult.data?.failed_count === 0) {
         toast.success(
-          `${t('excel.importSuccess') || 'Importación exitosa'}: ${response.data.data.success_count} ${type === 'publications' ? t('excel.publications') || 'publicaciones' : t('excel.campaigns') || 'campañas'}`,
+          `${t('excel.importSuccess') || 'Importación exitosa'}: ${importResult.data.success_count} ${type === 'publications' ? t('excel.publications') || 'publicaciones' : t('excel.campaigns') || 'campañas'}`,
         );
         setTimeout(() => {
           onSuccess();
           handleClose();
         }, 2000);
-      } else if (response.data.data?.failed_count > 0) {
+      } else if (importResult.data?.failed_count > 0) {
         toast.error(
-          `${t('excel.importPartial') || 'Importación parcial'}: ${response.data.data.success_count} ${t('excel.successful') || 'exitosos'}, ${response.data.data.failed_count} ${t('excel.failed') || 'fallidos'}`,
+          `${t('excel.importPartial') || 'Importación parcial'}: ${importResult.data.success_count} ${t('excel.successful') || 'exitosos'}, ${importResult.data.failed_count} ${t('excel.failed') || 'fallidos'}`,
         );
       }
     } catch (error: any) {

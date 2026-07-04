@@ -5,4 +5,7 @@ export const subscriptionService = {
     axios
       .get('/api/v1/subscription/current-usage', { params: { _t: Date.now() } })
       .then((r) => r.data),
+
+  listPlans: <TPlan = unknown>(): Promise<TPlan[]> =>
+    axios.get('/api/v1/plans').then((r) => r.data),
 };

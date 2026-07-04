@@ -5,7 +5,7 @@ import { useConfirm } from '@/Hooks/common/useConfirm';
 import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -112,7 +112,7 @@ export default function GlobalUploadIndicator() {
     });
     if (!ok) return;
     try {
-      await axios.post(route('api.v1.publications.cancel', id));
+      await publicationService.cancel(id);
     } catch {}
   };
 
@@ -130,9 +130,7 @@ export default function GlobalUploadIndicator() {
     });
     if (!ok) return;
     try {
-      await axios.post(route('api.v1.publications.cancel', publicationId), {
-        platform_ids: [platformId],
-      });
+      await publicationService.cancel(publicationId, [platformId]);
       window.dispatchEvent(
         new CustomEvent('publication-cancelled', { detail: { publicationId, platformId } }),
       );
