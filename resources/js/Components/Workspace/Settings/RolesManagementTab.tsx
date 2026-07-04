@@ -13,7 +13,7 @@ import {
 import type { Permission, Role, RolesManagementTabProps } from '@/types/Workspace/rolesManagement';
 import { getRoleConfig, getRoleLabel } from '@/Utils/Roles/roleHelpers';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { roleService } from '@/Services/Roles/roleService';
 import {
   AlertCircle, ChevronDown, ChevronUp, Edit2,
   Search, Shield, ShieldAlert, Trash2, Users,
@@ -298,12 +298,12 @@ export default function RolesManagementTab({
     if (!editingRole) return;
     setIsLoading(true);
     try {
-      const res = await axios.put(route('api.v1.workspaces.roles.update', { idOrSlug: workspace.id, role: editingRole.id }), {
+      const res = await roleService.update(workspace.id, editingRole.id, {
         permission_ids: selectedPermissions,
         color_hex: editColor,
       });
 
-      const colorSaved: boolean = res.data?.data?.color_saved ?? false;
+      const colorSaved: boolean = res.data?.color_saved ?? false;
 
       if (!colorSaved && editColor !== (editingRole.color_hex ?? '#6366f1')) {
         // color_hex DB column missing (migration pending) — warn user
@@ -316,7 +316,7 @@ export default function RolesManagementTab({
       router.reload({ only: ['roles'] });
       closeEditModal();
     } catch (err: unknown) {
-      const msg = axios.isAxiosError(err) ? (err.response?.data as { message?: string })?.message : undefined;
+      const msg = (err as { response?: { data?: { message?: string } } }).response?.data?.message;
       toast.error(msg ?? t('roles.errors.update_failed'));
     } finally {
       setIsLoading(false);
@@ -327,12 +327,12 @@ export default function RolesManagementTab({
     if (!deletingRole) return;
     setIsLoading(true);
     try {
-      await axios.delete(route('api.v1.workspaces.roles.destroy', { idOrSlug: workspace.id, role: deletingRole.id }));
+      await roleService.destroy(workspace.id, deletingRole.id);
       toast.success(t('roles.success.deleted'));
       router.reload({ only: ['roles'] });
       closeDeleteModal();
     } catch (err: unknown) {
-      const msg = axios.isAxiosError(err) ? (err.response?.data as { message?: string })?.message : undefined;
+      const msg = (err as { response?: { data?: { message?: string } } }).response?.data?.message;
       toast.error(msg ?? t('roles.errors.delete_failed'));
     } finally { setIsLoading(false); }
   };

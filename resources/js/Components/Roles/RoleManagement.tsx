@@ -2,7 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import Select from '@/Components/common/Modern/Select';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { roleService } from '@/Services/Roles/roleService';
 import { Edit2, Shield, User, UserCheck, UserX } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -65,10 +65,7 @@ export default function RoleManagement({
 
     try {
       setIsLoading(true);
-      await axios.post(route('api.v1.workspaces.roles.assign', { idOrSlug: workspace.id }), {
-        user_id: userId,
-        role_id: roleId,
-      });
+      await roleService.assign(workspace.id, userId, roleId);
 
       toast.success(t('roles.success.assigned'));
       router.reload({ only: ['users'] });
@@ -89,15 +86,7 @@ export default function RoleManagement({
   const handleSaveRole = async (roleId: number, permissionIds: number[]) => {
     try {
       setIsLoading(true);
-      await axios.put(
-        route('api.v1.workspaces.roles.update', {
-          idOrSlug: workspace.id,
-          role: roleId,
-        }),
-        {
-          permission_ids: permissionIds,
-        },
-      );
+      await roleService.update(workspace.id, roleId, { permission_ids: permissionIds });
 
       toast.success(t('roles.success.updated'));
       router.reload({ only: ['roles'] });

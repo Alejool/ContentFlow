@@ -4,7 +4,7 @@ import Textarea from '@/Components/common/Modern/Textarea';
 import Modal from '@/Components/common/ui/Modal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createRoleSchema, type CreateRoleFormData } from '@/schemas/Roles/createRole';
-import axios from 'axios';
+import { roleService } from '@/Services/Roles/roleService';
 import { CheckSquare, Save, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -58,8 +58,8 @@ export default function CreateRoleModal({
   const fetchPermissions = async () => {
     try {
       setIsLoadingPermissions(true);
-      const response = await axios.get(route('api.v1.workspaces.permissions', workspace.id));
-      setAllPermissions(response.data.data || []);
+      const permissions = await roleService.listPermissions<any>(workspace.id);
+      setAllPermissions(permissions);
     } catch (error) {
       toast.error(t('workspace.roles_management.role_created_error'));
     } finally {
@@ -75,9 +75,9 @@ export default function CreateRoleModal({
 
   const onSubmit = async (data: CreateRoleFormData) => {
     try {
-      const response = await axios.post(route('api.v1.workspaces.roles.store', workspace.id), data);
+      const response = await roleService.create(workspace.id, data);
       toast.success(t('workspace.roles_management.role_created_success'));
-      onSuccess(response.data.role);
+      onSuccess(response.role);
       onClose();
       reset();
     } catch (error: any) {
