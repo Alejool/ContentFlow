@@ -94,6 +94,15 @@ export const approvalService = {
       .put(route('api.v1.workspaces.approval-workflow.configure', { idOrSlug: workspaceId }), data)
       .then((r) => r.data.data),
 
+  submitPublication: (publicationId: number): Promise<Record<string, unknown>> =>
+    axios
+      .post(
+        route('api.v1.approvals.submit'),
+        { publication_id: publicationId },
+        { skipErrorHandler: true } as object,
+      )
+      .then((r) => r.data),
+
   submitForApproval: (contentId: number): Promise<{ data: unknown }> =>
     axios
       .post(route('api.content.submit-for-approval', contentId), {}, { skipErrorHandler: true } as object)

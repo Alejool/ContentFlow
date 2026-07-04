@@ -1,5 +1,5 @@
 import type { CalendarEvent, CalendarFilters, CalendarView, DataConflict } from '@/types/Calendar/calendar';
-import axios from 'axios';
+import { calendarService } from '@/Services/Calendar/calendarService';
 import {
     addDays,
     addMonths,
@@ -202,12 +202,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         params.statuses = filters.statuses.join(',');
       }
 
-      const response = await axios.get(route('api.v1.calendar.events'), {
-        params,
-      });
+      const events = await calendarService.getEvents<CalendarEvent>(params);
 
       set({
-        events: response.data.data || [],
+        events,
         isLoading: false,
       });
     } catch (error) {
@@ -256,7 +254,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       // Get current event for conflict detection
       const currentEvent = get().events.find((ev) => ev.id === id);
 
-      await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
+      await calendarService.updateEvent(resourceId as string, {
         scheduled_at: newDate,
         type: eventType,
         current_version: currentEvent?.extendedProps?.version || null,
@@ -312,13 +310,9 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkUpdateEvents: async (eventIds, newDate) => {
     try {
-      const response = await axios.post('/api/v1/calendar/bulk-update', {
-        event_ids: eventIds,
-        new_date: newDate,
-        operation: 'move',
-      });
+      const response = await calendarService.bulkUpdate(eventIds, newDate, 'move');
 
-      if (response.data.success) {
+      if (response.success) {
         // Update local state
         const events = get().events.map((ev) =>
           eventIds.includes(ev.id) ? { ...ev, start: newDate } : ev,
@@ -327,7 +321,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
           events,
           selectedEvents: new Set(),
           canUndo: true,
-          lastBulkOperation: response.data.data,
+          lastBulkOperation: response.data ?? null,
           lastBulkOperationTime: new Date(),
         });
 
@@ -346,20 +340,20 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkDeleteEvents: async (eventIds) => {
     try {
-      const response = await axios.post('/api/v1/calendar/bulk-update', {
-        event_ids: eventIds,
-        new_date: new Date().toISOString(), // Not used for delete
-        operation: 'delete',
-      });
+      const response = await calendarService.bulkUpdate(
+        eventIds,
+        new Date().toISOString(), // Not used for delete
+        'delete',
+      );
 
-      if (response.data.success) {
+      if (response.success) {
         // Remove deleted events from local state
         const events = get().events.filter((ev) => !eventIds.includes(ev.id));
         set({
           events,
           selectedEvents: new Set(),
           canUndo: true,
-          lastBulkOperation: response.data.data,
+          lastBulkOperation: response.data ?? null,
           lastBulkOperationTime: new Date(),
         });
 
@@ -378,9 +372,9 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   undoBulkOperation: async () => {
     try {
-      const response = await axios.post('/api/v1/calendar/bulk-undo');
+      const response = await calendarService.bulkUndo();
 
-      if (response.data.success) {
+      if (response.success) {
         // Refresh events to get the restored state
         await get().fetchEvents();
         set({
@@ -420,17 +414,14 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       // Parse event ID to determine type
       const parts = id.split('_');
       const type = parts[0]; // 'post', 'user', or 'publication'
-      const resourceId = parts[parts.length - 1]; // Get the last part as resource ID
+      const resourceId = parts[parts.length - 1] ?? ''; // Get the last part as resource ID
 
-      if (type === 'user') {
-        // Delete user event
-        await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
-      } else if (type === 'post') {
+      if (type === 'post') {
         // Delete scheduled post
-        await axios.delete(`/api/v1/scheduled-posts/${resourceId}`);
+        await calendarService.deleteScheduledPost(resourceId);
       } else {
-        // For other types, try user-events endpoint as fallback
-        await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
+        // User events — and fallback for any other type
+        await calendarService.deleteUserEvent(resourceId);
       }
 
       // Remove from local state
@@ -450,17 +441,17 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   exportToGoogleCalendar: async () => {
     try {
       const { events } = get();
-      const response = await axios.post('/api/v1/calendar/export/google', {
-        events: events.map((e) => ({
+      const response = await calendarService.exportToGoogle(
+        events.map((e) => ({
           title: e.title,
           start: e.start,
           end: e.end,
           description: `Status: ${e.status}`,
         })),
-      });
+      );
 
-      if (response.data.url) {
-        window.open(response.data.url, '_blank');
+      if (response.url) {
+        window.open(response.url, '_blank');
       }
     } catch (error) {
       set({
@@ -472,17 +463,17 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   exportToOutlook: async () => {
     try {
       const { events } = get();
-      const response = await axios.post('/api/v1/calendar/export/outlook', {
-        events: events.map((e) => ({
+      const response = await calendarService.exportToOutlook(
+        events.map((e) => ({
           title: e.title,
           start: e.start,
           end: e.end,
           description: `Status: ${e.status}`,
         })),
-      });
+      );
 
-      if (response.data.url) {
-        window.open(response.data.url, '_blank');
+      if (response.url) {
+        window.open(response.url, '_blank');
       }
     } catch (error) {
       set({
@@ -555,7 +546,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     try {
       const resourceId = conflict.eventId.split('_').pop();
 
-      await axios.post(`/api/v1/calendar/events/${resourceId}/resolve-conflict`, {
+      await calendarService.resolveConflict(resourceId as string, {
         resolution,
         field: conflict.field,
         value: resolution === 'local' ? conflict.localValue : conflict.serverValue,

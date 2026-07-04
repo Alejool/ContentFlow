@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { notificationService } from '@/Services/Notifications/notificationService';
 import { create } from 'zustand';
 
 export type NotificationTypeFilter =
@@ -71,8 +71,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   fetchNotifications: async () => {
     set({ isLoading: true });
     try {
-      const response = await axios.get('/api/v1/notifications');
-      const notifications = response.data.notifications.sort(
+      const response = await notificationService.list<NotificationData>();
+      const notifications = response.notifications.sort(
         (a: NotificationData, b: NotificationData) => {
           // Sort by read status (unread first)
           if (a.read_at === null && b.read_at !== null) return -1;
@@ -83,7 +83,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         },
       );
 
-      const unreadCount = response.data.unread_count;
+      const unreadCount = response.unread_count;
 
       const applicationNotifications = notifications.filter(
         (n: NotificationData) => n.category === 'application' || n.data.category === 'application',
@@ -108,7 +108,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   markAsRead: async (id: string) => {
     try {
-      await axios.post(`/api/v1/notifications/${id}/read`);
+      await notificationService.markAsRead(id);
       set((state) => {
         const updatedNotifications = state.notifications.map((n) =>
           n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
@@ -133,7 +133,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   markAllAsRead: async () => {
     try {
-      await axios.post('/api/v1/notifications/read-all');
+      await notificationService.markAllAsRead();
       set((state) => {
         const updatedNotifications = state.notifications.map((n) => ({
           ...n,
@@ -156,7 +156,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   deleteNotification: async (id: string) => {
     try {
-      await axios.delete(`/api/v1/notifications/${id}`);
+      await notificationService.delete(id);
       set((state) => {
         const notification = state.notifications.find((n) => n.id === id);
         const updatedNotifications = state.notifications.filter((n) => n.id !== id);

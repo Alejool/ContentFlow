@@ -1,5 +1,5 @@
+import { addonService } from '@/Services/Addons/addonService';
 import type { AddonsSummaryData } from '@/types/Addons/addon';
-import axios from 'axios';
 import { create } from 'zustand';
 
 interface AddonsSummaryState {
@@ -18,12 +18,13 @@ export const useAddonsSummaryStore = create<AddonsSummaryState>((set) => ({
   fetchSummary: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get<AddonsSummaryData>('/api/v1/addons/summary');
-      set({ data: response.data, loading: false });
-    } catch (error: any) {
+      const data = await addonService.getSummary();
+      set({ data, loading: false });
+    } catch (error) {
       console.error('Error fetching addons summary:', error);
+      const axiosError = error as { response?: { data?: { message?: string } } };
       set({
-        error: error.response?.data?.message || 'Error al cargar el resumen de addons',
+        error: axiosError.response?.data?.message || 'Error al cargar el resumen de addons',
         loading: false,
       });
     }

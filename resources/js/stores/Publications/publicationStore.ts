@@ -2,7 +2,7 @@ import { publicationService } from '@/Services/Publications/publicationService';
 import { useCalendarStore } from '@/stores/Calendar/calendarStore';
 import { useContentPaginationStore } from '@/stores/Content/contentPaginationStore';
 import type { Publication } from '@/types/Publications/Publication';
-import { type AxiosError } from 'axios';
+type AxiosError<T> = { response?: { data?: T }; message?: string };
 import { create } from 'zustand';
 
 interface PublicationState {

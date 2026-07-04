@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { logService } from '@/Services/Admin/logService';
 import { create } from 'zustand';
 
 interface LogState {
@@ -16,64 +16,36 @@ interface LogState {
   reset: () => void;
 }
 
+const emptyPagination = {
+  current_page: 1,
+  last_page: 1,
+  total: 0,
+  per_page: 10,
+};
+
 export const useLogStore = create<LogState>((set) => ({
   logs: [],
-  pagination: {
-    current_page: 1,
-    last_page: 1,
-    total: 0,
-    per_page: 10,
-  },
+  pagination: emptyPagination,
   isLoading: false,
   error: null,
 
   fetchLogs: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
     try {
-      // Limpiar filtros vacíos
-      const cleanFilters = Object.entries(filters).reduce(
-        (acc, [key, value]) => {
-          if (Array.isArray(value) && value.length > 0) {
-            acc[key] = value;
-          } else if (value && !Array.isArray(value) && value !== 'all') {
-            acc[key] = value;
-          }
-          return acc;
-        },
-        {} as Record<string, unknown>,
-      );
-      const response = await axios.get('/api/v1/logs', {
-        params: { ...cleanFilters, page },
-        paramsSerializer: {
-          indexes: null,
-          serialize: (params) => {
-            const searchParams = new URLSearchParams();
-            Object.entries(params).forEach(([key, value]) => {
-              if (Array.isArray(value)) {
-                value.forEach((v) => searchParams.append(`${key}[]`, String(v)));
-              } else if (value !== null && value !== undefined) {
-                searchParams.append(key, String(value));
-              }
-            });
-            return searchParams.toString();
-          },
-        },
-      });
-      if (response.data.success) {
+      const response = await logService.list(filters, page);
+      if (response.success) {
         set({
-          logs: response.data.logs.data,
+          logs: response.logs.data,
           pagination: {
-            current_page: response.data.logs.current_page,
-            last_page: response.data.logs.last_page,
-            total: response.data.logs.total,
-            per_page: response.data.logs.per_page,
+            current_page: response.logs.current_page,
+            last_page: response.logs.last_page,
+            total: response.logs.total,
+            per_page: response.logs.per_page,
           },
         });
       }
     } catch (error) {
-      set({
-        error: error.message ?? 'Failed to fetch logs',
-      });
+      set({ error: (error as Error).message ?? 'Failed to fetch logs' });
     } finally {
       set({ isLoading: false });
     }
@@ -82,12 +54,7 @@ export const useLogStore = create<LogState>((set) => ({
   reset: () =>
     set({
       logs: [],
-      pagination: {
-        current_page: 1,
-        last_page: 1,
-        total: 0,
-        per_page: 10,
-      },
+      pagination: emptyPagination,
       isLoading: false,
       error: null,
     }),

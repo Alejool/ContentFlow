@@ -1,5 +1,5 @@
+import { timezoneService } from '@/Services/common/timezoneService';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
 import { create } from 'zustand';
 
 /**
@@ -85,20 +85,20 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Cargar timezones desde API (fallback)
   loadTimezones: async () => {
     try {
-      const [workspaceRes, userRes] = await Promise.all([
-        axios.get('/api/v1/workspace/timezone').catch(() => ({ data: { timezone: null } })),
-        axios.get('/api/v1/timezone').catch(() => ({ data: { timezone: null } })),
+      const [workspaceTimezone, userTimezone] = await Promise.all([
+        timezoneService.getWorkspaceTimezone(),
+        timezoneService.getUserTimezone(),
       ]);
 
       set({
-        workspaceTimezone: sanitizeTimezone(workspaceRes.data.timezone) || null,
-        userTimezone: sanitizeTimezone(userRes.data.timezone) || null,
+        workspaceTimezone: sanitizeTimezone(workspaceTimezone) || null,
+        userTimezone: sanitizeTimezone(userTimezone) || null,
         isLoaded: true,
       });
 
       console.log('✅ Timezones loaded from API:', {
-        workspace: workspaceRes.data.timezone,
-        user: userRes.data.timezone,
+        workspace: workspaceTimezone,
+        user: userTimezone,
         effective: get().effectiveTimezone(),
       });
     } catch (error) {
@@ -110,7 +110,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Actualizar timezone del workspace (solo admin)
   updateWorkspaceTimezone: async (timezone: string) => {
     try {
-      await axios.patch('/api/v1/workspace/timezone', { timezone });
+      await timezoneService.updateWorkspaceTimezone(timezone);
       set({ workspaceTimezone: timezone });
 
       // Recargar la página para aplicar cambios en toda la app
@@ -124,7 +124,7 @@ export const useTimezoneStore = create<TimezoneState>((set, get) => ({
   // Actualizar timezone del usuario
   updateUserTimezone: async (timezone: string) => {
     try {
-      await axios.patch('/api/v1/timezone', { timezone });
+      await timezoneService.updateUserTimezone(timezone);
       set({ userTimezone: timezone });
     } catch (error) {
       console.error('Error updating user timezone:', error);

@@ -9,7 +9,7 @@ import type { RetryOptions } from '@/Utils/common/networkErrorHandler';
 import { offlineQueue } from '@/Utils/Offline/offlineQueue';
 import type { QueuedAction } from '@/Utils/Offline/offlineQueue';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { onboardingService } from '@/Services/Onboarding/onboardingService';
 import { create } from 'zustand';
 
 // LocalStorage cache key
@@ -305,19 +305,20 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         clearCachedState();
 
         // Call backend to restart onboarding
-        axios
-          .post('/api/v1/onboarding/restart')
+        onboardingService
+          .restart()
           .then((response) => {
             // Update local state with clean state from backend
-            if (response.data.state) {
+            const state = response.state as Record<string, unknown> | undefined;
+            if (state) {
               set({
-                tourCurrentStep: response.data.state.tourCurrentStep || 0,
-                tourCompleted: response.data.state.tourCompleted || false,
-                tourSkipped: response.data.state.tourSkipped || false,
-                tourCompletedSteps: response.data.state.tourCompletedSteps || [],
-                wizardCurrentStep: response.data.state.wizardCurrentStep || 0,
-                wizardCompleted: response.data.state.wizardCompleted || false,
-                wizardSkipped: response.data.state.wizardSkipped || false,
+                tourCurrentStep: (state['tourCurrentStep'] as number) || 0,
+                tourCompleted: (state['tourCompleted'] as boolean) || false,
+                tourSkipped: (state['tourSkipped'] as boolean) || false,
+                tourCompletedSteps: (state['tourCompletedSteps'] as string[]) || [],
+                wizardCurrentStep: (state['wizardCurrentStep'] as number) || 0,
+                wizardCompleted: (state['wizardCompleted'] as boolean) || false,
+                wizardSkipped: (state['wizardSkipped'] as boolean) || false,
               });
               get()._updateCache();
             }
@@ -326,7 +327,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
               window.location.reload();
             }, 500);
           })
-          .catch((error) => {
+          .catch(() => {
             // Fallback: just reload the page
             window.location.reload();
           });
@@ -346,8 +347,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       // Optionally sync with backend asynchronously (non-blocking)
       // This ensures the step is saved even if navigation happens
       if (!get().isOffline) {
-        // Use axios which is already configured with CSRF token
-        axios.post('/api/v1/onboarding/tour/step', { step: newStep }).catch(() => {
+        onboardingService.updateTourStep(newStep).catch(() => {
           // Don't block or rollback - local state is source of truth during tour
         });
       }
@@ -767,72 +767,27 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
           throw createNetworkError('No internet connection');
         }
 
-        let endpoint = '';
-        let data: Record<string, unknown> = {};
-
-        switch (type) {
-          case 'completeBusinessInfo':
-            endpoint = '/api/v1/onboarding/business-info/complete';
-            data = payload;
-            break;
-          case 'selectPlan':
-            endpoint = '/api/v1/onboarding/plan/select';
-            data = { plan_id: payload.planId };
-            break;
-          case 'skipTour':
-            endpoint = '/api/v1/onboarding/tour/skip';
-            break;
-          case 'completeTourStep':
-            endpoint = '/api/v1/onboarding/tour/complete';
-            data = { step_id: payload.stepId };
-            break;
-          case 'dismissTooltip':
-            endpoint = '/api/v1/onboarding/tooltip/dismiss';
-            data = { tooltip_id: payload.tooltipId };
-            break;
-          case 'completeWizardStep':
-            endpoint = '/api/v1/onboarding/wizard/complete';
-            data = { step_id: payload.stepId, data: payload.data };
-            break;
-          case 'skipWizard':
-            endpoint = '/api/v1/onboarding/wizard/skip';
-            break;
-          case 'selectTemplate':
-            endpoint = '/api/v1/onboarding/template/select';
-            data = { template_id: payload.templateId };
-            break;
-          default:
-            throw new Error(`Unknown action type: ${type}`);
-        }
-
-        // Use axios for API calls instead of Inertia router
-        const response = await axios.post(endpoint, data);
+        const response = await onboardingService.performAction(type, payload);
+        const state = response.state as Record<string, unknown> | undefined;
 
         // Update state with response data if available
-        if (response.data?.state) {
+        if (state) {
           // Transform snake_case to camelCase
           const transformedState = {
-            tourCompleted: response.data.state.tourCompleted ?? response.data.state.tour_completed,
-            tourSkipped: response.data.state.tourSkipped ?? response.data.state.tour_skipped,
-            tourCurrentStep:
-              response.data.state.tourCurrentStep ?? response.data.state.tour_current_step,
-            tourCompletedSteps:
-              response.data.state.tourCompletedSteps ?? response.data.state.tour_completed_steps,
-            wizardCompleted:
-              response.data.state.wizardCompleted ?? response.data.state.wizard_completed,
-            wizardSkipped: response.data.state.wizardSkipped ?? response.data.state.wizard_skipped,
-            wizardCurrentStep:
-              response.data.state.wizardCurrentStep ?? response.data.state.wizard_current_step,
-            templateSelected:
-              response.data.state.templateSelected ?? response.data.state.template_selected,
-            templateId: response.data.state.templateId ?? response.data.state.template_id,
-            dismissedTooltips:
-              response.data.state.dismissedTooltips ?? response.data.state.dismissed_tooltips,
-            completedAt: response.data.state.completedAt ?? response.data.state.completed_at,
-            startedAt: response.data.state.startedAt ?? response.data.state.started_at,
-            completionPercentage:
-              response.data.state.completionPercentage ?? response.data.state.completion_percentage,
-          };
+            tourCompleted: state['tourCompleted'] ?? state['tour_completed'],
+            tourSkipped: state['tourSkipped'] ?? state['tour_skipped'],
+            tourCurrentStep: state['tourCurrentStep'] ?? state['tour_current_step'],
+            tourCompletedSteps: state['tourCompletedSteps'] ?? state['tour_completed_steps'],
+            wizardCompleted: state['wizardCompleted'] ?? state['wizard_completed'],
+            wizardSkipped: state['wizardSkipped'] ?? state['wizard_skipped'],
+            wizardCurrentStep: state['wizardCurrentStep'] ?? state['wizard_current_step'],
+            templateSelected: state['templateSelected'] ?? state['template_selected'],
+            templateId: state['templateId'] ?? state['template_id'],
+            dismissedTooltips: state['dismissedTooltips'] ?? state['dismissed_tooltips'],
+            completedAt: state['completedAt'] ?? state['completed_at'],
+            startedAt: state['startedAt'] ?? state['started_at'],
+            completionPercentage: state['completionPercentage'] ?? state['completion_percentage'],
+          } as Partial<OnboardingState>;
 
           set(transformedState);
           get()._updateCache();

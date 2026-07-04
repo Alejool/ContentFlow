@@ -1,8 +1,28 @@
+import { approvalService } from '@/Services/Approval/approvalService';
+import type { Publication } from '@/types/Publications/Publication';
+import { userEventService } from '@/Services/Calendar/userEventService';
 import { useManageContentUIStore } from '@/stores/Content/manageContentUIStore';
 import { usePublicationStore } from '@/stores/Publications/publicationStore';
 import { router } from '@inertiajs/react';
-import axios, { AxiosError } from 'axios';
 import { create } from 'zustand';
+
+function apiErrorMessage(error: unknown, fallback: string): string {
+  const axiosError = error as { response?: { data?: { message?: string } } };
+  return axiosError.response?.data?.message || fallback;
+}
+
+interface ApprovalRequestPayload {
+  currentStep?: { level_number?: number | string; level_name?: string };
+  [key: string]: unknown;
+}
+
+interface PublicationPayload {
+  status?: string;
+  current_approval_step_id?: number | null;
+  current_approval_level?: number | null;
+  submitted_for_approval_at?: string | null;
+  [key: string]: unknown;
+}
 
 interface LoadingStates {
   [key: number]: {
@@ -55,30 +75,23 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
 
     try {
       // Nuevo endpoint del sistema simplificado
-      const response = await axios.post(
-        route('api.v1.approvals.submit'),
-        {
-          publication_id: itemId,
-        },
-        { skipErrorHandler: true },
-      );
+      const data = (await approvalService.submitPublication(itemId)) as {
+        data?: { request?: ApprovalRequestPayload; publication?: PublicationPayload };
+        request?: ApprovalRequestPayload;
+        publication?: PublicationPayload;
+      };
 
       // Backend can return either { data: { request, publication } } or { request, publication }
-      const approvalRequest = response.data?.data?.request ?? response.data?.request;
-      const publication = response.data?.data?.publication ?? response.data?.publication;
+      const approvalRequest = data?.data?.request ?? data?.request;
+      const publication = data?.data?.publication ?? data?.publication;
 
       // Actualizar el store de publicaciones con el nuevo estado
       if (publication) {
-
         const updateData = {
           ...publication,
-          status: publication.status,
-          current_approval_step_id: publication.current_approval_step_id,
-          current_approval_level: publication.current_approval_level,
-          submitted_for_approval_at: publication.submitted_for_approval_at,
           // Incluir el approval_request activo para el frontend
           approval_request: approvalRequest,
-        };
+        } as unknown as Partial<Publication>;
 
         // Actualizar la publicación en el store con el nuevo estado
         usePublicationStore.getState().updatePublication(itemId, updateData);
@@ -110,10 +123,9 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
 
       return approvalInfo ? { success: true, approvalInfo } : { success: true };
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
       return {
         success: false,
-        message: axiosError.response?.data?.message || 'Error al enviar a revisión',
+        message: apiErrorMessage(error, 'Error al enviar a revisión'),
       };
     } finally {
       setItemLoading(itemId, 'submitting', false);
@@ -129,11 +141,10 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
       // que viene del componente padre
       return { success: true };
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
       console.error('Error deleting publication:', error);
       return {
         success: false,
-        message: axiosError.response?.data?.message || 'Error al eliminar',
+        message: apiErrorMessage(error, 'Error al eliminar'),
       };
     } finally {
       setItemLoading(itemId, 'deleting', false);
@@ -145,15 +156,14 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
     setItemLoading(itemId, 'deleting', true);
 
     try {
-      await axios.delete(`/api/v1/calendar/user-events/${itemId}`);
+      await userEventService.delete(itemId);
       router.reload({ only: ['publications'] });
       return { success: true, message: 'Evento eliminado' };
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
       console.error('Error deleting user event:', error);
       return {
         success: false,
-        message: axiosError.response?.data?.message || 'Error al eliminar evento',
+        message: apiErrorMessage(error, 'Error al eliminar evento'),
       };
     } finally {
       setItemLoading(itemId, 'deleting', false);
@@ -169,11 +179,10 @@ export const usePublicationActionsStore = create<PublicationActionsStore>((set, 
       // que viene del componente padre
       return { success: true };
     } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string }>;
       console.error('Error duplicating publication:', error);
       return {
         success: false,
-        message: axiosError.response?.data?.message || 'Error al duplicar',
+        message: apiErrorMessage(error, 'Error al duplicar'),
       };
     } finally {
       setItemLoading(itemId, 'duplicating', false);

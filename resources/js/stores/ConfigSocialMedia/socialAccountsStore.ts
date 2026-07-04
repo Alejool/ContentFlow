@@ -1,5 +1,5 @@
+import { socialAccountService } from '@/Services/ConfigSocialMedia/socialAccountService';
 import type { SocialAccount } from '@/types/ConfigSocialMedia/SocialAccount';
-import axios from 'axios';
 import { create } from 'zustand';
 
 interface AccountsStore {
@@ -73,22 +73,16 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
   fetchAccounts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get('/api/v1/social-accounts');
-      const accounts = response.data.accounts || [];
-
-      const processedAccounts = accounts.map((acc: SocialAccount) => ({
-        ...acc,
-        account_name: acc.account_name,
-      }));
+      const accounts = await socialAccountService.list();
 
       set({
-        accounts: processedAccounts,
+        accounts,
         isLoading: false,
         lastUpdated: new Date(),
       });
-      return processedAccounts;
+      return accounts;
     } catch (error) {
-      const axiosError = error as import('axios').AxiosError<{ message?: string }>;
+      const axiosError = error as { response?: { data?: { message?: string } }; message?: string };
       const errorMessage =
         axiosError.response?.data?.message || axiosError.message || 'Failed to fetch accounts';
       set({
