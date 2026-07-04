@@ -10,7 +10,11 @@ use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use App\Http\Requests\Publications\ApprovePublicationRequest;
+use App\Http\Requests\Publications\AttachMediaRequest;
+use App\Http\Requests\Publications\RejectPublicationRequest;
 use App\Http\Requests\Publications\StorePublicationRequest;
+use App\Http\Requests\Publications\SuggestContentTypeRequest;
 use App\Http\Requests\Publications\UpdatePublicationRequest;
 use App\Actions\Publications\CreatePublicationAction;
 use App\Actions\Publications\UpdatePublicationAction;
@@ -1166,7 +1170,7 @@ class PublicationController extends Controller
     return $this->successResponse(['publication' => $publication], 'Publication sent for review and locked for editing.');
   }
 
-  public function approve(Request $request, Publication $publication)
+  public function approve(ApprovePublicationRequest $request, Publication $publication)
   {
     // Check if user has permission to approve (Owner or admin in workspace)
     if (!Auth::user()->hasPermission('approve', $publication->workspace_id)) {
@@ -1185,9 +1189,6 @@ class PublicationController extends Controller
       return $this->errorResponse('Only publications in pending review can be approved.', 422);
     }
 
-    $request->validate([
-      'comment' => 'nullable|string|max:500',
-    ]);
 
     $latestLog = $publication->approvalLogs()
       ->latest('created_at')
@@ -1505,7 +1506,7 @@ class PublicationController extends Controller
 
   /** @var User $user */
 
-  public function reject(Request $request, Publication $publication)
+  public function reject(RejectPublicationRequest $request, Publication $publication)
   {
     /** @var User $user */
     $user = Auth::user();
@@ -1525,13 +1526,6 @@ class PublicationController extends Controller
       return $this->errorResponse('Only publications in pending review can be rejected.', 422);
     }
 
-    $request->validate([
-      'rejection_reason' => 'required|string|min:10|max:500',
-    ], [
-      'rejection_reason.required' => __('validation.rejection_reason_required'),
-      'rejection_reason.min' => __('validation.rejection_reason_min'),
-      'rejection_reason.max' => __('validation.rejection_reason_max'),
-    ]);
 
     // Check if this user already rejected this step
     $approvalRequestForReject = $publication->approvalRequest;
@@ -2046,22 +2040,12 @@ class PublicationController extends Controller
   /**
    * Attach uploaded media to a publication
    */
-  public function attachMedia(Request $request, Publication $publication)
+  public function attachMedia(AttachMediaRequest $request, Publication $publication)
   {
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to modify this publication.', 403);
     }
 
-    $request->validate([
-      'key' => 'required|string',
-      'filename' => 'required|string',
-      'mime_type' => 'required|string',
-      'size' => 'required|integer',
-      'duration' => 'nullable|numeric|min:0',
-      'width' => 'nullable|integer|min:1',
-      'height' => 'nullable|integer|min:1',
-      'aspect_ratio' => 'nullable|numeric|min:0',
-    ]);
 
     try {
       Log::info("📤 attachMedia called", [
@@ -2384,12 +2368,8 @@ class PublicationController extends Controller
    * @param Request $request
    * @return \Illuminate\Http\JsonResponse
    */
-  public function suggestContentType(Request $request)
+  public function suggestContentType(SuggestContentTypeRequest $request)
   {
-    $request->validate([
-      'media' => 'nullable|array',
-      'current_type' => 'nullable|string|in:post,reel,story,carousel,poll',
-    ]);
 
     $mediaFiles = $request->input('media', []);
     $currentType = $request->input('current_type');
