@@ -92,7 +92,7 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
               {formatTimeString(event.start)}
             </span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${dark ? 'bg-white/20 text-white' : 'bg-black/10 text-gray-700'}`}
+              className={`rounded-full px-2 py-0.5 text-2xs font-semibold capitalize ${dark ? 'bg-white/20 text-white' : 'bg-black/10 text-gray-700'}`}
             >
               {event.status}
             </span>
@@ -131,7 +131,7 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`group flex min-h-[90px] border-b border-gray-100 transition-colors dark:border-neutral-800 ${
+      className={`group flex min-h-22.5 border-b border-gray-100 transition-colors dark:border-neutral-800 ${
         isOver ? 'bg-primary-50 dark:bg-primary-900/20' : ''
       }`}
     >
@@ -178,7 +178,7 @@ const DroppableHourSlot: React.FC<DroppableHourSlotProps> = ({
             type="button"
             onClick={handleSlotClick}
             variant="ghost"
-            className="hover:border-primary-300 hover:bg-primary-50 hover:text-primary-500 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 flex h-full min-h-[66px] w-full items-center justify-center rounded-lg border-2 border-dashed border-transparent text-xs text-gray-400 transition-all dark:text-neutral-600"
+            className="hover:border-primary-300 hover:bg-primary-50 hover:text-primary-500 dark:hover:border-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-400 flex h-full min-h-16.5 w-full items-center justify-center rounded-lg border-2 border-dashed border-transparent text-xs text-gray-400 transition-all dark:text-neutral-600"
             icon={<Plus className="h-4 w-4" />}
           >
             {''}

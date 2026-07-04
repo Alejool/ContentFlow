@@ -179,14 +179,14 @@ const PublicationRow = memo(function PublicationRow({
                       return (
                         <span
                           key={platform}
-                          className={`inline-flex items-center rounded border border-gray-100 px-1.5 py-0.5 text-[10px] font-medium dark:border-white/5 ${colorClass}`}
+                          className={`inline-flex items-center rounded border border-gray-100 px-1.5 py-0.5 text-2xs font-medium dark:border-white/5 ${colorClass}`}
                         >
                           {platform.slice(0, 2).toUpperCase()}: {typeLabel}
                         </span>
                       );
                     })}
                   {Object.keys(item.platform_settings).length > 2 && (
-                    <span className="inline-flex items-center rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:border-white/5 dark:bg-white/10 dark:text-neutral-300">
+                    <span className="inline-flex items-center rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 text-2xs font-medium text-gray-600 dark:border-white/5 dark:bg-white/10 dark:text-neutral-300">
                       +{Object.keys(item.platform_settings).length - 2}
                     </span>
                   )}
@@ -201,7 +201,7 @@ const PublicationRow = memo(function PublicationRow({
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                   </span>
                 </div>
-                <span className="text-[10px] font-bold tracking-tight text-amber-700 uppercase dark:text-amber-400">
+                <span className="text-2xs font-bold tracking-tight text-amber-700 uppercase dark:text-amber-400">
                   {t('publications.table.editingBy')} {lockedByName}
                 </span>
               </div>
@@ -212,7 +212,7 @@ const PublicationRow = memo(function PublicationRow({
                   <Clock className="h-2.5 w-2.5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold tracking-tight text-yellow-700 uppercase dark:text-yellow-400">
+                  <span className="text-2xs font-bold tracking-tight text-yellow-700 uppercase dark:text-yellow-400">
                     {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                   </span>
                   {item.current_approval_step?.name && (
@@ -226,7 +226,7 @@ const PublicationRow = memo(function PublicationRow({
             {item.status === 'publishing' && item.publisher && (
               <div className="mt-1 flex items-center gap-1.5">
                 <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-500"></span>
-                <span className="text-[10px] font-bold tracking-tight text-emerald-600 uppercase dark:text-emerald-400">
+                <span className="text-2xs font-bold tracking-tight text-emerald-600 uppercase dark:text-emerald-400">
                   {(() => {
                     const publishingAccounts = connectedAccounts.filter((acc) =>
                       publishingPlatforms.includes(acc.id),
@@ -251,7 +251,7 @@ const PublicationRow = memo(function PublicationRow({
             {item.status === 'rejected' && item.rejector && (
               <div className="mt-1 flex items-center gap-1.5">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-rose-500"></span>
-                <span className="text-[10px] font-bold tracking-tight text-rose-600 uppercase dark:text-rose-400">
+                <span className="text-2xs font-bold tracking-tight text-rose-600 uppercase dark:text-rose-400">
                   {t('publications.table.rejectedBy') || 'Rejected by'} {item.rejector.name}
                 </span>
               </div>
@@ -261,7 +261,7 @@ const PublicationRow = memo(function PublicationRow({
               <div className="mt-1 flex flex-col gap-0.5">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="text-primary-500 h-3 w-3" />
-                  <span className="text-primary-500 text-[10px] font-bold tracking-tight uppercase">
+                  <span className="text-primary-500 text-2xs font-bold tracking-tight uppercase">
                     {(item as Publication & { type?: string }).type === 'user_event'
                       ? t('publications.table.manualEvent')
                       : t('publications.table.socialNetworkEvent')}
@@ -287,7 +287,7 @@ const PublicationRow = memo(function PublicationRow({
               className="shrink-0"
             />
             <div className="ml-3 hidden xl:block">
-              <p className="max-w-[100px] truncate text-sm font-medium text-gray-900 dark:text-white">
+              <p className="max-w-25 truncate text-sm font-medium text-gray-900 dark:text-white">
                 {item.user.name}
               </p>
             </div>
@@ -306,34 +306,34 @@ const PublicationRow = memo(function PublicationRow({
       <td className="px-6 py-4 text-sm text-gray-500">
         <div className="flex items-center gap-2">
           {mediaCount.images > 0 && (
-            <span className="flex items-center rounded border border-gray-100 bg-gray-50 px-1.5 py-0.5 text-[10px] dark:border-white/5 dark:bg-white/5">
+            <span className="flex items-center rounded border border-gray-100 bg-gray-50 px-1.5 py-0.5 text-2xs dark:border-white/5 dark:bg-white/5">
               <Image className="mr-1 h-3 w-3 text-blue-500" /> {mediaCount.images}
             </span>
           )}
           {mediaCount.videos > 0 && (
-            <span className="flex items-center rounded border border-gray-100 bg-gray-50 px-1.5 py-0.5 text-[10px] dark:border-white/5 dark:bg-white/5">
+            <span className="flex items-center rounded border border-gray-100 bg-gray-50 px-1.5 py-0.5 text-2xs dark:border-white/5 dark:bg-white/5">
               <Video className="mr-1 h-3 w-3 text-purple-500" /> {mediaCount.videos}
             </span>
           )}
           {mediaCount.total === 0 && (
-            <span className="text-[10px] text-gray-400">
+            <span className="text-2xs text-gray-400">
               {t('publications.table.noMedia') || 'Sin multimedia'}
             </span>
           )}
         </div>
       </td>
-      <td className="max-w-[120px] px-6 py-4">
+      <td className="max-w-3 px-6 py-4">
         {item.campaigns && item.campaigns.length > 0 ? (
           <div className="flex flex-wrap gap-1">
-            <span className="rounded border border-indigo-100 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400">
+            <span className="rounded border border-indigo-100 bg-indigo-50 px-1.5 py-0.5 text-2xs font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400">
               {item.campaigns.length} {item.campaigns.length === 1 ? 'Campaign' : 'Campaigns'}
             </span>
           </div>
         ) : (
-          <span className="text-[10px] text-gray-400 italic">{t('common.none') || 'Ninguna'}</span>
+          <span className="text-2xs text-gray-400 italic">{t('common.none') || 'Ninguna'}</span>
         )}
       </td>
-      <td className="max-w-[180px] px-6 py-4">
+      <td className="max-w-45 px-6 py-4">
         <SocialAccountsDisplay
           publication={item}
           connectedAccounts={connectedAccounts}

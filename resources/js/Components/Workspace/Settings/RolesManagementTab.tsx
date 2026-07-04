@@ -141,7 +141,7 @@ function RoleCard({
           {/* Badges + actions */}
           <div className="flex items-center gap-1">
             {isProtectedRole(role) && (
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-2xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                 {t('roles.protected')}
               </span>
             )}
@@ -166,7 +166,7 @@ function RoleCard({
 
         {/* Slug */}
         <div className="mb-3 flex items-center gap-2">
-          <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
+          <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
             {role.slug}
           </span>
           {/* Color dot */}
@@ -184,14 +184,14 @@ function RoleCard({
           {role.permissions?.slice(0, 4).map((p) => (
             <span
               key={p.id}
-              className="rounded-md px-2 py-0.5 text-[10px] font-medium"
+              className="rounded-md px-2 py-0.5 text-2xs font-medium"
               style={styles.badge}
             >
               {p.display_name ?? p.name}
             </span>
           ))}
           {(role.permissions?.length ?? 0) > 4 && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
+            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-2xs font-medium text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
               +{(role.permissions?.length ?? 0) - 4}
             </span>
           )}

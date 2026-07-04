@@ -377,7 +377,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                             {/* Status badge */}
                             <div className="absolute top-4 right-4 z-10">
                               <div
-                                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-tight uppercase transition-colors ${
+                                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-2xs font-bold tracking-tight uppercase transition-colors ${
                                   account.isConnected
                                     ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/80 dark:bg-emerald-900/30 dark:text-emerald-400'
                                     : 'border-gray-100 bg-gray-50 text-gray-500 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-400'
@@ -455,7 +455,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
 
                               {account.isConnected && account.accountDetails ? (
                                 <div className="mt-1.5 flex flex-col items-center gap-1">
-                                  <p className="rounded-full border border-gray-100 bg-gray-50 px-2 py-0.5 text-[10px] font-bold text-gray-500 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:text-neutral-400">
+                                  <p className="rounded-full border border-gray-100 bg-gray-50 px-2 py-0.5 text-2xs font-bold text-gray-500 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:text-neutral-400">
                                     {account.accountDetails.account_metadata?.username
                                       ? `@${account.accountDetails.account_metadata.username}`
                                       : `ID: ${account.accountDetails.account_id}`}
@@ -487,41 +487,41 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                 </p>
                                 <div className="space-y-1">
                                   {account.platform.toLowerCase() === 'facebook' && (<>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerHour')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerHour}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerMinute')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerMinute}</span>
                                     </div>
                                   </>)}
                                   {account.platform.toLowerCase() === 'tiktok' && (<>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerDay')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerDay}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.postsPerDay')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.postsPerDay}</span>
                                     </div>
                                   </>)}
                                   {account.platform.toLowerCase() === 'twitter' && (<>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.postsPerThreeHours')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.postsPerThreeHours}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.requestsPerDay')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.requestsPerDay}</span>
                                     </div>
                                   </>)}
                                   {account.platform.toLowerCase() === 'youtube' && (<>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.dailyQuota')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.quotaUnitsPerDay} units</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-[10px]">
+                                    <div className="flex items-center justify-between text-2xs">
                                       <span className="text-gray-600 dark:text-neutral-400">{t('manageContent.socialMedia.limits.uploadCost')}:</span>
                                       <span className="font-bold text-gray-900 dark:text-neutral-100">{apiLimits.uploadCost}</span>
                                     </div>
@@ -550,7 +550,7 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
                                     <div className="mb-2 flex items-start gap-2">
                                       <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
                                       <div className="flex-1">
-                                        <p className="text-[10px] leading-tight font-bold text-amber-800 dark:text-amber-300">
+                                        <p className="text-2xs leading-tight font-bold text-amber-800 dark:text-amber-300">
                                           {t('manageContent.socialMedia.oauth1Required') ||
                                             'OAuth 1.0a requerido'}
                                         </p>

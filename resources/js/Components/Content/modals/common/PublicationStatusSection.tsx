@@ -50,7 +50,7 @@ export default function PublicationStatusSection({
                   </div>
                   {totalInProgress > 0 && (
                     <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-amber-500 dark:border-neutral-900">
-                      <span className="text-[10px] font-bold text-white">{totalInProgress}</span>
+                      <span className="text-2xs font-bold text-white">{totalInProgress}</span>
                     </div>
                   )}
                 </div>

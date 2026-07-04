@@ -257,7 +257,7 @@ export default function ReelsSection({
                   </div>
                   {/* Platform Badge on thumbnail */}
                   <div
-                    className={`absolute top-1 left-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-[10px] font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
+                    className={`absolute top-1 left-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-2xs font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
                   >
                     {getPlatformIcon(reel.metadata?.platform)}
                   </div>
@@ -269,7 +269,7 @@ export default function ReelsSection({
                     <span className="text-sm font-semibold text-gray-900 capitalize dark:text-white">
                       {reel.metadata?.platform || 'Reel'}
                     </span>
-                    <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                    <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-2xs font-bold uppercase">
                       Reel
                     </span>
                   </div>
@@ -423,7 +423,7 @@ function ReelListItem({
         )}
         {/* Platform Badge on thumbnail */}
         <div
-          className={`absolute top-1 left-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-[10px] font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
+          className={`absolute top-1 left-1 rounded bg-gradient-to-r px-1.5 py-0.5 text-2xs font-bold text-white ${getPlatformColor(reel.metadata?.platform)}`}
         >
           {getPlatformIcon(reel.metadata?.platform)}
         </div>
@@ -435,7 +435,7 @@ function ReelListItem({
           <span className="text-sm font-semibold text-gray-900 capitalize dark:text-white">
             {reel.metadata?.platform || 'Reel'}
           </span>
-          <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+          <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 rounded-full px-2 py-0.5 text-2xs font-bold uppercase">
             Reel
           </span>
         </div>

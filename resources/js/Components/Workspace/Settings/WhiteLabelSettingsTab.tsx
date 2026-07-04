@@ -489,7 +489,7 @@ export default function WhiteLabelSettingsTab({
                     <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
                       {workspace.name}
                     </p>
-                    <p className="text-[10px] font-bold tracking-tighter uppercase opacity-60">
+                    <p className="text-2xs font-bold tracking-tighter uppercase opacity-60">
                       {t('workspace.white_label.workspace_branding') || 'Workspace Branding'}
                     </p>
                   </div>

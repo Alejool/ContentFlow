@@ -239,7 +239,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       <Head title="Planificador de Contenido" />
 
       <div className="py-8">
-        <div className="mx-auto max-w-[1600px] sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4 sm:px-6 lg:px-8">
           <div className="overflow-hidden border border-gray-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-black sm:rounded-lg">
             <div className="p-6">
               {/* Toolbar */}

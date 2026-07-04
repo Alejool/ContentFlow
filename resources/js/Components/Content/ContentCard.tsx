@@ -234,7 +234,7 @@ export default function ContentCard({
                   {type === 'campaign' ? 'Campaña' : 'Publicación'}
                 </span>
                 {remoteLock && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                  <span className="flex items-center gap-1 text-2xs font-bold text-amber-600 dark:text-amber-400">
                     <Lock className="h-3 w-3" />
                     {lockedByFirstName}
                   </span>
@@ -303,7 +303,7 @@ export default function ContentCard({
                   {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                 </span>
                 {item.currentApprovalStep?.role?.name && (
-                  <span className="text-[10px] text-yellow-600 dark:text-yellow-500">
+                  <span className="text-2xs text-yellow-600 dark:text-yellow-500">
                     {t('approvals.approver_role')}: {item.currentApprovalStep.role.name}
                   </span>
                 )}

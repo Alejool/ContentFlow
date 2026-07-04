@@ -366,7 +366,7 @@ export default function Dashboard({
                     </div>
                     {t('dashboard.engagementTrends')}
                   </h2>
-                  <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                  <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                     <EngagementChart data={stats.engagementTrends} theme={theme as any} />
                   </Suspense>
                 </div>
@@ -388,7 +388,7 @@ export default function Dashboard({
                   <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
                     {t('dashboard.sections.platforms', 'Comparativa de Plataformas')}
                   </h2>
-                  <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                  <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                     <PlatformPerformance data={stats.platformComparison} theme={theme as any} />
                   </Suspense>
                 </div>
@@ -399,7 +399,7 @@ export default function Dashboard({
                   <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
                     {t('dashboard.sections.accounts', 'Estado de Cuentas Conectadas')}
                   </h2>
-                  <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
+                  <Suspense fallback={<Skeleton className="h-75 w-full rounded-lg" />}>
                     <SocialMediaAccounts
                       accounts={stats.platformData}
                       theme={theme as any}

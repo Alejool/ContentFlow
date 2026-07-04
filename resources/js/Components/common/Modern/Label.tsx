@@ -57,7 +57,7 @@ export default function Label({
     xs: {
       label: 'text-xs',
       icon: 'w-3 h-3',
-      badge: 'text-[10px] px-1.5 py-0.5',
+      badge: 'text-2xs px-1.5 py-0.5',
       indicator: 'w-1.5 h-1.5',
     },
     sm: {

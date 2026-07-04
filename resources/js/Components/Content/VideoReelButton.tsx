@@ -156,7 +156,7 @@ export default function VideoReelButton({
                         {reel.metadata?.platform || 'Reel'}
                       </span>
                       {reel.metadata?.duration && (
-                        <span className="text-[10px] text-gray-500">
+                        <span className="text-2xs text-gray-500">
                           {Math.floor(reel.metadata.duration)}s
                         </span>
                       )}
@@ -184,13 +184,13 @@ export default function VideoReelButton({
                     {reel.status === 'processing' && (
                       <div className="flex items-center gap-1">
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
-                        <span className="text-[10px] font-medium text-blue-600">Procesando</span>
+                        <span className="text-2xs font-medium text-blue-600">Procesando</span>
                       </div>
                     )}
                     {reel.status === 'failed' && (
                       <div className="flex items-center gap-1">
                         <AlertCircle className="h-3.5 w-3.5 text-red-600" />
-                        <span className="text-[10px] font-medium text-red-600">Error</span>
+                        <span className="text-2xs font-medium text-red-600">Error</span>
                       </div>
                     )}
                   </div>

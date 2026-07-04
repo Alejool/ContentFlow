@@ -107,7 +107,7 @@ export default function Switch({
   };
 
   const descriptionSizeClasses = {
-    xs: 'text-[10px]',
+    xs: 'text-2xs',
     sm: 'text-xs',
     md: 'text-xs',
     lg: 'text-sm',

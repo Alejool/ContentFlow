@@ -69,14 +69,14 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
         </div>
 
         <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="bg-primary-50 text-primary-500 dark:bg-primary-900/30 rounded-full px-2 py-0.5 text-[10px] font-black tracking-widest uppercase">
+          <span className="bg-primary-50 text-primary-500 dark:bg-primary-900/30 rounded-full px-2 py-0.5 text-2xs font-black tracking-widest uppercase">
             {dayEvents.length}&nbsp;{t('calendar.events.count')}
           </span>
 
           {dayEvents.length > 0 && onSelectAll && !nSelected && (
             <button
               onClick={onSelectAll}
-              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
+              className="flex items-center gap-1 rounded px-1.5 py-0.5 text-2xs font-semibold text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
             >
               <CheckSquare className="h-3 w-3" />
               {t('calendar.selectAll') || 'Sel. todo'}
@@ -205,7 +205,7 @@ export const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
 
                     {(event.user?.name || event.extendedProps?.user_name) && (
                       <p
-                        className={`text-[10px] ${isDarkColor(eventColor) ? 'text-white/70' : 'text-black/50'}`}
+                        className={`text-2xs ${isDarkColor(eventColor) ? 'text-white/70' : 'text-black/50'}`}
                       >
                         {Number(event.user?.id) === Number(currentUser?.id)
                           ? t('common.me') || 'Yo'

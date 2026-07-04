@@ -118,7 +118,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
           <button
             onClick={handleSkip}
             disabled={isSkipping}
-            className="focus:ring-primary-500 flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:text-gray-600 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:text-gray-300"
+            className="focus:ring-primary-500 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:text-gray-600 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:text-gray-300"
             aria-label={t('templates.close')}
           >
             <X className="h-5 w-5 md:h-6 md:w-6" />
@@ -158,7 +158,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`focus:ring-primary-500 min-h-[44px] rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none md:px-4 md:text-base ${
+                  className={`focus:ring-primary-500 min-h-11 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none md:px-4 md:text-base ${
                     selectedCategory === category
                       ? 'bg-primary-600 text-white'
                       : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-neutral-600 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:hover:bg-neutral-700'
@@ -214,7 +214,7 @@ export default function TemplateGallery({ templates, onSelect, onSkip }: Templat
           <button
             onClick={handleSkip}
             disabled={isSkipping}
-            className="focus:ring-primary-500 min-h-[44px] w-full rounded-lg px-6 py-2 font-medium text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:text-neutral-400 dark:hover:text-white"
+            className="focus:ring-primary-500 min-h-11 w-full rounded-lg px-6 py-2 font-medium text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:text-neutral-400 dark:hover:text-white"
             aria-label={t('templates.skipAndCreate')}
           >
             {isSkipping ? t('templates.skipping') : t('templates.skip')}

@@ -31,7 +31,7 @@ export default function BestTimeToPostHeatmap({ data }: BestTimeToPostHeatmapPro
       <EmptyState
         title={t('analytics.bestTimeToPost.emptyTitle', 'Recopilando tendencias...')}
         description={t('analytics.bestTimeToPost.emptyDesc', 'Aún no hay suficientes datos históricos. Sigue publicando para identificar el mejor momento.')}
-        className="h-[400px] border-dashed bg-gray-50/50"
+        className="h-1 border-dashed bg-gray-50/50"
       />
     );
   }
@@ -70,7 +70,7 @@ export default function BestTimeToPostHeatmap({ data }: BestTimeToPostHeatmapPro
 
   return (
     <div className="w-full">
-      <div className="h-[400px] w-full">
+      <div className="h-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart
             margin={{

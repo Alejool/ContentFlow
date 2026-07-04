@@ -89,7 +89,7 @@ const SocialAccountsSection = memo(
                     .map((acc) => (
                       <span
                         key={acc.id}
-                        className="inline-flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
+                        className="inline-flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 text-2xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
                       >
                         <span className="capitalize">{acc.platform}</span>
                         <span className="opacity-75">@{acc.account_name || acc.name}</span>

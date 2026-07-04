@@ -110,7 +110,7 @@ function PlatformCard({
             )}
           </div>
         ) : (
-          <div className="flex h-full min-h-[120px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800/30 dark:bg-amber-900/10">
+          <div className="flex h-full min-h-3 flex-col items-center justify-center rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800/30 dark:bg-amber-900/10">
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
               <Settings2 className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>

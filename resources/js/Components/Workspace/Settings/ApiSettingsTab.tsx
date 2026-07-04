@@ -191,7 +191,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
             </div>
 
             {canManageWorkspace && !generatedToken && (
-              <form onSubmit={createTokenDirectly} className="w-full md:w-auto md:min-w-[300px]">
+              <form onSubmit={createTokenDirectly} className="w-full md:w-auto md:min-w-75">
                 <div className="flex flex-col gap-3">
 
                   {/* Token name input */}
@@ -280,7 +280,7 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                                       className="mt-0.5 h-3 w-3 rounded border-neutral-300 text-primary-600"
                                     />
                                     <div>
-                                      <span className="block text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
+                                      <span className="block text-2xs font-mono text-neutral-500 dark:text-neutral-400">
                                         {scopeKey}
                                       </span>
                                       <span className="block text-xs text-neutral-700 dark:text-neutral-300">
@@ -413,14 +413,14 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                             className={`transition-colors ${meta.isExpired ? 'opacity-60' : 'hover:bg-neutral-50 dark:hover:bg-neutral-700/30'}`}
                           >
                             {/* Name + abilities */}
-                            <td className="max-w-[220px] px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                            <td className="max-w-55 px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
                               <span className="block truncate" title={token.name}>
                                 {token.name}
                               </span>
                               {token.abilities && (
                                 <div className="mt-1 flex flex-wrap gap-1">
                                   {token.abilities.includes('*') || token.abilities.length === 0 ? (
-                                    <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                                    <span className="inline-flex rounded-full bg-amber-100 px-1.5 py-0.5 text-2xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
                                       {t('workspace.api.full_access')}
                                     </span>
                                   ) : (
@@ -428,13 +428,13 @@ export default function ApiSettingsTab({ workspace, canManageWorkspace }: ApiSet
                                       {token.abilities.slice(0, 3).map((a) => (
                                         <span
                                           key={a}
-                                          className="inline-flex rounded-full bg-primary-50 px-1.5 py-0.5 text-[10px] font-mono text-primary-700 dark:bg-primary-900/20 dark:text-primary-300"
+                                          className="inline-flex rounded-full bg-primary-50 px-1.5 py-0.5 text-2xs font-mono text-primary-700 dark:bg-primary-900/20 dark:text-primary-300"
                                         >
                                           {a}
                                         </span>
                                       ))}
                                       {token.abilities.length > 3 && (
-                                        <span className="inline-flex rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
+                                        <span className="inline-flex rounded-full bg-neutral-100 px-1.5 py-0.5 text-2xs text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
                                           +{token.abilities.length - 3}
                                         </span>
                                       )}

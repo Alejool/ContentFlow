@@ -57,7 +57,7 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
     <div className="group border-b border-gray-100 p-3 last:border-0 dark:border-neutral-700">
       <div className="mb-2 flex items-start justify-between">
         <span
-          className="max-w-[200px] truncate text-xs font-medium text-neutral-900 dark:text-neutral-100"
+          className="max-w-5 truncate text-xs font-medium text-neutral-900 dark:text-neutral-100"
           title={upload.file.name}
         >
           {upload.file.name}
@@ -80,12 +80,12 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="w-10 text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">
+        <span className="w-10 text-right text-2xs font-semibold text-neutral-600 dark:text-neutral-300">
           {progress}%
         </span>
       </div>
 
-      <div className="flex justify-between text-[10px] text-gray-500 dark:text-neutral-400">
+      <div className="flex justify-between text-2xs text-gray-500 dark:text-neutral-400">
         <span>
           {upload.status === 'uploading' && upload.stats?.speed
             ? formatSpeed(upload.stats.speed)

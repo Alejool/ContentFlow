@@ -333,13 +333,13 @@ const PublicationStatusTimeline = ({
                   {/* Status badge */}
                   {state === 'current' && (
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${step.bgColor} ${step.color}`}
+                      className={`rounded-full px-2 py-0.5 text-2xs font-bold uppercase ${step.bgColor} ${step.color}`}
                     >
                       {t('publications.status.current') || 'Actual'}
                     </span>
                   )}
                   {state === 'completed' && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700 uppercase dark:bg-green-900/30 dark:text-green-300">
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-2xs font-bold text-green-700 uppercase dark:bg-green-900/30 dark:text-green-300">
                       {t('publications.status.completed') || 'Completado'}
                     </span>
                   )}

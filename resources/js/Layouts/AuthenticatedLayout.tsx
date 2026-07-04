@@ -82,7 +82,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
               <img 
                 src="/assets/mascot-watermark.png" 
                 alt=""
-                className="fixed bottom-[-50px] right-[-50px] w-[600px] h-[600px] object-contain opacity-[0.04] dark:opacity-[0.02]"
+                className="fixed bottom-[-50px] right-[-50px] w-15 h-15 object-contain opacity-[0.04] dark:opacity-[0.02]"
                 onError={(e) => e.currentTarget.style.display = 'none'}
               />
             </div>

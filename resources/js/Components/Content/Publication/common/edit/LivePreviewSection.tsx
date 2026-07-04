@@ -37,7 +37,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
       return (
         <iframe
           src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&theme=light`}
-          className="h-[600px] w-full max-w-[550px] border-0"
+          className="h-15 w-full max-w-137.5 border-0"
           scrolling="no"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
         />
@@ -48,7 +48,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
       return (
         <iframe
           src={`${igUrl}embed`}
-          className="h-[700px] w-full max-w-[540px] overflow-hidden border-0"
+          className="h-175 w-full max-w-135 overflow-hidden border-0"
           scrolling="no"
           allowtransparency="true"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
@@ -99,7 +99,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
       return (
         <iframe
           src={`https://www.youtube.com/embed/${videoId}`}
-          className="aspect-video w-full max-w-[640px] rounded-lg border-0"
+          className="aspect-video w-full max-w-16 rounded-lg border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation"
           allowFullScreen
@@ -110,7 +110,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
       return (
         <iframe
           src={`https://www.tiktok.com/embed/v2/${url.split('/video/')[1]?.split('?')[0]}`}
-          className="h-[730px] w-full max-w-[325px] border-0"
+          className="h-182.5 w-full max-w-[325px] border-0"
           scrolling="no"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           allowFullScreen
@@ -310,7 +310,7 @@ export const LivePreviewSection = ({
         })}
       </div>
 
-      <div className="min-h-[400px] rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+      <div className="min-h-1 rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
         {publishedLinks && publishedLinks[activePlatform] ? (
           <div className="space-y-4">
             <div className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
@@ -344,7 +344,7 @@ export const LivePreviewSection = ({
                 </a>
               </div>
             </div>
-            <div className="flex min-h-[500px] items-center justify-center rounded-lg bg-white p-4 dark:bg-theme-bg-secondary">
+            <div className="flex min-h-125 items-center justify-center rounded-lg bg-white p-4 dark:bg-theme-bg-secondary">
               <EmbeddedPost platform={activePlatform} url={publishedLinks[activePlatform]} />
             </div>
           </div>

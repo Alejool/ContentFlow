@@ -49,11 +49,11 @@ export default function WorkspaceDropdown({
               {current_workspace.name}
             </p>
             <div className="flex items-center gap-2">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400">
+              <p className="text-2xs font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400">
                 {roleLabel || t('workspace.member')}
               </p>
               <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-neutral-600" />
-              <p className="truncate text-[10px] text-gray-500 dark:text-neutral-400">
+              <p className="truncate text-2xs text-gray-500 dark:text-neutral-400">
                 {workspaces.length} {t('workspace.workspaces', { count: workspaces.length })}
               </p>
             </div>
@@ -76,7 +76,7 @@ export default function WorkspaceDropdown({
       <Popover trigger={trigger} placement={isSidebarOpen ? 'bottom' : 'right'} className={'w-72'}>
         {/* Workspace list */}
         <div className="border-b border-gray-100 p-2 dark:border-neutral-800">
-          <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-500">
+          <p className="px-3 py-1 text-2xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-500">
             {t('workspace.select_workspace')}
           </p>
           <div className="mt-1 space-y-1">

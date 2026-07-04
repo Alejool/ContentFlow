@@ -435,7 +435,7 @@ export default function ManageContentPage() {
                     className="ring-black/8 absolute right-0 z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-lg bg-white shadow-2xl ring-1 transition focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in dark:bg-theme-bg-secondary dark:ring-white/10"
                   >
                     <div className="px-4 pb-2 pt-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
+                      <p className="text-2xs font-semibold uppercase tracking-widest text-gray-400 dark:text-neutral-500">
                         {t('manageContent.createNew')}
                       </p>
                     </div>
@@ -563,7 +563,7 @@ export default function ManageContentPage() {
             />
           </div>
 
-          <div className="min-h-[500px]">
+          <div className="min-h-125">
             {activeTab === 'calendar' && (
               <div className="animate-in fade-in zoom-in duration-300">
                 <ModernCalendar onEventClick={handleEventClick} />

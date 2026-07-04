@@ -115,7 +115,7 @@ const ContentTypeBadge = memo(
 
     const sizeClasses = {
       sm: 'px-1.5 py-0.5 text-[9px] gap-1',
-      md: 'px-2 py-1 text-[10px] gap-1.5',
+      md: 'px-2 py-1 text-2xs gap-1.5',
       lg: 'px-3 py-1.5 text-xs gap-2',
     };
 
@@ -136,7 +136,7 @@ const ContentTypeBadge = memo(
         )}
         <span>{display.label}</span>
         {showDescription && size === 'lg' && (
-          <span className="ml-1 text-[10px] font-normal normal-case opacity-75">
+          <span className="ml-1 text-2xs font-normal normal-case opacity-75">
             {display.description}
           </span>
         )}

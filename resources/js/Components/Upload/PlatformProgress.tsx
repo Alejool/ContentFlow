@@ -17,7 +17,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-neutral-700">
           <div className="bg-primary/50 h-full w-full animate-pulse" />
         </div>
-        <span className="block text-center text-[10px] italic text-gray-500 dark:text-neutral-400">
+        <span className="block text-center text-2xs italic text-gray-500 dark:text-neutral-400">
           {publication.status === 'publishing'
             ? t('publications.gallery.sendingToSocial', {
                 defaultValue: 'Iniciando envío...',
@@ -123,12 +123,12 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="w-10 text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">
+              <span className="w-10 text-right text-2xs font-semibold text-neutral-600 dark:text-neutral-300">
                 {isDone || isFailed ? '100%' : '...'}
               </span>
             </div>
             {isFailed && platform.error && (
-              <div className="mt-1.5 rounded bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              <div className="mt-1.5 rounded bg-red-50 px-2 py-1 text-2xs text-red-600 dark:bg-red-900/20 dark:text-red-400">
                 {platform.error}
               </div>
             )}
@@ -137,7 +137,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                 href={platform.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1.5 flex items-center gap-1 text-[10px] text-primary-500 hover:underline"
+                className="mt-1.5 flex items-center gap-1 text-2xs text-primary-500 hover:underline"
               >
                 {t('publications.viewPost', {
                   defaultValue: 'Ver publicación',

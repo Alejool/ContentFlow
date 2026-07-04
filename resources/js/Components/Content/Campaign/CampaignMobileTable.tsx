@@ -68,7 +68,7 @@ export default function CampaignMobileTable({
                   </p>
                 </div>
                 <div
-                  className={`rounded-full px-2 py-1 text-[10px] font-medium whitespace-nowrap sm:text-xs ${getStatusColor(
+                  className={`rounded-full px-2 py-1 text-2xs font-medium whitespace-nowrap sm:text-xs ${getStatusColor(
                     item.status,
                   )}`}
                 >
@@ -120,11 +120,11 @@ export default function CampaignMobileTable({
               </div>
 
               <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-2 dark:border-neutral-700/50">
-                <div className="min-w-[140px] flex-1">
+                <div className="min-w-35 flex-1">
                   {(item.publications?.length || 0) > 0 ? (
                     <button
                       onClick={() => toggleExpand(item.id)}
-                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase transition-all active:scale-95 ${
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-2xs font-bold uppercase transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
                           ? 'bg-primary-50 text-primary-700 ring-primary-200 dark:bg-primary-900/40 dark:text-primary-400 dark:ring-primary-800 ring-1'
                           : 'bg-gray-50 text-gray-600 ring-1 ring-gray-100 hover:bg-gray-100 dark:bg-theme-bg-secondary dark:text-neutral-300 dark:ring-neutral-700 dark:hover:bg-neutral-700'
@@ -216,7 +216,7 @@ export default function CampaignMobileTable({
                           </div>
                         </div>
                         <div
-                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium whitespace-nowrap ${getStatusColor(
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-2xs font-medium whitespace-nowrap ${getStatusColor(
                             pub.status,
                           )}`}
                         >

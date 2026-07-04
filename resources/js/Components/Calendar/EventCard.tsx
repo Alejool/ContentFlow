@@ -142,7 +142,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               {new Intl.DateTimeFormat('es-ES', { weekday: 'short' }).format(new Date(event.start))}
             </span>
           )}
-          <span className={`text-[10px] font-bold tabular-nums ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : 'text-gray-700') : 'text-gray-700'}`}>
+          <span className={`text-2xs font-bold tabular-nums ${eventColor ? (isDarkColor(eventColor) ? 'text-white' : 'text-gray-700') : 'text-gray-700'}`}>
             {formatTimeString(event.start).split(' ')[0]}
           </span>
         </div>

@@ -25,7 +25,7 @@ export default function NotificationButton() {
         <div className="relative">
           <Bell className="h-6 w-6" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-neutral-900">
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-2xs font-bold text-white shadow-sm ring-2 ring-white dark:ring-neutral-900">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}

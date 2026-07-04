@@ -23,7 +23,7 @@ export const ThreadsPreview = ({
 }: ThreadsPreviewProps) => {
   return (
     <div
-      className={`mx-auto w-full max-w-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white font-sans text-black ${className}`}
+      className={`mx-auto w-full max-w-125 overflow-hidden rounded-lg border border-gray-200 bg-white font-sans text-black ${className}`}
     >
       {/* Header */}
       <div className="flex items-start gap-3 p-4">

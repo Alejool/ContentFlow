@@ -550,7 +550,7 @@ export default function IntegrationsSettingsTab({
                             href={log.payload.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-1 flex max-w-[200px] items-center gap-1 truncate text-xs text-primary-500 hover:text-primary-600"
+                            className="mt-1 flex max-w-5 items-center gap-1 truncate text-xs text-primary-500 hover:text-primary-600"
                           >
                             <ExternalLink className="h-3 w-3" />
                             {log.payload.url}
@@ -575,7 +575,7 @@ export default function IntegrationsSettingsTab({
                       </td>
                       <td className="px-6 py-4">
                         <div
-                          className="max-w-[250px] truncate font-mono text-sm text-gray-500 dark:text-neutral-500"
+                          className="max-w-62.5 truncate font-mono text-sm text-gray-500 dark:text-neutral-500"
                           title={log.response}
                         >
                           {log.status_code ? `[${log.status_code}] ` : ''}

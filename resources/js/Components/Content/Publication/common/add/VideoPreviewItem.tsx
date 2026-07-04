@@ -104,7 +104,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
                   handleTypeChange('short');
                 }}
                 disabled={duration > 60}
-                className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                className={`rounded px-2 py-0.5 text-2xs font-medium transition-colors ${
                   youtubeType === 'short'
                     ? 'bg-primary-500 text-white'
                     : duration > 60
@@ -121,7 +121,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
                   e.stopPropagation();
                   handleTypeChange('video');
                 }}
-                className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                className={`rounded px-2 py-0.5 text-2xs font-medium transition-colors ${
                   youtubeType === 'video'
                     ? 'bg-primary-500 text-white'
                     : 'bg-white/20 text-white hover:bg-white/30'

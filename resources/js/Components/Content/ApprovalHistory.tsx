@@ -293,7 +293,7 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
                       )}
                       {request.status === 'rejected' && request.rejection_reason && (
                         <div
-                          className="max-w-[200px] truncate text-xs text-rose-600 dark:text-rose-400"
+                          className="max-w-5 truncate text-xs text-rose-600 dark:text-rose-400"
                           title={request.rejection_reason}
                         >
                           {request.rejection_reason}

@@ -105,7 +105,7 @@ const CampaignRow = memo(
                 {item.goal && (
                   <div className="flex items-center gap-1 rounded bg-gray-50 px-1.5 py-0.5 text-xs text-gray-500 dark:bg-white/5 dark:text-neutral-400">
                     <Target className="text-primary-500 h-3 w-3" />
-                    <span className="max-w-[150px] truncate">{item.goal}</span>
+                    <span className="max-w-37.5 truncate">{item.goal}</span>
                   </div>
                 )}
                 {item.budget && (
@@ -135,7 +135,7 @@ const CampaignRow = memo(
                 )}
               </div>
               <div className="ml-3">
-                <p className="max-w-[120px] truncate text-sm font-medium text-gray-900 dark:text-white">
+                <p className="max-w-3 truncate text-sm font-medium text-gray-900 dark:text-white">
                   {item.user.name}
                 </p>
               </div>

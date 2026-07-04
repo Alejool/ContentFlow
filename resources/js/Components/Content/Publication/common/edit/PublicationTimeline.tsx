@@ -177,7 +177,7 @@ export default function PublicationTimeline({ activities }: PublicationTimelineP
                           : JSON.stringify(activity.details.platforms)}
                       </p>
                     ) : (
-                      <pre className="whitespace-pre-wrap overflow-hidden text-[10px] opacity-70 font-mono">
+                      <pre className="whitespace-pre-wrap overflow-hidden text-2xs opacity-70 font-mono">
                         {JSON.stringify(activity.details, null, 2)}
                       </pre>
                     )}

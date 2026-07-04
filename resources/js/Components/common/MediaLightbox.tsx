@@ -25,7 +25,7 @@ function LightboxMediaElement({
 
   if (isS3Key && isLoading) {
     return (
-      <div className={`flex h-full w-full items-center justify-center bg-gray-900 ${!isThumbnail && 'min-h-[200px] min-w-[200px]'}`}>
+      <div className={`flex h-full w-full items-center justify-center bg-gray-900 ${!isThumbnail && 'min-h-5 min-w-5'}`}>
         <Loader2 className="h-6 w-6 animate-spin text-white" />
       </div>
     );

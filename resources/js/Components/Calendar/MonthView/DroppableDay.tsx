@@ -41,7 +41,7 @@ export const DroppableDay: React.FC<DroppableDayProps> = ({
           onDaySelect?.(day);
         }
       }}
-      className={`group relative min-h-[140px] cursor-pointer border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900' : 'border-gray-100 bg-gray-50 dark:border-neutral-800/50 dark:bg-neutral-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isSelected ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-300 dark:bg-primary-900/10' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-neutral-900/50`}
+      className={`group relative min-h-35 cursor-pointer border p-3 transition-all ${isCurrentMonth ? 'border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900' : 'border-gray-100 bg-gray-50 dark:border-neutral-800/50 dark:bg-neutral-900/50'} ${isTodayDay ? 'ring-2 ring-inset ring-primary-500' : ''} ${isSelected ? 'bg-primary-50/50 ring-2 ring-inset ring-primary-300 dark:bg-primary-900/10' : ''} ${isOver ? 'bg-primary-50 ring-2 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''} hover:bg-gray-50 dark:hover:bg-neutral-900/50`}
     >
       <div className="mb-2.5 flex items-start justify-between">
         <div className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export const DroppableDay: React.FC<DroppableDayProps> = ({
 
         <div className="flex items-center gap-1">
           {isTodayDay && (
-            <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+            <span className="rounded-full bg-primary-100 px-2 py-0.5 text-2xs font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
               HOY
             </span>
           )}
@@ -88,7 +88,7 @@ export const DroppableDay: React.FC<DroppableDayProps> = ({
         </div>
       </div>
 
-      <div className="custom-scrollbar relative z-10 flex max-h-[120px] flex-col gap-2 overflow-y-auto pr-1">
+      <div className="custom-scrollbar relative z-10 flex max-h-3 flex-col gap-2 overflow-y-auto pr-1">
         {events.map((event) => (
           <DraggableEvent
             key={event.id}

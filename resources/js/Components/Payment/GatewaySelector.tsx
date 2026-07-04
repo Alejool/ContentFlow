@@ -111,7 +111,7 @@ export function GatewaySelector({
             key={gateway.name}
             onClick={() => handleGatewaySelect(gateway.name)}
             disabled={!gateway.available}
-            className={`relative flex min-h-[100px] flex-col items-center justify-center rounded-lg border-2 p-4 transition-all ${
+            className={`relative flex min-h-25 flex-col items-center justify-center rounded-lg border-2 p-4 transition-all ${
               selectedGateway === gateway.name
                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                 : 'border-gray-200 hover:border-primary-300 dark:border-neutral-700 dark:hover:border-primary-600'

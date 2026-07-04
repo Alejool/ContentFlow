@@ -166,7 +166,7 @@ export default function ColorPicker({
             style={{ backgroundColor: safeColor }}
           >
             <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider"
+              className="rounded-full px-2 py-0.5 text-2xs font-bold tracking-wider"
               style={{
                 backgroundColor: `${safeColor}33`,
                 color: onColor,
@@ -197,7 +197,7 @@ export default function ColorPicker({
 
           {/* Preset swatches */}
           <div className="p-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+            <p className="mb-2 text-2xs font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
               Presets
             </p>
             <div className="grid grid-cols-6 gap-1.5">
@@ -227,7 +227,7 @@ export default function ColorPicker({
           {/* Hex input */}
           {showHexInput && (
             <div className="border-t border-gray-100 p-3 dark:border-neutral-700">
-              <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+              <label className="mb-1 block text-2xs font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
                 HEX
               </label>
               <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function ColorPicker({
                 />
               </div>
               {!isValidHex(hexDraft) && (
-                <p className="mt-1 text-[10px] text-red-500">Enter a valid hex (#rrggbb)</p>
+                <p className="mt-1 text-2xs text-red-500">Enter a valid hex (#rrggbb)</p>
               )}
             </div>
           )}

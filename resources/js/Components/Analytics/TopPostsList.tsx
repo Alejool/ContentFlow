@@ -23,7 +23,7 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="flex h-[300px] items-center justify-center">
+      <div className="flex h-75 items-center justify-center">
         <p className="text-gray-500">No data available</p>
       </div>
     );
@@ -34,7 +34,7 @@ export default function TopPostsList({ posts }: TopPostsListProps) {
     if (parts.length >= 2) {
       return (
         <div className="flex flex-col min-w-0 group">
-          <span className="text-[10px] uppercase font-bold tracking-wider text-primary-600 dark:text-primary-400 truncate">
+          <span className="text-2xs uppercase font-bold tracking-wider text-primary-600 dark:text-primary-400 truncate">
             {parts[0]}
           </span>
           <a href="#" className="truncate font-semibold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors flex items-center gap-1.5">

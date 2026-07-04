@@ -65,7 +65,7 @@ export default function ApprovalSuccessModal({
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-neutral-500">
+                  <p className="text-2xs font-bold tracking-widest text-gray-400 uppercase dark:text-neutral-500">
                     {t('approvals.approvedBy') || 'Aprobado por'}
                   </p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">{approverName}</p>

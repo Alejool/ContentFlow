@@ -80,7 +80,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <WeekdayHeaderRow />
 
-        <div className="grid min-h-[700px] auto-rows-fr grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
+        <div className="grid min-h-175 auto-rows-fr grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
           {startingEmptySlots.map((_, i) => (
             <div
               key={`empty-${i}`}

@@ -381,7 +381,7 @@ export default function SubscriptionSection({
                       style={{ width: `${elapsedPct}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] text-gray-400">
+                  <div className="flex justify-between text-2xs text-gray-400">
                     <span>Inicio</span>
                     <span>Renovación: {formatDate(subscription.current_period_end)}</span>
                   </div>
@@ -558,7 +558,7 @@ export default function SubscriptionSection({
                     </p>
                     <Badge
                       variant="outline"
-                      className="h-4 border-green-200 bg-green-50 py-0 text-[10px] text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400"
+                      className="h-4 border-green-200 bg-green-50 py-0 text-2xs text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400"
                     >
                       {t(`subscription.status.${invoice.status}`, invoice.status)}
                     </Badge>

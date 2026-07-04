@@ -167,7 +167,7 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
                     />
 
                     <span
-                      className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold tracking-tight uppercase ${getStatusColor(item.status)}`}
+                      className={`inline-flex items-center rounded-lg px-2 py-0.5 text-2xs font-bold tracking-tight uppercase ${getStatusColor(item.status)}`}
                     >
                       {item.status || 'Draft'}
                     </span>
@@ -200,7 +200,7 @@ const PublicationMobileGrid = memo(function PublicationMobileGrid({
                 {item.campaigns && item.campaigns.length > 0 && (
                   <div className="flex items-center gap-1.5 rounded-lg border border-indigo-100/50 bg-indigo-50/50 px-2 py-1 dark:border-indigo-900/30 dark:bg-indigo-900/10">
                     <Folder className="h-3 w-3 text-indigo-500" />
-                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                    <span className="text-2xs font-bold text-indigo-600 dark:text-indigo-400">
                       {item.campaigns.length}
                     </span>
                   </div>

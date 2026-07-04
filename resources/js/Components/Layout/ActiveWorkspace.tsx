@@ -13,7 +13,7 @@ export default function ActiveWorkspace() {
   return (
     <Link
       href={route('workspaces.index')}
-      className={`group flex w-full items-center justify-center gap-2 px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase transition-all duration-300 ${
+      className={`group flex w-full items-center justify-center gap-2 px-4 py-1.5 text-2xs font-bold tracking-widest uppercase transition-all duration-300 ${
         actualTheme === 'dark'
           ? 'bg-primary-900/40 text-primary-200 hover:bg-primary-900/60'
           : 'bg-primary-600 hover:bg-primary-700 text-white'
@@ -33,7 +33,7 @@ export default function ActiveWorkspace() {
         ) : (
           <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-current" />
         )}
-        <span className="max-w-[200px] truncate md:max-w-none">
+        <span className="max-w-5 truncate md:max-w-none">
           {auth?.current_workspace?.name || '...'}
         </span>
       </div>

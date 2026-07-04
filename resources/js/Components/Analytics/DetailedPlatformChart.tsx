@@ -269,7 +269,7 @@ export default function DetailedPlatformChart({ platforms, theme = 'light' }: Pr
         {displayPlatforms.map((platform) => (
           <div
             key={platform.id}
-            className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-[800px] ${
+            className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-2 ${
               isDark
                 ? 'border border-neutral-700/50 bg-neutral-800/50'
                 : 'border border-gray-100 bg-white shadow-sm'

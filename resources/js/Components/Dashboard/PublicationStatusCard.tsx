@@ -112,7 +112,7 @@ export function PublicationStatusCard({
       {/* Label */}
       <p
         className={cn(
-          'relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide sm:text-xs',
+          'relative z-10 mb-1 text-2xs font-medium uppercase tracking-wide sm:text-xs',
           'text-gray-500 dark:text-neutral-400',
           'transition-colors duration-300 group-hover:text-gray-700 dark:group-hover:text-gray-200',
         )}

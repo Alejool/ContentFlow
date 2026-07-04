@@ -220,7 +220,7 @@ export default function PerformanceTable({
                                 ? t('analytics.drilldown.standalone')
                                 : item.campaign.title}
                             </div>
-                            <div className="text-[10px] font-bold tracking-tight text-gray-500">
+                            <div className="text-2xs font-bold tracking-tight text-gray-500">
                               {item.campaign.id !== 0 && (
                                 <>
                                   <span className="uppercase">
@@ -258,7 +258,7 @@ export default function PerformanceTable({
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2 pl-8">
                         <FileText className="h-3.5 w-3.5 text-gray-400" />
-                        <span className="max-w-[250px] truncate text-sm text-gray-600 dark:text-neutral-300">
+                        <span className="max-w-62.5 truncate text-sm text-gray-600 dark:text-neutral-300">
                           {item.publication.title}
                         </span>
                       </div>

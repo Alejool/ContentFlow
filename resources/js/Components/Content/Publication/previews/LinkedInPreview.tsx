@@ -24,7 +24,7 @@ export const LinkedInPreview = ({
 }: LinkedInPreviewProps) => {
   return (
     <div
-      className={`w-full max-w-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white font-sans text-black ${className}`}
+      className={`w-full max-w-125 overflow-hidden rounded-lg border border-gray-200 bg-white font-sans text-black ${className}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between p-3 pb-2">
@@ -62,14 +62,14 @@ export const LinkedInPreview = ({
           {mediaUrls[0].match(/\.(mp4|mov|webm)$/i) ? (
             <video
               src={mediaUrls[0]}
-              className="h-auto max-h-[500px] w-full object-contain"
+              className="h-auto max-h-125 w-full object-contain"
               controls={false}
             />
           ) : (
             <img
               src={mediaUrls[0]}
               alt="Post media"
-              className="h-auto max-h-[500px] w-full object-contain"
+              className="h-auto max-h-125 w-full object-contain"
             />
           )}
         </div>

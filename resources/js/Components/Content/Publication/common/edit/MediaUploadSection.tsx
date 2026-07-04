@@ -202,7 +202,7 @@ const MediaUploadSection = memo(
             onDragLeave={disabled ? undefined : onDragLeave}
           >
             <div
-              className={`flex min-h-[200px] flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed p-6 text-center transition-colors ${getUploadAreaStyles()}`}
+              className={`flex min-h-5 flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed p-6 text-center transition-colors ${getUploadAreaStyles()}`}
             >
               {mediaPreviews.length > 0 ? (
                 <div className="grid w-full grid-cols-2 gap-4">
@@ -257,7 +257,7 @@ const MediaUploadSection = memo(
                         }}
                       />
                     </div>
-                    <span className="whitespace-nowrap text-[10px] font-bold uppercase text-primary-600 dark:text-primary-400">
+                    <span className="whitespace-nowrap text-2xs font-bold uppercase text-primary-600 dark:text-primary-400">
                       {Object.values(uploadProgress || {}).length > 0
                         ? 'Subiendo...'
                         : 'Procesando S3...'}
@@ -424,7 +424,7 @@ const MediaPreviewItem = memo(
                 style={{ width: `${progress || 0}%` }}
               />
             </div>
-            <div className="flex w-full justify-between text-[10px] font-bold uppercase tracking-tighter text-white/90">
+            <div className="flex w-full justify-between text-2xs font-bold uppercase tracking-tighter text-white/90">
               <span>{Math.round(progress || 0)}%</span>
               {stats?.eta && typeof stats.eta === 'number' && !isNaN(stats.eta) && (
                 <span>~{formatETA(stats.eta)}</span>

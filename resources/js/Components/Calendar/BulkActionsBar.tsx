@@ -79,7 +79,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
             {/* Top accent gradient */}
             <div className="from-primary-400 via-primary-700 to-primary-900 absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-linear-to-r" />
 
-            <div className="flex flex-col items-center gap-4 px-6 py-5 min-w-[320px]">
+            <div className="flex flex-col items-center gap-4 px-6 py-5 min-w-8">
               {/* Top: Selection Info & Clear Button */}
               <div className="flex w-full items-center justify-between">
                 <SelectionInfo selectedCount={selectedCount} />

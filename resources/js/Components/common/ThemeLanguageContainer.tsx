@@ -77,7 +77,7 @@ export default function ThemeLanguageContainer({
 
           {/* Menú desplegable */}
           {isMobileMenuOpen && (
-            <div className="absolute right-4 top-16 z-50 min-w-[180px] rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="absolute right-4 top-16 z-50 min-w-45 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
               <div className="flex flex-col space-y-3">
                 {canLogin && (
                   <Link

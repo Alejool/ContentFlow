@@ -12,6 +12,9 @@
   /* ── Content sources ── */
   /* Defined via @source directives below */
 
+  /* ── Font sizes (extends default scale) ── */
+  --text-2xs: 0.625rem; /* 10px — tiny labels/badges; replaces text-[10px] */
+
   /* ── Font families ── */
   --font-family-heading: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --font-family-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;

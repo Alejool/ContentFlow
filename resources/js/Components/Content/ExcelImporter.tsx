@@ -223,7 +223,7 @@ export default function ExcelImporter({ type, isOpen, onClose, onSuccess, t }: E
             />
 
             <div
-              className={`flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
+              className={`flex min-h-5 flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
                 isDragging
                   ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
                   : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary'

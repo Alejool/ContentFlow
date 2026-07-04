@@ -261,7 +261,7 @@ const LogsList = memo(
                               </span>
                             </div>
                             {log.account_name && (
-                              <span className="max-w-[120px] truncate text-xs text-gray-500 dark:text-neutral-400">
+                              <span className="max-w-3 truncate text-xs text-gray-500 dark:text-neutral-400">
                                 {log.account_name}
                               </span>
                             )}
@@ -275,7 +275,7 @@ const LogsList = memo(
                               </span>
                             )}
                             {log.publication && (
-                              <span className="max-w-[150px] truncate text-xs text-gray-600 dark:text-neutral-400">
+                              <span className="max-w-37.5 truncate text-xs text-gray-600 dark:text-neutral-400">
                                 {log.publication.title}
                               </span>
                             )}
@@ -291,7 +291,7 @@ const LogsList = memo(
                             <span>{t(`logs.status.${log.status}`) || log.status}</span>
                           </div>
                         </td>
-                        <td className="max-w-[200px] px-4 py-3">
+                        <td className="max-w-5 px-4 py-3">
                           <ExpandableText
                             text={log.content || '-'}
                             maxLength={80}

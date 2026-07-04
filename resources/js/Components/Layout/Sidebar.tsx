@@ -125,7 +125,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
           }`}
       >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
-          <item.icon className="h-[18px] w-[18px]" />
+          <item.icon className="h-4.5 w-4.5" />
         </div>
 
         {isSidebarOpen && (
@@ -138,7 +138,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
 
         {!isSidebarOpen && (
           <div
-            className={`pointer-events-none fixed left-[110px] mt-0.5 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 z-[99999] ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
+            className={`pointer-events-none fixed left-27.5 mt-0.5 rounded-lg px-3 py-2 text-sm whitespace-nowrap opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 z-[99999] ${isDark ? 'bg-neutral-800 text-gray-100' : 'bg-gray-900 text-white'
               }`}
           >
             {t(item.nameKey)}
@@ -205,7 +205,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                       : 'Intellipost'}
                   </h2>
                   {auth?.current_workspace?.role && (
-                    <p className="text-primary-500 truncate text-[10px] font-bold tracking-widest uppercase">
+                    <p className="text-primary-500 truncate text-2xs font-bold tracking-widest uppercase">
                       {auth.current_workspace.role.name}
                     </p>
                   )}
@@ -252,7 +252,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                       className="group/section mb-1.5 mt-4 flex w-full items-center justify-between px-3 py-1 first:mt-0 text-left"
                     >
                       <span
-                        className={`flex items-center gap-1.5 text-[10px] font-bold tracking-[0.15em] uppercase ${sectionActive
+                        className={`flex items-center gap-1.5 text-2xs font-bold tracking-[0.15em] uppercase ${sectionActive
                           ? classes.sectionActiveText
                           : classes.sectionInactiveText
                           }`}
@@ -314,7 +314,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                 className="absolute right-[-10px] bottom-[-10px] w-16 h-16 object-contain opacity-20 dark:opacity-20 pointer-events-none z-0"
                 onError={(e) => e.currentTarget.style.display = 'none'}
               />
-              <div className="relative z-10 flex items-center gap-2 text-[10px] text-gray-400 dark:text-neutral-500">
+              <div className="relative z-10 flex items-center gap-2 text-2xs text-gray-400 dark:text-neutral-500">
                 <Command className="h-3 w-3" />
                 <span>
                   <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono text-[9px] dark:border-neutral-600 dark:bg-theme-bg-secondary">

@@ -338,7 +338,7 @@ export default function DetailedPublicationPerformance({ publications, theme = '
           {displayPublications.map((pub) => (
             <div
               key={pub.id}
-              className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-[800px] ${
+              className={`w-full shrink-0 snap-center rounded-lg p-6 lg:w-2 ${
                 isDark
                   ? 'border border-neutral-700/50 bg-neutral-800/50'
                   : 'border border-gray-100 bg-white shadow-sm'

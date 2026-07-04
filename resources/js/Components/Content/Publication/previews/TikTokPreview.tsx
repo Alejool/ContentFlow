@@ -17,7 +17,7 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
   const imageUrl = mediaUrls.find((url) => !url.includes('video') && !url.includes('.mp4'));
 
   return (
-    <div className="group relative h-[560px] w-[320px] overflow-hidden rounded-[32px] border-[8px] border-neutral-900 bg-black shadow-2xl">
+    <div className="group relative h-14 w-8 overflow-hidden rounded-[32px] border-[8px] border-neutral-900 bg-black shadow-2xl">
       {/* Video/Image Background */}
       <div className="absolute inset-0 flex items-center justify-center">
         {videoUrl ? (
@@ -44,7 +44,7 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
             className="border-2 border-white"
           />
           <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#fe2c55] p-0.5 text-white">
-            <span className="text-[10px] font-bold">+</span>
+            <span className="text-2xs font-bold">+</span>
           </div>
         </div>
 
@@ -52,28 +52,28 @@ export const TikTokPreview = memo(({ content, mediaUrls, user }: TikTokPreviewPr
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-md">
             <Heart className="h-6 w-6 fill-white text-white" />
           </div>
-          <span className="mt-1 text-[10px] font-semibold text-white">0</span>
+          <span className="mt-1 text-2xs font-semibold text-white">0</span>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-md">
             <MessageCircle className="h-6 w-6 fill-white text-white" />
           </div>
-          <span className="mt-1 text-[10px] font-semibold text-white">0</span>
+          <span className="mt-1 text-2xs font-semibold text-white">0</span>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-md">
             <Bookmark className="h-6 w-6 fill-white text-white" />
           </div>
-          <span className="mt-1 text-[10px] font-semibold text-white">0</span>
+          <span className="mt-1 text-2xs font-semibold text-white">0</span>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-md">
             <Share2 className="h-6 w-6 fill-white text-white" />
           </div>
-          <span className="mt-1 text-[10px] font-semibold text-white">0</span>
+          <span className="mt-1 text-2xs font-semibold text-white">0</span>
         </div>
 
         {/* Spinning Disc */}

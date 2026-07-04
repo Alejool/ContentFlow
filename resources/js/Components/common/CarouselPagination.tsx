@@ -29,7 +29,7 @@ export function CarouselPagination({
       >
         <ChevronLeft className="h-5 w-5" />
       </Button>
-      <span className="min-w-[60px] text-center text-sm text-gray-600 dark:text-neutral-400">
+      <span className="min-w-15 text-center text-sm text-gray-600 dark:text-neutral-400">
         {currentSlide + 1} / {totalSlides}
       </span>
       <Button

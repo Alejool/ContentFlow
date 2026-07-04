@@ -89,7 +89,7 @@ export const AnimatedToast: React.FC<ToastProps> = ({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.25, ease: 'easeInOut' }}
-        className={`flex items-start gap-3 rounded-lg border-l-4 p-4 shadow-lg ${styles.border} ${styles.bg} min-w-[320px] max-w-md`}
+        className={`flex items-start gap-3 rounded-lg border-l-4 p-4 shadow-lg ${styles.border} ${styles.bg} min-w-8 max-w-md`}
         role="alert"
         aria-live={type === 'error' ? 'assertive' : 'polite'}
       >

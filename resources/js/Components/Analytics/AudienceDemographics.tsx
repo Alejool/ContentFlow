@@ -28,7 +28,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
       <EmptyState
         title={t('analytics.demographics.emptyTitle', 'Sin datos demográficos')}
         description={t('analytics.demographics.emptyDesc', 'Se necesita más interacción de tu audiencia para generar este reporte.')}
-        className="h-[400px] border-dashed bg-gray-50/50"
+        className="h-1 border-dashed bg-gray-50/50"
       />
     );
   }
@@ -55,7 +55,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
           <Users className="w-4 h-4" />
           Distribución por Género
         </h3>
-        <div className="h-[250px] w-full">
+        <div className="h-62.5 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -84,7 +84,7 @@ export default function AudienceDemographics({ data }: AudienceDemographicsProps
           <Users className="w-4 h-4" />
           Rango de Edad
         </h3>
-        <div className="h-[250px] w-full">
+        <div className="h-62.5 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

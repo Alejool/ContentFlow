@@ -223,7 +223,7 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
                         {t('publications.table.pendingAdminReview') || 'Pendiente de revisión'}
                       </span>
                       {item.current_approval_step?.name && (
-                        <span className="ml-1 text-[10px] text-yellow-600 dark:text-yellow-500">
+                        <span className="ml-1 text-2xs text-yellow-600 dark:text-yellow-500">
                           ({item.current_approval_step.name})
                         </span>
                       )}

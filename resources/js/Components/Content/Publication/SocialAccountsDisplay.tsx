@@ -53,7 +53,7 @@ const SocialAccountsDisplay = memo(function SocialAccountsDisplay({
   );
 
   if (displayItems.length === 0) {
-    return <span className="text-[10px] italic text-gray-400">No props</span>;
+    return <span className="text-2xs italic text-gray-400">No props</span>;
   }
 
   if (showCount) {
@@ -74,7 +74,7 @@ const SocialAccountsDisplay = memo(function SocialAccountsDisplay({
         return (
           <div
             key={`${item.id}-${platform}`}
-            className={`relative flex h-6 w-6 items-center justify-center rounded text-[10px] font-black uppercase transition-all ${config.bgClass} ${config.textColor} ${config.borderColor} ${config.darkColor} ${config.darkTextColor} ${config.darkBorderColor} ${isConnected ? 'opacity-100 ring-1 ring-emerald-500/20' : 'scale-95 opacity-40 grayscale'} `}
+            className={`relative flex h-6 w-6 items-center justify-center rounded text-2xs font-black uppercase transition-all ${config.bgClass} ${config.textColor} ${config.borderColor} ${config.darkColor} ${config.darkTextColor} ${config.darkBorderColor} ${isConnected ? 'opacity-100 ring-1 ring-emerald-500/20' : 'scale-95 opacity-40 grayscale'} `}
             title={
               isPublishing
                 ? `Publicando en ${account?.account_name || platform}...`
@@ -124,7 +124,7 @@ const SocialAccountsDisplay = memo(function SocialAccountsDisplay({
         );
       })}
       {displayItems.length > 4 && (
-        <span className="text-[10px] font-bold text-gray-400">+{displayItems.length - 4}</span>
+        <span className="text-2xs font-bold text-gray-400">+{displayItems.length - 4}</span>
       )}
     </div>
   );

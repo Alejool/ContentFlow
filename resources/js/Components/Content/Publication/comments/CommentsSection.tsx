@@ -122,7 +122,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
 
   return (
     <div className="space-y-4">
-      <div className="custom-scrollbar max-h-[300px] space-y-4 overflow-y-auto pr-2">
+      <div className="custom-scrollbar max-h-75 space-y-4 overflow-y-auto pr-2">
         {loading && comments.length === 0 ? (
           <div className="py-4 text-center text-sm text-gray-500">
             {t('publications.modal.comments.loading') || 'Loading comments...'}
@@ -143,7 +143,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                       <span className="text-xs font-semibold text-gray-900 dark:text-neutral-100">
                         {comment.user.name}
                       </span>
-                      <span className="text-[10px] text-gray-500">
+                      <span className="text-2xs text-gray-500">
                         {format(new Date(comment.created_at), 'MMM d, h:mm a')}
                       </span>
                     </div>
@@ -189,7 +189,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                               <span className="text-[12px] font-bold text-gray-900 dark:text-neutral-100">
                                 {reply.user.name}
                               </span>
-                              <span className="text-[10px] text-gray-500">
+                              <span className="text-2xs text-gray-500">
                                 {format(new Date(reply.created_at), 'MMM d, h:mm a')}
                               </span>
                             </div>
@@ -201,7 +201,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
                             <button
                               type="button"
                               onClick={() => handleDelete(reply.id)}
-                              className="mt-1 flex items-center gap-1 text-[10px] text-red-500 opacity-0 transition-opacity hover:text-red-700 group-hover:opacity-100"
+                              className="mt-1 flex items-center gap-1 text-2xs text-red-500 opacity-0 transition-opacity hover:text-red-700 group-hover:opacity-100"
                             >
                               <Trash className="h-2.5 w-2.5" />{' '}
                               {t('publications.modal.comments.delete') || 'Delete'}
@@ -220,7 +220,7 @@ export const CommentsSection = ({ publicationId, currentUser }: CommentsSectionP
 
       <div className="relative">
         {replyTo && (
-          <div className="flex items-center justify-between rounded-t-lg border-x border-t border-gray-200 bg-primary-50 px-3 py-1 text-[10px] text-primary-700 dark:border-neutral-800 dark:bg-primary-900/10 dark:text-primary-400">
+          <div className="flex items-center justify-between rounded-t-lg border-x border-t border-gray-200 bg-primary-50 px-3 py-1 text-2xs text-primary-700 dark:border-neutral-800 dark:bg-primary-900/10 dark:text-primary-400">
             <span>
               {t('publications.modal.comments.replyingTo') || 'Respondiendo a'}{' '}
               <span className="font-semibold">{replyTo.user.name}</span>

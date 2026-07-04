@@ -133,7 +133,7 @@ const UpdatePasswordForm = ({ className = '' }: UpdatePasswordFormProps) => {
               variant="primary"
               icon={Key}
               loading={isSubmitting}
-              className="shadow-primary-500/20 w-full min-w-[200px] rounded-lg font-bold tracking-wider uppercase shadow-lg transition-transform active:scale-95 sm:w-auto"
+              className="shadow-primary-500/20 w-full min-w-5 rounded-lg font-bold tracking-wider uppercase shadow-lg transition-transform active:scale-95 sm:w-auto"
             >
               {isSubmitting ? t('common.updating') : t('profile.password.updateButton')}
             </ModernButton>

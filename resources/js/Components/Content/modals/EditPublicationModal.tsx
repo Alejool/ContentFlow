@@ -676,17 +676,17 @@ const EditPublicationModal = ({
                                       <div className="text-xs font-semibold text-gray-900 dark:text-white">
                                         {step.name}
                                       </div>
-                                      <div className="text-[10px] text-gray-600 dark:text-neutral-400">
+                                      <div className="text-2xs text-gray-600 dark:text-neutral-400">
                                         {step.role?.name || 'Sin rol asignado'}
                                       </div>
                                     </div>
                                     {isCurrent && (
-                                      <span className="bg-primary-200 text-primary-600 dark:bg-primary-800 dark:text-primary-400 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                                      <span className="bg-primary-200 text-primary-600 dark:bg-primary-800 dark:text-primary-400 rounded-full px-2 py-0.5 text-2xs font-bold">
                                         {t('approvals.in_progress') || 'En Proceso'}
                                       </span>
                                     )}
                                     {isPast && (
-                                      <span className="text-[10px] font-bold text-green-600 dark:text-green-400">
+                                      <span className="text-2xs font-bold text-green-600 dark:text-green-400">
                                         ✓ {t('common.completed') || 'Completado'}
                                       </span>
                                     )}

@@ -82,7 +82,7 @@ const SocialAccountItem = memo(
     return (
       <>
         <div
-          className={`relative flex min-h-[80px] items-start rounded-lg border-2 p-3 transition-all ${
+          className={`relative flex min-h-2 items-start rounded-lg border-2 p-3 transition-all ${
             isInternalDisabled ? 'cursor-default opacity-80' : 'cursor-pointer'
           } ${
             isFailed || durationError
@@ -152,7 +152,7 @@ const SocialAccountItem = memo(
                 )}
                 {isCheckedActually && (
                   <span
-                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase ${
+                    className={`rounded-full px-1.5 py-0.5 text-2xs font-bold uppercase ${
                       isPublished
                         ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
                         : isPublishing
@@ -193,7 +193,7 @@ const SocialAccountItem = memo(
                     <Clock className="h-3 w-3" />
                     {formatDateTimeStyled(customSchedule || globalSchedule || '', 'short', 'short')}
                     {!customSchedule && globalSchedule && (
-                      <span className="text-[10px] opacity-70">(Global)</span>
+                      <span className="text-2xs opacity-70">(Global)</span>
                     )}
                   </span>
                   {customSchedule && (
@@ -215,20 +215,20 @@ const SocialAccountItem = memo(
                 </div>
               )}
               {!customSchedule && !globalSchedule && !isPublished && !isPublishing && isChecked && (
-                <div className="animate-in fade-in slide-in-from-top-1 flex items-center gap-1 text-[10px] font-medium text-primary-500">
+                <div className="animate-in fade-in slide-in-from-top-1 flex items-center gap-1 text-2xs font-medium text-primary-500">
                   <Clock className="h-3 w-3" />
                   {t('publications.modal.schedule.instantWarning') ||
                     'Para publicar inmediatamente, configura la fecha desde el modal de programación.'}
                 </div>
               )}
               {isPublished && (
-                <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
+                <div className="mt-1 flex items-center gap-1 text-2xs font-medium text-green-600 dark:text-green-400">
                   <Check className="h-3 w-3" />
                   {t('publications.modal.publish.published')}
                 </div>
               )}
               {isPublishing && (
-                <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
+                <div className="mt-1 flex items-center justify-between gap-1 text-2xs font-medium text-yellow-600 dark:text-yellow-400">
                   <div className="flex items-center gap-1">
                     <div className="h-3 w-3 animate-spin rounded-full border-2 border-yellow-600 border-t-transparent" />
                     {t('publications.modal.publish.publishing')} en {account.platform}
@@ -249,14 +249,14 @@ const SocialAccountItem = memo(
                 </div>
               )}
               {isUnpublishing && (
-                <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <div className="mt-1 flex items-center gap-1 text-2xs font-medium text-amber-600 dark:text-amber-400">
                   <div className="h-3 w-3 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
                   {t('publications.modal.publish.unpublishing') || 'Despublicando...'}
                 </div>
               )}
               {isFailed && (
                 <div className="mt-1 flex flex-col gap-1">
-                  <div className="flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
+                  <div className="flex items-center gap-1 text-2xs font-medium text-red-600 dark:text-red-400">
                     <div className="flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
                       <X className="h-2 w-2 text-white" />
                     </div>
@@ -264,7 +264,7 @@ const SocialAccountItem = memo(
                   </div>
                   {errorMessage && (
                     <div className="flex flex-col gap-1.5">
-                      <div className="rounded border border-red-200 bg-red-50 px-2 py-1 text-[10px] text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                      <div className="rounded border border-red-200 bg-red-50 px-2 py-1 text-2xs text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
                         {errorMessage}
                       </div>
                       {/* Botón de reconexión si el error es de OAuth 1.0a */}
@@ -279,7 +279,7 @@ const SocialAccountItem = memo(
                               e.stopPropagation();
                               reconnect(account.id, account.platform);
                             }}
-                            className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-60 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                            className="flex items-center justify-center gap-1 rounded border border-blue-300 bg-blue-50 px-2 py-1 text-2xs font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-60 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
                           >
                             <svg
                               className={`h-3 w-3 ${isReconnecting ? 'animate-spin' : ''}`}
@@ -302,7 +302,7 @@ const SocialAccountItem = memo(
                 </div>
               )}
               {durationError && (
-                <div className="animate-in slide-in-from-top-1 mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
+                <div className="animate-in slide-in-from-top-1 mt-1 flex items-center gap-1 text-2xs font-medium text-red-600 dark:text-red-400">
                   <AlertTriangle className="h-3 w-3" />
                   {durationError}
                 </div>

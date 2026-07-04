@@ -55,7 +55,7 @@ const RecurringPostsSection = ({
         </span>
       </div>
 
-      <div className="max-h-[200px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent space-y-1.5 overflow-y-auto pr-1 dark:scrollbar-thumb-neutral-600">
+      <div className="max-h-5 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent space-y-1.5 overflow-y-auto pr-1 dark:scrollbar-thumb-neutral-600">
         {uniqueScheduled.map((post: any) => (
           <div
             key={post.id}
@@ -496,7 +496,7 @@ export default function PublishPublicationModal({
                                     className="h-5 w-5 rounded-full"
                                   />
                                 ) : (
-                                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-yellow-200 text-[10px] font-bold dark:bg-yellow-800">
+                                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-yellow-200 text-2xs font-bold dark:bg-yellow-800">
                                     {latestLog.requester?.name?.charAt(0) || '?'}
                                   </div>
                                 )}

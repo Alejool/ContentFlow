@@ -162,7 +162,7 @@ export default function PlatformConfigCard({
         {/* Type Selector */}
         {config.is_compatible && (
           <div className="mb-2 flex items-center gap-2">
-            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-neutral-400">
+            <label className="min-w-15 text-xs font-semibold text-gray-500 dark:text-neutral-400">
               Tipo:
             </label>
             {editable && config.can_change_type && config.available_types ? (
@@ -188,7 +188,7 @@ export default function PlatformConfigCard({
         {/* Quality Info */}
         {config.quality && (
           <div className="mb-2 flex items-center gap-2">
-            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-neutral-400">
+            <label className="min-w-15 text-xs font-semibold text-gray-500 dark:text-neutral-400">
               Calidad:
             </label>
             <div className="flex flex-1 flex-wrap gap-1.5">
@@ -209,7 +209,7 @@ export default function PlatformConfigCard({
         {/* Format Info */}
         {config.format && (
           <div className="mb-2 flex items-center gap-2">
-            <label className="min-w-[60px] text-xs font-semibold text-gray-500 dark:text-neutral-400">
+            <label className="min-w-15 text-xs font-semibold text-gray-500 dark:text-neutral-400">
               Formato:
             </label>
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-theme-bg-secondary dark:text-neutral-300">

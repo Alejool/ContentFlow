@@ -89,7 +89,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
 
         {/* Month/Year Picker Dropdown */}
         {showMonthPicker && (
-          <div className="absolute top-full left-0 z-50 mt-2 min-w-[280px] rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-neutral-800 dark:bg-neutral-800">
+          <div className="absolute top-full left-0 z-50 mt-2 min-w-7 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-neutral-800 dark:bg-neutral-800">
             <div className="mb-4 grid grid-cols-3 gap-2">
               {Array.from({ length: 12 }, (_, i) => (
                 <Button

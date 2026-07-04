@@ -81,7 +81,7 @@ export default function PublicationRow({
                         return (
                           <span
                             key={platform}
-                            className="inline-flex items-center rounded border border-sky-200 bg-sky-100 px-1.5 py-0.5 text-[10px] font-medium text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400"
+                            className="inline-flex items-center rounded border border-sky-200 bg-sky-100 px-1.5 py-0.5 text-2xs font-medium text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400"
                           >
                             Twitter:{' '}
                             {settings.type === 'poll'
@@ -96,7 +96,7 @@ export default function PublicationRow({
                         return (
                           <span
                             key={platform}
-                            className="inline-flex items-center rounded border border-red-200 bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+                            className="inline-flex items-center rounded border border-red-200 bg-red-100 px-1.5 py-0.5 text-2xs font-medium text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
                           >
                             YouTube: {settings.type === 'short' ? 'Short' : 'Video'}
                           </span>
@@ -108,7 +108,7 @@ export default function PublicationRow({
                         return (
                           <span
                             key={platform}
-                            className="inline-flex items-center rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-800 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+                            className="inline-flex items-center rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-2xs font-medium text-blue-800 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
                           >
                             FB: {settings.type === 'reel' ? 'Reel' : 'Post'}
                           </span>

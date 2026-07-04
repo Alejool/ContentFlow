@@ -120,7 +120,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                 showStatus
               />
             </div>
-            <span className="hidden max-w-[150px] truncate text-sm font-medium transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400 sm:block">
+            <span className="hidden max-w-37.5 truncate text-sm font-medium transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400 sm:block">
               {user?.name || 'User'}
             </span>
             <ChevronDown
@@ -157,7 +157,7 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
                       {user?.email}
                     </p>
                     <div className="mt-1.5">
-                      <span className="inline-flex items-center rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                      <span className="inline-flex items-center rounded bg-emerald-100 px-2 py-0.5 text-2xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                         Active
                       </span>
                     </div>

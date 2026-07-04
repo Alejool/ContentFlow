@@ -16,7 +16,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-[88px] animate-pulse rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700/50 dark:bg-theme-bg-secondary"
+            className="h-22 animate-pulse rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700/50 dark:bg-theme-bg-secondary"
           >
             <div className="flex h-full items-center gap-4">
               <div className="h-12 w-12 shrink-0 rounded-full bg-gray-100 dark:bg-neutral-700"></div>

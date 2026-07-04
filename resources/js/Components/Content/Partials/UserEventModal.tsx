@@ -287,7 +287,7 @@ export default function UserEventModal({
                     t('calendar.userEvents.modal.visibility.privateHint')}
               </p>
               {!event && (
-                <p className="mt-1 text-[10px] italic text-gray-500 dark:text-neutral-400">
+                <p className="mt-1 text-2xs italic text-gray-500 dark:text-neutral-400">
                   {t('calendar.userEvents.modal.footer.note')}
                 </p>
               )}

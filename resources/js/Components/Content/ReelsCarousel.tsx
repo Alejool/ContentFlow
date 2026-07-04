@@ -113,7 +113,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
   return (
     <div className="space-y-4">
       {/* Main Video Player */}
-      <div className="relative mx-auto aspect-[9/16] max-h-[600px] overflow-hidden rounded-lg bg-black">
+      <div className="relative mx-auto aspect-[9/16] max-h-15 overflow-hidden rounded-lg bg-black">
         <VideoPlayer reelId={currentReel.id} />
 
         {/* Platform Badge */}

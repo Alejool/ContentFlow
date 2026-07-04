@@ -27,7 +27,7 @@ export const FacebookPreview = memo(
     pollDuration = 24,
   }: FacebookPreviewProps) => {
     return (
-      <div className="w-full max-w-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-[#3e4042] dark:bg-[#242526] dark:text-[#e4e6eb]">
+      <div className="w-full max-w-125 overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-[#3e4042] dark:bg-[#242526] dark:text-[#e4e6eb]">
         {/* Header */}
         <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2">

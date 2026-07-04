@@ -157,7 +157,7 @@ export default function GlobalAiAssistant() {
   return (
     <div
       className={`fixed bottom-6 right-6 z-50 flex flex-col overflow-hidden rounded-lg shadow-2xl backdrop-blur-2xl transition-all duration-300 ${
-        isMinimized ? 'w-68 h-18' : 'h-[500px] w-80 sm:w-96'
+        isMinimized ? 'w-68 h-18' : 'h-125 w-80 sm:w-96'
       } `}
     >
       <button

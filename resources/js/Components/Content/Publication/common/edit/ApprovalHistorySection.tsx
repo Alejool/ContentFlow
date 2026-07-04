@@ -151,7 +151,7 @@ export default function ApprovalHistorySection({
               {t('approvals.workflow_status') || 'Estado del Flujo'}
             </h3>
             {workflow.name && (
-              <span className="rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-[10px] font-bold text-primary-700 dark:border-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
+              <span className="rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-2xs font-bold text-primary-700 dark:border-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
                 {workflow.name}
               </span>
             )}
@@ -159,7 +159,7 @@ export default function ApprovalHistorySection({
 
           <div className="relative flex justify-between">
             {/* Line connecting the steps */}
-            <div className="absolute left-0 top-[18px] h-0.5 w-full bg-gray-100 dark:bg-theme-bg-secondary" />
+            <div className="absolute left-0 top-4.5 h-0.5 w-full bg-gray-100 dark:bg-theme-bg-secondary" />
 
             {workflowSteps.map((step) => {
               const stepLog = logs.find(
@@ -196,7 +196,7 @@ export default function ApprovalHistorySection({
                         <Avatar src={step.user.photo_url ?? null} name={step.user.name} size="md" />
                         {(isPast || isCompleted) && (
                           <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-green-500 dark:border-neutral-800">
-                            <span className="text-[10px] font-bold text-white">✓</span>
+                            <span className="text-2xs font-bold text-white">✓</span>
                           </div>
                         )}
                       </div>
@@ -226,11 +226,11 @@ export default function ApprovalHistorySection({
                     <div className="line-clamp-1 text-[11px] font-bold text-gray-900 dark:text-white">
                       {step.name}
                     </div>
-                    <div className="flex items-center justify-center gap-1 text-[10px] text-gray-500 dark:text-neutral-400">
+                    <div className="flex items-center justify-center gap-1 text-2xs text-gray-500 dark:text-neutral-400">
                       {step.user ? (
-                        <span className="max-w-[80px] truncate">{step.user.name}</span>
+                        <span className="max-w-2 truncate">{step.user.name}</span>
                       ) : (
-                        <span className="max-w-[80px] truncate">
+                        <span className="max-w-2 truncate">
                           {step.role?.name || t('approvals.no_role_assigned') || 'Sin rol'}
                         </span>
                       )}
@@ -290,7 +290,7 @@ export default function ApprovalHistorySection({
                             <span className="font-medium">{t('approvals.step')} {log.approvalStep.level_number}:</span>{' '}
                             {log.approvalStep.level_name}
                             {log.approvalStep.role && (
-                              <span className="ml-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">
+                              <span className="ml-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-2xs font-medium text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">
                                 {log.approvalStep.role.name}
                               </span>
                             )}
@@ -298,7 +298,7 @@ export default function ApprovalHistorySection({
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-0.5">
-                        <span className="text-[10px] font-bold text-gray-900 dark:text-neutral-100 sm:text-xs">
+                        <span className="text-2xs font-bold text-gray-900 dark:text-neutral-100 sm:text-xs">
                           {formatDateTimeString(log.created_at || log.requested_at || '')}
                         </span>
                       </div>

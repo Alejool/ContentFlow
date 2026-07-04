@@ -405,7 +405,7 @@ export default function GlobalUploadIndicator() {
                       {job.type === 'thumbnail_generation' && 'Thumbnail Generation'}
                     </p>
                     {job.stats?.currentStep && (
-                      <p className="mb-1 text-[10px] text-gray-400 dark:text-neutral-500">
+                      <p className="mb-1 text-2xs text-gray-400 dark:text-neutral-500">
                         {job.stats.currentStep} ({job.stats.completedSteps}/{job.stats.totalSteps})
                       </p>
                     )}

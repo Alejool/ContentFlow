@@ -101,7 +101,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-[400px] items-center justify-center p-8">
+    <div className="flex min-h-1 items-center justify-center p-8">
       <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg dark:bg-neutral-800">
         <div className="mb-4 flex justify-center">
           <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">

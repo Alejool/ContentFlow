@@ -174,7 +174,7 @@ const PlatformCard = memo(
               onToggle();
             }
           }}
-          className={`relative flex h-[110px] w-full flex-col gap-3 rounded-lg border-2 p-4 transition-all ${
+          className={`relative flex h-27.5 w-full flex-col gap-3 rounded-lg border-2 p-4 transition-all ${
             canToggle ? 'cursor-pointer' : 'cursor-not-allowed'
           } ${
             !canPublish && !isPublished && !isScheduled
@@ -317,7 +317,7 @@ const PlatformCard = memo(
                   <span className="text-center text-xs font-medium text-amber-700 dark:text-amber-400">
                     {t('publications.modal.publish.oauth1_required') || 'Requiere reconexión'}
                   </span>
-                  <span className="mt-1 text-center text-[10px] leading-tight text-amber-600 dark:text-amber-500">
+                  <span className="mt-1 text-center text-2xs leading-tight text-amber-600 dark:text-amber-500">
                     {t('publications.modal.publish.oauth1_video_message') ||
                       'Esta cuenta necesita credenciales OAuth 1.0a para subir videos'}
                   </span>
@@ -351,18 +351,18 @@ const PlatformCard = memo(
                     <span className="text-center text-xs font-medium text-red-700 dark:text-red-400">
                       {t('publications.modal.publish.cannot_publish') || 'No se puede publicar'}
                     </span>
-                    <div className="mt-2 max-w-[200px] space-y-1">
+                    <div className="mt-2 max-w-5 space-y-1">
                       {capabilityErrors.map((error, idx) => (
                         <div
                           key={idx}
-                          className="text-center text-[10px] leading-tight text-red-600 dark:text-red-500"
+                          className="text-center text-2xs leading-tight text-red-600 dark:text-red-500"
                         >
                           • {error}
                         </div>
                       ))}
                     </div>
                     {upgradeMessage && (
-                      <div className="mt-2 rounded-lg border border-red-200 bg-red-100 px-2 py-1 text-center text-[10px] font-medium text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
+                      <div className="mt-2 rounded-lg border border-red-200 bg-red-100 px-2 py-1 text-center text-2xs font-medium text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
                         {upgradeMessage}
                       </div>
                     )}
@@ -439,7 +439,7 @@ const PlatformCard = memo(
               if (validation.maxDuration === Infinity || validation.isValid) return null;
 
               return (
-                <div className="absolute top-2 left-2 z-10 flex animate-pulse items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-[10px] font-bold text-red-600 shadow-sm dark:border-red-800/30 dark:bg-red-900/30 dark:text-red-400">
+                <div className="absolute top-2 left-2 z-10 flex animate-pulse items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-2xs font-bold text-red-600 shadow-sm dark:border-red-800/30 dark:bg-red-900/30 dark:text-red-400">
                   <XCircle className="h-3 w-3" />
                   <span className="leading-none">MAX {validation.formattedMax}</span>
                 </div>
@@ -448,7 +448,7 @@ const PlatformCard = memo(
 
           {/* Capability Warnings Badge */}
           {/* {canPublish && capabilityWarnings.length > 0 && !isPublishing && !isUnpublishing && !isPublished && (
-            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-600 shadow-sm dark:border-amber-800/30 dark:bg-amber-900/30 dark:text-amber-400"
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-2xs font-bold text-amber-600 shadow-sm dark:border-amber-800/30 dark:bg-amber-900/30 dark:text-amber-400"
                  title={capabilityWarnings.join(', ')}>
               <AlertTriangle className="h-3 w-3" />
               <span className="leading-none">{capabilityWarnings.length} {t('common.warning', 'Advertencia')}</span>
@@ -473,7 +473,7 @@ const PlatformCard = memo(
                 </div>
                 {/* Selected badge */}
                 {isSelected && !isPublished && !isScheduled && !isPublishing && (
-                  <span className="bg-primary-600 dark:bg-primary-500 shrink-0 rounded-lg px-2 py-0.5 text-[10px] font-bold text-white uppercase shadow-sm">
+                  <span className="bg-primary-600 dark:bg-primary-500 shrink-0 rounded-lg px-2 py-0.5 text-2xs font-bold text-white uppercase shadow-sm">
                     {t('common.selected') || 'Seleccionado'}
                   </span>
                 )}
@@ -486,7 +486,7 @@ const PlatformCard = memo(
 
           {/* Connected By Info */}
           {account.user?.name && !isPublishing && !isUnpublishing && !isPublished && (
-            <div className="z-10 truncate text-[10px] font-medium tracking-wide text-gray-500 uppercase dark:text-neutral-400">
+            <div className="z-10 truncate text-2xs font-medium tracking-wide text-gray-500 uppercase dark:text-neutral-400">
               {t('manageContent.socialMedia.status.connectedBy') || 'Conectado por'}:{' '}
               {account.user.name}
             </div>
@@ -506,7 +506,7 @@ const PlatformCard = memo(
                   (sp: any) => sp.social_account_id === account.id,
                 );
                 return schedPost?.scheduled_at ? (
-                  <span className="rounded-lg bg-white px-2 py-0.5 text-[10px] text-gray-600 shadow-sm dark:bg-theme-bg-secondary dark:text-neutral-400">
+                  <span className="rounded-lg bg-white px-2 py-0.5 text-2xs text-gray-600 shadow-sm dark:bg-theme-bg-secondary dark:text-neutral-400">
                     {formatDateTimeStyled(schedPost.scheduled_at, 'short', 'short')}
                   </span>
                 ) : null;
@@ -533,7 +533,7 @@ const PlatformCard = memo(
           !isUnpublishing &&
           !isRetrying && (
             <div className="absolute top-2 left-2 z-10">
-              <span className="flex items-center gap-1 rounded-lg border border-red-300 bg-red-100 px-2 py-1 text-[10px] font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
+              <span className="flex items-center gap-1 rounded-lg border border-red-300 bg-red-100 px-2 py-1 text-2xs font-bold text-red-700 shadow-sm dark:border-red-800 dark:bg-red-900/40 dark:text-red-400">
                 <XCircle className="h-3 w-3" />
                 {t('publications.modal.publish.failed') || 'Falló'}
               </span>

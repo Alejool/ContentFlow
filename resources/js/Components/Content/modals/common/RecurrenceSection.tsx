@@ -237,7 +237,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                                 >
                                   <span className="font-semibold">{account.platform}</span>
                                   <span className="opacity-75">·</span>
-                                  <span className="max-w-[120px] truncate">
+                                  <span className="max-w-3 truncate">
                                     {account.account_name}
                                   </span>
                                 </span>
@@ -653,7 +653,7 @@ export const RecurrenceSection: React.FC<RecurrenceSectionProps> = ({
                     </div>
                   )}
 
-                  <p className="mt-3 flex items-start gap-1.5 text-[10px] text-gray-500 italic dark:text-neutral-400">
+                  <p className="mt-3 flex items-start gap-1.5 text-2xs text-gray-500 italic dark:text-neutral-400">
                     <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
                     <span>
                       {t('publications.modal.schedule.recurrence.preview_note') ||

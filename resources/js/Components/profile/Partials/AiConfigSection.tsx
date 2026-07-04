@@ -140,7 +140,7 @@ export default function AiConfigSection({
                     href={provider.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary-500 hover:text-primary-600 flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase transition-colors"
+                    className="text-primary-500 hover:text-primary-600 flex items-center gap-1 text-2xs font-bold tracking-widest uppercase transition-colors"
                   >
                     {t('profile.ai.get_key') || 'Obtener Clave'}
                     <ExternalLink className="h-3 w-3" />
@@ -171,7 +171,7 @@ export default function AiConfigSection({
                       showPasswordToggle
                       containerClassName="max-w-xl"
                     />
-                    <div className="mt-2 flex items-center gap-2 text-[10px] font-bold tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
+                    <div className="mt-2 flex items-center gap-2 text-2xs font-bold tracking-wide text-emerald-600 uppercase dark:text-emerald-400">
                       <ShieldCheck className="h-3.5 w-3.5" />
                       {t('profile.ai.secured_storage') || 'Almacenamiento Seguro Encriptado'}
                     </div>

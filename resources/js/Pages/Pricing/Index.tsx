@@ -168,7 +168,7 @@ export default function Pricing() {
 
                       <h3 className="mb-2 text-2xl font-bold text-gray-900">{plan.name}</h3>
 
-                      <p className="min-h-[40px] text-sm text-gray-600">{plan.description}</p>
+                      <p className="min-h-1 text-sm text-gray-600">{plan.description}</p>
                     </div>
 
                     {/* Price */}

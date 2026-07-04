@@ -27,7 +27,7 @@ export default function WorkspaceInfoBadge({ variant = 'compact' }: WorkspaceInf
           {current_workspace.name.charAt(0).toUpperCase()}
         </div>
         {variant === 'full' && (
-          <span className="group-hover:text-primary-600 dark:group-hover:text-primary-400 max-w-[100px] truncate text-sm font-semibold text-gray-900 transition-colors sm:max-w-[200px] dark:text-white">
+          <span className="group-hover:text-primary-600 dark:group-hover:text-primary-400 max-w-25 truncate text-sm font-semibold text-gray-900 transition-colors sm:max-w-5 dark:text-white">
             {current_workspace.name}
           </span>
         )}
@@ -45,7 +45,7 @@ export default function WorkspaceInfoBadge({ variant = 'compact' }: WorkspaceInf
         </span>
       </div>
 
-      <span className="border-primary-200 bg-primary-100 text-primary-700 dark:border-primary-500/30 dark:bg-primary-500/20 dark:text-primary-300 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase">
+      <span className="border-primary-200 bg-primary-100 text-primary-700 dark:border-primary-500/30 dark:bg-primary-500/20 dark:text-primary-300 rounded-full border px-2.5 py-1 text-2xs font-bold tracking-wider uppercase">
         {userRole}
       </span>
     </Link>

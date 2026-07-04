@@ -128,7 +128,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
               >
                 {/* Header */}
                 <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900/60">
-                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-neutral-500">
+                  <p className="text-2xs font-bold tracking-widest text-gray-400 uppercase dark:text-neutral-500">
                     {t('calendar.selectOptions') || 'Opciones de selección'}
                   </p>
                 </div>

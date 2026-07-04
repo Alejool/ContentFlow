@@ -161,7 +161,7 @@ const CustomTimeSelector = ({
   };
 
   return (
-    <div className="flex w-full shrink-0 flex-col border-t border-gray-100 bg-white md:w-[220px] md:border-t-0 md:border-l dark:border-neutral-800 dark:bg-neutral-900">
+    <div className="flex w-full shrink-0 flex-col border-t border-gray-100 bg-white md:w-55 md:border-t-0 md:border-l dark:border-neutral-800 dark:bg-neutral-900">
       <div className="flex h-12 items-center justify-center gap-1.5 border-b border-gray-100 bg-white px-3 text-[0.8125rem] font-semibold text-gray-700 md:h-16 md:gap-2 md:px-4 md:text-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
         <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
         <span>{currentLocale === 'es' ? 'Seleccionar Hora' : 'Select Time'}</span>
@@ -466,7 +466,7 @@ const DatePickerModern = <T extends FieldValues>({
             <span className="sr-only">Previous month</span>
           </Button>
           <div className="flex flex-1 items-center justify-center gap-2">
-            <div className="w-[140px]">
+            <div className="w-35">
               <Select
                 id="dp-month"
                 options={monthOptions}
@@ -484,7 +484,7 @@ const DatePickerModern = <T extends FieldValues>({
                 usePortal={false}
               />
             </div>
-            <div className="w-[100px]">
+            <div className="w-25">
               <Select
                 id="dp-year"
                 options={yearOptions}

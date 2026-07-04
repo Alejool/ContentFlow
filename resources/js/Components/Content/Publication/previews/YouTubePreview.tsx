@@ -20,7 +20,7 @@ export const YouTubePreview = memo(
     const imageUrl = mediaUrls.find((url) => !url.includes('video') && !url.includes('.mp4'));
 
     return (
-      <div className="w-full max-w-[640px] overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-neutral-800 dark:bg-[#0f0f0f] dark:text-white">
+      <div className="w-full max-w-16 overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-neutral-800 dark:bg-[#0f0f0f] dark:text-white">
         {/* Video Player Area */}
         <div className="relative flex aspect-video items-center justify-center bg-black">
           {videoUrl ? (

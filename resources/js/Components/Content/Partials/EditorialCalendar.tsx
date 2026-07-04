@@ -71,7 +71,7 @@ export default function EditorialCalendar() {
         {days.map((day) => (
           <div
             key={day}
-            className="py-2 text-center text-[10px] font-bold uppercase tracking-wider text-gray-400 sm:text-xs"
+            className="py-2 text-center text-2xs font-bold uppercase tracking-wider text-gray-400 sm:text-xs"
           >
             {day}
           </div>
@@ -103,7 +103,7 @@ export default function EditorialCalendar() {
           return (
             <div
               key={day.toISOString()}
-              className={`relative min-h-[80px] border-b border-r p-1 transition-colors sm:min-h-[140px] sm:p-2 ${
+              className={`relative min-h-2 border-b border-r p-1 transition-colors sm:min-h-35 sm:p-2 ${
                 actualTheme === 'dark'
                   ? `${isCurrentMonth ? 'bg-neutral-900/30' : 'bg-neutral-950/50'} border-neutral-800`
                   : `${isCurrentMonth ? 'bg-white' : 'bg-gray-50/50'} border-gray-100`
@@ -111,7 +111,7 @@ export default function EditorialCalendar() {
             >
               <div className="mb-1 flex justify-end">
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium sm:h-8 sm:w-8 sm:text-sm ${
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-2xs font-medium sm:h-8 sm:w-8 sm:text-sm ${
                     isTodayDate
                       ? 'bg-primary-600 text-white shadow-lg'
                       : isCurrentMonth
@@ -125,7 +125,7 @@ export default function EditorialCalendar() {
                 </span>
               </div>
 
-              <div className="scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-neutral-800 max-h-[60px] space-y-1 overflow-y-auto overflow-x-hidden scroll-smooth pr-0.5 transition-all duration-300 sm:max-h-[100px]">
+              <div className="scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-neutral-800 max-h-15 space-y-1 overflow-y-auto overflow-x-hidden scroll-smooth pr-0.5 transition-all duration-300 sm:max-h-25">
                 {dayEvents.map((event) => (
                   <div
                     key={event.id}
@@ -133,7 +133,7 @@ export default function EditorialCalendar() {
                       e.stopPropagation();
                       handleEventClick(event);
                     }}
-                    className={`group flex cursor-pointer flex-col gap-0.5 truncate rounded border-l-2 px-1 py-0.5 text-[7px] font-medium shadow-sm transition-all hover:scale-[1.02] active:scale-95 sm:px-2 sm:py-1 sm:text-[10px] ${
+                    className={`group flex cursor-pointer flex-col gap-0.5 truncate rounded border-l-2 px-1 py-0.5 text-[7px] font-medium shadow-sm transition-all hover:scale-[1.02] active:scale-95 sm:px-2 sm:py-1 sm:text-2xs ${
                       actualTheme === 'dark'
                         ? 'bg-neutral-800/80 hover:bg-neutral-700/80'
                         : 'bg-gray-50 hover:bg-gray-100'

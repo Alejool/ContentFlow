@@ -15,7 +15,7 @@ const CreateWorkspaceCard = ({ onClick }: CreateWorkspaceCardProps) => {
       {...keyboardProps}
       className="group relative cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary-400 hover:bg-gradient-to-br hover:from-primary-50/30 hover:to-primary-100/30 hover:shadow-xl dark:border-neutral-700 dark:hover:border-primary-500 dark:hover:from-primary-900/5 dark:hover:to-primary-900/10"
     >
-      <div className="flex h-full min-h-[280px] flex-col items-center justify-center p-4 text-center">
+      <div className="flex h-full min-h-7 flex-col items-center justify-center p-4 text-center">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 transition-transform group-hover:scale-110 dark:from-primary-900/30 dark:to-primary-800/30">
           <Plus className="h-8 w-8 text-primary-600 dark:text-primary-400" />
         </div>

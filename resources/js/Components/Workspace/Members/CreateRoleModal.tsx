@@ -130,7 +130,7 @@ export default function CreateRoleModal({
               <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-neutral-300">
                 {t('workspace.roles_management.key_permissions_label')}
               </label>
-              <div className="h-[200px] space-y-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-800 dark:bg-theme-bg-secondary">
+              <div className="h-5 space-y-2 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-800 dark:bg-theme-bg-secondary">
                 {isLoadingPermissions ? (
                   <div className="flex justify-center p-4">
                     <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-primary-600"></div>
@@ -151,7 +151,7 @@ export default function CreateRoleModal({
                       />
                       <div className="text-xs">
                         <div className="font-bold">{permission.name}</div>
-                        <div className="max-w-[200px] truncate opacity-70">
+                        <div className="max-w-5 truncate opacity-70">
                           {permission.description}
                         </div>
                       </div>

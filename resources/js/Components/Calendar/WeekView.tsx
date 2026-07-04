@@ -95,12 +95,12 @@ const DroppableTimeSlot: React.FC<DroppableTimeSlotProps> = ({
           onAddEvent(toAddEventDateTime(day, hour));
         }
       }}
-      className={`group relative min-h-[80px] cursor-pointer border-r border-gray-100 transition-colors hover:bg-primary-50/20 dark:border-neutral-800 dark:hover:bg-primary-900/10 ${
+      className={`group relative min-h-2 cursor-pointer border-r border-gray-100 transition-colors hover:bg-primary-50/20 dark:border-neutral-800 dark:hover:bg-primary-900/10 ${
         isOver ? 'bg-primary-100/50 ring-1 ring-inset ring-primary-500 dark:bg-primary-900/20' : ''
       } ${isToday(day) ? 'bg-primary-50/20 dark:bg-primary-900/5' : ''} ${isSelectedDay ? 'bg-gray-50/40 dark:bg-white/5' : ''}`}
     >
       {/* Línea de media hora decorativa */}
-      <div className="absolute top-1/2 left-0 h-[1px] w-full border-t border-dashed border-gray-100 dark:border-neutral-800/50" />
+      <div className="absolute top-1/2 left-0 h-px w-full border-t border-dashed border-gray-100 dark:border-neutral-800/50" />
       {events.map((event) => (
         <DraggableWeekEvent
           key={event.id}
@@ -173,7 +173,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       {/* Outer wrapper: horizontal scroll on small screens */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-neutral-800">
-        <div className="min-w-[640px]">
+        <div className="min-w-16">
 
           {/* ── Day headers ── */}
           <div className="sticky top-0 z-10 grid border-b border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900"
@@ -205,7 +205,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
                 {isToday(day) && (
                   <div className="absolute top-0 left-0 h-1 w-full bg-primary-500 shadow-[0_0_8px_rgba(var(--primary-500),0.5)]" />
                 )}
-                <div className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-neutral-400">
+                <div className="text-2xs font-semibold uppercase tracking-wide text-gray-500 dark:text-neutral-400">
                   {format(day, 'EEE')}
                 </div>
                 <div

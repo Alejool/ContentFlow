@@ -277,7 +277,7 @@ export default function PlatformCard({
           <button
             onClick={handleConnect}
             disabled={isConnecting}
-            className="bg-primary-600 hover:bg-primary-700 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary-600 hover:bg-primary-700 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={t('platform.connectTo', { platform: platform.name })}
           >
             {isConnecting ? (

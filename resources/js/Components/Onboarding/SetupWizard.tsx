@@ -161,7 +161,7 @@ export default function SetupWizard({
           <button
             onClick={handleSkip}
             disabled={isSkipping || state.isLoading}
-            className="focus:ring-primary-500 flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:text-gray-600 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:text-gray-300"
+            className="focus:ring-primary-500 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:text-gray-600 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:text-gray-300"
             aria-label={t('wizard.close')}
           >
             <X className="h-5 w-5 md:h-6 md:w-6" />
@@ -189,7 +189,7 @@ export default function SetupWizard({
           <button
             onClick={handleBack}
             disabled={currentStep === 'welcome' || state.isLoading}
-            className="focus:ring-primary-500 order-2 flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:order-1 dark:text-neutral-400 dark:hover:text-white"
+            className="focus:ring-primary-500 order-2 flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:order-1 dark:text-neutral-400 dark:hover:text-white"
             aria-label={t('wizard.previousStep')}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -205,7 +205,7 @@ export default function SetupWizard({
               <button
                 onClick={handleSkip}
                 disabled={isSkipping || state.isLoading}
-                className="focus:ring-primary-500 min-h-[44px] rounded-lg px-4 py-2 text-center text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400 dark:hover:text-white"
+                className="focus:ring-primary-500 min-h-11 rounded-lg px-4 py-2 text-center text-gray-600 transition-colors hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400 dark:hover:text-white"
                 aria-label={t('wizard.skipSetup')}
               >
                 {isSkipping ? t('wizard.skipping') : t('wizard.skip')}
@@ -216,7 +216,7 @@ export default function SetupWizard({
               <button
                 onClick={handleNext}
                 disabled={state.isLoading}
-                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-6 py-2 font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 flex min-h-11 items-center justify-center gap-2 rounded-lg px-6 py-2 font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={t('wizard.getStartedSetup')}
               >
                 {t('wizard.getStarted')}
@@ -228,7 +228,7 @@ export default function SetupWizard({
               <button
                 onClick={handleNext}
                 disabled={state.isLoading}
-                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-6 py-2 font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 flex min-h-11 items-center justify-center gap-2 rounded-lg px-6 py-2 font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={t('wizard.nextStep')}
               >
                 {connectedAccounts.length > 0
@@ -242,7 +242,7 @@ export default function SetupWizard({
               <button
                 onClick={handleComplete}
                 disabled={state.isLoading}
-                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-6 py-2 font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 flex min-h-11 items-center justify-center gap-2 rounded-lg px-6 py-2 font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={t('wizard.finishSetup')}
               >
                 {t('wizard.finish')}

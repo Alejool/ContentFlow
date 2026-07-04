@@ -96,7 +96,7 @@ export function PublicationStatusCards({
                 animate={{ scale: isActive ? 1.04 : 1, opacity: isActive ? 1 : 0.75 }}
                 transition={{ duration: 0.4 }}
                 className={cn(
-                  'group relative flex w-[148px] flex-none flex-col items-center overflow-hidden rounded-lg border p-3 text-center shadow-sm sm:p-4',
+                  'group relative flex w-37 flex-none flex-col items-center overflow-hidden rounded-lg border p-3 text-center shadow-sm sm:p-4',
                   'bg-white/80 backdrop-blur-sm dark:bg-theme-bg-secondary',
                   statusConfig.border,
                   isActive && 'shadow-md',
@@ -118,7 +118,7 @@ export function PublicationStatusCards({
                   <StatusIcon className={cn('h-4 w-4 sm:h-5 sm:w-5', statusConfig.text)} />
                 </div>
 
-                <p className="relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-neutral-400 sm:text-xs">
+                <p className="relative z-10 mb-1 text-2xs font-medium uppercase tracking-wide text-gray-500 dark:text-neutral-400 sm:text-xs">
                   {t(`publications.status.${statusKey}`)}
                 </p>
 
@@ -250,7 +250,7 @@ export function PublicationStatusCards({
               <StatusIcon className={cn('h-4 w-4 sm:h-5 sm:w-5', statusConfig.text)} />
             </div>
 
-            <p className="relative z-10 mb-1 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:text-neutral-400 sm:text-xs">
+            <p className="relative z-10 mb-1 text-2xs font-medium uppercase tracking-wide text-gray-500 dark:text-neutral-400 sm:text-xs">
               {t(`publications.status.${statusKey}`)}
             </p>
 

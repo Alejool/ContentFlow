@@ -126,13 +126,13 @@ export default function PlanUsageSection({ usage, usageLoading, isOwner }: PlanU
                 <HardDrive className="h-3 w-3" />
                 <span>{t('subscription.usage.storage') || 'Almacenamiento'}</span>
               </div>
-              <span className="text-[10px] font-semibold text-gray-900 dark:text-white">
+              <span className="text-2xs font-semibold text-gray-900 dark:text-white">
                 {usage.storage.limit_gb === -1
                   ? `${formatBytes(usage.storage.used_bytes)} / ∞`
                   : formatStorageUsage(usage.storage.used_bytes, usage.storage.total_available_bytes)}
               </span>
             </div>
-            <div className='text-[10px]'>
+            <div className='text-2xs'>
               {usage.storage.limit_gb !== -1 && (
                 <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-neutral-700">
                   <div

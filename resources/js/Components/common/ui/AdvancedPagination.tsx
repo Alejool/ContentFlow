@@ -105,7 +105,7 @@ export default function AdvancedPagination({
                 key={page}
                 onClick={() => onPageChange(page)}
                 disabled={isLoading}
-                className={`h-10 min-w-[40px] rounded-lg px-3 text-sm font-medium transition-all ${
+                className={`h-10 min-w-1 rounded-lg px-3 text-sm font-medium transition-all ${
                   currentPage === page
                     ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
                     : 'text-gray-600 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700'

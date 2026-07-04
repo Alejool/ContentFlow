@@ -10,7 +10,7 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="max-h-[500px] space-y-6 overflow-y-auto pr-2">
+    <div className="max-h-125 space-y-6 overflow-y-auto pr-2">
       {/* Current Workflow Progress */}
       {item.status === 'pending_review' && item.currentApprovalStep?.workflow && (
         <div className="rounded-lg border border-primary-200 bg-gradient-to-br from-primary-50 to-blue-50 p-4 dark:border-primary-800 dark:from-primary-900/20 dark:to-blue-900/20">
@@ -101,11 +101,11 @@ export default function ApprovalsTab({ item }: ApprovalsTabProps) {
                   <div className="text-xs font-semibold text-gray-900 dark:text-white">
                     {step.name}
                   </div>
-                  <div className="text-[10px] text-gray-600 dark:text-neutral-400">
+                  <div className="text-2xs text-gray-600 dark:text-neutral-400">
                     {step.role?.name || 'Sin rol asignado'}
                   </div>
                 </div>
-                <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 dark:text-green-400">
+                <span className="flex items-center gap-1 text-2xs font-bold text-green-600 dark:text-green-400">
                   <Check className="h-3 w-3" />
                   {t('common.completed') || 'Completado'}
                 </span>

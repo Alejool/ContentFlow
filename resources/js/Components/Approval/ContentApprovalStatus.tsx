@@ -205,7 +205,7 @@ export default function ContentApprovalStatus({
                 {t('approvals.last_submission') || 'Último envío por'}: <span className="font-semibold text-gray-700 dark:text-neutral-300">{approvalStatus.last_action_by || t('common.system')}</span>
               </p>
               {approvalStatus.last_action_at && (
-                <p className="text-[10px] text-gray-400">
+                <p className="text-2xs text-gray-400">
                   {formatDateTimeString(approvalStatus.last_action_at)}
                 </p>
               )}

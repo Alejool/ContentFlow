@@ -137,7 +137,7 @@ export default function JsonImporter({ isOpen, onClose, onSuccess, t }: JsonImpo
             }}
             onDrop={handleDrop}
             onClick={() => !file && fileInputRef.current?.click()}
-            className={`flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
+            className={`flex min-h-4 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
               isDragging
                 ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
                 : 'hover:border-primary-400 dark:hover:border-primary-500 border-gray-300 bg-gray-50 dark:border-neutral-600 dark:bg-theme-bg-secondary'

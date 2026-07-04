@@ -32,7 +32,7 @@ export default function SearchButton({ className = '', variant = 'default' }: Se
     >
       <Search className="h-4 w-4" />
       <span className="flex-1 text-left">{t('common.search')}...</span>
-      <kbd className="hidden h-5 items-center gap-1 rounded border border-gray-200 bg-gray-50 px-1.5 font-mono text-[10px] font-medium text-gray-500 opacity-100 transition-opacity group-hover:opacity-100 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-400 md:inline-flex">
+      <kbd className="hidden h-5 items-center gap-1 rounded border border-gray-200 bg-gray-50 px-1.5 font-mono text-2xs font-medium text-gray-500 opacity-100 transition-opacity group-hover:opacity-100 dark:border-neutral-700 dark:bg-theme-bg-secondary dark:text-neutral-400 md:inline-flex">
         <span className="text-xs">⌘</span>K
       </kbd>
     </button>

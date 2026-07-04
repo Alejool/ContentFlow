@@ -149,7 +149,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
       </div>
       <div className="pointer-events-none select-none p-6 opacity-10 filter blur-sm">
         <Skeleton className="mb-4 h-8 w-48 rounded-lg" />
-        <Skeleton className="h-[300px] w-full rounded-lg" />
+        <Skeleton className="h-75 w-full rounded-lg" />
       </div>
     </div>
   );
@@ -258,7 +258,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-neutral-100">
                   {t('analytics.charts.engagementTrends')}
                 </h2>
-                <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
+                <Suspense fallback={<Skeleton className="h-75 w-full rounded-lg" />}>
                   <EngagementChart data={engagementTrends} theme={theme as any} />
                 </Suspense>
               </div>
@@ -268,7 +268,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                   {t('analytics.formatPerformance.title', 'Rendimiento por Formato')}
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">{t('analytics.formatPerformance.subtitle', 'Interacción basada en el tipo de contenido')}</p>
-                <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
+                <Suspense fallback={<Skeleton className="h-75 w-full rounded-lg" />}>
                   <ContentFormatPerformance data={contentFormatPerformance} />
                 </Suspense>
               </div>
@@ -294,7 +294,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               <div className="lg:col-span-2">
                 {campaigns.length > 0 ? (
-                  <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                  <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                     <CampaignPerformance campaigns={campaigns} theme={theme} />
                   </Suspense>
                 ) : (
@@ -302,7 +302,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 )}
               </div>
               
-              <div className="w-full max-h-[480px] flex flex-col rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
+              <div className="w-full max-h-12 flex flex-col rounded-lg border border-gray-100 bg-white p-6 shadow-lg transition-colors duration-300 dark:border-neutral-700/50 dark:bg-theme-bg-secondary dark:backdrop-blur-sm">
                 <div className="shrink-0">
                   <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-neutral-100">
                     {t('analytics.topPosts.title', 'Mejores Publicaciones')}
@@ -310,7 +310,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                   <p className="text-sm text-gray-500 mb-6">{t('analytics.topPosts.subtitle', 'Top 5 publicaciones por interacción')}</p>
                 </div>
                 <div className="flex-1 overflow-y-auto overflow-x-hidden pr-2 -mr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-700">
-                  <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
+                  <Suspense fallback={<Skeleton className="h-75 w-full rounded-lg" />}>
                     <TopPostsList posts={topPerformingPosts} />
                   </Suspense>
                 </div>
@@ -324,7 +324,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                     {t('analytics.charts.detailedPublications', 'Rendimiento Detallado por Publicación')}
                   </h2>
                 </div>
-                <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                   <DetailedPublicationPerformance publications={detailedPublications} theme={theme} />
                 </Suspense>
               </div>
@@ -336,7 +336,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
         {activeTab === 'audience' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {socialMedia.length > 0 ? (
-              <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}>
+              <Suspense fallback={<Skeleton className="h-75 w-full rounded-lg" />}>
                 <SocialMediaAccounts accounts={socialMedia} theme={theme} showChart={true} />
               </Suspense>
             ) : (
@@ -351,7 +351,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                 <p className={`mb-5 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                   {t('analytics.advanced.daily_metrics')}
                 </p>
-                <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                   <DetailedPlatformChart platforms={detailedPlatforms} theme={theme} />
                 </Suspense>
               </div>
@@ -369,7 +369,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                     {t('analytics.demographics.title', 'Demografía de la Audiencia')}
                   </h2>
                   <p className="text-sm text-gray-500 mb-6">{t('analytics.demographics.subtitle', 'Conoce mejor quién interactúa con tu contenido')}</p>
-                  <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                  <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                     <AudienceDemographics data={audienceDemographics} />
                   </Suspense>
                 </div>
@@ -380,7 +380,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
                       {t('analytics.bestTimeToPost.title', 'Mejor Hora para Publicar')}
                     </h2>
                     <p className="text-sm text-gray-500 mb-6">{t('analytics.bestTimeToPost.subtitle', 'Momentos de mayor actividad de tu audiencia')}</p>
-                    <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                    <Suspense fallback={<Skeleton className="h-1 w-full rounded-lg" />}>
                       <BestTimeToPostHeatmap data={bestTimeToPost} />
                     </Suspense>
                   </div>

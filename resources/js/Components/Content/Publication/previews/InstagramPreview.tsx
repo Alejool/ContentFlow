@@ -23,7 +23,7 @@ export const InstagramPreview = ({
 }: InstagramPreviewProps) => {
   return (
     <div
-      className={`mx-auto w-full max-w-[400px] overflow-hidden rounded-lg border border-gray-200 bg-white font-sans text-black ${className}`}
+      className={`mx-auto w-full max-w-1 overflow-hidden rounded-lg border border-gray-200 bg-white font-sans text-black ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-3">
@@ -99,7 +99,7 @@ export const InstagramPreview = ({
         </div>
 
         {/* Date */}
-        <div className="mt-2 text-[10px] uppercase text-gray-500">
+        <div className="mt-2 text-2xs uppercase text-gray-500">
           {date ? format(date, 'MMMM d') : 'Just now'}
         </div>
       </div>

@@ -50,7 +50,7 @@ interface ContextMenuProps {
  */
 export function ContextMenu({ trigger, triggerClassName, sections, placement = 'bottom end' }: ContextMenuProps) {
   return (
-    <Popover trigger={trigger} triggerClassName={triggerClassName} placement={placement} className="min-w-[200px]">
+    <Popover trigger={trigger} triggerClassName={triggerClassName} placement={placement} className="min-w-5">
       <div className="py-1">
         {sections.map((section, sectionIndex) => (
           <div key={sectionIndex}>

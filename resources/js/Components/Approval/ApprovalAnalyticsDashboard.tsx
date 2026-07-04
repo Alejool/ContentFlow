@@ -227,7 +227,7 @@ export default function ApprovalAnalyticsDashboard({
               theme={actualTheme}
             />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
+            <div className="flex h-75 items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
@@ -261,7 +261,7 @@ export default function ApprovalAnalyticsDashboard({
               theme={actualTheme}
             />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
+            <div className="flex h-75 items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
@@ -293,7 +293,7 @@ export default function ApprovalAnalyticsDashboard({
               theme={actualTheme}
             />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
+            <div className="flex h-75 items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
@@ -310,7 +310,7 @@ export default function ApprovalAnalyticsDashboard({
           {approvalRatesPieData.length > 0 ? (
             <PieChart data={approvalRatesPieData} height={300} theme={actualTheme} />
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
+            <div className="flex h-75 items-center justify-center text-gray-500 dark:text-neutral-400">
               {t('approval.analytics.no_data_available')}
             </div>
           )}
@@ -341,7 +341,7 @@ export default function ApprovalAnalyticsDashboard({
             theme={actualTheme}
           />
         ) : (
-          <div className="flex h-[300px] items-center justify-center text-gray-500 dark:text-neutral-400">
+          <div className="flex h-75 items-center justify-center text-gray-500 dark:text-neutral-400">
             {t('approval.analytics.no_data_available')}
           </div>
         )}

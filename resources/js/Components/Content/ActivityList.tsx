@@ -116,7 +116,7 @@ const ActivityTimelineItem = ({
               <div className="mb-1 font-medium text-red-700 dark:text-red-400">
                 {t('activity.timeline.before', 'Antes')}:
               </div>
-              <div className="break-words font-mono text-[10px] leading-tight text-gray-700 dark:text-neutral-300">
+              <div className="break-words font-mono text-2xs leading-tight text-gray-700 dark:text-neutral-300">
                 {typeof activity.formatted_changes.before === 'object'
                   ? JSON.stringify(activity.formatted_changes.before, null, 2)
                   : activity.formatted_changes.before || '(vacío)'}
@@ -126,7 +126,7 @@ const ActivityTimelineItem = ({
               <div className="mb-1 font-medium text-green-700 dark:text-green-400">
                 {t('activity.timeline.after', 'Después')}:
               </div>
-              <div className="break-words font-mono text-[10px] leading-tight text-gray-700 dark:text-neutral-300">
+              <div className="break-words font-mono text-2xs leading-tight text-gray-700 dark:text-neutral-300">
                 {typeof activity.formatted_changes.after === 'object'
                   ? JSON.stringify(activity.formatted_changes.after, null, 2)
                   : activity.formatted_changes.after || '(vacío)'}

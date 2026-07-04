@@ -31,7 +31,7 @@ export const TwitterPreview = ({
 }: TwitterPreviewProps) => {
   return (
     <div
-      className={`w-full max-w-[500px] rounded-lg border border-gray-200 bg-white p-4 font-sans dark:border-neutral-800 dark:bg-black ${className}`}
+      className={`w-full max-w-125 rounded-lg border border-gray-200 bg-white p-4 font-sans dark:border-neutral-800 dark:bg-black ${className}`}
     >
       <div className="flex gap-3">
         <div className="shrink-0">
@@ -119,17 +119,17 @@ export const TwitterPreview = ({
               className="group flex items-center gap-2 transition-colors hover:text-blue-400"
             >
               <div className="-ml-2 rounded-full p-2 transition-colors group-hover:bg-blue-400/10">
-                <MessageCircle className="h-[18px] w-[18px]" />
+                <MessageCircle className="h-4.5 w-4.5" />
               </div>
             </button>
             <button className="group flex items-center gap-2 transition-colors hover:text-green-400">
               <div className="-ml-2 rounded-full p-2 transition-colors group-hover:bg-green-400/10">
-                <Repeat className="h-[18px] w-[18px]" />
+                <Repeat className="h-4.5 w-4.5" />
               </div>
             </button>
             <button className="group flex items-center gap-2 transition-colors hover:text-pink-400">
               <div className="-ml-2 rounded-full p-2 transition-colors group-hover:bg-pink-400/10">
-                <Heart className="h-[18px] w-[18px]" />
+                <Heart className="h-4.5 w-4.5" />
               </div>
             </button>
             <button
@@ -137,7 +137,7 @@ export const TwitterPreview = ({
               className="group flex items-center gap-2 transition-colors hover:text-blue-400"
             >
               <div className="-ml-2 rounded-full p-2 transition-colors group-hover:bg-blue-400/10">
-                <Share className="h-[18px] w-[18px]" />
+                <Share className="h-4.5 w-4.5" />
               </div>
             </button>
           </div>

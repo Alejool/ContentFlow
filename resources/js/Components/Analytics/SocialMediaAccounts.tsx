@@ -188,7 +188,7 @@ export default function SocialMediaAccounts({
             return (
               <div
                 key={account.id}
-                className={`relative w-[85vw] shrink-0 snap-center rounded-lg p-6 transition-all duration-300 hover:scale-[1.02] sm:w-[350px] md:w-[400px] ${
+                className={`relative w-[85vw] shrink-0 snap-center rounded-lg p-6 transition-all duration-300 hover:scale-[1.02] sm:w-87.5 md:w-1 ${
                   needsReconnect
                     ? theme === 'dark'
                       ? 'border border-amber-600/50 bg-neutral-800/30'
