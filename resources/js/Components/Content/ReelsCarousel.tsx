@@ -1,5 +1,5 @@
 import { usePresignedUrl, useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { ChevronLeft, ChevronRight, Download, ExternalLink, Film, Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -92,7 +92,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
 
     setDeleting(true);
     try {
-      await axios.delete(`/api/v1/media/${currentReel.id}`);
+      await publicationService.deleteMedia(currentReel.id);
       toast.success(t('reels.messages.reelDeleted'));
 
       // Move to next reel or previous if this was the last one

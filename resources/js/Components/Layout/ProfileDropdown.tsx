@@ -8,7 +8,7 @@ import esFlag from '@assets/Icons/Flags/es.svg';
 import { Menu, MenuButton, MenuItems, Radio, RadioGroup } from '@headlessui/react';
 import { Link as InertiaLink, usePage } from '@inertiajs/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { profileService } from '@/Services/Auth/profileService';
 import {
     Check,
     ChevronDown,
@@ -81,16 +81,13 @@ export default function ProfileDropdown({ user, isProfileActive = false }: Profi
   const queryClient = useQueryClient();
 
   const updateThemeColorMutation = useMutation({
-    mutationFn: (color: string) =>
-      axios.patch((route as any)('api.v1.profile.theme.update'), {
-        theme_color: color,
-      }),
+    mutationFn: (color: string) => profileService.updateTheme(color),
     onError: () => toast.error(t('common.error') || 'Error al actualizar el tema'),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
   });
 
   const updateLocaleMutation = useMutation({
-    mutationFn: (locale: string) => axios.patch((route as any)('settings.locale'), { locale }),
+    mutationFn: (locale: string) => profileService.updateLocale(locale),
     onError: () => toast.error(t('common.error') || 'Error al actualizar el idioma'),
   });
 

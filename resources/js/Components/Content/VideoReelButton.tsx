@@ -1,6 +1,6 @@
 import Button from '@/Components/common/Modern/Button';
 import { useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
-import axios from 'axios';
+import { reelService } from '@/Services/Reels/reelService';
 import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -60,7 +60,7 @@ export default function VideoReelButton({
     setGenerating(true);
 
     try {
-      await axios.post('/api/v1/reels/generate', {
+      await reelService.generate({
         media_file_id: videoFile.id,
         publication_id: publicationId,
         platforms: ['instagram', 'tiktok', 'youtube_shorts'],

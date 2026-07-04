@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import { cssPropertiesManager } from '@/Utils/common/CSSCustomPropertiesManager';
+import { profileService } from '@/Services/Auth/profileService';
 import { router, useForm } from '@inertiajs/react';
-import axios from 'axios';
 import { Check, Crown, Lock, Palette } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -28,17 +28,13 @@ export default function UpdateThemeForm({ user, workspace }: UpdateThemeFormProp
     e.preventDefault();
     setLoading(true);
 
-    // Usamos useForm state para 'processing' manual si es necesario,
-    // pero useForm.patch está diseñado para Inertia redirects.
-    // Para JSON puro, usamos axios.
-
     try {
-      const response = await axios.patch(route('api.v1.profile.theme.update'), data);
+      const response = await profileService.updateTheme(data.theme_color);
 
-      if (response.data.success) {
-        toast.success(t('profile.theme.success_message') || response.data.message);
+      if (response.success) {
+        toast.success(t('profile.theme.success_message') || response.message || '');
       } else {
-        toast.error(response.data.message || t('common.error'));
+        toast.error(response.message || t('common.error'));
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || t('common.error');
