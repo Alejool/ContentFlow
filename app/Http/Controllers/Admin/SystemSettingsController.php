@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BulkUpdateSystemSettingsRequest;
+use App\Http\Requests\Admin\UpdateSystemSettingRequest;
 use App\Models\System\SystemSetting;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
@@ -291,11 +293,9 @@ class SystemSettingsController extends Controller
     /**
      * Update a system setting
      */
-    public function update(Request $request, SystemSetting $setting)
+    public function update(UpdateSystemSettingRequest $request, SystemSetting $setting)
     {
-        $validated = $request->validate([
-            'value' => 'required',
-        ]);
+        $validated = $request->validated();
 
         $setting->value = $this->prepareValue($validated['value'], $setting->type);
         $setting->updated_by = Auth::id();
@@ -316,13 +316,9 @@ class SystemSettingsController extends Controller
     /**
      * Bulk update settings
      */
-    public function bulkUpdate(Request $request)
+    public function bulkUpdate(BulkUpdateSystemSettingsRequest $request)
     {
-        $validated = $request->validate([
-            'settings' => 'required|array',
-            'settings.*.id' => 'required|exists:system_settings,id',
-            'settings.*.value' => 'required',
-        ]);
+        $validated = $request->validated();
 
         $updated = [];
         

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Files\ConfirmUploadRequest;
+use App\Http\Requests\Files\PresignUploadRequest;
 use App\Models\MediaFiles\MediaFile;
 use App\Services\Storage\S3PathService;
 use App\Services\Storage\S3PresignedUrlService;
@@ -59,16 +61,10 @@ class FilesController extends Controller
      *   "expiresIn": 300
      * }
      */
-    public function generateUploadUrl(Request $request): JsonResponse
+    public function generateUploadUrl(PresignUploadRequest $request): JsonResponse
     {
         try {
-            // Validar entrada
-            $validated = $request->validate([
-                'fileName' => 'required|string|max:255',
-                'mimeType' => 'required|string|max:100',
-                'size' => 'required|integer|min:1|max:5368709120', // 5GB max
-                'uploadType' => 'sometimes|string|in:publication,avatar,reel,document',
-            ]);
+            $validated = $request->validated();
 
             $user = Auth::user();
             $workspaceId = $user->current_workspace_id;
@@ -146,15 +142,10 @@ class FilesController extends Controller
      *   "s3Key": "..."
      * }
      */
-    public function confirmUpload(Request $request): JsonResponse
+    public function confirmUpload(ConfirmUploadRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                's3Key' => 'required|string',
-                'fileName' => 'required|string|max:255',
-                'mimeType' => 'required|string|max:100',
-                'size' => 'required|integer|min:1',
-            ]);
+            $validated = $request->validated();
 
             $user = Auth::user();
             $workspaceId = $user->current_workspace_id;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ApiLoginRequest;
+use App\Http\Requests\Auth\RefreshTokenRequest;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Traits\System\ApiResponse;
@@ -49,13 +51,8 @@ class ApiAuthController extends Controller
    *   workspace     object  — Workspace info
    *   user          object  — Authenticated user info
    */
-  public function generateToken(Request $request)
+  public function generateToken(ApiLoginRequest $request)
   {
-    $request->validate([
-      'email'     => 'required|email',
-      'password'  => 'required|string',
-      'workspace' => 'required|string',
-    ]);
 
     // 1 — Authenticate user credentials
     $user = User::where('email', $request->email)->first();
@@ -166,12 +163,8 @@ class ApiAuthController extends Controller
    *
    * Returns a new access_token and a new refresh_token (rotation).
    */
-  public function refreshToken(Request $request)
+  public function refreshToken(RefreshTokenRequest $request)
   {
-    $request->validate([
-      'refresh_token' => 'required|string',
-      'workspace'     => 'required|string',
-    ]);
 
     // 1 — Parse the refresh token from the Sanctum formatted string (id|token)
     $parts = explode('|', $request->refresh_token, 2);

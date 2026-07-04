@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Media\DerivativeFormatRequest;
+use App\Http\Requests\Media\GenerateDerivativeRequest;
 use App\Models\MediaFiles\MediaFile;
 use App\Services\Cache\MediaCacheService;
 use App\Services\CDN\CDNService;
@@ -77,12 +79,8 @@ class MediaDerivativeController extends Controller
      * Get best derivative for specific viewport
      * GET /api/media/{id}/best?width=640&format=webp
      */
-    public function best(int $id, Request $request)
+    public function best(int $id, GenerateDerivativeRequest $request)
     {
-        $request->validate([
-            'width' => 'required|integer|min:1|max:4000',
-            'format' => 'nullable|in:webp,avif,jpeg',
-        ]);
 
         $mediaFile = $this->cacheService->getMediaWithDerivatives($id);
 
@@ -125,11 +123,8 @@ class MediaDerivativeController extends Controller
      * Get responsive srcset for image
      * GET /api/media/{id}/srcset?format=webp
      */
-    public function srcset(int $id, Request $request)
+    public function srcset(int $id, DerivativeFormatRequest $request)
     {
-        $request->validate([
-            'format' => 'nullable|in:webp,avif,jpeg',
-        ]);
 
         $mediaFile = $this->cacheService->getMediaWithDerivatives($id);
 

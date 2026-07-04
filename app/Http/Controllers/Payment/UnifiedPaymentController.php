@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Payment;
 
 use App\Helpers\Subscription\AddonHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Payment\CreateSubscriptionCheckoutRequest;
+use App\Http\Requests\Payment\PurchaseAddonRequest;
 use App\Facades\PaymentGateway;
 use App\Facades\CountryDetection;
 use Illuminate\Http\Request;
@@ -111,12 +113,8 @@ class UnifiedPaymentController extends Controller
     /**
      * Crear sesión de checkout para suscripción
      */
-    public function createSubscriptionCheckout(Request $request): JsonResponse
+    public function createSubscriptionCheckout(CreateSubscriptionCheckoutRequest $request): JsonResponse
     {
-        $request->validate([
-            'plan' => 'required|in:starter,growth,professional,enterprise',
-            'gateway' => 'nullable|string|in:stripe,mercadopago,epayco,payu,wompi',
-        ]);
 
         $user = $request->user();
         $workspace = $user->currentWorkspace;
@@ -231,13 +229,8 @@ class UnifiedPaymentController extends Controller
     /**
      * Crear checkout para addon
      */
-    public function createAddonCheckout(Request $request): JsonResponse
+    public function createAddonCheckout(PurchaseAddonRequest $request): JsonResponse
     {
-        $request->validate([
-            'sku' => 'required|string',
-            'quantity' => 'nullable|integer|min:1|max:100',
-            'gateway' => 'nullable|string|in:stripe,mercadopago,epayco,payu,wompi',
-        ]);
 
         $user = $request->user();
         $workspace = $user->currentWorkspace;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Calendar\BulkRescheduleRequest;
+use App\Http\Requests\Calendar\ExportCalendarRequest;
 use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,15 +18,9 @@ class CalendarExportController extends Controller
     /**
      * Export events to Google Calendar format (iCal)
      */
-    public function exportToGoogle(Request $request)
+    public function exportToGoogle(ExportCalendarRequest $request)
     {
-        $validated = $request->validate([
-            'events' => 'required|array',
-            'events.*.title' => 'required|string',
-            'events.*.start' => 'required|date',
-            'events.*.end' => 'nullable|date',
-            'events.*.description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $calendar = Calendar::create(Auth::user()->name . "'s Calendar");
 
@@ -59,7 +55,7 @@ class CalendarExportController extends Controller
     /**
      * Export events to Outlook format (iCal)
      */
-    public function exportToOutlook(Request $request)
+    public function exportToOutlook(ExportCalendarRequest $request)
     {
         // Outlook uses the same iCal format as Google Calendar
         return $this->exportToGoogle($request);
@@ -84,13 +80,9 @@ class CalendarExportController extends Controller
     /**
      * Bulk update events
      */
-    public function bulkUpdate(Request $request)
+    public function bulkUpdate(BulkRescheduleRequest $request)
     {
-        $validated = $request->validate([
-            'event_ids' => 'required|array',
-            'event_ids.*' => 'required|string',
-            'scheduled_at' => 'required|date',
-        ]);
+        $validated = $request->validated();
 
         $workspaceId = Auth::user()->current_workspace_id;
         $updatedCount = 0;

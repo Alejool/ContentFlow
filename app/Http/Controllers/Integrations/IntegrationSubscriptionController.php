@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Integrations;
 
 use App\Constants\IntegrationEvents;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Integrations\StoreIntegrationSubscriptionRequest;
+use App\Http\Requests\Integrations\UpdateIntegrationSubscriptionRequest;
 use App\Models\Integrations\IntegrationDeliveryLog;
 use App\Models\Integrations\IntegrationEventSubscription;
 use App\Models\Workspace\Workspace;
@@ -38,18 +40,12 @@ class IntegrationSubscriptionController extends Controller
     }
 
     /** POST /api/v1/workspaces/{ws}/integrations/subscriptions */
-    public function store(Request $request, string $idOrSlug): JsonResponse
+    public function store(StoreIntegrationSubscriptionRequest $request, string $idOrSlug): JsonResponse
     {
         $workspace = $this->resolveWorkspace($idOrSlug);
         $this->authorizeAdmin($workspace);
 
-        $validated = $request->validate([
-            'channel_type' => ['required', 'string', 'in:' . implode(',', array_keys(IntegrationEventSubscription::supportedChannels()))],
-            'channel_name' => 'nullable|string|max:128',
-            'event_type'   => ['required', 'string', 'in:' . implode(',', IntegrationEvents::all())],
-            'config'       => 'required|array',
-            'is_active'    => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $subscription = IntegrationEventSubscription::create([
             'workspace_id' => $workspace->id,
@@ -60,17 +56,13 @@ class IntegrationSubscriptionController extends Controller
     }
 
     /** PUT /api/v1/workspaces/{ws}/integrations/subscriptions/{id} */
-    public function update(Request $request, string $idOrSlug, int $id): JsonResponse
+    public function update(UpdateIntegrationSubscriptionRequest $request, string $idOrSlug, int $id): JsonResponse
     {
         $workspace    = $this->resolveWorkspace($idOrSlug);
         $this->authorizeAdmin($workspace);
         $subscription = IntegrationEventSubscription::where('workspace_id', $workspace->id)->findOrFail($id);
 
-        $validated = $request->validate([
-            'channel_name' => 'nullable|string|max:128',
-            'config'       => 'sometimes|array',
-            'is_active'    => 'sometimes|boolean',
-        ]);
+        $validated = $request->validated();
 
         $subscription->update($validated);
 
