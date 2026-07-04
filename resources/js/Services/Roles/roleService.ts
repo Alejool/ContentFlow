@@ -1,5 +1,5 @@
 import axios from 'axios';
-import route from 'ziggy-js';
+import { route } from 'ziggy-js';
 
 export interface UpdateRolePayload {
   permission_ids: number[];

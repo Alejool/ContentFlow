@@ -3,9 +3,11 @@ import axios from 'axios';
 import { approvalService } from '@/Services/Approval/approvalService';
 
 vi.mock('axios');
-vi.mock('ziggy-js', () => ({
-  default: (name: string, params?: unknown) => `/mocked/${name}/${JSON.stringify(params ?? '')}`,
-}));
+vi.mock('ziggy-js', () => {
+  const route = (name: string, params?: unknown) =>
+    `/mocked/${name}/${JSON.stringify(params ?? '')}`;
+  return { default: route, route };
+});
 
 const mockedAxios = vi.mocked(axios);
 
