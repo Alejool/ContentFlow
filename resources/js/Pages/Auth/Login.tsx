@@ -1,9 +1,9 @@
 import { useAuth } from '@/Hooks/Auth/useAuth';
 import GuestLayout from '@/Layouts/GuestLayout';
+import { createLoginSchema, type LoginFormData } from '@/schemas/Auth/login.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
@@ -15,16 +15,7 @@ export default function Login() {
   const { t } = useTranslation();
   const { error: authError, successMessage, submitLogin, handleGoogleLogin } = useAuth();
 
-  const loginSchema = z.object({
-    email: z
-      .string()
-      .min(1, { message: t('validation.required') })
-      .email({ message: t('validation.email') }),
-    password: z.string().min(1, { message: t('validation.required') }),
-    remember: z.boolean().default(false),
-  });
-
-  type LoginFormData = z.infer<typeof loginSchema>;
+  const loginSchema = createLoginSchema(t);
 
   const {
     register,

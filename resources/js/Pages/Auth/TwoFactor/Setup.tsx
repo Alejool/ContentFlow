@@ -1,8 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import {
+  createTwoFactorSetupSchema,
+  type TwoFactorSetupFormData,
+} from '@/schemas/Auth/twoFactor.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
@@ -22,15 +25,8 @@ export default function Setup({ qrCodeUrl, secret, backupCodes }: SetupProps) {
   const [copiedSecret, setCopiedSecret] = useState(false);
   const [copiedBackupCode, setCopiedBackupCode] = useState<number | null>(null);
 
-  const setupSchema = z.object({
-    code: z
-      .string()
-      .min(6, { message: t('twoFactor.errors.codeMustBe6Digits') })
-      .max(6, { message: t('twoFactor.errors.codeMustBe6Digits') })
-      .regex(/^\d+$/, { message: t('twoFactor.errors.codeOnlyNumbers') }),
-  });
-
-  type SetupFormData = z.infer<typeof setupSchema>;
+  const setupSchema = createTwoFactorSetupSchema(t);
+  type SetupFormData = TwoFactorSetupFormData;
 
   const {
     register,

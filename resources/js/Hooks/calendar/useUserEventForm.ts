@@ -1,35 +1,14 @@
+import { userEventService } from '@/Services/Calendar/userEventService';
+import { userEventSchema, type EventFormValues } from '@/schemas/Calendar/userEvent.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
 import { isBefore, parseISO, startOfDay } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 
-/**
- * Event form schema
- */
-const eventSchema = z.object({
-  title: z.string().min(1, 'calendar.userEvents.modal.validation.titleRequired'),
-  description: z.string().optional(),
-  start_date: z
-    .date({
-      required_error: 'calendar.userEvents.modal.validation.startDateRequired',
-    })
-    .refine((date) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return date >= today;
-    }, 'calendar.userEvents.modal.validation.pastDate'),
-  end_date: z.date().nullable().optional(),
-  remind_at: z.date().nullable().optional(),
-  color: z.string().default('#3B82F6'),
-  is_public: z.boolean().default(true),
-});
-
-export type EventFormValues = z.infer<typeof eventSchema>;
+export type { EventFormValues };
 
 interface UseUserEventFormProps {
   show: boolean;
@@ -55,7 +34,7 @@ export function useUserEventForm({
   const [selectedColor, setSelectedColor] = useState('#3B82F6');
 
   const form = useForm<EventFormValues>({
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(userEventSchema),
     defaultValues: {
       title: '',
       description: '',
@@ -149,10 +128,10 @@ export function useUserEventForm({
 
       if (event) {
         const resourceId = event.id.includes('_') ? event.id.split('_')[2] : event.id;
-        await axios.put(`/api/v1/calendar/user-events/${resourceId}`, payload);
+        await userEventService.update(resourceId, payload);
         toast.success(t('calendar.userEvents.modal.messages.successUpdate'));
       } else {
-        await axios.post('/api/v1/calendar/user-events', payload);
+        await userEventService.create(payload);
         toast.success(t('calendar.userEvents.modal.messages.successCreate'));
       }
       onSuccess();

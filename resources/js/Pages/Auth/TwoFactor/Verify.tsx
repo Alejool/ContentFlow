@@ -1,8 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import {
+  twoFactorVerifySchema,
+  type TwoFactorVerifyFormData,
+} from '@/schemas/Auth/twoFactor.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
@@ -12,11 +15,8 @@ import { useTranslation } from 'react-i18next';
 export default function Verify() {
   const { t } = useTranslation();
 
-  const verifySchema = z.object({
-    code: z.string().min(1, { message: 'Verification code is required' }),
-  });
-
-  type VerifyFormData = z.infer<typeof verifySchema>;
+  const verifySchema = twoFactorVerifySchema;
+  type VerifyFormData = TwoFactorVerifyFormData;
 
   const {
     register,
