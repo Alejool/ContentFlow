@@ -377,18 +377,9 @@ class AnalyticsController extends Controller
     /**
      * Store analytics data (for API integrations)
      */
-    public function store(Request $request)
+    public function store(StoreMetricRequest $request)
     {
-        $validated = $request->validate([
-            'metric_type' => 'required|string',
-            'metric_name' => 'required|string',
-            'metric_value' => 'required|numeric',
-            'metric_date' => 'required|date',
-            'platform' => 'nullable|string',
-            'reference_id' => 'nullable|integer',
-            'reference_type' => 'nullable|string',
-            'metadata' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
         $analytics = Analytics::create([
             'user_id' => Auth::id(),

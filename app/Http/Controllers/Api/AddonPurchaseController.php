@@ -21,11 +21,9 @@ class AddonPurchaseController extends Controller
     /**
      * Crear un Payment Intent para comprar un addon
      */
-    public function createPaymentIntent(Request $request)
+    public function createPaymentIntent(PurchaseAddonBySkuRequest $request)
     {
-        $request->validate([
-            'sku' => 'required|string',
-        ]);
+
 
         $user = Auth::user();
         $workspace = $user->currentWorkspace;
@@ -87,11 +85,9 @@ class AddonPurchaseController extends Controller
     /**
      * Confirmar la compra después del pago exitoso
      */
-    public function confirmPurchase(Request $request)
+    public function confirmPurchase(ConfirmAddonPurchaseRequest $request)
     {
-        $request->validate([
-            'payment_intent_id' => 'required|string',
-        ]);
+
 
         $user = Auth::user();
         $workspace = $user->currentWorkspace;

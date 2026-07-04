@@ -63,12 +63,9 @@ class AddonsController extends Controller
     /**
      * Iniciar el proceso de compra de un add-on
      */
-    public function purchase(Request $request)
+    public function purchase(PurchaseAddonRequest $request)
     {
-        $request->validate([
-            'sku' => 'required|string',
-            'quantity' => 'required|integer|min:1',
-        ]);
+
 
         $sku = $request->input('sku');
         $quantity = $request->input('quantity');

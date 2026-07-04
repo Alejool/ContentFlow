@@ -42,15 +42,9 @@ class AdminSubscriptionControlController extends Controller
      *
      * Requisito 5.6
      */
-    public function update(Request $request)
+    public function update(UpdateSubscriptionControlRequest $request)
     {
-        $validated = $request->validate([
-            'demo_mode' => 'sometimes|boolean',
-            'purchases_enabled' => 'sometimes|boolean',
-            'grace_period_days' => 'sometimes|integer|min:1|max:365',
-            'max_retry_attempts' => 'sometimes|integer|min:1|max:10',
-            'retry_interval_hours' => 'sometimes|integer|min:1|max:168',
-        ]);
+        $validated = $request->validated();
 
         $adminUserId = Auth::id();
 

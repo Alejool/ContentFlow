@@ -69,11 +69,9 @@ class SubscriptionLimitController extends Controller
     /**
      * Check if workspace can downgrade to a specific plan.
      */
-    public function checkDowngrade(Request $request): JsonResponse
+    public function checkDowngrade(UpdatePlanLimitsRequest $request): JsonResponse
     {
-        $request->validate([
-            'plan' => 'required|string|in:free,starter,growth,professional,enterprise',
-        ]);
+
 
         $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();
 

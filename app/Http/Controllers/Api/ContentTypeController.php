@@ -17,13 +17,9 @@ class ContentTypeController extends Controller
     /**
      * Suggest optimal content type based on media file
      */
-    public function suggestType(Request $request): JsonResponse
+    public function suggestType(SuggestContentTypeByMediaRequest $request): JsonResponse
     {
-        $request->validate([
-            'duration' => 'nullable|numeric|min:0',
-            'mime_type' => 'required|string',
-            'current_type' => 'required|string|in:post,reel,story,carousel,poll'
-        ]);
+
 
         $mediaFile = [
             'duration' => $request->duration,

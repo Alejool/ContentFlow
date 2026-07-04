@@ -30,12 +30,10 @@ class ApprovalWorkflowController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function submit(Request $request): JsonResponse
+    public function submit(SubmitForApprovalRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'publication_id' => 'required|exists:publications,id',
-            ]);
+            $validated = $request->validated();
 
             $publication = Publication::findOrFail($validated['publication_id']);
             $user = Auth::user();

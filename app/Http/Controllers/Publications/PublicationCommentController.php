@@ -21,12 +21,9 @@ class PublicationCommentController extends Controller
         );
     }
 
-    public function store(Request $request, Publication $publication)
+    public function store(StoreCommentRequest $request, Publication $publication)
     {
-        $validated = $request->validate([
-            'content' => 'required|string|max:1000',
-            'parent_id' => 'nullable|exists:publication_comments,id',
-        ]);
+        $validated = $request->validated();
 
         $comment = $publication->comments()->create([
             'user_id' => Auth::id(),

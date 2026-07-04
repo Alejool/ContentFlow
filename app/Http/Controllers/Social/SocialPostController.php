@@ -15,13 +15,9 @@ class SocialPostController extends Controller
     $this->socialManager = $socialManager;
   }
 
-  public function schedulePost(Request $request)
+  public function schedulePost(SchedulePostRequest $request)
   {
-    $request->validate([
-      'content' => 'required',
-      'platforms' => 'required|array',
-      'scheduled_at' => 'nullable|date'
-    ]);
+
 
     $post = $this->socialManager->schedule(
       $request->user(),

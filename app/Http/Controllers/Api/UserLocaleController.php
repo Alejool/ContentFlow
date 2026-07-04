@@ -11,11 +11,9 @@ class UserLocaleController extends Controller
     /**
      * Actualiza el idioma preferido del usuario
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdateUserLocaleRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'locale' => 'required|string|in:en,es',
-        ]);
+        $validated = $request->validated();
 
         $user = $request->user();
         

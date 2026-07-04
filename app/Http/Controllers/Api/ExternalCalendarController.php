@@ -429,19 +429,13 @@ class ExternalCalendarController extends Controller
     /**
      * Configure sync settings for a provider
      */
-    public function configureSyncSettings(Request $request, string $provider): JsonResponse
+    public function configureSyncSettings(UpdateExternalCalendarRequest $request, string $provider): JsonResponse
     {
         try {
             $user = Auth::user();
             $workspaceId = $request->input('workspace_id', $user->current_workspace_id);
 
-            $validated = $request->validate([
-                'sync_enabled' => 'boolean',
-                'sync_campaigns' => 'array',
-                'sync_campaigns.*' => 'integer|exists:campaigns,id',
-                'sync_platforms' => 'array',
-                'sync_platforms.*' => 'string',
-            ]);
+            $validated = $request->validated();
 
             $connection = ExternalCalendarConnection::where('user_id', $user->id)
                 ->where('workspace_id', $workspaceId)

@@ -139,12 +139,9 @@ class GranularLimitsController extends Controller
     /**
      * Check if a file can be uploaded.
      */
-    public function checkFileUpload(Request $request): JsonResponse
+    public function checkFileUpload(CheckMediaLimitsRequest $request): JsonResponse
     {
-        $request->validate([
-            'file_size' => 'required|integer|min:1',
-            'duration_minutes' => 'nullable|integer|min:0',
-        ]);
+
 
         $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();
 

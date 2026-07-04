@@ -191,12 +191,9 @@ class MediaDownloadController extends Controller
      * - key: string - Ruta del archivo en S3 (requerido)
      * - type: string - Tipo de media (image, video, pdf) para hint de content-type
      */
-    public function previewByKey(Request $request)
+    public function previewByKey(DownloadMediaRequest $request)
     {
-        $request->validate([
-            'key' => 'required|string',
-            'type' => 'nullable|string|in:image,video,pdf,audio',
-        ]);
+
 
         try {
             $s3Key = $request->input('key');

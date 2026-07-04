@@ -243,7 +243,7 @@ class ContentApprovalController extends Controller
      * 
      * POST /api/content/{content}/manual-resolve
      */
-    public function manualResolve(Request $request, $contentId): JsonResponse
+    public function manualResolve(ProcessApprovalRequest $request, $contentId): JsonResponse
     {
         try {
             $content = Publication::withoutGlobalScope('workspace')->findOrFail($contentId);
@@ -252,11 +252,7 @@ class ContentApprovalController extends Controller
             $this->authorize('manualResolve', $content);
 
             // Validate request
-            $validated = $request->validate([
-                'action' => 'required|in:approve,reject,advance',
-                'reason' => 'required|string|max:500',
-                'target_level' => 'nullable|integer|min:0',
-            ]);
+            $validated = $request->validated();
 
             $action = $validated['action'];
             $reason = $validated['reason'];

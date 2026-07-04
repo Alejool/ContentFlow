@@ -25,15 +25,9 @@ class SystemNotificationController extends Controller
   /**
    * Send a system notification to all users.
    */
-  public function send(Request $request)
+  public function send(StoreSystemNotificationRequest $request)
   {
-    $request->validate([
-      'title' => 'required|string|max:255',
-      'message' => 'required|string',
-      'description' => 'nullable|string',
-      'type' => 'required|string|in:info,success,warning,error',
-      'icon' => 'nullable|string',
-    ]);
+
 
     SendSystemNotificationJob::dispatch(
       $request->title,

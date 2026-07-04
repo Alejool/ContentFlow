@@ -120,12 +120,9 @@ class SubscriptionHistoryController extends Controller
     /**
      * Get usage summary for a specific period.
      */
-    public function usageSummary(Request $request): JsonResponse
+    public function usageSummary(UsageSummaryRequest $request): JsonResponse
     {
-        $request->validate([
-            'year' => 'required|integer|min:2020|max:2100',
-            'month' => 'required|integer|min:1|max:12',
-        ]);
+
 
         $summary = $this->trackingService->getUsageSummary(
             $request->user(),

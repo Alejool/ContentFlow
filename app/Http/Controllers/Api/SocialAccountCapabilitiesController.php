@@ -58,14 +58,9 @@ class SocialAccountCapabilitiesController extends Controller
     /**
      * Validate video for multiple accounts
      */
-    public function validateVideo(Request $request): JsonResponse
+    public function validateVideo(AccountCapabilitiesRequest $request): JsonResponse
     {
-        $request->validate([
-            'account_ids' => 'required|array',
-            'account_ids.*' => 'exists:social_accounts,id',
-            'video_duration' => 'required|integer|min:1',
-            'file_size_mb' => 'required|numeric|min:0',
-        ]);
+
 
         $accounts = SocialAccount::whereIn('id', $request->account_ids)
             ->where('workspace_id', auth()->user()->current_workspace_id)

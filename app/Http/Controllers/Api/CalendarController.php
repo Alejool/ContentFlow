@@ -184,12 +184,9 @@ class CalendarController extends Controller
   /**
    * Update publication schedule (drag and drop)
    */
-  public function update(Request $request, $id)
+  public function update(RescheduleEventRequest $request, $id)
   {
-    $request->validate([
-      'scheduled_at' => 'required|date|after:now',
-      'type' => 'nullable|in:post,user_event'
-    ]);
+
 
     $type = $request->input('type', 'post');
     $workspaceId = Auth::user()->current_workspace_id;

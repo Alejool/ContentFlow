@@ -122,13 +122,10 @@ class WorkspaceAddonController extends Controller
     /**
      * Create checkout session for addon purchase.
      */
-    public function createCheckoutSession(Request $request): JsonResponse
+    public function createCheckoutSession(WorkspaceAddonPurchaseRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'sku' => 'required|string',
-                'quantity' => 'integer|min:1|max:100',
-            ]);
+            $validated = $request->validated();
 
             $workspace = $request->user()->currentWorkspace;
 

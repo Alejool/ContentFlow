@@ -25,7 +25,7 @@ class ReelGeneratorController extends Controller
   /**
    * Generate reels from uploaded video
    */
-  public function generate(Request $request)
+  public function generate(GenerateReelRequest $request)
   {
     Log::info('🎬 Reel generation request received', [
       'user_id' => Auth::id(),
@@ -33,17 +33,7 @@ class ReelGeneratorController extends Controller
     ]);
 
     try {
-      $validated = $request->validate([
-        'media_file_id' => 'required|exists:media_files,id',
-        'publication_id' => 'nullable|exists:publications,id',
-        'platforms' => 'nullable|array',
-        'platforms.*' => 'in:instagram,tiktok,youtube_shorts',
-        'add_subtitles' => 'nullable|boolean',
-        'language' => 'nullable|string|in:es,en,fr,de,pt',
-        'generate_clips' => 'nullable|boolean',
-        'clip_duration' => 'nullable|integer|min:5|max:60',
-        'max_clips' => 'nullable|integer|min:1|max:10',
-      ]);
+      $validated = $request->validated();
 
       Log::info('✅ Validation passed', ['validated' => $validated]);
 

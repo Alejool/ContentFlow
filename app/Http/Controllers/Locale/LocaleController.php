@@ -11,11 +11,9 @@ class LocaleController extends Controller
     /**
      * Update the user's locale.
      */
-    public function update(Request $request)
+    public function update(UpdateLocaleRequest $request)
     {
-        $request->validate([
-            'locale' => ['required', 'string', 'in:en,es'],
-        ]);
+
 
         $user = $request->user();
         $user->locale = $request->locale;

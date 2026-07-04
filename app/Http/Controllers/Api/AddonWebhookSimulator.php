@@ -14,12 +14,9 @@ class AddonWebhookSimulator extends Controller
      * Simular webhook para una sesión específica
      * Esto se llama automáticamente después de crear el checkout
      */
-    public function simulateWebhook(Request $request)
+    public function simulateWebhook(SimulateAddonWebhookRequest $request)
     {
-        $request->validate([
-            'session_id' => 'required|string',
-            'force' => 'nullable|boolean', // Para testing
-        ]);
+
 
         $sessionId = $request->session_id;
         $force = $request->boolean('force', false);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Workspace;
 
 use App\Constants\ApiScopes;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Workspace\StoreApiTokenRequest;
 use App\Models\Workspace\Workspace;
 use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
@@ -54,7 +55,7 @@ class ApiTokenController extends Controller
    * For programmatic short-lived tokens with automatic refresh, use:
    *   POST /api/auth/token  (via ApiAuthController)
    */
-  public function store(Request $request, Workspace $workspace)
+  public function store(StoreApiTokenRequest $request, Workspace $workspace)
   {
     if (Auth::id() !== $workspace->created_by) {
       abort(403);
@@ -63,19 +64,6 @@ class ApiTokenController extends Controller
     if ($workspace->getPlanName() !== 'enterprise') {
       return $this->errorResponse('API access is only available for Enterprise plans.', 403);
     }
-
-    $request->validate([
-      'name'      => 'required|string|max:255',
-      'abilities' => 'nullable|array',
-      'abilities.*' => [
-        'string',
-        function ($attribute, $value, $fail) {
-          if (!ApiScopes::isValid($value)) {
-            $fail("Invalid scope: {$value}. See /api/v1/auth/scopes for valid values.");
-          }
-        },
-      ],
-    ]);
 
     // Use provided abilities or fall back to wildcard for backwards compat.
     $abilities = $request->filled('abilities')

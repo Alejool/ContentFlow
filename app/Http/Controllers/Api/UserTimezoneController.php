@@ -12,11 +12,9 @@ class UserTimezoneController extends Controller
     /**
      * Actualiza la zona horaria del usuario.
      */
-    public function update(Request $request)
+    public function update(UpdateTimezoneRequest $request)
     {
-        $validated = $request->validate([
-            'timezone' => ['required', 'string', 'timezone'],
-        ]);
+        $validated = $request->validated();
 
         $user = Auth::user();
         $user->timezone = $validated['timezone'];

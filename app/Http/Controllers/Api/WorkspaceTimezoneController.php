@@ -15,11 +15,9 @@ class WorkspaceTimezoneController extends Controller
      * Actualiza la zona horaria del workspace actual.
      * Solo el owner o admin del workspace puede cambiarla.
      */
-    public function update(Request $request)
+    public function update(UpdateTimezoneRequest $request)
     {
-        $validated = $request->validate([
-            'timezone' => ['required', 'string', 'timezone'],
-        ]);
+        $validated = $request->validated();
 
         $workspace = Auth::user()->currentWorkspace;
 
