@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\CheckUserRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
@@ -12,11 +13,8 @@ class LoginController extends Controller
   /**
    * Checks if the user exists and how they registered.
    */
-  public function checkUser(Request $request)
+  public function checkUser(CheckUserRequest $request)
   {
-    $request->validate([
-      'email' => 'required|email',
-    ]);
 
     // TEST COMMENT TO CHECK IF EMAIL ARRIVES
     // return response()->json([

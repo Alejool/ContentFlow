@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -35,23 +36,8 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request)
+    public function store(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' =>'required|string|min:8|max:255',
-            'provider' => 'nullable|string',
-            'provider_id' => 'nullable|string',
-            'photo_url' => 'nullable|string',
-            'locale' => 'nullable|string|in:en,es',
-        ], [
-            'email.unique' => 'Ya existe una cuenta con ese correo electrónico.',
-            'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'El correo electrónico no tiene un formato válido.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-            'name.required' => 'El nombre es obligatorio.',
-        ]);
 
         $createdIp = $request->ip();
         $geo = app(\App\Services\Analytics\GeoIpService::class)->lookup($createdIp);

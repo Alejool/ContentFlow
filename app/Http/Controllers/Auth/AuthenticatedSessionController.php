@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\CheckUserRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,11 +70,8 @@ class AuthenticatedSessionController extends Controller
         return redirect('/')->with('forceOrangeTheme', true);
     }
 
-    public function checkUser(Request $request)
+    public function checkUser(CheckUserRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
 
         $user = User::where('email', $request->email)->first();
 
