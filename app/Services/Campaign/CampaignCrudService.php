@@ -2,6 +2,8 @@
 
 namespace App\Services\Campaign;
 
+use App\DTOs\Campaign\CreateCampaignDTO;
+use App\DTOs\Campaign\UpdateCampaignDTO;
 use App\Models\Campaigns\Campaign;
 use App\Repositories\CampaignRepository;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -45,22 +47,16 @@ class CampaignCrudService
         return $this->campaigns->findForWorkspace($id, $workspaceId);
     }
 
-    public function create(array $data, int $workspaceId): Campaign
+    public function create(CreateCampaignDTO $dto, int $workspaceId): Campaign
     {
         $campaign = Campaign::create([
             'user_id' => Auth::id(),
             'workspace_id' => $workspaceId,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? null,
-            'status' => $data['status'] ?? 'active',
-            'start_date' => $data['start_date'] ?? null,
-            'end_date' => $data['end_date'] ?? null,
-            'goal' => $data['goal'] ?? null,
-            'budget' => $data['budget'] ?? null,
+            ...$dto->toAttributes(),
         ]);
 
-        if (!empty($data['publication_ids'])) {
-            $campaign->publications()->attach($this->orderedSync($data['publication_ids']));
+        if (!empty($dto->publicationIds)) {
+            $campaign->publications()->attach($this->orderedSync($dto->publicationIds));
         }
 
         $this->clearCache($workspaceId);
@@ -71,19 +67,19 @@ class CampaignCrudService
     /**
      * @return array{ok: bool, campaign?: Campaign, error?: string}
      */
-    public function update(Campaign $campaign, array $data, int $workspaceId): array
+    public function update(Campaign $campaign, UpdateCampaignDTO $dto, int $workspaceId): array
     {
-        if (isset($data['name']) && $data['name'] !== $campaign->name) {
+        if ($dto->name !== null && $dto->name !== $campaign->name) {
             $hasPublished = $campaign->publications()->where('status', 'published')->exists();
             if ($hasPublished) {
                 return ['ok' => false, 'error' => __('messages.campaign.cannot_change_name')];
             }
         }
 
-        $campaign->update($data);
+        $campaign->update($dto->attributes);
 
-        if (isset($data['publication_ids'])) {
-            $campaign->publications()->sync($this->orderedSync($data['publication_ids']));
+        if ($dto->hasPublicationIds()) {
+            $campaign->publications()->sync($this->orderedSync($dto->publicationIds));
         }
 
         $this->clearCache($workspaceId);

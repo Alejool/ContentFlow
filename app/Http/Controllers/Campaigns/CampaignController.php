@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Campaigns;
 
+use App\DTOs\Campaign\CreateCampaignDTO;
+use App\DTOs\Campaign\UpdateCampaignDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaigns\CampaignPublicationsRequest;
 use App\Http\Requests\Campaigns\StoreCampaignRequest;
@@ -62,7 +64,7 @@ class CampaignController extends Controller
   public function store(StoreCampaignRequest $request)
   {
     $campaign = $this->campaignService->create(
-      $request->validated(),
+      CreateCampaignDTO::fromRequest($request),
       Auth::user()->current_workspace_id,
     );
 
@@ -87,7 +89,7 @@ class CampaignController extends Controller
     $workspaceId = Auth::user()->current_workspace_id;
     $campaign = $this->campaignService->findScoped($id, $workspaceId);
 
-    $result = $this->campaignService->update($campaign, $request->validated(), $workspaceId);
+    $result = $this->campaignService->update($campaign, UpdateCampaignDTO::fromRequest($request), $workspaceId);
 
     if (!$result['ok']) {
       return response()->json([
