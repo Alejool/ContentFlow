@@ -3,6 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Onboarding\CompleteBusinessInfoRequest;
+use App\Http\Requests\Onboarding\CompleteTourStepRequest;
+use App\Http\Requests\Onboarding\CompleteWizardStepRequest;
+use App\Http\Requests\Onboarding\DismissTooltipRequest;
+use App\Http\Requests\Onboarding\SelectPlanRequest;
+use App\Http\Requests\Onboarding\SelectTemplateRequest;
+use App\Http\Requests\Onboarding\UpdateTourStepRequest;
 use App\Services\Onboarding\OnboardingService;
 use App\Services\Onboarding\OnboardingAnalyticsService;
 use Illuminate\Http\JsonResponse;
@@ -28,14 +35,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function completeBusinessInfo(Request $request): JsonResponse
+    public function completeBusinessInfo(CompleteBusinessInfoRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'businessName' => 'nullable|string|max:255',
-            'businessIndustry' => 'nullable|string|max:255',
-            'businessGoals' => 'nullable|string|max:1000',
-            'businessSize' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
@@ -70,11 +72,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function selectPlan(Request $request): JsonResponse
+    public function selectPlan(SelectPlanRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'plan_id' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
@@ -142,11 +142,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function completeTourStep(Request $request): JsonResponse
+    public function completeTourStep(CompleteTourStepRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'step_id' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
@@ -181,11 +179,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function updateTourStep(Request $request): JsonResponse
+    public function updateTourStep(UpdateTourStepRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'step' => 'required|integer|min:0',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
@@ -291,11 +287,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function dismissTooltip(Request $request): JsonResponse
+    public function dismissTooltip(DismissTooltipRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'tooltip_id' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
@@ -330,12 +324,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function completeWizardStep(Request $request): JsonResponse
+    public function completeWizardStep(CompleteWizardStepRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'step_id' => 'required|string|max:255',
-            'data' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
@@ -374,11 +365,9 @@ class OnboardingController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function selectTemplate(Request $request): JsonResponse
+    public function selectTemplate(SelectTemplateRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'template_id' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         try {
             $user = $request->user();
