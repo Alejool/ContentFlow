@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Campaigns\CampaignPublicationsRequest;
 use App\Http\Requests\Campaigns\StoreCampaignRequest;
 use App\Http\Requests\Campaigns\UpdateCampaignRequest;
+use App\Services\Campaign\CampaignCrudService;
 use App\Services\Statistics\StatisticsService;
-use App\Models\Campaigns\Campaign;
 use App\Traits\System\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,11 +17,10 @@ class CampaignController extends Controller
 {
   use ApiResponse;
 
-  protected $statisticsService;
-
-  public function __construct(StatisticsService $statisticsService)
-  {
-    $this->statisticsService = $statisticsService;
+  public function __construct(
+    private StatisticsService $statisticsService,
+    private CampaignCrudService $campaignService,
+  ) {
   }
 
   /**
@@ -33,7 +32,6 @@ class CampaignController extends Controller
     $performanceData = $this->statisticsService->getTopCampaigns($workspaceId, 100);
     $cacheVersion = cache()->get("campaigns:{$workspaceId}:version", 1);
 
-    // Cache key based on workspace, version, filters, and page
     $cacheKey = sprintf(
       'campaigns:%d:v%d:%s:%d',
       $workspaceId,
@@ -42,65 +40,15 @@ class CampaignController extends Controller
       $request->query('page', 1)
     );
 
-    $campaigns = cache()->remember($cacheKey, 10, function () use ($request) {
-      $query = Campaign::where('workspace_id', Auth::user()->current_workspace_id)
-        ->with([
-          'user' => fn($q) => $q->select('id', 'name', 'email', 'photo_url'),
-          'publications' => fn($q) => $q->select('publications.id', 'publications.title', 'publications.status', 'publications.created_at'),
-          'publications.analytics', // Eager load analytics for calculation
-          'publications.socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at'),
-          'publications.socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
-          'publications.mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name')
-        ]);
-
-      if ($request->has('status') && $request->status !== 'all') {
-        $query->where('status', $request->status);
-      }
-      if ($request->has('status') && $request->status !== 'all') {
-        switch ($request->status) {
-          case 'active':
-            $query->active();
-            break;
-          case 'inactive':
-            $query->inactive();
-            break;
-          case 'completed':
-            $query->completed();
-            break;
-          case 'deleted':
-            $query->deleted();
-            break;
-          case 'paused':
-            $query->paused();
-            break;
-        }
-      }
-
-      if ($request->has('search') && !empty($request->search)) {
-        $query->where('name', 'LIKE', '%' . $request->search . '%');
-      }
-
-      if ($request->has('date_start') && $request->has('date_end')) {
-        $query->byDateRange($request->date_start, $request->date_end);
-      }
-
-      // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
-      $perPage = $request->query('per_page', 12);
-      $campaigns = $query->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->paginate($perPage);
-
-      // Calculate aggregate stats for each campaign
-      $campaigns->getCollection()->transform(function ($campaign) {
-        $campaign->stats = [
-          'views' => $campaign->publications->flatMap->analytics->sum('views'),
-          'clicks' => $campaign->publications->flatMap->analytics->sum('clicks'),
-          'engagement' => $campaign->publications->flatMap->analytics->sum('total_engagement') // Assuming logic or separate columns
-            ?? ($campaign->publications->flatMap->analytics->sum('likes') + $campaign->publications->flatMap->analytics->sum('comments'))
-        ];
-        return $campaign;
-      });
-
-      return $campaigns;
-    });
+    $campaigns = cache()->remember(
+      $cacheKey,
+      10,
+      fn () => $this->campaignService->listWithStats(
+        $workspaceId,
+        $request->only(['status', 'search', 'date_start', 'date_end']),
+        (int) $request->query('per_page', 12),
+      ),
+    );
 
     return $this->successResponse([
       'campaigns' => $campaigns,
@@ -113,31 +61,12 @@ class CampaignController extends Controller
    */
   public function store(StoreCampaignRequest $request)
   {
-    $validatedData = $request->validated();
+    $campaign = $this->campaignService->create(
+      $request->validated(),
+      Auth::user()->current_workspace_id,
+    );
 
-    $campaign = Campaign::create([
-      'user_id' => Auth::id(),
-      'workspace_id' => Auth::user()->current_workspace_id,
-      'name' => $validatedData['name'],
-      'description' => $validatedData['description'] ?? null,
-      'status' => $validatedData['status'] ?? 'active',
-      'start_date' => $validatedData['start_date'] ?? null,
-      'end_date' => $validatedData['end_date'] ?? null,
-      'goal' => $validatedData['goal'] ?? null,
-      'budget' => $validatedData['budget'] ?? null,
-    ]);
-
-    // Attach publications if provided
-    if (!empty($validatedData['publication_ids'])) {
-      foreach ($validatedData['publication_ids'] as $index => $publicationId) {
-        $campaign->publications()->attach($publicationId, ['order' => $index + 1]);
-      }
-    }
-
-    // Clear cache after creating campaign
-    $this->clearCampaignCache(Auth::user()->current_workspace_id);
-
-    return $this->successResponse(['campaign' => $campaign->load('publications')], 'Campaign created successfully', 201);
+    return $this->successResponse(['campaign' => $campaign], 'Campaign created successfully', 201);
   }
 
   /**
@@ -145,13 +74,7 @@ class CampaignController extends Controller
    */
   public function show(Request $request, $id)
   {
-    $campaign = Campaign::with([
-      'publications' => fn($q) => $q->select('publications.id', 'publications.title', 'publications.status', 'publications.created_at'),
-      'publications.mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name'),
-      'publications.socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at'),
-      'publications.socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name')
-    ])->where('workspace_id', Auth::user()->current_workspace_id)
-      ->findOrFail($id);
+    $campaign = $this->campaignService->find($id, Auth::user()->current_workspace_id);
 
     return $this->successResponse(['campaign' => $campaign]);
   }
@@ -161,40 +84,20 @@ class CampaignController extends Controller
    */
   public function update(UpdateCampaignRequest $request, $id)
   {
-    $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+    $workspaceId = Auth::user()->current_workspace_id;
+    $campaign = $this->campaignService->findScoped($id, $workspaceId);
 
-    $validatedData = $request->validated();
+    $result = $this->campaignService->update($campaign, $request->validated(), $workspaceId);
 
-    // Check if campaign has published publications before allowing name change
-    if ($request->has('name') && $request->name !== $campaign->name) {
-      $hasPublishedPosts = $campaign->publications()
-        ->where('status', 'published')
-        ->exists();
-
-      if ($hasPublishedPosts) {
-        return response()->json([
-          'success' => false,
-          'message' => __('messages.campaign.cannot_change_name'),
-          'errors' => ['name' => [__('messages.campaign.cannot_change_name')]],
-        ], 422);
-      }
+    if (!$result['ok']) {
+      return response()->json([
+        'success' => false,
+        'message' => $result['error'],
+        'errors' => ['name' => [$result['error']]],
+      ], 422);
     }
 
-    $campaign->update($validatedData);
-
-    // Sync publications if provided
-    if (isset($validatedData['publication_ids'])) {
-      $syncData = [];
-      foreach ($validatedData['publication_ids'] as $index => $publicationId) {
-        $syncData[$publicationId] = ['order' => $index + 1];
-      }
-      $campaign->publications()->sync($syncData);
-    }
-
-    // Clear cache after updating campaign
-    $this->clearCampaignCache(Auth::user()->current_workspace_id);
-
-    return $this->successResponse(['campaign' => $campaign->load('publications')], 'Campaign updated successfully');
+    return $this->successResponse(['campaign' => $result['campaign']], 'Campaign updated successfully');
   }
 
   /**
@@ -202,11 +105,9 @@ class CampaignController extends Controller
    */
   public function destroy($id)
   {
-    $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
-    $campaign->delete();
-
-    // Clear cache after deleting campaign
-    $this->clearCampaignCache(Auth::user()->current_workspace_id);
+    $workspaceId = Auth::user()->current_workspace_id;
+    $campaign = $this->campaignService->findScoped($id, $workspaceId);
+    $this->campaignService->delete($campaign, $workspaceId);
 
     return $this->successResponse(null, 'Campaign deleted successfully');
   }
@@ -216,38 +117,11 @@ class CampaignController extends Controller
    */
   public function duplicate($id)
   {
-    $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+    $workspaceId = Auth::user()->current_workspace_id;
+    $campaign = $this->campaignService->findScoped($id, $workspaceId);
+    $copy = $this->campaignService->duplicate($campaign, $workspaceId);
 
-    // Generate unique name with number
-    $baseName = $campaign->name;
-    $counter = 1;
-    $newName = $baseName . ' ' . $counter;
-
-    while (Campaign::where('workspace_id', Auth::user()->current_workspace_id)
-      ->where('name', $newName)
-      ->exists()
-    ) {
-      $counter++;
-      $newName = $baseName . ' ' . $counter;
-    }
-
-    // Create a new campaign with duplicated data (without publications)
-    $newCampaign = Campaign::create([
-      'user_id' => Auth::id(),
-      'workspace_id' => Auth::user()->current_workspace_id,
-      'name' => $newName,
-      'description' => $campaign->description,
-      'status' => $campaign->status,
-      'start_date' => $campaign->start_date,
-      'end_date' => $campaign->end_date,
-      'goal' => $campaign->goal,
-      'budget' => $campaign->budget,
-    ]);
-
-    // Clear cache after creating campaign
-    $this->clearCampaignCache(Auth::user()->current_workspace_id);
-
-    return $this->successResponse(['campaign' => $newCampaign], 'Campaign duplicated successfully', 201);
+    return $this->successResponse(['campaign' => $copy], 'Campaign duplicated successfully', 201);
   }
 
   /**
@@ -255,19 +129,10 @@ class CampaignController extends Controller
    */
   public function addPublications(CampaignPublicationsRequest $request, $id)
   {
-    $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+    $campaign = $this->campaignService->findScoped($id, Auth::user()->current_workspace_id);
+    $campaign = $this->campaignService->addPublications($campaign, $request->validated()['publication_ids']);
 
-    $validatedData = $request->validated();
-
-    $currentMax = $campaign->publications()->max('order') ?? 0;
-
-    foreach ($validatedData['publication_ids'] as $index => $publicationId) {
-      $campaign->publications()->attach($publicationId, [
-        'order' => $currentMax + $index + 1
-      ]);
-    }
-
-    return $this->successResponse(['campaign' => $campaign->load('publications')], 'Publications added to campaign');
+    return $this->successResponse(['campaign' => $campaign], 'Publications added to campaign');
   }
 
   /**
@@ -275,13 +140,10 @@ class CampaignController extends Controller
    */
   public function removePublications(CampaignPublicationsRequest $request, $id)
   {
-    $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+    $campaign = $this->campaignService->findScoped($id, Auth::user()->current_workspace_id);
+    $campaign = $this->campaignService->removePublications($campaign, $request->validated()['publication_ids']);
 
-    $validatedData = $request->validated();
-
-    $campaign->publications()->detach($validatedData['publication_ids']);
-
-    return $this->successResponse(['campaign' => $campaign->load('publications')], 'Publications removed from campaign');
+    return $this->successResponse(['campaign' => $campaign], 'Publications removed from campaign');
   }
 
   public function export(Request $request)
@@ -325,45 +187,6 @@ class CampaignController extends Controller
         'success' => false,
         'message' => __('messages.campaign.export_failed', ['error' => $e->getMessage()])
       ], 500);
-    }
-  }
-
-  /**
-   * Clear campaign caches for a workspace
-   */
-  private function clearCampaignCache($workspaceId)
-  {
-    if (!$workspaceId)
-      return;
-
-    // Increment version to effectively clear all workspace cache keys across any driver
-    try {
-      cache()->increment("campaigns:{$workspaceId}:version");
-    } catch (\Exception $e) {
-      cache()->put("campaigns:{$workspaceId}:version", time(), now()->addDays(7));
-    }
-
-    // Also invalidate publications as they are often viewed in context of campaigns
-    try {
-      cache()->increment("publications:{$workspaceId}:version");
-    } catch (\Exception $e) {
-      cache()->put("publications:{$workspaceId}:version", time(), now()->addDays(7));
-    }
-
-    // Still try Redis pattern clear if using Redis for extra cleanliness
-    if (config('cache.default') === 'redis') {
-      try {
-        $pattern = "campaigns:{$workspaceId}:*";
-        $keys = cache()->getRedis()->keys(config('cache.prefix') . $pattern);
-        if (!empty($keys)) {
-          foreach ($keys as $key) {
-            $cleanKey = str_replace(config('cache.prefix'), '', $key);
-            cache()->forget($cleanKey);
-          }
-        }
-      } catch (\Exception $e) {
-        // Silently fail
-      }
     }
   }
 }
