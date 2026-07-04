@@ -6,9 +6,9 @@ use App\Constants\IntegrationEvents;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Integrations\StoreIntegrationSubscriptionRequest;
 use App\Http\Requests\Integrations\UpdateIntegrationSubscriptionRequest;
-use App\Models\Integrations\IntegrationDeliveryLog;
 use App\Models\Integrations\IntegrationEventSubscription;
 use App\Models\Workspace\Workspace;
+use App\Repositories\IntegrationSubscriptionRepository;
 use App\Services\Integrations\IntegrationEventDispatcher;
 use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -19,21 +19,17 @@ class IntegrationSubscriptionController extends Controller
 {
     use ApiResponse;
 
+    public function __construct(private IntegrationSubscriptionRepository $repo)
+    {
+    }
+
     /** GET /api/v1/workspaces/{ws}/integrations/subscriptions */
     public function index(string $idOrSlug): JsonResponse
     {
         $workspace = $this->resolveWorkspace($idOrSlug);
-        $this->authorizeAdmin($workspace);
-
-        $grouped = IntegrationEventSubscription::query()
-            ->forWorkspace($workspace->id)
-            ->orderBy('channel_type')
-            ->orderBy('event_type')
-            ->get()
-            ->groupBy('channel_type');
 
         return $this->successResponse([
-            'subscriptions'     => $grouped,
+            'subscriptions'     => $this->repo->groupedForWorkspace($workspace->id),
             'supported_channels' => IntegrationEventSubscription::supportedChannels(),
             'event_definitions'  => IntegrationEvents::groups(),
         ]);
@@ -43,14 +39,7 @@ class IntegrationSubscriptionController extends Controller
     public function store(StoreIntegrationSubscriptionRequest $request, string $idOrSlug): JsonResponse
     {
         $workspace = $this->resolveWorkspace($idOrSlug);
-        $this->authorizeAdmin($workspace);
-
-        $validated = $request->validated();
-
-        $subscription = IntegrationEventSubscription::create([
-            'workspace_id' => $workspace->id,
-            ...$validated,
-        ]);
+        $subscription = $this->repo->create($workspace->id, $request->validated());
 
         return $this->successResponse(['subscription' => $subscription], 'Subscription created.', 201);
     }
@@ -58,13 +47,9 @@ class IntegrationSubscriptionController extends Controller
     /** PUT /api/v1/workspaces/{ws}/integrations/subscriptions/{id} */
     public function update(UpdateIntegrationSubscriptionRequest $request, string $idOrSlug, int $id): JsonResponse
     {
-        $workspace    = $this->resolveWorkspace($idOrSlug);
-        $this->authorizeAdmin($workspace);
-        $subscription = IntegrationEventSubscription::where('workspace_id', $workspace->id)->findOrFail($id);
-
-        $validated = $request->validated();
-
-        $subscription->update($validated);
+        $workspace = $this->resolveWorkspace($idOrSlug);
+        $subscription = $this->repo->findForWorkspace($workspace->id, $id);
+        $subscription->update($request->validated());
 
         return $this->successResponse(['subscription' => $subscription], 'Subscription updated.');
     }
@@ -72,10 +57,8 @@ class IntegrationSubscriptionController extends Controller
     /** DELETE /api/v1/workspaces/{ws}/integrations/subscriptions/{id} */
     public function destroy(string $idOrSlug, int $id): JsonResponse
     {
-        $workspace    = $this->resolveWorkspace($idOrSlug);
-        $this->authorizeAdmin($workspace);
-        $subscription = IntegrationEventSubscription::where('workspace_id', $workspace->id)->findOrFail($id);
-        $subscription->delete();
+        $workspace = $this->resolveWorkspace($idOrSlug);
+        $this->repo->findForWorkspace($workspace->id, $id)->delete();
 
         return $this->successResponse(null, 'Subscription deleted.');
     }
@@ -83,9 +66,8 @@ class IntegrationSubscriptionController extends Controller
     /** POST /api/v1/workspaces/{ws}/integrations/subscriptions/{id}/test */
     public function test(string $idOrSlug, int $id): JsonResponse
     {
-        $workspace    = $this->resolveWorkspace($idOrSlug);
-        $this->authorizeAdmin($workspace);
-        $subscription = IntegrationEventSubscription::where('workspace_id', $workspace->id)->findOrFail($id);
+        $workspace = $this->resolveWorkspace($idOrSlug);
+        $subscription = $this->repo->findForWorkspace($workspace->id, $id);
 
         try {
             IntegrationEventDispatcher::dispatch(
@@ -104,35 +86,28 @@ class IntegrationSubscriptionController extends Controller
     public function logs(Request $request, string $idOrSlug): JsonResponse
     {
         $workspace = $this->resolveWorkspace($idOrSlug);
-        $this->authorizeAdmin($workspace);
-
-        $logs = IntegrationDeliveryLog::query()
-            ->where('workspace_id', $workspace->id)
-            ->with('subscription')
-            ->latest()
-            ->paginate($request->integer('per_page', 20));
+        $logs = $this->repo->deliveryLogs($workspace->id, $request->integer('per_page', 20));
 
         return $this->successResponse(['logs' => $logs]);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    /** Resolve the workspace and assert the caller is an owner/admin. */
     private function resolveWorkspace(string $idOrSlug): Workspace
     {
-        return Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
-    }
+        $workspace = $this->repo->resolveWorkspace($idOrSlug);
 
-    private function authorizeAdmin(Workspace $workspace): void
-    {
         $user = Auth::user();
-        if (!$user) abort(401);
+        if (!$user) {
+            abort(401);
+        }
 
-        $pivot = $workspace->users()->where('users.id', $user->id)->first()?->pivot;
-        if (!$pivot) abort(403);
+        $roleSlug = $this->repo->workspaceRoleSlug($workspace, $user->id);
+        if (!in_array($roleSlug, ['owner', 'admin'], true)) {
+            abort(403);
+        }
 
-        $roleSlug = \App\Models\Auth\Role::find($pivot->role_id)?->slug;
-        if (!in_array($roleSlug, ['owner', 'admin'])) abort(403);
+        return $workspace;
     }
 }
