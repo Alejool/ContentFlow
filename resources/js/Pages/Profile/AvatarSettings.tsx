@@ -1,7 +1,7 @@
 import FileUploadButton from '@/Components/common/FileUploadButton';
 import Button from '@/Components/common/Modern/Button';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { profileService } from '@/Services/Auth/profileService';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -69,16 +69,12 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
       formData.append('avatar', file);
       formData.append('name', user.name);
 
-      const response = await axios.post('/api/v1/profile/avatar', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = { data: await profileService.uploadAvatar(formData) };
 
       if (response.data.success) {
         const updatedUser = response.data.user;
         const newPhotoUrl =
-          updatedUser.photo_url && updatedUser.photo_url.trim() !== ''
+          updatedUser?.photo_url && updatedUser.photo_url.trim() !== ''
             ? updatedUser.photo_url
             : null;
         setPreviewUrl(newPhotoUrl);
@@ -119,7 +115,7 @@ export default function AvatarSettings({ user }: AvatarSettingsProps) {
     setImageError(false);
 
     try {
-      const response = await axios.delete('/api/v1/profile/avatar');
+      const response = { data: await profileService.deleteAvatar() };
 
       if (response.data.success) {
         setPreviewUrl(null);

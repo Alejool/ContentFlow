@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import axios from 'axios';
+import { subscriptionService } from '@/Services/Subscription/subscriptionService';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,11 +24,9 @@ export default function Success({ session }: SuccessProps) {
 
     const checkSubscriptionUpdate = async () => {
       try {
-        const response = await axios.get(route('api.v1.subscription.current-usage'), {
-          params: { _t: Date.now() },
-        });
+        const response = await subscriptionService.getCurrentUsage();
 
-        if (response.data.success) {
+        if (response.success) {
           // Suscripción actualizada correctamente
           setIsUpdating(false);
 

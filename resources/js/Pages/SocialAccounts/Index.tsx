@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
-import axios from 'axios';
+import { socialAccountService } from '@/Services/ConfigSocialMedia/socialAccountService';
 import { AlertTriangle, CheckCircle, Plus, RefreshCw, Share2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -51,9 +51,9 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
 
   const handleConnect = async (platform: string) => {
     try {
-      const response = await axios.get(route('social-accounts.auth-url', { platform }));
-      if (response.data.auth_url) {
-        window.location.href = response.data.auth_url;
+      const authUrl = await socialAccountService.getAuthUrl(platform);
+      if (authUrl) {
+        window.location.href = authUrl;
       }
     } catch (error) {
       toast.error(t('socialAccounts.connectError', 'Error al conectar la cuenta'));
@@ -69,7 +69,7 @@ export default function Index({ accounts, allowedPlatforms }: SocialAccountsInde
 
     setLoading(accountId);
     try {
-      await axios.delete(route('api.v1.social-accounts.destroy', { social_account: accountId }));
+      await socialAccountService.disconnect(accountId);
       toast.success(t('socialAccounts.disconnected', 'Cuenta desconectada'));
       router.reload();
     } catch (error) {

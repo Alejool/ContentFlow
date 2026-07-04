@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Sparkles, Film, Download, ExternalLink, Play, Filter, Loader2 } from 'lucide-react';
-import axios from 'axios';
+import { reelService } from '@/Services/Reels/reelService';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { usePresignedUrl, useGeneratePresignedUrl } from '@/Hooks/Upload/usePresignedUrl';
@@ -57,9 +57,9 @@ export default function AiReelsGallery() {
       if (selectedPlatform !== 'all') params.platform = selectedPlatform;
       if (selectedStatus !== 'all') params.status = selectedStatus;
 
-      const response = await axios.get('/api/v1/reels', { params });
-      setReels(response.data.data.reels);
-      setPagination(response.data.data.pagination);
+      const data = await reelService.list(params);
+      setReels(data.reels as never[]);
+      setPagination(data.pagination as never);
     } catch (error) {
       toast.error('Error al cargar los reels');
     } finally {

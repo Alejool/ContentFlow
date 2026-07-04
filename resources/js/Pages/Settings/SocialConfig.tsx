@@ -4,7 +4,7 @@ import { SOCIAL_PLATFORMS } from '@/Constants/ConfigSocialMedia/socialPlatformsC
 import { useKeyboardClick } from '@/Hooks/ui/useKeyboardClick';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import axios from 'axios';
+import { profileService } from '@/Services/Auth/profileService';
 import { Save, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -158,9 +158,7 @@ export default function SocialConfig({ settings: initialSettings }: SocialConfig
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await axios.patch(route('api.v1.profile.social-settings.update'), {
-        settings: globalSettings,
-      });
+      await profileService.updateSocialSettings(globalSettings);
       toast.success(t('platformSettings.success') || 'Configuración guardada');
       setIsSaving(false);
     } catch (error) {

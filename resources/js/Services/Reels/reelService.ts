@@ -11,4 +11,9 @@ export interface GenerateReelPayload {
 export const reelService = {
   generate: (payload: GenerateReelPayload): Promise<void> =>
     axios.post('/api/v1/reels/generate', payload).then(() => undefined),
+
+  list: <TReel = unknown, TPagination = unknown>(
+    params: Record<string, unknown>,
+  ): Promise<{ reels: TReel[]; pagination: TPagination }> =>
+    axios.get('/api/v1/reels', { params }).then((r) => r.data.data),
 };

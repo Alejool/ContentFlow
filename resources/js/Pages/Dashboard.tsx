@@ -7,7 +7,7 @@ import { useDashboardStats } from '@/Hooks/Dashboard/useDashboardStats';
 import { useTheme } from '@/Hooks/Layout/useTheme';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { profileService } from '@/Services/Auth/profileService';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3,
@@ -124,8 +124,8 @@ export default function Dashboard({
 
   const handleResendVerification = () => {
     setSending(true);
-    axios
-      .post(route('verification.send'))
+    profileService
+      .resendEmailVerification()
       .then(() => {
         setSuccessMessage(true);
         setSending(false);
