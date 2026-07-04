@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Publications;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Publications\StoreHashtagLibraryRequest;
+use App\Http\Requests\Publications\UpdateHashtagLibraryRequest;
 use App\Models\Publications\HashtagLibrary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,15 +30,9 @@ class HashtagLibraryController extends Controller
         return response()->json($hashtags);
     }
 
-    public function store(Request $request)
+    public function store(StoreHashtagLibraryRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'hashtags' => 'required|array',
-            'hashtags.*' => 'string',
-            'category' => 'nullable|string|max:100',
-            'is_favorite' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $hashtag = HashtagLibrary::create([
             ...$validated,
@@ -47,17 +43,11 @@ class HashtagLibraryController extends Controller
         return response()->json($hashtag, 201);
     }
 
-    public function update(Request $request, HashtagLibrary $hashtagLibrary)
+    public function update(UpdateHashtagLibraryRequest $request, HashtagLibrary $hashtagLibrary)
     {
         $this->authorize('update', $hashtagLibrary);
 
-        $validated = $request->validate([
-            'name' => 'string|max:255',
-            'hashtags' => 'array',
-            'hashtags.*' => 'string',
-            'category' => 'nullable|string|max:100',
-            'is_favorite' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $hashtagLibrary->update($validated);
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Calendar\StoreUserCalendarEventRequest;
+use App\Http\Requests\Calendar\UpdateUserCalendarEventRequest;
 use App\Models\User\UserCalendarEvent;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,7 +39,7 @@ class UserCalendarEventController extends Controller
     return $this->successResponse($events);
   }
 
-  public function store(Request $request)
+  public function store(StoreUserCalendarEventRequest $request)
   {
     Log::debug('UserCalendarEventController@store hit', [
       'url' => $request->fullUrl(),
@@ -45,36 +47,7 @@ class UserCalendarEventController extends Controller
       'data' => $request->all()
     ]);
 
-    $validated = $request->validate([
-      'title' => 'required|string|max:255',
-      'description' => 'nullable|string',
-      'start_date' => 'required|date|after:now',
-      'end_date' => 'nullable|date|after_or_equal:start_date',
-      'color' => 'nullable|string|max:20',
-      'remind_at' => [
-        'nullable',
-        'date',
-        function ($attribute, $value, $fail) use ($request) {
-          $start = $request->input('start_date');
-          $end = $request->input('end_date');
-
-          if (empty($value) || empty($start)) return;
-
-          // If multi-day event (has end_date), reminder must be before end_date
-          if (!empty($end)) {
-            if (strtotime($value) > strtotime($end)) {
-              $fail('The reminder must be before the end of the event.');
-            }
-          } else {
-            // Single day event: reminder must be strictly before start
-            if (strtotime($value) >= strtotime($start)) {
-              $fail('The reminder must be before the event starts.');
-            }
-          }
-        },
-      ],
-      'is_public' => 'nullable|boolean',
-    ]);
+    $validated = $request->validated();
 
     // Normalize incoming datetimes using client's timezone header and store in UTC
     $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
@@ -102,7 +75,7 @@ class UserCalendarEventController extends Controller
     return $this->successResponse($event, 'Event created successfully', 201);
   }
 
-  public function update(Request $request, string $id)
+  public function update(UpdateUserCalendarEventRequest $request, string $id)
   {
     Log::debug('UserCalendarEventController@update hit', [
       'id' => $id,
@@ -115,37 +88,7 @@ class UserCalendarEventController extends Controller
       ->where('user_id', Auth::id())
       ->findOrFail($id);
 
-    $validated = $request->validate([
-      'title' => 'sometimes|required|string|max:255',
-      'description' => 'nullable|string',
-      'start_date' => 'sometimes|required|date|after:now',
-      'end_date' => 'nullable|date|after_or_equal:start_date',
-      'color' => 'nullable|string|max:20',
-      'remind_at' => [
-        'nullable',
-        'date',
-        function ($attribute, $value, $fail) use ($request, $event) {
-          // Get start/end from request or fallback to existing event data
-          $start = $request->input('start_date') ?? $event->start_date;
-          $end = $request->input('end_date') ?? $event->end_date;
-
-          if (empty($value)) return;
-
-          // If multi-day event (has end_date), reminder must be before end_date
-          if (!empty($end)) {
-            if (strtotime($value) > strtotime($end)) {
-              $fail('The reminder must be before the end of the event.');
-            }
-          } else {
-            // Single day event: reminder must be strictly before start
-            if (strtotime($value) >= strtotime($start)) {
-              $fail('The reminder must be before the event starts.');
-            }
-          }
-        },
-      ],
-      'is_public' => 'nullable|boolean',
-    ]);
+    $validated = $request->validated();
 
     // Normalize incoming datetimes using client's timezone header and store in UTC
     $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
