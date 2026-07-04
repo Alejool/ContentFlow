@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Workspace;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\AssignRoleRequest;
 use App\Http\Requests\Role\RevokeRoleRequest;
-use App\Models\Auth\Role;
-use App\Models\User;
-use App\Models\Workspace\Workspace;
+use App\Http\Requests\Role\UpdateRolePermissionsRequest;
+use App\Repositories\RoleRepository;
 use App\Services\Roles\RoleService;
 use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -18,51 +17,34 @@ class RoleController extends Controller
     use ApiResponse;
 
     public function __construct(
-        private RoleService $roleService
+        private RoleService $roleService,
+        private RoleRepository $roles,
     ) {}
 
     /**
-     * Assign a role to a user in a workspace
-     * 
+     * Assign a role to a user in a workspace.
      * POST /api/v1/workspaces/{workspace}/roles/assign
-     * 
-     * @param AssignRoleRequest $request
-     * @param string $idOrSlug Workspace ID or slug
-     * @return JsonResponse
      */
     public function assign(AssignRoleRequest $request, string $idOrSlug): JsonResponse
     {
-        // Find workspace by ID or slug
-        $workspace = Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
-
-        // Find the user to assign the role to
-        $user = User::findOrFail($request->validated('user_id'));
-
-        // Get the authenticated user (assigner)
-        $assigner = Auth::user();
+        $workspace = $this->roles->findWorkspace($idOrSlug);
+        $user = $this->roles->findUser($request->validated('user_id'));
 
         try {
-            // Assign the role
             $this->roleService->assignRole(
                 $user,
                 $workspace,
                 $request->validated('role_name'),
-                $assigner
+                Auth::user()
             );
 
-            return $this->successResponse(
-                [
-                    'user_id' => $user->id,
-                    'user_name' => $user->name,
-                    'role_name' => $request->validated('role_name'),
-                    'workspace_id' => $workspace->id,
-                    'workspace_slug' => $workspace->slug,
-                ],
-                'Role assigned successfully.',
-                200
-            );
+            return $this->successResponse([
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'role_name' => $request->validated('role_name'),
+                'workspace_id' => $workspace->id,
+                'workspace_slug' => $workspace->slug,
+            ], 'Role assigned successfully.', 200);
         } catch (\App\Exceptions\Auth\RoleNotFoundException $e) {
             return $this->errorResponse($e->getMessage(), 404);
         } catch (\App\Exceptions\Auth\InsufficientPermissionsException $e) {
@@ -77,384 +59,106 @@ class RoleController extends Controller
     }
 
     /**
-     * Revoke a user's role in a workspace
-     * 
+     * Revoke a user's role in a workspace.
      * DELETE /api/v1/workspaces/{workspace}/roles/revoke
-     * 
-     * @param RevokeRoleRequest $request
-     * @param string $idOrSlug Workspace ID or slug
-     * @return JsonResponse
      */
     public function revoke(RevokeRoleRequest $request, string $idOrSlug): JsonResponse
     {
-        // Find workspace by ID or slug
-        $workspace = Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
+        $workspace = $this->roles->findWorkspace($idOrSlug);
+        $user = $this->roles->findUser($request->validated('user_id'));
 
-        // Find the user to revoke the role from
-        $user = User::findOrFail($request->validated('user_id'));
-
-        // Get the authenticated user (revoker)
-        $assigner = Auth::user();
-
-        // Check if the user trying to revoke is authorized
-        // Get the user's current role in the workspace
-        $userRolePivot = \Illuminate\Support\Facades\DB::table('role_user')
-            ->where('user_id', $user->id)
-            ->where('workspace_id', $workspace->id)
-            ->first();
-
-        if (!$userRolePivot) {
-            return $this->errorResponse('User does not have a role in this workspace.', 404);
+        $result = $this->roleService->revokeRole($user, $workspace, Auth::user());
+        if (!$result['ok']) {
+            return $this->errorResponse($result['error'], $result['status']);
         }
 
-        $userRole = Role::find($userRolePivot->role_id);
-
-        // Prevent revoking Owner role
-        if ($userRole && $userRole->name === Role::OWNER) {
-            return $this->errorResponse('Cannot revoke the Owner role.', 403);
-        }
-
-        // Check if assigner can revoke this role
-        if (!$this->roleService->canAssignRole($assigner, $userRole->name)) {
-            return $this->errorResponse('You do not have permission to revoke this role.', 403);
-        }
-
-        try {
-            // Remove the role assignment
-            \Illuminate\Support\Facades\DB::table('role_user')
-                ->where('user_id', $user->id)
-                ->where('workspace_id', $workspace->id)
-                ->delete();
-
-            return $this->successResponse(
-                [
-                    'user_id' => $user->id,
-                    'user_name' => $user->name,
-                    'workspace_id' => $workspace->id,
-                    'workspace_slug' => $workspace->slug,
-                ],
-                'Role revoked successfully.',
-                200
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                'An error occurred while revoking the role.',
-                500,
-                config('app.debug') ? $e->getMessage() : null
-            );
-        }
+        return $this->successResponse([
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'workspace_id' => $workspace->id,
+            'workspace_slug' => $workspace->slug,
+        ], 'Role revoked successfully.', 200);
     }
 
     /**
-     * List all roles with their permissions
-     * 
+     * List all system roles with their permissions.
      * GET /api/v1/workspaces/{workspace}/roles
-     * 
-     * @param string $idOrSlug Workspace ID or slug
-     * @return JsonResponse
      */
     public function index(string $idOrSlug): JsonResponse
     {
-        // Find workspace by ID or slug
-        $workspace = Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
+        $this->roles->findWorkspace($idOrSlug);
 
-        try {
-            // Get all system roles with their permissions
-            $roles = Role::systemRoles()
-                ->with('permissions')
-                ->get()
-                ->map(function ($role) {
-                    return [
-                        'id' => $role->id,
-                        'name' => $role->name,
-                        'display_name' => $role->display_name,
-                        'description' => $role->description,
-                        'color_hex'   => $role->color_hex,
-                        'icon_slug'   => $role->icon_slug,
-                        'is_system_role' => $role->is_system_role,
-                        'approval_participant' => $role->approval_participant,
-                        'permissions' => $role->permissions->map(function ($permission) {
-                            return [
-                                'id' => $permission->id,
-                                'name' => $permission->name,
-                                'display_name' => $permission->display_name,
-                                'description' => $permission->description,
-                            ];
-                        }),
-                    ];
-                });
-
-            return $this->successResponse(
-                ['roles' => $roles],
-                'Roles retrieved successfully.',
-                200
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                'An error occurred while retrieving roles.',
-                500,
-                config('app.debug') ? $e->getMessage() : null
-            );
-        }
+        return $this->successResponse(
+            ['roles' => $this->roleService->listSystemRoles()],
+            'Roles retrieved successfully.',
+            200
+        );
     }
 
     /**
-     * Update role permissions
-     * 
+     * Update role fields and permissions.
      * PUT /api/v1/workspaces/{workspace}/roles/{role}
-     * 
-     * @param string $idOrSlug Workspace ID or slug
-     * @param int $roleId Role ID
-     * @return JsonResponse
      */
-    public function update(string $idOrSlug, int $roleId): JsonResponse
+    public function update(UpdateRolePermissionsRequest $request, string $idOrSlug, int $roleId): JsonResponse
     {
-        // Find workspace by ID or slug
-        $workspace = Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
+        $workspace = $this->roles->findWorkspace($idOrSlug);
+        $role = $this->roles->findRole($roleId);
 
-        // Find the role
-        $role = Role::findOrFail($roleId);
-
-        // Get the authenticated user
-        $user = Auth::user();
-
-        // Check if user has permission to manage roles
-        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-team')) {
+        if (!$this->roleService->userHasPermission(Auth::user(), $workspace, 'manage-team')) {
             return $this->errorResponse('You do not have permission to update roles.', 403);
         }
 
-        // Prevent editing Owner role
-        if ($role->slug === Role::OWNER) {
-            return $this->errorResponse('Cannot edit the Owner role.', 403);
+        $result = $this->roleService->updateRolePermissions($role, $request->validated());
+        if (!$result['ok']) {
+            return $this->errorResponse($result['error'], $result['status']);
         }
 
-        // Validate request
-        $validated = request()->validate([
-            'permission_ids' => 'required|array',
-            'permission_ids.*' => 'exists:permissions,id',
-            'name'        => 'sometimes|string|max:64',
-            'description' => 'sometimes|nullable|string|max:255',
-            'color_hex'   => ['sometimes', 'nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
-            'icon_slug'   => 'sometimes|nullable|string|max:64',
-        ]);
-
-        // Track whether the color was actually saved (column may not exist yet)
-        $colorSaved = false;
-
-        try {
-            // Update editable role fields.
-            // Color/icon update is isolated in its own try/catch so a missing DB
-            // column (migration pending) never blocks permission sync.
-            $updateFields = array_filter([
-                'name'        => $validated['name'] ?? null,
-                'description' => $validated['description'] ?? null,
-                'color_hex'   => $validated['color_hex'] ?? null,
-                'icon_slug'   => $validated['icon_slug'] ?? null,
-            ], fn ($v) => $v !== null);
-
-            if (!empty($updateFields)) {
-                $fieldsToApply = $role->is_system_role
-                    ? array_intersect_key($updateFields, array_flip(['color_hex', 'icon_slug']))
-                    : $updateFields;
-
-                if (!empty($fieldsToApply)) {
-                    try {
-                        $role->update($fieldsToApply);
-                        $colorSaved = isset($fieldsToApply['color_hex']);
-                    } catch (\Throwable $colorErr) {
-                        // Column probably doesn't exist yet (migration pending).
-                        // Log and continue — permissions sync must not be blocked.
-                        \Illuminate\Support\Facades\Log::warning('Role visual fields update skipped (column missing?)', [
-                            'role_id' => $role->id,
-                            'fields'  => array_keys($fieldsToApply),
-                            'error'   => $colorErr->getMessage(),
-                        ]);
-                    }
-                }
-            }
-
-            // Sync permissions (always runs, even if color update failed)
-            $role->permissions()->sync($validated['permission_ids']);
-
-            // Clear role cache
-            \Illuminate\Support\Facades\Cache::tags(['roles', "role_{$role->id}"])->flush();
-
-            // Clear all users' permission cache in Redis since role permissions changed
-            $keys = \Illuminate\Support\Facades\Redis::keys("permission:user:*");
-            if (!empty($keys)) {
-                \Illuminate\Support\Facades\Redis::del($keys);
-            }
-            $aggregatedKeys = \Illuminate\Support\Facades\Redis::keys("permissions:user:*");
-            if (!empty($aggregatedKeys)) {
-                \Illuminate\Support\Facades\Redis::del($aggregatedKeys);
-            }
-
-            // Reload role with permissions
-            $role->load('permissions');
-
-            return $this->successResponse(
-                [
-                    'role' => [
-                        'id' => $role->id,
-                        'name' => $role->name,
-                        'display_name' => $role->display_name,
-                        'description' => $role->description,
-                        'color_hex'   => $role->color_hex,
-                        'icon_slug'   => $role->icon_slug,
-                        'permissions' => $role->permissions->map(function ($permission) {
-                            return [
-                                'id' => $permission->id,
-                                'name' => $permission->name,
-                                'display_name' => $permission->display_name,
-                                'description' => $permission->description,
-                            ];
-                        }),
-                    ],
-                    'color_saved' => $colorSaved,
-                ],
-                'Role updated successfully.',
-                200
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                'An error occurred while updating the role.',
-                500,
-                config('app.debug') ? $e->getMessage() : null
-            );
-        }
+        return $this->successResponse(
+            ['role' => $result['role'], 'color_saved' => $result['color_saved']],
+            'Role updated successfully.',
+            200
+        );
     }
 
     /**
-     * Delete a custom role
-     *
+     * Delete a custom role.
      * DELETE /api/v1/workspaces/{workspace}/roles/{role}
-     *
-     * @param string $idOrSlug Workspace ID or slug
-     * @param int $roleId Role ID
-     * @return JsonResponse
      */
     public function destroy(string $idOrSlug, int $roleId): JsonResponse
     {
-        // Find workspace by ID or slug
-        $workspace = Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
+        $workspace = $this->roles->findWorkspace($idOrSlug);
+        $role = $this->roles->findRole($roleId);
 
-        // Find the role
-        $role = Role::findOrFail($roleId);
-
-        // Get the authenticated user
-        $user = Auth::user();
-
-        // Check if user has permission to manage roles
-        if (!$this->roleService->userHasPermission($user, $workspace, 'manage-team')) {
+        if (!$this->roleService->userHasPermission(Auth::user(), $workspace, 'manage-team')) {
             return $this->errorResponse('You do not have permission to delete roles.', 403);
         }
 
-        // Prevent deleting system roles
-        if ($role->is_system_role) {
-            return $this->errorResponse('Cannot delete system roles.', 403);
+        $result = $this->roleService->deleteRole($role, $workspace);
+        if (!$result['ok']) {
+            return $this->errorResponse($result['error'], $result['status']);
         }
 
-        // Prevent deleting protected roles (owner, admin, editor)
-        $protectedRoles = [Role::OWNER, Role::ADMIN, Role::EDITOR];
-        if (in_array($role->slug, $protectedRoles)) {
-            return $this->errorResponse('Cannot delete protected roles.', 403);
-        }
-
-        // Check if any users have this role
-        $userCount = \Illuminate\Support\Facades\DB::table('role_user')
-            ->where('role_id', $role->id)
-            ->where('workspace_id', $workspace->id)
-            ->count();
-
-        if ($userCount > 0) {
-            return $this->errorResponse('Cannot delete a role that has users assigned to it.', 400);
-        }
-
-        try {
-            // Delete the role
-            $role->delete();
-
-            // Clear role cache
-            \Illuminate\Support\Facades\Cache::tags(['roles', "role_{$role->id}"])->flush();
-
-            return $this->successResponse(
-                [
-                    'role_id' => $roleId,
-                ],
-                'Role deleted successfully.',
-                200
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                'An error occurred while deleting the role.',
-                500,
-                config('app.debug') ? $e->getMessage() : null
-            );
-        }
+        return $this->successResponse(['role_id' => $roleId], 'Role deleted successfully.', 200);
     }
 
-
     /**
-     * Get user permissions in a workspace
-     * 
+     * Get a user's permissions in a workspace.
      * GET /api/v1/workspaces/{workspace}/users/{user}/permissions
-     * 
-     * @param string $idOrSlug Workspace ID or slug
-     * @param int $userId User ID
-     * @return JsonResponse
      */
     public function permissions(string $idOrSlug, int $userId): JsonResponse
     {
-        // Find workspace by ID or slug
-        $workspace = Workspace::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
-            ->firstOrFail();
-
-        // Find the user
-        $user = User::findOrFail($userId);
+        $workspace = $this->roles->findWorkspace($idOrSlug);
+        $user = $this->roles->findUser($userId);
 
         try {
-            // Get user permissions
-            $permissions = $this->roleService->getUserPermissions($user, $workspace);
-
-            // Get user's role in the workspace
-            $rolePivot = \Illuminate\Support\Facades\DB::table('role_user')
-                ->where('user_id', $user->id)
-                ->where('workspace_id', $workspace->id)
-                ->first();
-
-            $role = null;
-            if ($rolePivot) {
-                $roleModel = Role::find($rolePivot->role_id);
-                if ($roleModel) {
-                    $role = [
-                        'id' => $roleModel->id,
-                        'name' => $roleModel->name,
-                        'display_name' => $roleModel->display_name,
-                    ];
-                }
-            }
-
-            return $this->successResponse(
-                [
-                    'user_id' => $user->id,
-                    'user_name' => $user->name,
-                    'workspace_id' => $workspace->id,
-                    'workspace_slug' => $workspace->slug,
-                    'role' => $role,
-                    'permissions' => $permissions,
-                ],
-                'User permissions retrieved successfully.',
-                200
-            );
+            return $this->successResponse([
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'workspace_id' => $workspace->id,
+                'workspace_slug' => $workspace->slug,
+                'role' => $this->roleService->userRoleSummary($user, $workspace),
+                'permissions' => $this->roleService->getUserPermissions($user, $workspace),
+            ], 'User permissions retrieved successfully.', 200);
         } catch (\Exception $e) {
             return $this->errorResponse(
                 'An error occurred while retrieving user permissions.',

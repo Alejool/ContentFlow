@@ -9,7 +9,10 @@ use App\Models\Workspace\Workspace;
 use App\Exceptions\Auth\RoleNotFoundException;
 use App\Exceptions\Auth\InsufficientPermissionsException;
 use App\Events\System\RoleChanged;
+use App\Repositories\RoleRepository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +22,10 @@ class RoleService
      * Cache TTL in seconds (1 hour)
      */
     private const CACHE_TTL = 3600;
+
+    public function __construct(private RoleRepository $roles)
+    {
+    }
 
     /**
      * Assign a role to a user in a workspace
@@ -357,6 +364,180 @@ class RoleService
         foreach (Permission::allPermissionSlugs() as $permission) {
             $key = $this->getPermissionCacheKey($user, $workspace, $permission);
             Redis::del($key);
+        }
+    }
+
+    // ── Workspace role management (moved out of RoleController) ────────────
+
+    /**
+     * System roles mapped for the index endpoint.
+     */
+    public function listSystemRoles(): Collection
+    {
+        return $this->roles->systemRolesWithPermissions()->map(fn (Role $role) => [
+            'id' => $role->id,
+            'name' => $role->name,
+            'display_name' => $role->display_name,
+            'description' => $role->description,
+            'color_hex' => $role->color_hex,
+            'icon_slug' => $role->icon_slug,
+            'is_system_role' => $role->is_system_role,
+            'approval_participant' => $role->approval_participant,
+            'permissions' => $this->mapPermissions($role),
+        ]);
+    }
+
+    /**
+     * Revoke a user's role in a workspace.
+     *
+     * @return array{ok: bool, status?: int, error?: string}
+     */
+    public function revokeRole(User $user, Workspace $workspace, User $assigner): array
+    {
+        $pivot = $this->roles->userRolePivot($user->id, $workspace->id);
+        if (!$pivot) {
+            return ['ok' => false, 'status' => 404, 'error' => 'User does not have a role in this workspace.'];
+        }
+
+        $userRole = $this->roles->findRoleById($pivot->role_id);
+        if ($userRole && $userRole->name === Role::OWNER) {
+            return ['ok' => false, 'status' => 403, 'error' => 'Cannot revoke the Owner role.'];
+        }
+
+        if (!$this->canAssignRole($assigner, $userRole->name)) {
+            return ['ok' => false, 'status' => 403, 'error' => 'You do not have permission to revoke this role.'];
+        }
+
+        $this->roles->deleteUserRole($user->id, $workspace->id);
+
+        return ['ok' => true];
+    }
+
+    /**
+     * Update a role's editable fields and permissions.
+     *
+     * @return array{ok: bool, status?: int, error?: string, role?: array, color_saved?: bool}
+     */
+    public function updateRolePermissions(Role $role, array $data): array
+    {
+        if ($role->slug === Role::OWNER) {
+            return ['ok' => false, 'status' => 403, 'error' => 'Cannot edit the Owner role.'];
+        }
+
+        $colorSaved = false;
+
+        $updateFields = array_filter([
+            'name' => $data['name'] ?? null,
+            'description' => $data['description'] ?? null,
+            'color_hex' => $data['color_hex'] ?? null,
+            'icon_slug' => $data['icon_slug'] ?? null,
+        ], fn ($v) => $v !== null);
+
+        if (!empty($updateFields)) {
+            $fieldsToApply = $role->is_system_role
+                ? array_intersect_key($updateFields, array_flip(['color_hex', 'icon_slug']))
+                : $updateFields;
+
+            if (!empty($fieldsToApply)) {
+                try {
+                    $role->update($fieldsToApply);
+                    $colorSaved = isset($fieldsToApply['color_hex']);
+                } catch (\Throwable $colorErr) {
+                    Log::warning('Role visual fields update skipped (column missing?)', [
+                        'role_id' => $role->id,
+                        'fields' => array_keys($fieldsToApply),
+                        'error' => $colorErr->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        $role->permissions()->sync($data['permission_ids']);
+        $this->flushRoleCaches($role);
+        $role->load('permissions');
+
+        return [
+            'ok' => true,
+            'color_saved' => $colorSaved,
+            'role' => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'display_name' => $role->display_name,
+                'description' => $role->description,
+                'color_hex' => $role->color_hex,
+                'icon_slug' => $role->icon_slug,
+                'permissions' => $this->mapPermissions($role),
+            ],
+        ];
+    }
+
+    /**
+     * Delete a custom role after guard checks.
+     *
+     * @return array{ok: bool, status?: int, error?: string}
+     */
+    public function deleteRole(Role $role, Workspace $workspace): array
+    {
+        if ($role->is_system_role) {
+            return ['ok' => false, 'status' => 403, 'error' => 'Cannot delete system roles.'];
+        }
+
+        if (in_array($role->slug, [Role::OWNER, Role::ADMIN, Role::EDITOR], true)) {
+            return ['ok' => false, 'status' => 403, 'error' => 'Cannot delete protected roles.'];
+        }
+
+        if ($this->roles->countRoleUsers($role->id, $workspace->id) > 0) {
+            return ['ok' => false, 'status' => 400, 'error' => 'Cannot delete a role that has users assigned to it.'];
+        }
+
+        $roleId = $role->id;
+        $role->delete();
+        Cache::tags(['roles', "role_{$roleId}"])->flush();
+
+        return ['ok' => true];
+    }
+
+    /**
+     * A user's role summary in a workspace, or null.
+     */
+    public function userRoleSummary(User $user, Workspace $workspace): ?array
+    {
+        $pivot = $this->roles->userRolePivot($user->id, $workspace->id);
+        if (!$pivot) {
+            return null;
+        }
+
+        $role = $this->roles->findRoleById($pivot->role_id);
+        if (!$role) {
+            return null;
+        }
+
+        return [
+            'id' => $role->id,
+            'name' => $role->name,
+            'display_name' => $role->display_name,
+        ];
+    }
+
+    private function mapPermissions(Role $role): Collection
+    {
+        return $role->permissions->map(fn ($permission) => [
+            'id' => $permission->id,
+            'name' => $permission->name,
+            'display_name' => $permission->display_name,
+            'description' => $permission->description,
+        ]);
+    }
+
+    private function flushRoleCaches(Role $role): void
+    {
+        Cache::tags(['roles', "role_{$role->id}"])->flush();
+
+        foreach (['permission:user:*', 'permissions:user:*'] as $pattern) {
+            $keys = Redis::keys($pattern);
+            if (!empty($keys)) {
+                Redis::del($keys);
+            }
         }
     }
 }
