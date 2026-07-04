@@ -2,10 +2,10 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Integrations\Payment\PaymentHttpClient;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Services\Payment\PaymentGatewayInterface;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -58,10 +58,10 @@ class WompiGateway implements PaymentGatewayInterface
         );
 
         // Crear Payment Link (checkout hosted)
-        $response = Http::withHeaders([
+        $response = app(PaymentHttpClient::class)->post($this->baseUrl . '/payment_links', [
             'Authorization' => 'Bearer ' . $this->privateKey,
             'Content-Type' => 'application/json',
-        ])->post($this->baseUrl . '/payment_links', [
+        ], [
             'name' => "Suscripción {$planConfig['name']} - {$workspace->name}",
             'description' => "Plan {$planConfig['name']} - Suscripción mensual",
             'single_use' => true,
@@ -79,15 +79,15 @@ class WompiGateway implements PaymentGatewayInterface
             ], $metadata),
         ]);
 
-        if (!$response->successful()) {
+        if (!$response['successful']) {
             Log::error('Wompi: Failed to create payment link', [
-                'status' => $response->status(),
-                'body' => $response->body(),
+                'status' => $response['status'],
+                'body' => $response['body'],
             ]);
-            throw new \Exception('Failed to create Wompi payment link: ' . $response->body());
+            throw new \Exception('Failed to create Wompi payment link: ' . $response['body']);
         }
 
-        $data = $response->json()['data'] ?? [];
+        $data = $response['json']['data'] ?? [];
 
         return [
             'url' => $data['url'] ?? null,
@@ -113,10 +113,10 @@ class WompiGateway implements PaymentGatewayInterface
         );
 
         // Crear Payment Link
-        $response = Http::withHeaders([
+        $response = app(PaymentHttpClient::class)->post($this->baseUrl . '/payment_links', [
             'Authorization' => 'Bearer ' . $this->privateKey,
             'Content-Type' => 'application/json',
-        ])->post($this->baseUrl . '/payment_links', [
+        ], [
             'name' => $addonData['name'],
             'description' => "{$addonData['amount']} {$addonData['unit']} - {$addonData['description']}",
             'single_use' => true,
@@ -137,15 +137,15 @@ class WompiGateway implements PaymentGatewayInterface
             ], $metadata),
         ]);
 
-        if (!$response->successful()) {
+        if (!$response['successful']) {
             Log::error('Wompi: Failed to create addon payment link', [
-                'status' => $response->status(),
-                'body' => $response->body(),
+                'status' => $response['status'],
+                'body' => $response['body'],
             ]);
-            throw new \Exception('Failed to create Wompi payment link: ' . $response->body());
+            throw new \Exception('Failed to create Wompi payment link: ' . $response['body']);
         }
 
-        $data = $response->json()['data'] ?? [];
+        $data = $response['json']['data'] ?? [];
 
         return [
             'url' => $data['url'] ?? null,
@@ -160,19 +160,19 @@ class WompiGateway implements PaymentGatewayInterface
      */
     public function getTransaction(string $transactionId): ?array
     {
-        $response = Http::withHeaders([
+        $response = app(PaymentHttpClient::class)->get($this->baseUrl . '/transactions/' . $transactionId, [
             'Authorization' => 'Bearer ' . $this->publicKey,
-        ])->get($this->baseUrl . '/transactions/' . $transactionId);
+        ]);
 
-        if (!$response->successful()) {
+        if (!$response['successful']) {
             Log::error('Wompi: Failed to get transaction', [
                 'transaction_id' => $transactionId,
-                'status' => $response->status(),
+                'status' => $response['status'],
             ]);
             return null;
         }
 
-        return $response->json()['data'] ?? null;
+        return $response['json']['data'] ?? null;
     }
 
     /**
@@ -289,13 +289,13 @@ class WompiGateway implements PaymentGatewayInterface
      */
     public function createAcceptanceToken(): ?array
     {
-        $response = Http::get($this->baseUrl . '/merchants/' . $this->publicKey);
+        $response = app(PaymentHttpClient::class)->get($this->baseUrl . '/merchants/' . $this->publicKey);
 
-        if (!$response->successful()) {
+        if (!$response['successful']) {
             return null;
         }
 
-        $merchant = $response->json()['data'] ?? null;
+        $merchant = $response['json']['data'] ?? null;
         
         return [
             'acceptance_token' => $merchant['presigned_acceptance']['acceptance_token'] ?? null,

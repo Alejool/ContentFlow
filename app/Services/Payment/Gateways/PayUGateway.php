@@ -2,11 +2,11 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Integrations\Payment\PaymentHttpClient;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Services\Payment\PaymentGatewayInterface;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 
 /**
  * Gateway de PayU usando API REST directa
@@ -189,10 +189,10 @@ class PayUGateway implements PaymentGatewayInterface
     {
         try {
             // Consultar estado de una transacción usando API REST
-            $response = Http::withHeaders([
+            $response = app(PaymentHttpClient::class)->post($this->apiUrl, [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($this->apiUrl, [
+            ], [
                 'language' => 'es',
                 'command' => 'ORDER_DETAIL_BY_REFERENCE_CODE',
                 'merchant' => [
@@ -205,16 +205,16 @@ class PayUGateway implements PaymentGatewayInterface
                 'test' => $this->testMode,
             ]);
 
-            if (!$response->successful()) {
+            if (!$response['successful']) {
                 Log::error('PayU: Failed to get transaction', [
                     'subscription_id' => $subscriptionId,
-                    'status' => $response->status(),
-                    'body' => $response->body(),
+                    'status' => $response['status'],
+                    'body' => $response['body'],
                 ]);
                 return null;
             }
 
-            $data = $response->json();
+            $data = $response['json'];
             
             if (isset($data['result']['payload'])) {
                 $payload = $data['result']['payload'][0] ?? null;

@@ -2,10 +2,10 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Integrations\Payment\PaymentHttpClient;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 use App\Services\Payment\PaymentGatewayInterface;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -130,32 +130,32 @@ class MercadoPagoManualGateway implements PaymentGatewayInterface
             // MP returns the existing preference instead of creating a duplicate.
             $idempotencyKey = hash('sha256', "mp_manual_pref:{$workspace->id}:{$reference}:" . now()->format('YmdH'));
 
-            $response = Http::withHeaders([
+            $response = app(PaymentHttpClient::class)->post("{$this->apiUrl}/checkout/preferences", [
                 'Authorization' => 'Bearer ' . $this->accessToken,
                 'Content-Type' => 'application/json',
                 'X-Idempotency-Key' => $idempotencyKey,
-            ])->post("{$this->apiUrl}/checkout/preferences", $data);
+            ], $data);
 
             Log::info('MercadoPago Manual: API Response', [
-                'status' => $response->status(),
-                'successful' => $response->successful(),
-                'has_init_point' => isset($response->json()['init_point']),
-                'has_id' => isset($response->json()['id']),
+                'status' => $response['status'],
+                'successful' => $response['successful'],
+                'has_init_point' => isset($response['json']['init_point']),
+                'has_id' => isset($response['json']['id']),
             ]);
 
-            if (!$response->successful()) {
+            if (!$response['successful']) {
                 Log::error('MercadoPago Manual: Failed to create preference', [
                     'workspace_id' => $workspace->id,
                     'reference' => $reference,
-                    'status' => $response->status(),
-                    'error' => $response->json(),
-                    'body' => $response->body(),
+                    'status' => $response['status'],
+                    'error' => $response['json'],
+                    'body' => $response['body'],
                 ]);
 
-                throw new \Exception('MercadoPago API error: ' . $response->body());
+                throw new \Exception('MercadoPago API error: ' . $response['body']);
             }
 
-            $responseData = $response->json();
+            $responseData = $response['json'];
 
             if (!isset($responseData['init_point']) || !isset($responseData['id'])) {
                 Log::error('MercadoPago Manual: Invalid response structure', [
@@ -231,15 +231,15 @@ class MercadoPagoManualGateway implements PaymentGatewayInterface
     public function getSubscription(string $subscriptionId): ?array
     {
         try {
-            $response = Http::withHeaders([
+            $response = app(PaymentHttpClient::class)->get("{$this->apiUrl}/v1/payments/{$subscriptionId}", [
                 'Authorization' => 'Bearer ' . $this->accessToken,
-            ])->get("{$this->apiUrl}/v1/payments/{$subscriptionId}");
+            ]);
 
-            if (!$response->successful()) {
+            if (!$response['successful']) {
                 return null;
             }
 
-            $payment = $response->json();
+            $payment = $response['json'];
 
             return [
                 'id' => $payment['id'],
