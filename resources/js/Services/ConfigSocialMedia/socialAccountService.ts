@@ -10,4 +10,9 @@ export const socialAccountService = {
 
   disconnect: (accountId: number): Promise<void> =>
     axios.delete(`/api/v1/social-accounts/${accountId}`).then(() => undefined),
+
+  getPublishingStatus: (accountId: number): Promise<{ has_publishing?: boolean }> =>
+    axios
+      .get(`/api/v1/social-accounts/${accountId}/publishing-status`)
+      .then((r) => r.data ?? {}),
 };

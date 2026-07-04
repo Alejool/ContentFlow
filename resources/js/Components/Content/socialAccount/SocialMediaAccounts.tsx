@@ -8,7 +8,7 @@ import { useSocialAccountReconnect } from '@/Hooks/social/useSocialAccountReconn
 import { getPlatformSchema } from '@/schemas/ConfigSocialMedia/platformSettings';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { router, usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { socialAccountService } from '@/Services/ConfigSocialMedia/socialAccountService';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
@@ -133,20 +133,11 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/v1/social-accounts', {
-        headers: {
-          'X-CSRF-TOKEN': document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content'),
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
+      const accounts = await socialAccountService.list();
       // Siempre llamar updateAccountsStatus — incluso si la respuesta está vacía o
       // el backend devuelve null. Así todas las plataformas activas aparecen con
       // la opción de conectar cuando no hay cuentas vinculadas.
-      updateAccountsStatus(response.data?.accounts ?? []);
+      updateAccountsStatus(accounts ?? []);
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error(t('manageContent.socialMedia.messages.unauthorized'));
@@ -240,19 +231,10 @@ const SocialMediaAccounts = memo(({ defaultOpen = false, highlighted = false }: 
       for (const account of accounts) {
         if (account.isConnected && account.accountId) {
           try {
-            const response = await axios.get(
-              `/api/v1/social-accounts/${account.accountId}/publishing-status`,
-              {
-                headers: {
-                  'X-CSRF-TOKEN': document
-                    .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute('content'),
-                  Accept: 'application/json',
-                },
-                withCredentials: true,
-              },
+            const status = await socialAccountService.getPublishingStatus(
+              account.accountId as number,
             );
-            if (response.data?.has_publishing) publishingAccounts.add(account.accountId as number);
+            if (status.has_publishing) publishingAccounts.add(account.accountId as number);
           } catch (error: any) {
             console.error(
               `[Publishing Check] Error checking ${account.name}:`,

@@ -1,7 +1,7 @@
 import Button from '@/Components/common/Modern/Button';
 import toast from '@/Utils/common/toast';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { exportService } from '@/Services/common/exportService';
 import { Download, FileSpreadsheet, FileText, Info } from 'lucide-react';
 import { formatDateString } from '@/Utils/formatters';
 import { useState } from 'react';
@@ -30,14 +30,11 @@ export default function ExportButtons({
     setIsExporting(true);
 
     try {
-      const response = await axios.get(endpoint, {
-        params: { ...filters, format },
-        responseType: 'blob',
-      });
+      const download = await exportService.download(endpoint, { ...filters, format });
 
       // Extract history limit info from headers (this is the source of truth)
-      const historyDaysHeader = response.headers['x-export-history-days'];
-      const startDate = response.headers['x-export-start-date'];
+      const historyDaysHeader = download.historyDays;
+      const startDate = download.startDate;
 
       if (historyDaysHeader) {
         const days = parseInt(historyDaysHeader);
@@ -60,16 +57,16 @@ export default function ExportButtons({
         toast.success(t('common.exportCompleted', { defaultValue: 'Exportación completada' }));
       }
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([download.blob]));
       const link = document.createElement('a');
       link.href = url;
 
-      const contentDisposition = response.headers['content-disposition'];
+      const contentDisposition = download.contentDisposition;
       let filename = `export_${Date.now()}.${format}`;
 
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-        if (filenameMatch) {
+        if (filenameMatch?.[1]) {
           filename = filenameMatch[1];
         }
       }

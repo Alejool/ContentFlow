@@ -115,7 +115,18 @@ describe('publicationService.cancel', () => {
   it('POST to cancel route', async () => {
     mockedAxios.post = vi.fn().mockResolvedValue({ data: {} });
     await publicationService.cancel(1);
-    expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringContaining('publications.cancel'));
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect.stringContaining('publications.cancel'),
+      {},
+    );
+  });
+
+  it('POST to cancel route with platform ids', async () => {
+    mockedAxios.post = vi.fn().mockResolvedValue({ data: {} });
+    await publicationService.cancel(1, [5, 7]);
+    expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringContaining('publications.cancel'), {
+      platform_ids: [5, 7],
+    });
   });
 });
 

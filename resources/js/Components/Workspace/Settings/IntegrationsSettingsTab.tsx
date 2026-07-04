@@ -5,7 +5,7 @@ import Input from '@/Components/common/Modern/Input';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import { formatDateString, formatTimeString } from '@/Utils/formatters';
 import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { workspaceService, workspaceWebhookService } from '@/Services/Workspace/workspaceService';
 import {
   Activity,
   Bell,
@@ -182,16 +182,12 @@ export default function IntegrationsSettingsTab({
         const channel = channelOverride !== undefined ? channelOverride : channelFilter;
         const status = statusOverride !== undefined ? statusOverride : statusFilter;
 
-        const response = await axios.get(route('api.v1.workspaces.activity', workspace.id), {
-          params: {
-            page,
-            per_page: perPage,
-            channel: channel || undefined,
-            status: status || undefined,
-          },
+        const payload = await workspaceService.getActivity(workspace.id, {
+          page,
+          per_page: perPage,
+          channel: channel || undefined,
+          status: status || undefined,
         });
-
-        const payload = response.data;
         // ApiResponse merges the paginator if toArray() was called in backend
         // So payload will have current_page, total, and data (the items)
         setActivityData({
@@ -240,15 +236,7 @@ export default function IntegrationsSettingsTab({
 
     setTesting(type);
     try {
-      await axios.post(
-        route('api.v1.workspaces.webhooks.test', {
-          workspace: workspace.id,
-        }),
-        {
-          type,
-          url: currentUrl,
-        },
-      );
+      await workspaceWebhookService.test(workspace.id, { type, url: currentUrl });
       toast.success(t('workspace.integrations.messages.test_success'));
       router.reload({
         only: ['workspace'],

@@ -147,6 +147,27 @@ export const publicationService = {
   deleteMedia: (mediaId: number): Promise<void> =>
     axios.delete(`/api/v1/media/${mediaId}`).then(() => undefined),
 
+  getPreview: <T = Record<string, unknown>>(
+    id: number,
+    payload: { platform_ids: number[]; simple_mode: boolean },
+  ): Promise<T> => axios.post(`/api/v1/publications/${id}/preview`, payload).then((r) => r.data),
+
+  autoOptimize: <T = Record<string, unknown>>(id: number, platformIds: number[]): Promise<T> =>
+    axios
+      .post(`/api/v1/publications/${id}/auto-optimize`, { platform_ids: platformIds })
+      .then((r) => r.data),
+
+  updatePlatformConfig: <T = Record<string, unknown>>(
+    id: number,
+    payload: Record<string, unknown>,
+  ): Promise<T> =>
+    axios.post(`/api/v1/publications/${id}/update-platform-config`, payload).then((r) => r.data),
+
+  publishWithConfigs: <T = Record<string, unknown>>(
+    id: number,
+    payload: Record<string, unknown>,
+  ): Promise<T> => axios.post(`/api/v1/publications/${id}/publish`, payload).then((r) => r.data),
+
   getPortalToken: (publicationId: number): Promise<string> =>
     axios
       .post(route('api.v1.publications.portal-token', { publication: publicationId }))

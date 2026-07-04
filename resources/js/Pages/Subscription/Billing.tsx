@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Com
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatDateString } from '@/Utils/formatters';
 import { Head, router, usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { subscriptionService } from '@/Services/Subscription/subscriptionService';
 import {
   AlertCircle,
   ArrowLeft,
@@ -136,23 +136,14 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
     try {
       toast.loading(t('subscription.billing.loadingPortal', 'Abriendo portal de facturación...'));
 
-      const response = await axios.post(
-        route('subscription.billing-portal'),
-        {},
-        {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+      const portal = await subscriptionService.openBillingPortal();
 
       toast.dismiss();
 
-      if (response.data.url) {
-        window.location.href = response.data.url;
-      } else if (response.data.error) {
-        toast.error(response.data.error);
+      if (portal.url) {
+        window.location.href = portal.url;
+      } else if (portal.error) {
+        toast.error(portal.error);
       }
     } catch (error: any) {
       toast.dismiss();
@@ -169,28 +160,19 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
     setIsCancelling(true);
 
     try {
-      const response = await axios.post(
-        route('subscription.cancel-subscription'),
-        {},
-        {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+      const result = await subscriptionService.cancelSubscription();
 
-      if (response.data.success) {
+      if (result.success) {
         toast.success(
-          response.data.message ||
+          result.message ||
             t('subscription.billing.cancelSuccess', 'Suscripción cancelada exitosamente'),
         );
         setShowCancelModal(false);
         setTimeout(() => {
           router.reload();
         }, 1500);
-      } else if (response.data.error) {
-        toast.error(response.data.error);
+      } else if (result.error) {
+        toast.error(result.error);
       }
     } catch (error: any) {
       console.error('Error al cancelar la suscripción:', error);

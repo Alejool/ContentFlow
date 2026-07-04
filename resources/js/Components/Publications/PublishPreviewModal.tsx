@@ -4,7 +4,7 @@ import type { ValidationResponse } from '@/Services/ConfigSocialMedia/SocialMedi
 import SocialMediaLimitsService from '@/Services/ConfigSocialMedia/SocialMediaLimitsService';
 import { formatDateString } from '@/Utils/formatters';
 import type { Publication } from '@/types/Publications/Publication';
-import axios from 'axios';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PlatformConfigCard from '@/Components/Publications/PlatformConfigCard';
@@ -110,11 +110,11 @@ export default function PublishPreviewModal({
   const loadPreview = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`/api/v1/publications/${publication.id}/preview`, {
+      const preview = await publicationService.getPreview<never>(publication.id, {
         platform_ids: selectedPlatforms,
         simple_mode: isSimpleMode,
       });
-      setPreviewData(response.data);
+      setPreviewData(preview);
     } catch (error) {
     } finally {
       setIsLoading(false);
@@ -124,10 +124,11 @@ export default function PublishPreviewModal({
   const handleAutoOptimize = async () => {
     setIsOptimizing(true);
     try {
-      const response = await axios.post(`/api/v1/publications/${publication.id}/auto-optimize`, {
-        platform_ids: selectedPlatforms,
-      });
-      setPreviewData(response.data);
+      const optimized = await publicationService.autoOptimize<never>(
+        publication.id,
+        selectedPlatforms,
+      );
+      setPreviewData(optimized);
     } catch (error) {
     } finally {
       setIsOptimizing(false);
@@ -140,15 +141,12 @@ export default function PublishPreviewModal({
     settings: Record<string, any>,
   ) => {
     try {
-      const response = await axios.post(
-        `/api/v1/publications/${publication.id}/update-platform-config`,
-        {
-          account_id: accountId,
-          type,
-          settings,
-        },
-      );
-      setPreviewData(response.data);
+      const updated = await publicationService.updatePlatformConfig<never>(publication.id, {
+        account_id: accountId,
+        type,
+        settings,
+      });
+      setPreviewData(updated);
     } catch (error) {}
   };
 
@@ -200,7 +198,7 @@ export default function PublishPreviewModal({
           settings: c.applied_settings,
         }));
 
-      const response = await axios.post(`/api/v1/publications/${publication.id}/publish`, {
+      const published = await publicationService.publishWithConfigs<never>(publication.id, {
         platform_configs: platformConfigs,
         scheduled_at: isScheduled ? scheduledAt : null,
       });
@@ -214,7 +212,7 @@ export default function PublishPreviewModal({
         );
       }
 
-      onPublished(response.data);
+      onPublished(published);
       handleClose();
     } catch (error: any) {
       // Manejar errores de validación del backend

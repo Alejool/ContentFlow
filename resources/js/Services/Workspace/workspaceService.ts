@@ -15,6 +15,13 @@ export const workspaceService = {
     axios.get(route('api.v1.workspaces.activity', workspaceId), { params }).then((r) => r.data),
 };
 
+export const workspaceWebhookService = {
+  test: (workspaceId: number | string, payload: { type: string; url: string }): Promise<void> =>
+    axios
+      .post(route('api.v1.workspaces.webhooks.test', { workspace: workspaceId }), payload)
+      .then(() => undefined),
+};
+
 export interface PaginatedActivity {
   data?: Record<string, unknown>[];
   current_page?: number;

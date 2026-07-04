@@ -3,7 +3,7 @@ import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import Select from '@/Components/common/Modern/Select';
 import ConfirmDialog from '@/Components/common/ui/ConfirmDialog';
-import axios from 'axios';
+import { approvalService } from '@/Services/Approval/approvalService';
 import {
   CheckCircle,
   ChevronRight,
@@ -221,11 +221,8 @@ export default function ApprovalWorkflowsTab({
     if (!workspace?.id) return;
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        route('api.v1.workspaces.approval-workflows.index', workspace.id),
-      );
       // Backend returns collections in 'data' key due to ApiResponse trait wrapping lists
-      setWorkflows(response.data.data || []);
+      setWorkflows(await approvalService.listWorkflows(workspace.id));
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || t('common.unknown');
       toast.error(`${t('common.approvals.errors.fetch')}: ${message}`);
@@ -311,19 +308,10 @@ export default function ApprovalWorkflowsTab({
       console.log('📤 Enviando workflow:', workflowToSave);
 
       if (editingWorkflow.id === 0) {
-        await axios.post(
-          route('api.v1.workspaces.approval-workflows.store', workspace.id),
-          workflowToSave,
-        );
+        await approvalService.createWorkflow(workspace.id, workflowToSave);
         toast.success(t('common.approvals.success.created'));
       } else {
-        await axios.put(
-          route('api.v1.workspaces.approval-workflows.update', {
-            idOrSlug: workspace.id,
-            workflow: editingWorkflow.id,
-          }),
-          workflowToSave,
-        );
+        await approvalService.updateWorkflowById(workspace.id, editingWorkflow.id, workflowToSave);
         toast.success(t('common.approvals.success.updated'));
       }
       setIsEditing(false);
@@ -344,12 +332,7 @@ export default function ApprovalWorkflowsTab({
   const confirmDelete = async () => {
     if (!workflowToDelete) return;
     try {
-      await axios.delete(
-        route('api.v1.workspaces.approval-workflows.destroy', {
-          idOrSlug: workspace.id,
-          workflow: workflowToDelete,
-        }),
-      );
+      await approvalService.deleteWorkflow(workspace.id, workflowToDelete);
       toast.success(t('common.approvals.success.deleted'));
       fetchWorkflows();
     } catch (error: any) {

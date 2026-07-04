@@ -94,6 +94,41 @@ export const approvalService = {
       .put(route('api.v1.workspaces.approval-workflow.configure', { idOrSlug: workspaceId }), data)
       .then((r) => r.data.data),
 
+  listWorkflows: <T = unknown>(workspaceId: number | string): Promise<T[]> =>
+    axios
+      .get(route('api.v1.workspaces.approval-workflows.index', workspaceId))
+      .then((r) => r.data.data || []),
+
+  createWorkflow: (workspaceId: number | string, data: Record<string, unknown>): Promise<void> =>
+    axios
+      .post(route('api.v1.workspaces.approval-workflows.store', workspaceId), data)
+      .then(() => undefined),
+
+  updateWorkflowById: (
+    workspaceId: number | string,
+    workflowId: number,
+    data: Record<string, unknown>,
+  ): Promise<void> =>
+    axios
+      .put(
+        route('api.v1.workspaces.approval-workflows.update', {
+          idOrSlug: workspaceId,
+          workflow: workflowId,
+        }),
+        data,
+      )
+      .then(() => undefined),
+
+  deleteWorkflow: (workspaceId: number | string, workflowId: number): Promise<void> =>
+    axios
+      .delete(
+        route('api.v1.workspaces.approval-workflows.destroy', {
+          idOrSlug: workspaceId,
+          workflow: workflowId,
+        }),
+      )
+      .then(() => undefined),
+
   submitPublication: (publicationId: number): Promise<Record<string, unknown>> =>
     axios
       .post(
