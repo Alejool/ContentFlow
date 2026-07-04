@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\Media\UploadProgressUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Upload\CancelUploadRequest;
+use App\Http\Requests\Upload\PauseUploadRequest;
+use App\Http\Requests\Upload\SignUploadRequest;
+use App\Http\Requests\Upload\UpdateUploadProgressRequest;
 use App\Services\Storage\S3PathService;
 use App\Services\Subscription\PlanLimitValidator;
 use Aws\S3\Exception\S3Exception;
@@ -18,15 +22,8 @@ class UploadController extends Controller
   /**
    * Generate a presigned URL for S3 upload.
    */
-  public function sign(Request $request)
+  public function sign(SignUploadRequest $request)
   {
-    $request->validate([
-      'filename'     => 'required|string',
-      'content_type' => 'required|string',
-      'file_size'    => 'nullable|integer|min:1', // bytes — sent by frontend
-      'pending_bytes' => 'nullable|integer|min:0', // bytes of files already queued for upload
-      'context'      => 'nullable|string|in:publication,profile,workspace', // upload context
-    ]);
 
     // --- Storage limit pre-check ---
     $fileSize = (int) $request->input('file_size', 0);
@@ -189,16 +186,9 @@ class UploadController extends Controller
    * Store upload progress in cache for retrieval
    * POST /api/uploads/progress
    */
-  public function updateProgress(Request $request)
+  public function updateProgress(UpdateUploadProgressRequest $request)
   {
-    $validated = $request->validate([
-      'upload_id' => 'required|string',
-      'progress' => 'required|integer|min:0|max:100',
-      'bytes_uploaded' => 'required|integer|min:0',
-      'total_bytes' => 'required|integer|min:1',
-      'speed' => 'nullable|numeric|min:0',
-      'eta' => 'nullable|integer|min:0',
-    ]);
+    $validated = $request->validated();
 
     $key = "upload_progress:{$validated['upload_id']}";
 
@@ -229,12 +219,9 @@ class UploadController extends Controller
    * Cancel an ongoing upload
    * DELETE /api/uploads/{uploadId}
    */
-  public function cancelUpload(Request $request, string $uploadId)
+  public function cancelUpload(CancelUploadRequest $request, string $uploadId)
   {
-    $validated = $request->validate([
-      's3_key' => 'required|string',
-      'multipart_upload_id' => 'nullable|string',
-    ]);
+    $validated = $request->validated();
 
     try {
       if (config('filesystems.default') !== 's3') {
@@ -300,17 +287,9 @@ class UploadController extends Controller
    * Pause upload by storing current state
    * POST /api/uploads/{uploadId}/pause
    */
-  public function pauseUpload(Request $request, string $uploadId)
+  public function pauseUpload(PauseUploadRequest $request, string $uploadId)
   {
-    $validated = $request->validate([
-      's3_key' => 'required|string',
-      'multipart_upload_id' => 'required|string',
-      'uploaded_parts' => 'required|array',
-      'uploaded_parts.*.PartNumber' => 'required|integer',
-      'uploaded_parts.*.ETag' => 'required|string',
-      'bytes_uploaded' => 'nullable|integer|min:0',
-      'total_bytes' => 'nullable|integer|min:1',
-    ]);
+    $validated = $request->validated();
 
     // Store pause state in cache for resumption (keep for 7 days)
     $pauseData = [

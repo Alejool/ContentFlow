@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Ai;
 
+use App\Http\Requests\Ai\ProcessMessageRequest;
+use App\Http\Requests\Ai\SuggestFieldsRequest;
+use App\Http\Requests\Ai\UpdateAiSettingsRequest;
+use App\Http\Requests\Ai\ValidateApiKeyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -32,14 +36,8 @@ class AIChatController extends Controller
     /**
      * Process chat message
      */
-    public function processMessage(Request $request)
+    public function processMessage(ProcessMessageRequest $request)
     {
-        $request->validate([
-            'message' => 'required|string|max:2000',
-            'context' => 'nullable|array',
-            'provider' => 'nullable|string|in:deepseek,gemini,openai,anthropic',
-            'source' => 'nullable|string|in:chat,assistant'
-        ]);
 
         try {
             // Get user information
@@ -160,14 +158,8 @@ class AIChatController extends Controller
     /**
      * Suggest fields for publication or campaign
      */
-    public function suggestFields(Request $request)
+    public function suggestFields(SuggestFieldsRequest $request)
     {
-        $request->validate([
-            'fields' => 'required|array',
-            'type' => 'required|string|in:publication,campaign',
-            'language' => 'nullable|string',
-            'field_limits' => 'nullable|array'
-        ]);
 
         try {
             /** @var User $user */
@@ -271,12 +263,8 @@ class AIChatController extends Controller
     /**
      * Update user AI settings
      */
-    public function updateAiSettings(Request $request)
+    public function updateAiSettings(UpdateAiSettingsRequest $request)
     {
-        $request->validate([
-            'settings' => 'required|array',
-            'validate' => 'nullable|boolean'
-        ]);
 
         try {
             /** @var User $user */
@@ -375,12 +363,8 @@ class AIChatController extends Controller
     /**
      * Validate API key for a provider
      */
-    public function validateApiKey(Request $request)
+    public function validateApiKey(ValidateApiKeyRequest $request)
     {
-        $request->validate([
-            'provider' => 'required|string|in:deepseek,gemini,openai,anthropic',
-            'api_key' => 'required|string'
-        ]);
 
         try {
             $isValid = $this->aiService->validateApiKey(

@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Progress\GetProcessingProgressRequest;
+use App\Http\Requests\Progress\GetUploadProgressRequest;
+use App\Http\Requests\Progress\UpdateProcessingProgressRequest;
+use App\Http\Requests\Progress\UpdateUploadProgressRequest;
 use App\Models\MediaFiles\MediaFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -13,11 +17,8 @@ class ProgressController extends Controller
     /**
      * Get upload progress for multiple uploads
      */
-    public function getUploadProgress(Request $request)
+    public function getUploadProgress(GetUploadProgressRequest $request)
     {
-        $request->validate([
-            'upload_ids' => 'required|string',
-        ]);
 
         $uploadIds = explode(',', $request->input('upload_ids'));
         $uploads = [];
@@ -73,11 +74,8 @@ class ProgressController extends Controller
     /**
      * Get processing progress for multiple jobs
      */
-    public function getProcessingProgress(Request $request)
+    public function getProcessingProgress(GetProcessingProgressRequest $request)
     {
-        $request->validate([
-            'job_ids' => 'required|string',
-        ]);
 
         $jobIds = explode(',', $request->input('job_ids'));
         $jobs = [];
@@ -130,15 +128,8 @@ class ProgressController extends Controller
     /**
      * Update upload progress (called by upload process)
      */
-    public function updateUploadProgress(Request $request)
+    public function updateUploadProgress(UpdateUploadProgressRequest $request)
     {
-        $request->validate([
-            'upload_id' => 'required|string',
-            'progress' => 'required|integer|min:0|max:100',
-            'bytes_uploaded' => 'nullable|integer|min:0',
-            'speed' => 'nullable|numeric|min:0',
-            'eta' => 'nullable|integer|min:0',
-        ]);
 
         $uploadId = $request->input('upload_id');
         $progress = $request->input('progress');
@@ -175,16 +166,8 @@ class ProgressController extends Controller
     /**
      * Update processing progress (called by jobs)
      */
-    public function updateProcessingProgress(Request $request)
+    public function updateProcessingProgress(UpdateProcessingProgressRequest $request)
     {
-        $request->validate([
-            'job_id' => 'required|string',
-            'progress' => 'required|integer|min:0|max:100',
-            'current_step' => 'nullable|string',
-            'total_steps' => 'nullable|integer|min:0',
-            'completed_steps' => 'nullable|integer|min:0',
-            'eta' => 'nullable|integer|min:0',
-        ]);
 
         $jobId = $request->input('job_id');
         $progress = $request->input('progress');

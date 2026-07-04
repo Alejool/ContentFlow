@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\TwoFactor\DisableTwoFactorRequest;
+use App\Http\Requests\Auth\TwoFactor\SetupTwoFactorRequest;
+use App\Http\Requests\Auth\TwoFactor\VerifyTwoFactorRequest;
 use App\Models\Logs\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -72,12 +75,9 @@ class TwoFactorController extends Controller
     /**
      * Store the 2FA configuration.
      */
-    public function setupStore(Request $request)
+    public function setupStore(SetupTwoFactorRequest $request)
     {
-        $request->validate([
-            'code' => 'required|string|size:6',
-        ]);
-        
+
         $secret = session('2fa_secret_temp');
         $setupStartedAt = session('2fa_setup_started_at');
         
@@ -156,12 +156,9 @@ class TwoFactorController extends Controller
     /**
      * Verify the 2FA code.
      */
-    public function verifyStore(Request $request)
+    public function verifyStore(VerifyTwoFactorRequest $request)
     {
-        $request->validate([
-            'code' => 'required|string',
-        ]);
-        
+
         $user = auth()->user();
         
         if (!$user->two_factor_secret) {
@@ -231,12 +228,9 @@ class TwoFactorController extends Controller
     /**
      * Disable 2FA for the user.
      */
-    public function disable(Request $request)
+    public function disable(DisableTwoFactorRequest $request)
     {
-        $request->validate([
-            'password' => 'required|string',
-        ]);
-        
+
         $user = auth()->user();
         
         // Verificar contraseña
@@ -269,12 +263,9 @@ class TwoFactorController extends Controller
     /**
      * Regenerate backup codes.
      */
-    public function regenerateBackupCodes(Request $request)
+    public function regenerateBackupCodes(VerifyTwoFactorRequest $request)
     {
-        $request->validate([
-            'code' => 'required|string',
-        ]);
-        
+
         $user = auth()->user();
         
         if (!$user->two_factor_secret) {
