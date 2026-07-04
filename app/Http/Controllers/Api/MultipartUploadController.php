@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Upload\CompleteMultipartRequest;
+use App\Http\Requests\Upload\InitiateMultipartRequest;
+use App\Http\Requests\Upload\SignPartRequest;
 use App\Services\Storage\S3PathService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,15 +19,8 @@ class MultipartUploadController extends Controller
    * Initiate a Multipart Upload
    * POST /api/upload/multipart/init
    */
-  public function initiate(Request $request)
+  public function initiate(InitiateMultipartRequest $request)
   {
-    $request->validate([
-      'filename' => 'required|string',
-      'content_type' => 'required|string',
-      'file_size' => 'nullable|integer|min:1',
-      'pending_bytes' => 'nullable|integer|min:0', // bytes of files already queued for upload
-      'context' => 'nullable|string|in:publication,profile,workspace', // upload context
-    ]);
 
     // --- Storage limit pre-check ---
     $fileSize = (int) $request->input('file_size', 0);
@@ -141,13 +137,8 @@ class MultipartUploadController extends Controller
    * Sign a specific Part Upload
    * POST /api/upload/multipart/sign-part
    */
-  public function signPart(Request $request)
+  public function signPart(SignPartRequest $request)
   {
-    $request->validate([
-      'key' => 'required|string',
-      'uploadId' => 'required|string',
-      'partNumber' => 'required|integer',
-    ]);
 
     $key = $request->input('key');
     $uploadId = $request->input('uploadId');
@@ -181,15 +172,8 @@ class MultipartUploadController extends Controller
    * Complete the Multipart Upload
    * POST /api/upload/multipart/complete
    */
-  public function complete(Request $request)
+  public function complete(CompleteMultipartRequest $request)
   {
-    $request->validate([
-      'key' => 'required|string',
-      'uploadId' => 'required|string',
-      'parts' => 'required|array',
-      'parts.*.ETag' => 'required|string',
-      'parts.*.PartNumber' => 'required|integer',
-    ]);
 
     $key = $request->input('key');
     $uploadId = $request->input('uploadId');

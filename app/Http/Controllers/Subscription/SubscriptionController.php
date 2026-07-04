@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Subscription;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Subscription\ActivateFreePlanRequest;
+use App\Http\Requests\Subscription\ChangePlanRequest;
+use App\Http\Requests\Subscription\CreateCheckoutSessionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -22,11 +25,8 @@ class SubscriptionController extends Controller
         private SubscriptionTrackingService $subscriptionTracking
     ) {}
 
-    public function createCheckoutSession(Request $request): JsonResponse
+    public function createCheckoutSession(CreateCheckoutSessionRequest $request): JsonResponse
     {
-        $request->validate([
-            'plan' => 'required|in:starter,growth,professional,enterprise',
-        ]);
 
         $user = $request->user();
         $workspace = $user->currentWorkspace;
@@ -336,11 +336,8 @@ class SubscriptionController extends Controller
         }
     }
 
-    public function activateFreePlan(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|RedirectResponse
+    public function activateFreePlan(ActivateFreePlanRequest $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|RedirectResponse
     {
-        $request->validate([
-            'plan' => 'required|in:free,demo',
-        ]);
 
         $user = $request->user();
         $plan = $request->plan;
@@ -450,11 +447,8 @@ class SubscriptionController extends Controller
         }
     }
 
-    public function changePlan(Request $request): JsonResponse
+    public function changePlan(ChangePlanRequest $request): JsonResponse
     {
-        $request->validate([
-            'plan' => 'required|in:free,starter,growth,professional,enterprise',
-        ]);
 
         $user = $request->user();
         $newPlan = $request->plan;

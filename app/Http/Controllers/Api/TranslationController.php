@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Translation\DetectLanguageRequest;
+use App\Http\Requests\Translation\TranslateBatchRequest;
+use App\Http\Requests\Translation\TranslateRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -14,14 +17,9 @@ class TranslationController extends Controller
     /**
      * Traduce un texto usando IA
      */
-    public function translate(Request $request): JsonResponse
+    public function translate(TranslateRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'text' => 'required|string|max:5000',
-            'target_language' => 'required|string|in:en,es',
-            'source_language' => 'nullable|string|in:en,es',
-            'context' => 'nullable|string|max:500',
-        ]);
+        $validated = $request->validated();
 
         $cacheKey = 'translation_' . md5(
             $validated['text'] . 
@@ -69,14 +67,9 @@ class TranslationController extends Controller
     /**
      * Traduce múltiples textos en batch
      */
-    public function translateBatch(Request $request): JsonResponse
+    public function translateBatch(TranslateBatchRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'texts' => 'required|array|max:50',
-            'texts.*' => 'required|string|max:5000',
-            'target_language' => 'required|string|in:en,es',
-            'source_language' => 'nullable|string|in:en,es',
-        ]);
+        $validated = $request->validated();
 
         $translations = [];
 
@@ -119,11 +112,9 @@ class TranslationController extends Controller
     /**
      * Detecta el idioma de un texto
      */
-    public function detectLanguage(Request $request): JsonResponse
+    public function detectLanguage(DetectLanguageRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'text' => 'required|string|max:1000',
-        ]);
+        $validated = $request->validated();
 
         try {
             $language = $this->detectLanguageWithAI($validated['text']);

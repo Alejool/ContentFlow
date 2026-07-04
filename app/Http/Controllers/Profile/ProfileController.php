@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\PasswordUpdateRequest;
+use App\Http\Requests\Profile\DeleteAccountRequest;
+use App\Http\Requests\Profile\UpdateSocialSettingsRequest;
+use App\Http\Requests\Profile\UploadAvatarRequest;
 use App\Services\Storage\S3PathService;
 use App\Traits\System\ApiResponse;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -142,11 +145,9 @@ class ProfileController extends Controller
     ]);
   }
 
-  public function updateSocialSettings(Request $request)
+  public function updateSocialSettings(UpdateSocialSettingsRequest $request)
   {
-    $validated = $request->validate([
-      'settings' => 'required|array',
-    ]);
+    $validated = $request->validated();
 
     $user = $request->user();
     $user->global_platform_settings = $validated['settings'];
@@ -162,13 +163,9 @@ class ProfileController extends Controller
   /**
    * Upload avatar image
    */
-  public function uploadAvatar(Request $request)
+  public function uploadAvatar(UploadAvatarRequest $request)
   {
     try {
-      $request->validate([
-        'avatar' => 'required|image|mimes:jpeg,jpg,png,gif,webp,svg|max:2048', // 2MB max
-        'name' => 'required|string',
-      ]);
 
       $user = User::find(Auth::id());
       
@@ -440,11 +437,8 @@ class ProfileController extends Controller
   /**
    * Delete the user's account.
    */
-  public function destroy(Request $request): RedirectResponse
+  public function destroy(DeleteAccountRequest $request): RedirectResponse
   {
-    $request->validate([
-      'password' => ['required', 'current_password'],
-    ]);
 
     $user = $request->user();
 
