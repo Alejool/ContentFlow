@@ -6,10 +6,11 @@ import {
   useApprovalHistory,
   usePublicationApprovalHistory,
 } from '@/Hooks/Approval/useApprovalHistory';
+import { getApprovalMeta } from '@/lib/common/approvalMeta';
 import { getDateFnsLocale } from '@/Utils/common/dateLocales';
 import type { ApprovalRequest } from '@/types/Approval/ApprovalTypes';
 import { format } from 'date-fns';
-import { CheckCircle, Clock, Send, XCircle } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -85,50 +86,20 @@ export default function ApprovalHistory({ publicationId, initialData }: Approval
   };
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { color: string; icon: any; label: string }> = {
-      pending: {
-        color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-        icon: Clock,
-        label: t('approvals.status.pending'),
-      },
-      approved: {
-        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        icon: CheckCircle,
-        label: t('approvals.status.approved'),
-      },
-      rejected: {
-        color: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
-        icon: XCircle,
-        label: t('approvals.status.rejected'),
-      },
-      cancelled: {
-        color: 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400',
-        icon: XCircle,
-        label: t('approvals.status.cancelled'),
-      },
-    };
-    const { color, icon: Icon, label } = config[status] ?? config['pending']!;
+    const { badge, Icon, labelKey } = getApprovalMeta(status);
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${color}`}
+        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${badge}`}
       >
         <Icon className="h-3.5 w-3.5" />
-        {label}
+        {t(labelKey)}
       </span>
     );
   };
 
   const getActionIcon = (action: string) => {
-    switch (action) {
-      case 'submitted':
-        return <Send className="h-4 w-4 text-blue-500" />;
-      case 'approved':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'rejected':
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
-    }
+    const { Icon, iconColor } = getApprovalMeta(action);
+    return <Icon className={`h-4 w-4 ${iconColor}`} />;
   };
 
   return (

@@ -1,7 +1,9 @@
 import { Avatar } from '@/Components/common/Avatar';
+import { getApprovalMeta } from '@/lib/common/approvalMeta';
+import { cn } from '@/lib/common/utils';
 import type { ApprovalLog as ApprovalLogType } from '@/types/Approval/ApprovalTypes';
 import { formatDateTimeString } from '@/Utils/formatters';
-import { CheckCircle, Clock, MessageSquare, User, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, MessageSquare, User } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -66,59 +68,17 @@ export default function ApprovalHistorySection({
   const { t } = useTranslation();
 
   // Color helper for logs
+  // Approval action metadata from the single source of truth.
   const getStatusIcon = (action: string | null) => {
-    switch (action) {
-      case 'approved':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'rejected':
-        return <XCircle className="h-5 w-5 text-rose-500" />;
-      case 'cancelled':
-        return <XCircle className="h-5 w-5 text-gray-400" />;
-      case 'reassigned':
-        return <Clock className="h-5 w-5 text-blue-500" />;
-      case 'auto_advanced':
-        return <CheckCircle className="h-5 w-5 text-purple-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-amber-500" />;
-    }
+    const { Icon, iconColor } = getApprovalMeta(action);
+    return <Icon className={cn('h-5 w-5', iconColor)} />;
   };
 
-  const getStatusStyle = (action: string | null) => {
-    switch (action) {
-      case 'approved':
-        return 'bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20';
-      case 'rejected':
-        return 'bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20';
-      case 'cancelled':
-        return 'bg-gray-50 dark:bg-neutral-900/10 border-gray-200 dark:border-neutral-700/30';
-      case 'reassigned':
-        return 'bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/20';
-      case 'auto_advanced':
-        return 'bg-purple-50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-900/20';
-      default:
-        return 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/20';
-    }
-  };
+  const getStatusStyle = (action: string | null) => getApprovalMeta(action).surface;
 
-  const getActionLabel = (action: string | null) => {
-    switch (action) {
-      case 'approved': return t('approvals.status.approved');
-      case 'rejected': return t('approvals.status.rejected');
-      case 'submitted': return t('approvals.status.submitted');
-      case 'cancelled': return t('approvals.status.cancelled');
-      case 'reassigned': return t('approvals.status.reassigned');
-      case 'auto_advanced': return t('approvals.status.auto_advanced');
-      default: return t('approvals.status.pending');
-    }
-  };
+  const getActionLabel = (action: string | null) => t(getApprovalMeta(action).labelKey);
 
-  const getByLabel = (action: string | null) => {
-    if (action === 'approved') return t('approvals.approvedBy');
-    if (action === 'rejected') return t('approvals.rejectedBy');
-    if (action === 'reassigned') return t('approvals.reassignedBy');
-    if (action === 'cancelled') return t('approvals.cancelledBy');
-    return t('approvals.submittedBy');
-  };
+  const getByLabel = (action: string | null) => t(getApprovalMeta(action).byKey);
 
   // Normalizar steps/levels - el backend puede devolver 'levels' o 'steps'
   const workflowSteps = useMemo(() => {
