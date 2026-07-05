@@ -99,8 +99,32 @@ values (or scope them under `[data-theme="brandB"]`).
 
 Follow those and any new component is automatically consistent with the system.
 
-## Migration note
+## Adoption / migration
 
-The legacy set in `Components/common/Modern/*` (108+ `Button` imports) keeps
-working untouched. New code should import from `@/Components/ui/system`. Migrate
-call sites incrementally — both can coexist during the transition.
+Three coexisting sources, in order of preference:
+
+1. **`@/Components/ui/system`** — canonical. Use for all new code.
+2. **`@/Components/ui/button|input|select|textarea|checkbox`** — thin re-exports
+   of the system (same components). `ui/badge|card|alert|dialog|progress` are
+   the older shadcn-style set, still in active use.
+3. **`@/Components/common/Modern/*`** — legacy, richer/divergent API
+   (`variant`+`buttonStyle`, `sizeType`, RHF `register`, `activeColor`). Still
+   works; ~140 call sites. **Do not blind-swap** — its visual output and API
+   differ, so migrate per-component **with the app running for visual QA**.
+
+### Recipe to migrate a `Modern/Input` call site
+
+```diff
+- <Input id="email" sizeType="md" icon={Mail} error={err} register={register} name="email" />
++ <Input size="md" leftIcon={Mail} error={err} {...register('email')} />
+```
+
+- `sizeType` → `size`  ·  `icon` → `leftIcon`  ·  `showPasswordToggle` →
+  `passwordToggle`  ·  RHF `register`+`name` → spread `{...register(name)}`.
+- Drop `variant="outlined|filled"` / `activeColor` (not in the token system) —
+  verify the field still looks right before committing.
+
+`Modern/Button` → system `Button`: `variant` (color) → `tone`,
+`buttonStyle` (style) → `appearance`, `rounded` → `radius`, `icon`+`iconPosition`
+→ `leftIcon`/`rightIcon`. `gradient`/`shadow`/`animation` have no system
+equivalent by design — confirm the button still reads correctly.
