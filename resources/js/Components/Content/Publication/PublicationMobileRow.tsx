@@ -4,6 +4,8 @@ import SimpleContentTypeBadge from '@/Components/Content/common/SimpleContentTyp
 import PublicationThumbnailCard from '@/Components/Content/Publication/PublicationThumbnailCard';
 import SocialAccountsDisplay from '@/Components/Content/Publication/SocialAccountsDisplay';
 import { usePublicationActions } from '@/Hooks/Publications/usePublicationActions';
+import { cn } from '@/lib/common/utils';
+import { getStatusColors, getStatusIcon as getStatusIcon_ } from '@/lib/common/statusMeta';
 import type { Publication } from '@/types/Publications/Publication';
 import {
   countMediaFiles,
@@ -16,17 +18,14 @@ import {
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
   Calendar,
-  CheckCircle,
   Clock,
   Copy,
   Edit,
   Eye,
-  Loader2,
   Lock,
   MoreVertical,
   Rocket,
   Trash2,
-  XCircle,
 } from 'lucide-react';
 import { memo } from 'react';
 
@@ -88,25 +87,11 @@ const PublicationMobileRow = memo(function PublicationMobileRow({
     permissions: permissions || [],
   });
 
+  // Icon + color from the single source of truth (lib/common/statusMeta).
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'published':
-        return <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />;
-      case 'publishing':
-        return <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-500" />;
-      case 'scheduled':
-        return <Calendar className="h-3.5 w-3.5 text-blue-500" />;
-      case 'failed':
-        return <XCircle className="h-3.5 w-3.5 text-rose-500" />;
-      case 'pending_review':
-        return <Clock className="h-3.5 w-3.5 text-amber-500" />;
-      case 'approved':
-        return <CheckCircle className="h-3.5 w-3.5 text-purple-500" />;
-      case 'rejected':
-        return <XCircle className="h-3.5 w-3.5 text-rose-500" />;
-      default:
-        return <Clock className="h-3.5 w-3.5 text-gray-500" />;
-    }
+    const Icon = getStatusIcon_(status);
+    const spin = status === 'publishing' || status === 'processing';
+    return <Icon className={cn('h-3.5 w-3.5', getStatusColors(status).icon, spin && 'animate-spin')} />;
   };
 
   const getStatusText = (status: string) => {
