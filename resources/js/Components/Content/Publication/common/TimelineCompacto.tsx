@@ -1,4 +1,5 @@
 import PublicationTimeline from '@/Components/Content/Publication/common/edit/PublicationTimeline';
+import { getStatusBadgeClass } from '@/lib/common/statusMeta';
 import { ChevronDown, ChevronUp, History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { PublicationActivity } from '@/types/Publications/Publication';
@@ -30,17 +31,8 @@ const TimelineCompacto = ({ activities, isExpanded, onToggle }: TimelineCompacto
   const lastActivity = getLastSignificantActivity();
   const totalActivities = activities.length;
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-      draft: 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-      approved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
-  };
+  // Status badge from the single source of truth (lib/common/statusMeta).
+  const getStatusColor = (status: string) => getStatusBadgeClass(status);
 
   const getStatusText = (status: string) => {
     const texts: Record<string, string> = {

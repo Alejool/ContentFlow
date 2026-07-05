@@ -1,7 +1,7 @@
 import type { ApprovalHistorySectionProps } from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
 import ApprovalHistorySection from '@/Components/Content/Publication/common/edit/ApprovalHistorySection';
-import { getApprovalColor } from '@/lib/common/designTokens';
-import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, Shield } from 'lucide-react';
+import { getApprovalMeta } from '@/lib/common/approvalMeta';
+import { ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ApprovalHistoryCompactoProps extends ApprovalHistorySectionProps {
@@ -41,25 +41,14 @@ const ApprovalHistoryCompacto = ({
   const latestLog = getLatestApprovalStatus();
   const totalLogs = logs.length;
 
-  const getStatusColor = (action: string) => getApprovalColor(action);
+  // Approval action metadata from the single source of truth (lib/common/approvalMeta).
+  const getStatusColor = (action: string) => getApprovalMeta(action).badge;
 
-  const getStatusText = (action: string) => {
-    const map: Record<string, string> = {
-      approved: t('approvals.status.approved'),
-      rejected: t('approvals.status.rejected'),
-      submitted: t('approvals.status.submitted'),
-      pending: t('approvals.status.pending'),
-      cancelled: t('approvals.status.cancelled'),
-      reassigned: t('approvals.status.reassigned'),
-      auto_advanced: t('approvals.status.auto_advanced'),
-    };
-    return map[action] ?? action;
-  };
+  const getStatusText = (action: string) => t(getApprovalMeta(action).labelKey);
 
   const getStatusIcon = (action: string) => {
-    if (action === 'approved') return <CheckCircle className="h-4 w-4" />;
-    if (action === 'rejected') return <AlertCircle className="h-4 w-4" />;
-    return <Clock className="h-4 w-4" />;
+    const { Icon } = getApprovalMeta(action);
+    return <Icon className="h-4 w-4" />;
   };
 
   if (totalLogs === 0) return null;

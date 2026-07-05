@@ -1,4 +1,5 @@
 import DynamicIcon from '@/Components/Notifications/DynamicIcon';
+import { getNotificationIconColor } from '@/lib/common/designTokens';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, CheckCircle, ImageOff, Info, X, XCircle } from 'lucide-react';
@@ -23,27 +24,8 @@ export default function NotificationItem({ notification, onMarkAsRead }: Notific
   const [imageError, setImageError] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const getStatusColor = () => {
-    const status = data.status || data.type;
-
-    switch (status) {
-      case 'success':
-      case 'published':
-        return 'text-green-600 dark:text-green-400';
-      case 'deleted':
-        return 'text-gray-600 dark:text-neutral-400';
-      case 'rejected':
-      case 'failed':
-      case 'error':
-        return 'text-red-600 dark:text-red-400';
-      case 'warning':
-      case 'restricted':
-      case 'copyright_claim':
-        return 'text-amber-600 dark:text-amber-400';
-      default:
-        return 'text-blue-600 dark:text-blue-400';
-    }
-  };
+  // Icon color from the single source of truth (lib/common/designTokens).
+  const getStatusColor = () => getNotificationIconColor(data.status || data.type);
 
   const getIcon = () => {
     if (data.icon) {

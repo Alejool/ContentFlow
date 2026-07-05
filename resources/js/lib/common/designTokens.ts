@@ -216,6 +216,25 @@ export function getCampaignStatusColor(status?: string): string {
   return CAMPAIGN_STATUS_COLORS[status as CampaignStatus] ?? CAMPAIGN_STATUS_COLORS.inactive;
 }
 
+// ─── Notification icon colors ─────────────────────────────────────────────────
+// Text color for a notification's icon, keyed by its status/type.
+
+const NOTIFICATION_ICON_COLORS: Record<string, string> = {
+  success:        'text-success-600 dark:text-success-400',
+  published:      'text-success-600 dark:text-success-400',
+  deleted:        'text-neutral-600 dark:text-neutral-400',
+  rejected:       'text-error-600 dark:text-error-400',
+  failed:         'text-error-600 dark:text-error-400',
+  error:          'text-error-600 dark:text-error-400',
+  warning:        'text-warning-600 dark:text-warning-400',
+  restricted:     'text-warning-600 dark:text-warning-400',
+  copyright_claim:'text-warning-600 dark:text-warning-400',
+};
+
+export function getNotificationIconColor(status?: string): string {
+  return NOTIFICATION_ICON_COLORS[status ?? ''] ?? 'text-info-600 dark:text-info-400';
+}
+
 // ─── Role colors ──────────────────────────────────────────────────────────────
 // Owner = amber/warning (highest privilege, must stand out)
 // Others = primary variants (normal system colors)

@@ -2,6 +2,7 @@
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
+import { getApprovalMeta } from '@/lib/common/approvalMeta';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import { VirtualList } from '@/Components/common/VirtualList';
@@ -358,20 +359,8 @@ export default function ApprovalList({
     }
   };
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700';
-      case 'approved':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-700';
-      case 'rejected':
-        return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-700';
-      case 'cancelled':
-        return 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400 border-gray-200 dark:border-neutral-700';
-      default:
-        return 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400 border-gray-200 dark:border-neutral-700';
-    }
-  };
+  // Approval action badge from the single source of truth (lib/common/approvalMeta).
+  const getStatusColor = (status?: string) => getApprovalMeta(status).badge;
 
   if (isLoading) {
     return (
