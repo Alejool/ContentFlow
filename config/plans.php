@@ -48,7 +48,6 @@ return [
             'publications_per_month' => 100,
             'social_accounts' => -1, // unlimited en demo
             'storage_gb' => 50,
-            'ai_requests_per_month' => 500,
             'team_members' => 10,
             'discord_channels' => 5,
             'reels_watermark' => false,
@@ -116,7 +115,6 @@ return [
             'publications_per_month' => 3,
             'social_accounts' => 1,
             'storage_gb' => 1,
-            'ai_requests_per_month' => 10,
             'team_members' => 1,
             'discord_channels' => 0,
             'reels_watermark' => true,
@@ -150,7 +148,6 @@ return [
             'publications_per_month' => 50,
             'social_accounts' => 3,
             'storage_gb' => 10,
-            'ai_requests_per_month' => 100,
             'team_members' => 3,
             'discord_channels' => 1,
             'reels_watermark' => false,
@@ -184,7 +181,6 @@ return [
             'publications_per_month' => 100,
             'social_accounts' => 5,
             'storage_gb' => 50,
-            'ai_requests_per_month' => 300,
             'team_members' => 5,
             'discord_channels' => 2,
             'reels_watermark' => false,
@@ -218,7 +214,6 @@ return [
             'publications_per_month' => 200,
             'social_accounts' => 8,
             'storage_gb' => 100,
-            'ai_requests_per_month' => -1, // unlimited
             'team_members' => 10,
             'discord_channels' => 5,
             'reels_watermark' => false,
@@ -252,7 +247,6 @@ return [
             'publications_per_month' => -1, // unlimited
             'social_accounts' => -1, // unlimited
             'storage_gb' => 1000, // 1TB
-            'ai_requests_per_month' => -1, // unlimited
             'team_members' => -1, // unlimited
             'discord_channels' => -1, // unlimited
             'reels_watermark' => false,

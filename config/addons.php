@@ -6,11 +6,11 @@
  * ============================================================================
  *
  * Este archivo define los paquetes adicionales (add-ons) disponibles para compra.
- * Los usuarios pueden comprar créditos de IA y almacenamiento adicional.
+ * Los usuarios pueden comprar almacenamiento, miembros y publicaciones adicionales.
+ * La IA es una capacidad nativa incluida y NO se vende como add-on.
  *
  * TIPOS DE ADD-ONS:
  * -----------------
- * - ai_credits: Paquetes de solicitudes de IA adicionales
  * - storage: Paquetes de almacenamiento adicional (GB)
  *
  * CONFIGURACIÓN:
@@ -28,64 +28,6 @@
  */
 
 return [
-    'ai_credits' => [
-        'enabled' => true,
-        'packages' => [
-            'ai_100' => [
-                'sku' => 'ai_100',
-                'name' => '100 Créditos IA',
-                'description' => 'Paquete de 100 solicitudes de IA adicionales',
-                'amount' => 100,
-                'unit' => 'créditos',
-                'price' => 9.99,
-                'stripe_price_id' => env('STRIPE_AI_100_PRICE_ID'),
-                'enabled' => true,
-                'expires_days' => null, // No expira
-                'popular' => false,
-                'savings_percentage' => 0,
-            ],
-            'ai_500' => [
-                'sku' => 'ai_500',
-                'name' => '500 Créditos IA',
-                'description' => 'Paquete de 500 solicitudes de IA adicionales',
-                'amount' => 500,
-                'unit' => 'créditos',
-                'price' => 39.99,
-                'stripe_price_id' => env('STRIPE_AI_500_PRICE_ID'),
-                'enabled' => true,
-                'expires_days' => null,
-                'popular' => true,
-                'savings_percentage' => 20, // 20% de ahorro vs comprar 5x100
-            ],
-            'ai_1000' => [
-                'sku' => 'ai_1000',
-                'name' => '1,000 Créditos IA',
-                'description' => 'Paquete de 1,000 solicitudes de IA adicionales',
-                'amount' => 1000,
-                'unit' => 'créditos',
-                'price' => 69.99,
-                'stripe_price_id' => env('STRIPE_AI_1000_PRICE_ID'),
-                'enabled' => true,
-                'expires_days' => null,
-                'popular' => false,
-                'savings_percentage' => 30, // 30% de ahorro
-            ],
-            'ai_5000' => [
-                'sku' => 'ai_5000',
-                'name' => '5,000 Créditos IA',
-                'description' => 'Paquete de 5,000 solicitudes de IA adicionales',
-                'amount' => 5000,
-                'unit' => 'créditos',
-                'price' => 299.99,
-                'stripe_price_id' => env('STRIPE_AI_5000_PRICE_ID'),
-                'enabled' => true,
-                'expires_days' => null,
-                'popular' => false,
-                'savings_percentage' => 40, // 40% de ahorro
-            ],
-        ],
-    ],
-
     'storage' => [
         'enabled' => true,
         'packages' => [

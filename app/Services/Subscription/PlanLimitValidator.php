@@ -126,7 +126,6 @@ class PlanLimitValidator
       'publications'  => $this->getPublicationsUsageForCurrentPlan($workspace),
       'social_accounts' => $this->getSocialAccountsUsage($workspace),
       'storage'       => $this->getStorageUsageBytesForCurrentPlan($workspace),
-      'ai_requests'   => $this->getAiRequestsUsageForCurrentPlan($workspace),
       'team_members'  => $this->getTeamMembersUsage($workspace),
       'workspaces'    => $this->getWorkspacesUsage($workspace),
       default         => 0,
@@ -144,7 +143,6 @@ class PlanLimitValidator
       'storage'       => ($limits['storage_gb'] ?? 0) === -1
         ? -1
         : (($limits['storage_gb'] ?? 0) * 1024 * 1024 * 1024),
-      'ai_requests'   => $limits['ai_requests_per_month'] ?? 0,
       'team_members'  => $limits['team_members'] ?? 0,
       'workspaces'    => $limits['workspaces'] ?? 0,
       // discord_channels replaces external_integrations
@@ -192,7 +190,6 @@ class PlanLimitValidator
 
     // Map limit types to addon types
     $addonTypeMap = [
-      'ai_requests' => 'ai_credits',
       'storage' => 'storage',
       'publications' => 'publications',
       'team_members' => 'team_members',
@@ -262,11 +259,6 @@ class PlanLimitValidator
         'message' => 'Has alcanzado el límite de almacenamiento de tu plan.',
         'action'  => 'Actualiza tu plan para obtener más espacio.',
       ],
-      'ai_requests' => [
-        'title'   => 'Límite de solicitudes IA alcanzado',
-        'message' => 'Has usado todas tus solicitudes de IA este mes.',
-        'action'  => 'Actualiza tu plan para obtener más solicitudes.',
-      ],
       'team_members' => [
         'title'   => 'Límite de miembros del equipo alcanzado',
         'message' => 'Has alcanzado el máximo de miembros permitidos.',
@@ -331,15 +323,6 @@ class PlanLimitValidator
   private function getStorageUsageBytes(Workspace $workspace): int
   {
     return (int) $workspace->mediaFiles()->sum('size');
-  }
-
-  /**
-   * Get AI requests usage from usage metrics (monthly counter).
-   */
-  private function getAiRequestsUsage(Workspace $workspace): int
-  {
-    $metric = $workspace->getUsageMetric('ai_requests');
-    return $metric?->current_usage ?? 0;
   }
 
   /**
@@ -442,30 +425,6 @@ class PlanLimitValidator
     );
   }
 
-  /**
-   * Get AI requests usage since the current plan started
-   */
-  private function getAiRequestsUsageForCurrentPlan(Workspace $workspace): int
-  {
-    $planStartDate = $this->getCurrentPlanStartDate($workspace);
-    
-    if (!$planStartDate) {
-      // Fallback to total usage if no plan start date
-      return $this->getAiRequestsUsage($workspace);
-    }
-    
-    return Cache::remember(
-      "workspace.{$workspace->id}.ai_requests.current_plan_usage",
-      now()->addMinutes(5),
-      function() use ($workspace, $planStartDate) {
-        // Sum usage from all metrics since plan started
-        return $workspace->usageMetrics()
-          ->where('metric_type', 'ai_requests')
-          ->where('period_start', '>=', $planStartDate->toDateString())
-          ->sum('current_usage');
-      }
-    );
-  }
 
   /**
    * Get the start date of the current plan for a workspace
@@ -499,8 +458,7 @@ class PlanLimitValidator
   {
     $cacheKeys = [
       "workspace.{$workspace->id}.storage.current_plan_usage",
-      "workspace.{$workspace->id}.publications.current_plan_usage", 
-      "workspace.{$workspace->id}.ai_requests.current_plan_usage",
+      "workspace.{$workspace->id}.publications.current_plan_usage",
       "workspace.{$workspace->id}.posts.monthly_count",
       "workspace.{$workspace->id}.limits.usage", // Cache usado por UsageLimitsNotificationService
       "workspace.{$workspace->id}.publications.active_count",

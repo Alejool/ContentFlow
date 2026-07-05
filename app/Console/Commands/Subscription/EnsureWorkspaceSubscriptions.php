@@ -81,7 +81,6 @@ class EnsureWorkspaceSubscriptions extends Command
         // Métricas mensuales
         $monthlyMetrics = [
             'publications_per_month',
-            'ai_requests_per_month',
         ];
         
         foreach ($monthlyMetrics as $metric) {
@@ -106,7 +105,6 @@ class EnsureWorkspaceSubscriptions extends Command
         // Verificar métricas del mes actual
         $monthlyMetrics = [
             'publications_per_month',
-            'ai_requests_per_month',
         ];
         
         foreach ($monthlyMetrics as $metric) {

@@ -31,7 +31,7 @@ class CheckUsageLimits extends Command
 
         $this->info("Checking limits for {$workspaces->count()} workspaces...");
         
-        $limitTypes = ['publications', 'social_accounts', 'storage', 'ai_requests', 'team_members'];
+        $limitTypes = ['publications', 'social_accounts', 'storage', 'team_members'];
         $warnings = [];
         $exceeded = [];
 

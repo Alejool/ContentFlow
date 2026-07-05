@@ -16,8 +16,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Campaign\Campaign;
 use App\Models\Social\SocialAccount;
 use App\Models\User;
-use App\Services\Subscription\PlanLimitValidator;
-use App\Services\Usage\UsageTrackingService;
 
 class AIChatController extends Controller
 {
@@ -25,9 +23,7 @@ class AIChatController extends Controller
 
     public function __construct(
         AIService $aiService,
-        protected \App\Services\Content\ContentSanitizerService $sanitizer,
-        protected PlanLimitValidator $planLimits,
-        protected UsageTrackingService $usageTracking
+        protected \App\Services\Content\ContentSanitizerService $sanitizer
     ) {
         $this->aiService = $aiService;
     }
@@ -44,21 +40,7 @@ class AIChatController extends Controller
             /** @var User $user */
             $user = Auth::user();
 
-            // Plan limit check for AI requests — only enforced for external API token calls.
-            // Internal dashboard requests (session auth, no Bearer token) bypass this limit.
-            $workspace = $user->currentWorkspace ?? $user->workspaces()->find($user->current_workspace_id);
-            $isExternalApiRequest = !empty($request->bearerToken());
-            if ($workspace && $isExternalApiRequest) {
-                if (!$this->planLimits->canPerformAction($workspace, 'ai_requests')) {
-                    $upgradeMsg = $this->planLimits->getUpgradeMessage($workspace, 'ai_requests');
-                    return response()->json([
-                        'success'     => false,
-                        'message'     => $upgradeMsg['message'],
-                        'limit_type'  => 'ai_requests',
-                        'upgrade_plan' => $upgradeMsg['suggested_plan'],
-                    ], 402);
-                }
-            }
+            // AI is a native, included capability — no per-plan credit gating.
 
             // Determine if we should include campaign context
             $source = $request->input('source', 'chat');
@@ -114,11 +96,6 @@ class AIChatController extends Controller
             $sanitizationResult = $this->sanitizer->sanitize($aiResponse['message']);
             $sanitizedMessage = $sanitizationResult->content;
 
-            // Increment AI request usage counter after successful response
-            if (isset($workspace)) {
-                $this->usageTracking->incrementUsage($workspace, 'ai_requests', 1);
-            }
-
             // Log successful request
             Log::info('AI Chat Request Processed', [
                 'user_id' => $user->id,
@@ -166,21 +143,7 @@ class AIChatController extends Controller
             $user = Auth::user();
             $language = $request->input('language', $user->locale ?? 'es');
 
-            // Plan limit check for AI requests — only enforced for external API token calls.
-            // Internal dashboard requests (session auth, no Bearer token) bypass this limit.
-            $workspace = $user->currentWorkspace ?? $user->workspaces()->find($user->current_workspace_id);
-            $isExternalApiRequest = !empty($request->bearerToken());
-            if ($workspace && $isExternalApiRequest) {
-                if (!$this->planLimits->canPerformAction($workspace, 'ai_requests')) {
-                    $upgradeMsg = $this->planLimits->getUpgradeMessage($workspace, 'ai_requests');
-                    return response()->json([
-                        'success'     => false,
-                        'message'     => $upgradeMsg['message'],
-                        'limit_type'  => 'ai_requests',
-                        'upgrade_plan' => $upgradeMsg['suggested_plan'],
-                    ], 402);
-                }
-            }
+            // AI is a native, included capability — no per-plan credit gating.
 
             // Check if AI is enabled at all
             if (!$this->aiService->isAiEnabled($user)) {
@@ -221,11 +184,6 @@ class AIChatController extends Controller
                 'type' => $request->input('type'),
                 'response' => $aiResponse
             ]);
-
-            // Increment AI request usage counter after successful suggestion
-            if (isset($workspace)) {
-                $this->usageTracking->incrementUsage($workspace, 'ai_requests', 1);
-            }
 
             return response()->json([
                 'success' => true,
