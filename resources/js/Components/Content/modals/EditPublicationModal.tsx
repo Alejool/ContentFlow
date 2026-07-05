@@ -24,6 +24,7 @@ import { usePublicationCapabilities } from '@/Hooks/Publications/usePublicationC
 import { usePublicationForm } from '@/Hooks/Publications/usePublicationForm';
 import { usePublicationLock } from '@/Hooks/Publications/usePublicationLock';
 import { usePublicationPermissions } from '@/Hooks/Publications/usePublicationPermissions';
+import { usePublicationPlatformState } from '@/Hooks/Publications/usePublicationPlatformState';
 import { usePublishedPlatforms } from '@/Hooks/Publications/usePublicationsList';
 import { useModalFocusTrap } from '@/Hooks/ui/useModalFocusTrap';
 import toast from '@/Utils/common/toast';
@@ -237,16 +238,6 @@ const EditPublicationModal = ({
     setForceUpdate((prev) => prev + 1);
   }, [content_type]);
 
-  // Get selected platform names for content type filtering
-  const selectedPlatformNames = useMemo(() => {
-    return selectedSocialAccounts
-      .map((id: number) => {
-        const account = socialAccounts.find((a) => a.id === id);
-        return account?.platform;
-      })
-      .filter(Boolean) as string[];
-  }, [selectedSocialAccounts, socialAccounts]);
-
   const watched = useMemo(
     () => ({
       social_accounts: selectedSocialAccounts,
@@ -291,15 +282,25 @@ const EditPublicationModal = ({
     }));
   }, [mediaFiles]);
 
-  const hasPublishedPlatform = useMemo(() => {
-    return publication?.social_post_logs?.some((log: any) => log.status === 'published');
-  }, [publication]);
-
-  const hasPublishingPlatform = useMemo(() => {
-    return publication?.social_post_logs?.some((log: any) => log.status === 'publishing');
-  }, [publication]);
-
   const { data: platformsData } = usePublishedPlatforms(isOpen ? publication?.id : null);
+
+  const {
+    publishedAccountIds,
+    publishingAccountIds,
+    failedAccountIds,
+    selectedPlatformNames,
+    selectedPlatforms,
+    allPlatformSettings,
+    hasYouTubeAccount,
+    hasPublishedPlatform,
+    hasPublishingPlatform,
+  } = usePublicationPlatformState({
+    publication,
+    platformsData,
+    selectedSocialAccounts,
+    socialAccounts,
+    platformSettings,
+  });
 
   const { auth } = usePage<any>().props;
   const user = auth.user;
@@ -328,61 +329,6 @@ const EditPublicationModal = ({
       // but let's not do that automatically to avoid confusion
     }
   }, [isOpen, publication, accountSchedules, useGlobalSchedule, setValue]);
-
-  const publishedAccountIds = useMemo(() => {
-    const fromQuery = platformsData?.published ?? [];
-    const fromLogs =
-      publication?.social_post_logs
-        ?.filter((log: any) => log.status === 'published')
-        .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromQuery, ...fromLogs]));
-  }, [publication, platformsData]);
-
-  const publishingAccountIds = useMemo(() => {
-    const fromQuery = platformsData?.publishing ?? [];
-    const fromLogs =
-      publication?.social_post_logs
-        ?.filter((log: any) => log.status === 'publishing')
-        .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromQuery, ...fromLogs]));
-  }, [publication, platformsData]);
-
-  const failedAccountIds = useMemo(() => {
-    const fromQuery = platformsData?.failed ?? [];
-    const fromLogs =
-      publication?.social_post_logs
-        ?.filter((log: any) => log.status === 'failed')
-        .map((log: any) => log.social_account_id) || [];
-    return Array.from(new Set([...fromQuery, ...fromLogs]));
-  }, [publication, platformsData]);
-
-  const selectedPlatforms = useMemo(() => {
-    return Array.from(
-      new Set(
-        selectedSocialAccounts
-          .map((id: number) => {
-            const account = socialAccounts.find((a) => a.id === id);
-            return account?.platform;
-          })
-          .filter((platform): platform is string => Boolean(platform)),
-      ),
-    );
-  }, [selectedSocialAccounts, socialAccounts]);
-
-  const allPlatformSettings = useMemo(() => {
-    const settings: Record<string, any> = {};
-    selectedPlatforms.forEach((platform) => {
-      if (!platform) return;
-      const platformKey = platform.toLowerCase();
-      settings[platformKey] = platformSettings[platformKey] || {};
-    });
-    return settings;
-  }, [selectedPlatforms, platformSettings]);
-
-  const hasYouTubeAccount = selectedSocialAccounts.some((id: number) => {
-    const account = socialAccounts.find((a) => a.id === id);
-    return account?.platform?.toLowerCase() === 'youtube';
-  });
 
   // Partial locking:
   // - Global lock: only if another user has the lock
