@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getUploadProgressColor } from '@/lib/common/uploadMeta';
 import { formatSpeed, formatTime } from '@/Utils/formatters';
 
 interface UploadItemProps {
@@ -20,20 +21,8 @@ export function UploadItem({ upload, onRemove }: UploadItemProps) {
   // Ensure progress is a valid number between 0-100
   const progress = Math.min(100, Math.max(0, Math.round(upload.progress || 0)));
 
-  const getProgressColor = () => {
-    switch (upload.status) {
-      case 'error':
-        return 'bg-red-500';
-      case 'completed':
-        return 'bg-green-500';
-      case 'cancelled':
-        return 'bg-gray-400';
-      case 'paused':
-        return 'bg-yellow-500';
-      default:
-        return 'bg-primary';
-    }
-  };
+  // Progress-bar color from the single source of truth (lib/common/uploadMeta).
+  const getProgressColor = () => getUploadProgressColor(upload.status);
 
   const getStatusText = () => {
     if (upload.status === 'uploading' && upload.stats?.eta) {

@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
 import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
-import { AlertCircle, CheckCircle, Clock, RotateCcw, Upload, X } from 'lucide-react';
+import { getUploadBadgeClass, getUploadMeta } from '@/lib/common/uploadMeta';
+import { cn } from '@/lib/common/utils';
+import { Clock, RotateCcw, Upload, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -63,41 +65,13 @@ export const UploadStatusIndicator: React.FC<UploadStatusIndicatorProps> = ({
     return null;
   }
 
+  // Upload status color + icon from the single source of truth.
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'uploading':
-      case 'processing':
-        return <Upload className="h-4 w-4 animate-spin" />;
-      case 'pending':
-      case 'queued':
-        return <Clock className="h-4 w-4" />;
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error':
-      case 'failed':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4" />;
-    }
+    const { Icon, iconColor, spin } = getUploadMeta(status);
+    return <Icon className={cn('h-4 w-4', iconColor, spin && 'animate-spin')} />;
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'uploading':
-      case 'processing':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'pending':
-      case 'queued':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'error':
-      case 'failed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-neutral-900/30 dark:text-neutral-400';
-    }
-  };
+  const getStatusColor = (status: string) => getUploadBadgeClass(status);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 B';

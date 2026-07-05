@@ -200,6 +200,22 @@ export function getApprovalColor(action: string): string {
   return APPROVAL_COLORS[action as ApprovalAction] ?? APPROVAL_COLORS.pending;
 }
 
+// ─── Campaign status colors ───────────────────────────────────────────────────
+
+export type CampaignStatus = 'active' | 'inactive' | 'completed' | 'paused' | 'deleted';
+
+export const CAMPAIGN_STATUS_COLORS: Record<CampaignStatus, string> = {
+  active:    SEMANTIC.success.badge,
+  completed: PRIMARY_UI.default.badge,
+  paused:    SEMANTIC.warning.badge,
+  deleted:   SEMANTIC.error.badge,
+  inactive:  'bg-neutral-100 text-neutral-600 dark:bg-neutral-700/50 dark:text-neutral-400',
+};
+
+export function getCampaignStatusColor(status?: string): string {
+  return CAMPAIGN_STATUS_COLORS[status as CampaignStatus] ?? CAMPAIGN_STATUS_COLORS.inactive;
+}
+
 // ─── Role colors ──────────────────────────────────────────────────────────────
 // Owner = amber/warning (highest privilege, must stand out)
 // Others = primary variants (normal system colors)

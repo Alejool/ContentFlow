@@ -7,6 +7,7 @@ import { TableHeader } from '@/Components/Content/Publication/TableHeader';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/TableContainer';
+import { getCampaignStatusColor } from '@/lib/common/designTokens';
 import type { Campaign } from '@/types/Campaign/Campaign';
 import React, { Fragment, memo } from 'react';
 
@@ -54,22 +55,8 @@ const CampaignTable = memo(
         return () => clearTimeout(timer);
       }
     }, [isLoading]);
-    const getStatusColor = (status?: string) => {
-      switch (status) {
-        case 'active':
-          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-        case 'inactive':
-          return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
-        case 'completed':
-          return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-        case 'deleted':
-          return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-        case 'paused':
-          return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-        default:
-          return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
-      }
-    };
+    // Campaign status colors from the single source of truth.
+    const getStatusColor = (status?: string) => getCampaignStatusColor(status);
 
     return (
       <TableContainer
