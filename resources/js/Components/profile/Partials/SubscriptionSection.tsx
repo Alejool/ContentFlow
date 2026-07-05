@@ -2,6 +2,7 @@ import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { useSubscriptionUsage } from '@/Hooks/Subscription/useSubscriptionUsage';
+import { getPlanBadgeClass, getPlanMeta } from '@/lib/common/planMeta';
 import { formatDateString } from '@/Utils/formatters';
 import { formatCurrency } from '@/Utils/formatters/number';
 import { formatBytes } from '@/Utils/formatters/storage';
@@ -12,7 +13,6 @@ import {
     Calendar,
     CheckCircle,
     CreditCard,
-    Crown,
     FileText,
     HardDrive,
     Key,
@@ -216,37 +216,13 @@ export default function SubscriptionSection({
     subscription?.['plan_id']?.toLowerCase() === 'enterprise' ||
     globalWorkspace?.['plan']?.toLowerCase() === 'enterprise';
 
+  // Plan tier icon + color from the single source of truth (lib/common/planMeta).
   const getPlanIcon = (planId: string) => {
-    switch (planId) {
-      case 'free':
-      case 'demo':
-        return <Zap className="h-5 w-5" />;
-      case 'starter':
-        return <TrendingUp className="h-5 w-5" />;
-      case 'professional':
-      case 'enterprise':
-        return <Crown className="h-5 w-5" />;
-      default:
-        return <Zap className="h-5 w-5" />;
-    }
+    const { Icon } = getPlanMeta(planId);
+    return <Icon className="h-5 w-5" />;
   };
 
-  const getPlanColor = (planId: string) => {
-    switch (planId) {
-      case 'free':
-        return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300';
-      case 'demo':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
-      case 'starter':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'professional':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'enterprise':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
-      default:
-        return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300';
-    }
-  };
+  const getPlanColor = (planId: string) => getPlanBadgeClass(planId);
 
   const getStatusBadge = (status: string) => {
     switch (status) {

@@ -1,4 +1,5 @@
 import AlertCard from '@/Components/common/Modern/AlertCard';
+import { getPlanBadgeClass as planBadgeClass } from '@/lib/common/planMeta';
 import Button from '@/Components/common/Modern/Button';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
@@ -200,22 +201,8 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
     }
   };
 
-  const getPlanBadgeClass = (plan: string) => {
-    switch (plan.toLowerCase()) {
-      case 'free':
-        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600';
-      case 'demo':
-        return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700';
-      case 'starter':
-        return 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700';
-      case 'professional':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700';
-      case 'enterprise':
-        return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600';
-    }
-  };
+  // Plan tier badge from the single source of truth (lib/common/planMeta).
+  const getPlanBadgeClass = (plan: string) => planBadgeClass(plan);
 
   return (
     <AuthenticatedLayout user={auth.user}>
