@@ -7,6 +7,7 @@ import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/TableContainer';
 import type { Publication } from '@/types/Publications/Publication';
+import { getStatusBadgeClass } from '@/lib/common/statusMeta';
 import { memo, useCallback, useEffect, useState } from 'react';
 
 interface PublicationTableProps {
@@ -70,28 +71,8 @@ const PublicationTable = memo(function PublicationTable({
     return () => clearTimeout(timer);
   }, [isLoading]);
 
-  const getStatusColor = useCallback((status?: string) => {
-    switch (status) {
-      case 'published':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'publishing':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'draft':
-        return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
-      case 'scheduled':
-        return 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400';
-      case 'failed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      case 'pending_review':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
-      case 'approved':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'rejected':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-neutral-700 dark:text-neutral-300';
-    }
-  }, []);
+  // Status colors come from the single source of truth (lib/common/statusMeta).
+  const getStatusColor = useCallback((status?: string) => getStatusBadgeClass(status), []);
 
   return (
     <TableContainer

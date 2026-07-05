@@ -54,9 +54,20 @@ const STATUS_LABEL_ICON: Record<PublicationStatus, { labelKey: string; fallback:
   cancelled: { labelKey: 'status.cancelled', fallback: 'Cancelled', Icon: Ban },
 };
 
+/** Aliases from post-log / legacy statuses onto the canonical set. */
+const STATUS_ALIASES: Record<string, PublicationStatus> = {
+  success: 'published',
+  pending: 'pending_review',
+  in_review: 'pending_review',
+  deleted: 'cancelled',
+  removed_on_platform: 'cancelled',
+  canceled: 'cancelled',
+};
+
 function normalize(status?: string): PublicationStatus {
-  const key = (status ?? '').toLowerCase() as PublicationStatus;
-  return key in STATUS_LABEL_ICON ? key : 'draft';
+  const key = (status ?? '').toLowerCase();
+  if (key in STATUS_LABEL_ICON) return key as PublicationStatus;
+  return STATUS_ALIASES[key] ?? 'draft';
 }
 
 /** Full metadata bundle for a status (colors + label + icon). */

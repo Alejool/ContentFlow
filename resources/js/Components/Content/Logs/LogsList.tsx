@@ -1,5 +1,6 @@
 ﻿import ExpandableText from '@/Components/Content/common/ExpandableText';
 import FilterSection from '@/Components/Content/common/FilterSection';
+import { getStatusBadgeClass } from '@/lib/common/statusMeta';
 import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 import EmptyState from '@/Components/common/ui/EmptyState';
 import TableContainer from '@/Components/common/TableContainer';
@@ -111,23 +112,8 @@ const LogsList = memo(
       }
     };
 
-    const getStatusColor = (status: string) => {
-      switch (status) {
-        case 'published':
-        case 'success':
-          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-        case 'failed':
-          return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-        case 'pending':
-        case 'publishing':
-          return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-        case 'deleted':
-        case 'removed_on_platform':
-          return 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-300';
-        default:
-          return 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-300';
-      }
-    };
+    // Colors from the single source of truth (lib/common/statusMeta).
+    const getStatusColor = (status: string) => getStatusBadgeClass(status);
 
     const getPlatformColor = (platform: string) => {
       switch (platform?.toLowerCase()) {
