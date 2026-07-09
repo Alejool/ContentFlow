@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Publications;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
@@ -65,11 +64,6 @@ class StorePublicationRequest extends FormRequest
         'required',
         'string',
         'max:255',
-        function ($attribute, $value, $fail) {
-          if (Publication::where('title', $value)->exists()) {
-            $fail('Publication already exists');
-          }
-        },
       ],
       'description' => [
         'string',
