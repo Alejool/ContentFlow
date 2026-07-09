@@ -319,6 +319,22 @@ export default defineConfig({
     server: isProduction ? {} : {
         host: '0.0.0.0',
         port: 5173,
+
+        // Pre-transformar el critical path al arrancar el servidor, en vez de
+        // esperar al primer request del navegador. Sin esto, la primera carga
+        // dispara cientos de transforms on-demand sobre el bind mount de Docker
+        // (lento en Windows) → minutos de pantalla en blanco.
+        warmup: {
+            clientFiles: [
+                './resources/js/app.tsx',
+                './resources/js/i18n.ts',
+                './resources/js/Layouts/AuthenticatedLayout.tsx',
+                './resources/js/Layouts/GuestLayout.tsx',
+                './resources/js/Pages/Auth/Login.tsx',
+                './resources/js/Pages/Dashboard.tsx',
+                './resources/js/Pages/Welcome.tsx',
+            ],
+        },
         // origin fija el URL que laravel-vite-plugin escribe en public/hot.
         // Sin esto, hmr.clientPort contamina el hot file y rompe los asset URLs.
         origin: `http://${host}:5173`,
