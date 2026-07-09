@@ -1,20 +1,23 @@
 import { z } from 'zod';
 
-// Define validation rules by content type
+// Define validation rules by content type.
+// Title, goal and hashtags are always optional: only the description (the
+// actual content) is required, except for polls where the question (title)
+// is the content itself. The backend derives a title when none is given.
 const VALIDATION_RULES = {
   post: {
-    requiresTitle: true,
+    requiresTitle: false,
     requiresDescription: true,
-    requiresGoal: true,
-    requiresHashtags: true,
+    requiresGoal: false,
+    requiresHashtags: false,
     descriptionMinLength: 1,
     descriptionMaxLength: 700,
   },
   reel: {
-    requiresTitle: true,
+    requiresTitle: false,
     requiresDescription: true,
     requiresGoal: false,
-    requiresHashtags: true,
+    requiresHashtags: false,
     descriptionMinLength: 1,
     descriptionMaxLength: 300,
   },
@@ -35,10 +38,10 @@ const VALIDATION_RULES = {
     descriptionMaxLength: 280,
   },
   carousel: {
-    requiresTitle: true,
+    requiresTitle: false,
     requiresDescription: true,
-    requiresGoal: true,
-    requiresHashtags: true,
+    requiresGoal: false,
+    requiresHashtags: false,
     descriptionMinLength: 1,
     descriptionMaxLength: 500,
   },
@@ -51,7 +54,6 @@ export const publicationSchema = (
   const rules =
     VALIDATION_RULES[contentType as keyof typeof VALIDATION_RULES] || VALIDATION_RULES.post;
 
-  console.log('Creating schema for content type:', contentType, 'with rules:', rules);
 
   return z
     .object({
@@ -270,12 +272,9 @@ export const publicationSchema = (
       (data) => {
         // If content type is poll, poll_options are required
         if (data.content_type === 'poll') {
-          console.log('Poll validation - poll_options:', data.poll_options);
-          console.log('Poll validation - poll_duration_hours:', data.poll_duration_hours);
 
           // Check if poll_options exist and are valid
           if (!data.poll_options || !Array.isArray(data.poll_options)) {
-            console.log('Poll options missing or not array');
             return false;
           }
 
@@ -284,7 +283,6 @@ export const publicationSchema = (
             data.poll_options.length <= 4 &&
             data.poll_options.every((opt) => opt && opt.trim().length > 0);
 
-          console.log('Poll options valid:', hasValidOptions);
           return hasValidOptions;
         }
         return true;
@@ -302,13 +300,11 @@ export const publicationSchema = (
         if (data.content_type === 'poll') {
           // Check if poll_duration_hours exists and is valid
           if (!data.poll_duration_hours || typeof data.poll_duration_hours !== 'number') {
-            console.log('Poll duration missing or not number');
             return false;
           }
 
           const hasValidDuration = data.poll_duration_hours >= 1 && data.poll_duration_hours <= 168;
 
-          console.log('Poll duration valid:', hasValidDuration);
           return hasValidDuration;
         }
         return true;
@@ -326,17 +322,9 @@ export const publicationSchema = (
           VALIDATION_RULES[data.content_type as keyof typeof VALIDATION_RULES] ||
           VALIDATION_RULES.post;
 
-        console.log(
-          'Hashtags validation for',
-          data.content_type,
-          '- requires hashtags:',
-          currentRules.requiresHashtags,
-        );
-        console.log('Hashtags value:', data.hashtags, 'Type:', typeof data.hashtags);
 
         // If hashtags are not required for this content type, skip validation
         if (!currentRules.requiresHashtags) {
-          console.log('Skipping hashtags validation for', data.content_type);
           return true;
         }
 
@@ -344,13 +332,11 @@ export const publicationSchema = (
         const hashtags = String(data.hashtags || '');
 
         if (hashtags.trim().length === 0) {
-          console.log('Hashtags validation failed: empty');
           return false;
         }
 
         // Simple validation: just check if there's at least one # character
         const hasHashtag = hashtags.includes('#');
-        console.log('Hashtags validation result:', hasHashtag);
         return hasHashtag;
       },
       {

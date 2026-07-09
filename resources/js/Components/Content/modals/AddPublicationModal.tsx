@@ -520,7 +520,7 @@ export default function AddPublicationModal({
                       error={errors.title?.message as string}
                       icon={FileText}
                       variant="filled"
-                      required
+                      required={content_type === 'poll'}
                       sizeType="lg"
                       hint={`${watched.title?.length || 0}/70 characters`}
                     />
@@ -571,7 +571,6 @@ export default function AddPublicationModal({
                       error={errors.goal?.message as string}
                       icon={Target}
                       variant="filled"
-                      required
                       sizeType="lg"
                       hint={`${watched.goal?.length || 0}/200 characters`}
                     />
@@ -589,7 +588,6 @@ export default function AddPublicationModal({
                       onChange={(e) => handleHashtagChange(e.target.value)}
                       icon={Hash}
                       variant="filled"
-                      required={content_type === 'post' || content_type === 'reel'}
                       sizeType="lg"
                       hint={`${
                         watched.hashtags

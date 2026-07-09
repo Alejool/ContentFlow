@@ -118,7 +118,8 @@ class UpdatePublicationRequest extends FormRequest
     }
     
     return [
-      'title' => 'required|string|max:255',
+      // sometimes: on update an absent title means "keep the current one"
+      'title' => 'sometimes|required|string|max:255',
       'description' => [
         'string',
         function ($attribute, $value, $fail) {
@@ -140,34 +141,20 @@ class UpdatePublicationRequest extends FormRequest
         'nullable',
         'string',
         function ($attribute, $value, $fail) {
-          $contentType = $this->input('content_type', 'post');
-          
-          // For polls and stories, hashtags are optional
-          if ($contentType === 'poll' || $contentType === 'story') {
-            return;
-          }
-          
-          // For other content types, hashtags are required
+          // Hashtags are always optional; only validate format/count when provided.
           if (empty($value) || trim($value) === '') {
-            $fail('Hashtags are required for this content type.');
             return;
           }
-          
-          // Simple validation: just check if there's at least one # character
-          if (!str_contains($value, '#')) {
-            $fail('At least one hashtag is required (must start with #).');
-            return;
-          }
-          
+
           // Count hashtags (better separation logic)
           $hashtags = array_filter(
-            preg_split('/[\s,]+/', $value), 
+            preg_split('/[\s,]+/', $value),
             function($tag) {
               $tag = trim($tag);
               return !empty($tag) && str_starts_with($tag, '#') && strlen($tag) > 1;
             }
           );
-          
+
           if (count($hashtags) > 10) {
             $fail('Maximum 10 hashtags allowed.');
           }

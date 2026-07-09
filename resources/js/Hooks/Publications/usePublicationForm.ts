@@ -1600,12 +1600,14 @@ export const usePublicationForm = ({
     const contentType = watched.content_type || 'post';
 
     // Define what fields should be validated for each content type
+    // Only description is required (the content itself) — title/goal/hashtags
+    // are optional everywhere; polls require their question + options instead.
     const FIELD_VALIDATION_RULES = {
-      post: ['title', 'description', 'goal', 'hashtags'],
-      reel: ['title', 'description', 'hashtags'],
+      post: ['description'],
+      reel: ['description'],
       story: [], // No required fields for stories
       poll: ['title', 'poll_options', 'poll_duration_hours'], // Only poll-specific fields
-      carousel: ['title', 'description', 'goal', 'hashtags'],
+      carousel: ['description'],
     };
 
     const requiredFields =

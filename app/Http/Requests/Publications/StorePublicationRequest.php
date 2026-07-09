@@ -28,6 +28,16 @@ class StorePublicationRequest extends FormRequest
       ]);
     }
 
+    // Title is optional for the user, but the column is NOT NULL and feeds the
+    // slug — derive one from the description (or content type) when absent.
+    if (trim((string) $this->input('title')) === '') {
+      $description = trim((string) $this->input('description'));
+      $derived = $description !== ''
+        ? mb_substr(preg_replace('/\s+/', ' ', $description), 0, 70)
+        : ucfirst((string) $this->input('content_type', 'post')) . ' ' . now()->format('Y-m-d H:i');
+      $this->merge(['title' => $derived]);
+    }
+
     if ($this->has('is_recurring')) {
       $this->merge([
         'is_recurring' => filter_var($this->is_recurring, FILTER_VALIDATE_BOOLEAN)
@@ -51,14 +61,6 @@ class StorePublicationRequest extends FormRequest
 
   public function rules(): array
   {
-    // Debug: Log incoming data before validation
-    Log::info('StorePublicationRequest - Incoming data:', [
-      'all_data' => $this->all(),
-      'status' => $this->input('status'),
-      'method' => $this->method(),
-      'url' => $this->fullUrl()
-    ]);
-
     return [
       'title' => [
         'required',
@@ -86,34 +88,20 @@ class StorePublicationRequest extends FormRequest
         'nullable',
         'string',
         function ($attribute, $value, $fail) {
-          $contentType = $this->input('content_type', 'post');
-          
-          // For polls and stories, hashtags are optional
-          if ($contentType === 'poll' || $contentType === 'story') {
-            return;
-          }
-          
-          // For other content types, hashtags are required
+          // Hashtags are always optional; only validate format/count when provided.
           if (empty($value) || trim($value) === '') {
-            $fail('Hashtags are required for this content type.');
             return;
           }
-          
-          // Simple validation: just check if there's at least one # character
-          if (!str_contains($value, '#')) {
-            $fail('At least one hashtag is required (must start with #).');
-            return;
-          }
-          
+
           // Count hashtags (better separation logic)
           $hashtags = array_filter(
-            preg_split('/[\s,]+/', $value), 
+            preg_split('/[\s,]+/', $value),
             function($tag) {
               $tag = trim($tag);
               return !empty($tag) && str_starts_with($tag, '#') && strlen($tag) > 1;
             }
           );
-          
+
           if (count($hashtags) > 10) {
             $fail('Maximum 10 hashtags allowed.');
           }
