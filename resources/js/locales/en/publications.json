@@ -327,7 +327,8 @@
       "sending": "Sending...",
       "inReview": "In Review",
       "submitForReview": "Submit for Review",
-      "submitting": "Submitting..."
+      "submitting": "Submitting...",
+      "publishNow": "Publish now"
     },
     "table": {
       "name": "Name",
@@ -367,7 +368,10 @@
       "platformCancelError": "Failed to cancel the platform",
       "error": "An unexpected error occurred",
       "uploadFailed": "Upload failed",
-      "uploadSuccess": "Uploaded successfully"
+      "uploadSuccess": "Uploaded successfully",
+      "publishStarted": "Publishing to the selected accounts…",
+      "publishNowFailed": "The publication was saved but could not be published. Open it and publish manually.",
+      "publishAfterUpload": "Saved. Files are still uploading: publish it once the upload finishes."
     },
     "filters": {
       "title": "Publications Filters",

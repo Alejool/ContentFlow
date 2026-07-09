@@ -23,7 +23,7 @@ import { useTokenHealth } from '@/Hooks/ConfigSocialMedia/useTokenHealth';
 import { ToastService } from '@/Services/common/ToastService';
 import { usePage } from '@inertiajs/react';
 import { publicationService } from '@/Services/Publications/publicationService';
-import { ChevronDown, FileText, Hash, Save, Target } from 'lucide-react';
+import { ChevronDown, FileText, Hash, Save, Send, Target } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
@@ -100,6 +100,7 @@ export default function AddPublicationModal({
     uploadProgress,
     uploadErrors,
     isS3Uploading: uploading,
+    beginPublishNow,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
@@ -107,6 +108,8 @@ export default function AddPublicationModal({
   });
 
   const { confirm, ConfirmDialog } = useConfirm();
+
+  const canPublish = auth.current_workspace?.permissions?.includes('publish');
 
   const handleUploadAndSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -228,6 +231,22 @@ export default function AddPublicationModal({
       url: m.url,
     }));
   }, [mediaFiles]);
+
+  // Publish-now only makes sense when the user picked accounts and is NOT
+  // scheduling (globally, per-account, or via recurrence).
+  const showPublishNow =
+    canPublish &&
+    selectedSocialAccounts.length > 0 &&
+    !scheduledAt &&
+    Object.keys(accountSchedules).length === 0 &&
+    !is_recurring;
+
+  const handlePublishNow = () => {
+    beginPublishNow();
+    // Goes through the form's native submit so upload + RHF validation run
+    // exactly as they do for a normal save.
+    (document.getElementById('add-publication-form') as HTMLFormElement | null)?.requestSubmit();
+  };
 
   if (!isOpen) return null;
 
@@ -648,6 +667,13 @@ export default function AddPublicationModal({
             }
             submitIcon={<Save className="h-4 w-4" />}
             cancelText={t('common.cancel') || 'Close'}
+            showSecondarySubmit={showPublishNow}
+            secondarySubmitText={t('publications.button.publishNow') || 'Publicar ahora'}
+            secondarySubmitVariant="success"
+            secondarySubmitStyle="solid"
+            secondarySubmitIcon={<Send className="h-4 w-4" />}
+            disableSecondarySubmit={!isTextValid}
+            onSecondarySubmit={handlePublishNow}
           />
           {/* Progress bar could go here */}
           {uploading && (

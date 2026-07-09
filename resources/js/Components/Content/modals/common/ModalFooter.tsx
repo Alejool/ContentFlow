@@ -15,6 +15,7 @@ interface ModalFooterProps {
   secondarySubmitVariant?: ModalFooterProps['submitVariant'];
   secondarySubmitStyle?: ModalFooterProps['submitStyle'];
   secondarySubmitIcon?: React.ReactNode;
+  disableSecondarySubmit?: boolean;
   onSecondarySubmit?: () => void;
   onPrimarySubmit?: () => void;
 
@@ -42,7 +43,7 @@ export default function ModalFooter({
   secondarySubmitVariant = 'secondary',
   secondarySubmitStyle = 'outline',
   secondarySubmitIcon,
-
+  disableSecondarySubmit = false,
   onSecondarySubmit,
   onPrimarySubmit,
   submitVariant = 'primary',
@@ -91,7 +92,7 @@ export default function ModalFooter({
               type={onSecondarySubmit ? 'button' : 'submit'}
               form={onSecondarySubmit ? undefined : formId}
               onClick={onSecondarySubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || disableSecondarySubmit}
               loading={isSubmitting}
               variant={secondarySubmitVariant || 'secondary'}
               buttonStyle={secondarySubmitStyle || 'outline'}
@@ -107,14 +108,6 @@ export default function ModalFooter({
               type={onPrimarySubmit ? 'button' : formId ? 'submit' : 'button'}
               form={onPrimarySubmit ? undefined : formId}
               onClick={() => {
-                console.log('=== Submit button clicked ===');
-                console.log('onPrimarySubmit:', !!onPrimarySubmit);
-                console.log('formId:', formId);
-                console.log(
-                  'Button type:',
-                  onPrimarySubmit ? 'button' : formId ? 'submit' : 'button',
-                );
-                console.log('Button form:', onPrimarySubmit ? undefined : formId);
                 if (onPrimarySubmit) {
                   onPrimarySubmit();
                 }

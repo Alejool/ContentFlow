@@ -2767,7 +2767,8 @@
       "sending": "Enviando...",
       "inReview": "En Revisión",
       "submitForReview": "Enviar a Revisión",
-      "submitting": "Enviando..."
+      "submitting": "Enviando...",
+      "publishNow": "Publicar ahora"
     },
     "table": {
       "name": "Nombre",
@@ -2807,7 +2808,10 @@
       "platformCancelError": "Error al cancelar la plataforma",
       "error": "Ha ocurrido un error inesperado",
       "uploadFailed": "Error al subir",
-      "uploadSuccess": "Subido correctamente"
+      "uploadSuccess": "Subido correctamente",
+      "publishStarted": "Publicando en las redes seleccionadas…",
+      "publishNowFailed": "Se guardó la publicación pero no se pudo publicar. Ábrela y publica manualmente.",
+      "publishAfterUpload": "Guardada. Los archivos aún se están subiendo: publícala cuando termine la subida."
     },
     "filters": {
       "title": "Filtros de publicación",

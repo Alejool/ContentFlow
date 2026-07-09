@@ -11,6 +11,7 @@ import { useS3Upload } from '@/Hooks/Upload/useS3Upload';
 import { queryKeys } from '@/lib/common/queryKeys';
 import type { PublicationFormData } from '@/schemas/Publications/publication';
 import { publicationSchema } from '@/schemas/Publications/publication';
+import { publicationService } from '@/Services/Publications/publicationService';
 import { useAccountsStore } from '@/stores/ConfigSocialMedia/socialAccountsStore';
 import { useMediaStore } from '@/stores/Upload/mediaStore';
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
@@ -92,6 +93,9 @@ export const usePublicationForm = ({
   const imageError = useMediaStore((s) => s.imageError);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // One-shot flag: when set, the next successful save also triggers immediate
+  // publishing to the selected accounts (consumed at the start of onFormSubmit).
+  const publishNowRef = useRef(false);
   const [removedMediaIds, setRemovedMediaIds] = useState<number[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isDataReady, setIsDataReady] = useState(false);
@@ -1139,6 +1143,11 @@ export const usePublicationForm = ({
   };
 
   const onFormSubmit = async (data: PublicationFormData) => {
+    // Consume the publish-now flag once so a failed attempt never leaks into
+    // a later normal save.
+    const publishNow = publishNowRef.current;
+    publishNowRef.current = false;
+
     // Skip media validation for polls (they don't require media)
     if (data.content_type !== 'poll' && mediaFiles.length === 0) {
       setImageError(t('publications.modal.validation.imageRequired'));
@@ -1152,8 +1161,9 @@ export const usePublicationForm = ({
       // Published posts don't need new schedule dates
       const isAlreadyPublished = publication?.status === 'published';
 
+      // Publish-now doesn't need a schedule: the point is publishing immediately.
       // Only validate schedule for non-published posts (draft, scheduled, failed, etc.)
-      if (!isAlreadyPublished) {
+      if (!isAlreadyPublished && !publishNow) {
         const allAccountsHaveSchedule = data.social_accounts.every(
           (id) => accountSchedules[id] || hasGlobalSchedule,
         );
@@ -1420,15 +1430,55 @@ export const usePublicationForm = ({
       }
 
       if (result) {
-        toast.success(
-          publication
-            ? t('publications.messages.updateSuccess')
-            : t('publications.messages.createSuccess'),
-        );
+        if (!publishNow) {
+          toast.success(
+            publication
+              ? t('publications.messages.updateSuccess')
+              : t('publications.messages.createSuccess'),
+          );
+        }
 
         // Reset dirty state after successful save so next time modal opens with fresh data
         if (publication) {
           reset(undefined, { keepValues: true, keepDirty: false });
+        }
+      }
+
+      // Publish-now: fire the publish endpoint right after the save so the user
+      // doesn't have to reopen the publication in the publish modal.
+      if (publishNow && result && socialAccounts.length > 0) {
+        const publishPubId = (result as any).id || (result as any).publication?.id;
+
+        if (publishPubId) {
+          if (uploadingFiles.length > 0) {
+            // Media is still uploading in background — publishing now would go
+            // out without the files. Leave it saved and let the user publish
+            // once the upload finishes.
+            toast(
+              t('publications.messages.publishAfterUpload') ||
+                'Guardada. Los archivos aún se están subiendo: publícala cuando termine la subida.',
+              { icon: '⏳', duration: 6000 },
+            );
+          } else {
+            try {
+              const publishFd = new FormData();
+              socialAccounts.forEach((id) => publishFd.append('platforms[]', id.toString()));
+              if (Object.keys(platformSettings).length > 0) {
+                publishFd.append('platform_settings', JSON.stringify(platformSettings));
+              }
+              await publicationService.publish(publishPubId, publishFd);
+              toast.success(
+                t('publications.messages.publishStarted') ||
+                  'Publicando en las redes seleccionadas…',
+              );
+            } catch (publishError: any) {
+              toast.error(
+                publishError.response?.data?.message ||
+                  t('publications.messages.publishNowFailed') ||
+                  'Se guardó la publicación pero no se pudo publicar. Ábrela y publica manualmente.',
+              );
+            }
+          }
         }
       }
 
@@ -1636,6 +1686,10 @@ export const usePublicationForm = ({
       return;
     }
 
+    // Validation failed — drop any pending publish-now intent so it can't leak
+    // into a later normal save.
+    publishNowRef.current = false;
+
     // Show errors only if there are relevant ones
     toast.error(`${t('common.errors.checkFormErrors')}: ${relevantErrors.join(', ')}`);
 
@@ -1675,6 +1729,10 @@ export const usePublicationForm = ({
     handleCancelPublication,
     handleCancelPlatform,
     handleSubmit: handleSubmit(onFormSubmit, onInvalidSubmit),
+    // Arms publish-now for the next submit (consumed once by onFormSubmit).
+    beginPublishNow: () => {
+      publishNowRef.current = true;
+    },
     fileInputRef,
 
     // Platform control
