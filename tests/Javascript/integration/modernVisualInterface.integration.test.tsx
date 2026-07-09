@@ -13,10 +13,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeProvider } from '@/Contexts/ThemeContext';
+import { ThemeProvider } from '@/Contexts/common/ThemeContext';
 import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
-import { FocusManager } from '@/Utils/FocusManager';
-import { themeStorage } from '@/Utils/ThemeStorage';
+import { FocusManager } from '@/Utils/common/FocusManager';
+import { themeStorage } from '@/Utils/common/ThemeStorage';
 import { AnimatedPage } from '@/Components/common/motion/AnimatedPage';
 import React from 'react';
 
@@ -33,7 +33,7 @@ vi.mock('ziggy-js', () => ({
 }));
 
 // Mock theme storage
-vi.mock('@/Utils/ThemeStorage', () => ({
+vi.mock('@/Utils/common/ThemeStorage', () => ({
   themeStorage: {
     saveThemePreference: vi.fn(() => Promise.resolve()),
     loadThemePreference: vi.fn(() => Promise.resolve(null)),

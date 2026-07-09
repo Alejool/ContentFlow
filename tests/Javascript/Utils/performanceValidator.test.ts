@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PerformanceValidator, PERFORMANCE_TARGETS } from '@/Utils/performanceValidator';
+import { PerformanceValidator, PERFORMANCE_TARGETS } from '@/Utils/common/performanceValidator';
 
 describe('Performance Validator', () => {
   let validator: PerformanceValidator;

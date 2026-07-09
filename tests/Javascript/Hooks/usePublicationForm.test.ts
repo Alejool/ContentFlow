@@ -1,9 +1,19 @@
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { useMediaStore } from "@/stores/mediaStore";
-import { usePublicationStore } from "@/stores/publicationStore";
+import React from "react";
+import { usePublicationForm } from "@/Hooks/Publications/usePublicationForm";
+import { useMediaStore } from "@/stores/Upload/mediaStore";
+import { usePublicationStore } from "@/stores/Publications/publicationStore";
 import { usePage } from "@inertiajs/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: queryClient }, children);
+};
 
 // Mocks
 vi.mock("@inertiajs/react", () => ({
@@ -63,12 +73,14 @@ describe("usePublicationForm", () => {
   });
 
   it("initializes with default values when no publication is provided", () => {
-    const { result } = renderHook(() =>
-      usePublicationForm({
-        publication: null,
-        onClose: mockOnClose,
-        isOpen: true,
-      }),
+    const { result } = renderHook(
+      () =>
+        usePublicationForm({
+          publication: null,
+          onClose: mockOnClose,
+          isOpen: true,
+        }),
+      { wrapper: createWrapper() },
     );
 
     expect(result.current.isDataReady).toBe(true);
@@ -89,12 +101,14 @@ describe("usePublicationForm", () => {
       media_files: [],
     };
 
-    const { result } = renderHook(() =>
-      usePublicationForm({
-        publication: mockPublication as any,
-        onClose: mockOnClose,
-        isOpen: true,
-      }),
+    const { result } = renderHook(
+      () =>
+        usePublicationForm({
+          publication: mockPublication as any,
+          onClose: mockOnClose,
+          isOpen: true,
+        }),
+      { wrapper: createWrapper() },
     );
 
     // Wait for useEffect to process
@@ -110,12 +124,14 @@ describe("usePublicationForm", () => {
   });
 
   it("handles account toggling correctly", async () => {
-    const { result } = renderHook(() =>
-      usePublicationForm({
-        publication: null,
-        onClose: mockOnClose,
-        isOpen: true,
-      }),
+    const { result } = renderHook(
+      () =>
+        usePublicationForm({
+          publication: null,
+          onClose: mockOnClose,
+          isOpen: true,
+        }),
+      { wrapper: createWrapper() },
     );
 
     act(() => {

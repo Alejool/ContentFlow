@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useOptimistic } from '../../../resources/js/Hooks/useOptimistic';
-import useOptimisticStore from '../../../resources/js/stores/optimisticStore';
+import { useOptimistic } from '../../../resources/js/Hooks/common/useOptimistic';
+import useOptimisticStore from '../../../resources/js/stores/common/optimisticStore';
 
 describe('useOptimistic Hook', () => {
   beforeEach(() => {

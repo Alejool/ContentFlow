@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { backgroundSyncManager } from '../../../resources/js/sw/syncManager';
-import type { SyncOperation } from '../../../resources/js/types/optimistic';
+import type { SyncOperation } from '../../../resources/js/types/common/optimistic';
 
 // Mock IndexedDB
 const mockIndexedDB = () => {

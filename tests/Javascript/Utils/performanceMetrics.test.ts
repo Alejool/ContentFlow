@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { PerformanceMetricsTracker } from '../../../resources/js/Utils/performanceMetrics';
+import { PerformanceMetricsTracker } from '../../../resources/js/Utils/common/performanceMetrics';
 
 // Mock import.meta.env
 vi.stubGlobal('import', {

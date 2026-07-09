@@ -16,7 +16,7 @@ import {
   syncWithInertia,
   isSharedData,
   mergeOptimisticData,
-} from '@/utils/inertiaOptimisticSync';
+} from '@/Utils/common/inertiaOptimisticSync';
 import { router } from '@inertiajs/react';
 
 describe('inertiaOptimisticSync', () => {

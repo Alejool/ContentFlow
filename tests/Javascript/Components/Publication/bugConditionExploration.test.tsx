@@ -162,13 +162,14 @@ describe('Bug Condition Exploration: Incompatible Content Type and Platform Comb
         />
       );
       
-      // Instagram should be disabled (Poll only supports Twitter)
-      const instagramCheckbox = container.querySelector('[data-platform="instagram"]');
-      
-      // EXPECTED: Instagram checkbox should be disabled or have disabled styling
-      // ACTUAL (unfixed): Instagram checkbox is enabled and selectable
-      // Note: This will fail because contentType prop doesn't exist yet
-      expect(instagramCheckbox).toHaveAttribute('disabled');
+      // Instagram should be disabled (Poll only supports Twitter).
+      // The disabled state lives on the nested react-aria-components checkbox
+      // input, not on the outer [data-platform] div itself.
+      const instagramInput = container.querySelector(
+        '[data-platform="instagram"] input[type="checkbox"]',
+      );
+
+      expect(instagramInput).toHaveAttribute('disabled');
     });
 
     it('should disable YouTube when Story type is selected (YouTube does not support Story)', () => {
@@ -195,11 +196,11 @@ describe('Bug Condition Exploration: Incompatible Content Type and Platform Comb
       );
       
       // YouTube should be disabled (Story only supports Instagram and Facebook)
-      const youtubeCheckbox = container.querySelector('[data-platform="youtube"]');
-      
-      // EXPECTED: YouTube checkbox should be disabled
-      // ACTUAL (unfixed): YouTube checkbox is enabled and selectable
-      expect(youtubeCheckbox).toHaveAttribute('disabled');
+      const youtubeInput = container.querySelector(
+        '[data-platform="youtube"] input[type="checkbox"]',
+      );
+
+      expect(youtubeInput).toHaveAttribute('disabled');
     });
   });
 

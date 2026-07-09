@@ -14,8 +14,8 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
+import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
 
 describe('Upload Progress and Empty States - Integration Tests', () => {
   

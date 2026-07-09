@@ -1,14 +1,14 @@
-import { useCompletionNotifications } from '@/Hooks/useCompletionNotifications';
-import { useUploadQueue } from '@/stores/uploadQueueStore';
-import { useProcessingProgress } from '@/stores/processingProgressStore';
-import { useNotificationStore } from '@/stores/notificationStore';
+import { useCompletionNotifications } from '@/Hooks/Notifications/useCompletionNotifications';
+import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
+import { useProcessingProgress } from '@/stores/Queue/processingProgressStore';
+import { useNotificationStore } from '@/stores/Notifications/notificationStore';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock stores
-vi.mock('@/stores/uploadQueueStore');
-vi.mock('@/stores/processingProgressStore');
-vi.mock('@/stores/notificationStore');
+vi.mock('@/stores/Upload/uploadQueueStore');
+vi.mock('@/stores/Queue/processingProgressStore');
+vi.mock('@/stores/Notifications/notificationStore');
 
 // Mock Inertia router
 vi.mock('@inertiajs/react', () => ({

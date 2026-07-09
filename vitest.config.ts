@@ -14,6 +14,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./resources/js"),
+      "@Components": path.resolve(__dirname, "./resources/js/Components"),
+      "@Hooks": path.resolve(__dirname, "./resources/js/Hooks"),
+      "@Utils": path.resolve(__dirname, "./resources/js/Utils"),
+      "@assets": path.resolve(__dirname, "./resources/assets"),
     },
   },
 });

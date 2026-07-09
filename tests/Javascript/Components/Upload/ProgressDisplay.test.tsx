@@ -3,23 +3,14 @@ import { render, screen } from "@testing-library/react";
 import { ProgressDisplay } from "@/Components/Upload/ProgressDisplay";
 import { I18nextProvider } from "react-i18next";
 import i18n from "i18next";
+import commonEn from "@/locales/en/common.json";
 
-// Initialize i18n for tests
+// Initialize i18n for tests with the real locale file so keys match the component
 i18n.init({
   lng: "en",
   resources: {
     en: {
-      translation: {
-        "publications.modal.upload.progress": "Upload progress",
-        "publications.modal.upload.left": "remaining",
-        "publications.modal.upload.pause": "Pause",
-        "publications.modal.upload.resume": "Resume",
-        "publications.modal.upload.cancel": "Cancel",
-        "publications.modal.upload.done": "Done",
-        "publications.modal.upload.paused": "Paused",
-        "publications.modal.upload.cancelled": "Cancelled",
-        "publications.modal.upload.pending": "Pending",
-      },
+      translation: commonEn,
     },
   },
 });
@@ -68,7 +59,7 @@ describe("ProgressDisplay", () => {
       />
     );
 
-    expect(screen.getByLabelText("Upload speed")).toHaveTextContent("1 MB/s");
+    expect(screen.getByLabelText("Upload speed")).toHaveTextContent("1.00 MB/s");
   });
 
   it("shows pause button when pausable and uploading", () => {

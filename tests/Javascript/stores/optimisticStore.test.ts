@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import useOptimisticStore from '../../../resources/js/stores/optimisticStore';
-import type { OptimisticOperation } from '../../../resources/js/types/optimistic';
+import useOptimisticStore from '../../../resources/js/stores/common/optimisticStore';
+import type { OptimisticOperation } from '../../../resources/js/types/common/optimistic';
 
 describe('OptimisticStore', () => {
   beforeEach(() => {

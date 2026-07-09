@@ -1,17 +1,31 @@
 import EditPublicationModal from "@/Components/Content/modals/EditPublicationModal";
-import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { usePublicationLock } from "@/Hooks/usePublicationLock";
-import { useCampaignStore } from "@/stores/campaignStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { usePublicationForm } from "@/Hooks/Publications/usePublicationForm";
+import { usePublicationLock } from "@/Hooks/Publications/usePublicationLock";
+import { useCampaignStore } from "@/stores/Campaign/campaignStore";
+import { useAccountsStore } from "@/stores/ConfigSocialMedia/socialAccountsStore";
+import { AbilityProvider } from "@/Contexts/Auth/AbilityContext";
 import { usePage } from "@inertiajs/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const renderWithProviders = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <AbilityProvider>{ui}</AbilityProvider>
+    </QueryClientProvider>,
+  );
+};
+
 // Mocks
-vi.mock("@/Hooks/publication/usePublicationForm");
-vi.mock("@/Hooks/usePublicationLock");
-vi.mock("@/stores/campaignStore");
-vi.mock("@/stores/socialAccountsStore");
+vi.mock("@/Hooks/Publications/usePublicationForm");
+vi.mock("@/Hooks/Publications/usePublicationLock");
+vi.mock("@/stores/Campaign/campaignStore");
+vi.mock("@/stores/ConfigSocialMedia/socialAccountsStore");
 vi.mock("@inertiajs/react", () => ({
   usePage: vi.fn(),
   useWatch: vi.fn(),
@@ -103,7 +117,7 @@ describe("EditPublicationModal", () => {
   });
 
   it("renders correctly when open", () => {
-    render(
+    renderWithProviders(
       <EditPublicationModal
         isOpen={true}
         onClose={mockOnClose}
@@ -127,7 +141,7 @@ describe("EditPublicationModal", () => {
       ],
     });
 
-    render(
+    renderWithProviders(
       <EditPublicationModal
         isOpen={true}
         onClose={mockOnClose}
@@ -141,7 +155,7 @@ describe("EditPublicationModal", () => {
     ).toBeDefined();
   });
 
-  it("shows configuration locked alert when user lacks permissions", () => {
+  it("disables the platform configuration section when user cannot publish and item isn't approved", () => {
     (usePage as any).mockReturnValue({
       props: {
         auth: {
@@ -151,25 +165,23 @@ describe("EditPublicationModal", () => {
       },
     });
 
-    // Publication is not owned by user and not approved
-    const otherPublication = {
+    // Publication is not approved, so allowConfiguration should be false
+    const draftPublication = {
       id: 2,
       title: "Other Pub",
       user_id: 2,
       status: "draft",
     };
 
-    render(
+    const { container } = renderWithProviders(
       <EditPublicationModal
         isOpen={true}
         onClose={mockOnClose}
-        publication={otherPublication as any}
+        publication={draftPublication as any}
         onSubmit={mockOnSubmit}
       />,
     );
 
-    expect(
-      screen.getByText("publications.modal.edit.configurationLocked"),
-    ).toBeDefined();
+    expect(container.querySelector(".opacity-50.pointer-events-none")).not.toBeNull();
   });
 });
