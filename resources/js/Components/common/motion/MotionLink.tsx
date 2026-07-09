@@ -62,7 +62,7 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
     },
     ref,
   ) => {
-    const { prefersReducedMotion } = useReducedMotion();
+    const prefersReducedMotion = useReducedMotion();
     const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
 
     // Map link hover effects to available hover variants
