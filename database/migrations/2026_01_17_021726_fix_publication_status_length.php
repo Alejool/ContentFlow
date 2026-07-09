@@ -13,7 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('publications', function (Blueprint $table) {
-            DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
+            if (config('database.default') === 'pgsql') {
+                DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
+            }
 
             $table->string('status', 50)->change();
         });

@@ -16,6 +16,15 @@ class SocialAccount extends Model
 {
   use HasFactory, SoftDeletes;
 
+  /**
+   * The factory lives in the flat Database\Factories namespace, not the
+   * convention-based Database\Factories\Social namespace, so resolve it explicitly.
+   */
+  protected static function newFactory(): \Database\Factories\SocialAccountFactory
+  {
+    return \Database\Factories\SocialAccountFactory::new();
+  }
+
   protected $fillable = [
     'user_id',
     'platform',

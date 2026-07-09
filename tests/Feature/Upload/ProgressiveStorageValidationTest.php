@@ -24,7 +24,7 @@ class ProgressiveStorageValidationTest extends TestCase
         // Create user and workspace
         $this->user = User::factory()->create();
         $this->workspace = Workspace::factory()->create([
-            'creator_id' => $this->user->id,
+            'created_by' => $this->user->id,
         ]);
 
         $this->user->workspaces()->attach($this->workspace->id, [

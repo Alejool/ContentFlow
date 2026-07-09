@@ -20,7 +20,7 @@ class IdempotencyTest extends TestCase
         // Crear usuario y workspace para las pruebas
         $this->user = User::factory()->create();
         $this->workspace = Workspace::factory()->create([
-            'creator_id' => $this->user->id,
+            'created_by' => $this->user->id,
         ]);
     }
 
@@ -387,7 +387,7 @@ class IdempotencyTest extends TestCase
     {
         // Crear otro workspace
         $workspace2 = Workspace::factory()->create([
-            'creator_id' => $this->user->id,
+            'created_by' => $this->user->id,
         ]);
 
         $eventId = 'evt_multi_workspace_' . uniqid();

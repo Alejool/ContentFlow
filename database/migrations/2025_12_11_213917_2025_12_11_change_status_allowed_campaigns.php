@@ -32,6 +32,14 @@ return new class extends Migration
             END
         ");
 
+        // SQLite does not cascade-drop dependent indexes like PostgreSQL does,
+        // so the index on (user_id, status) must be removed explicitly first
+        if (Schema::hasIndex('campaigns', 'campaigns_user_id_status_index')) {
+            Schema::table('campaigns', function (Blueprint $table) {
+                $table->dropIndex('campaigns_user_id_status_index');
+            });
+        }
+
         Schema::table('campaigns', function (Blueprint $table) {
             $table->dropColumn('status');
         });

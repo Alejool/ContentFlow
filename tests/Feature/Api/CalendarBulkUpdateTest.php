@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Auth\Role;
 use App\Models\Publications\Publication;
 use App\Models\User;
-use App\Models\Workspace;
+use App\Models\Workspace\Workspace;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,8 +27,7 @@ class CalendarBulkUpdateTest extends TestCase
         
         // Assign user to workspace
         $this->user->workspaces()->attach($this->workspace->id, [
-            'role' => 'admin',
-            'permissions' => json_encode(['manage-content' => true]),
+            'role_id' => Role::where('slug', 'admin')->first()->id,
         ]);
         
         $this->user->current_workspace_id = $this->workspace->id;
@@ -190,8 +190,7 @@ class CalendarBulkUpdateTest extends TestCase
         // Create user without manage-content permission
         $userWithoutPermission = User::factory()->create();
         $userWithoutPermission->workspaces()->attach($this->workspace->id, [
-            'role' => 'viewer',
-            'permissions' => json_encode(['manage-content' => false]),
+            'role_id' => Role::where('slug', 'viewer')->first()->id,
         ]);
         $userWithoutPermission->current_workspace_id = $this->workspace->id;
         $userWithoutPermission->save();

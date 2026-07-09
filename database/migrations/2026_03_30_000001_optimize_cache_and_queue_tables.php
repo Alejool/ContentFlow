@@ -7,28 +7,45 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    // Deshabilitar transacciones para permitir VACUUM
-    public $withinTransaction = false;
+    // VACUUM cannot run inside a transaction, so transactions are disabled only on
+    // PostgreSQL (where VACUUM runs). On other drivers (e.g. SQLite used in tests)
+    // keeping the default transactional behavior avoids desyncing the connection's
+    // transaction state, which otherwise breaks RefreshDatabase across tests.
+    public $withinTransaction = true;
+
+    public function __construct()
+    {
+        $this->withinTransaction = config('database.default') !== 'pgsql';
+    }
 
     public function up(): void
     {
+        // VACUUM ANALYZE <table> is PostgreSQL-only syntax
+        $isPgsql = config('database.default') === 'pgsql';
+
         // Optimizar tabla cache
         if (Schema::hasTable('cache')) {
             DB::statement('CREATE INDEX IF NOT EXISTS cache_expiration_idx ON cache (expiration)');
-            DB::statement('VACUUM ANALYZE cache');
+            if ($isPgsql) {
+                DB::statement('VACUUM ANALYZE cache');
+            }
         }
 
         // Optimizar tabla jobs
         if (Schema::hasTable('jobs')) {
             DB::statement('CREATE INDEX IF NOT EXISTS jobs_queue_reserved_at_idx ON jobs (queue, reserved_at)');
             DB::statement('CREATE INDEX IF NOT EXISTS jobs_available_at_idx ON jobs (available_at)');
-            DB::statement('VACUUM ANALYZE jobs');
+            if ($isPgsql) {
+                DB::statement('VACUUM ANALYZE jobs');
+            }
         }
 
         // Optimizar tabla sessions (si existe)
         if (Schema::hasTable('sessions')) {
             DB::statement('CREATE INDEX IF NOT EXISTS sessions_last_activity_idx ON sessions (last_activity)');
-            DB::statement('VACUUM ANALYZE sessions');
+            if ($isPgsql) {
+                DB::statement('VACUUM ANALYZE sessions');
+            }
         }
     }
 

@@ -105,13 +105,7 @@ return new class extends Migration
 
         foreach ($tables as $table) {
             if (Schema::hasTable($table)) {
-                $tableIndexes = DB::select("
-                    SELECT indexname 
-                    FROM pg_indexes 
-                    WHERE tablename = ?
-                ", [$table]);
-                
-                $indexes[$table] = array_column($tableIndexes, 'indexname');
+                $indexes[$table] = array_column(Schema::getIndexes($table), 'name');
             }
         }
 

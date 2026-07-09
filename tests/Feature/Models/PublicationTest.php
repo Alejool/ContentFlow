@@ -22,7 +22,7 @@ class PublicationTest extends TestCase
 
     $workspace = Workspace::create([
       'name' => 'Test Workspace',
-      'owner_id' => $user->id,
+      'created_by' => $user->id,
     ]);
 
     $publication = Publication::create([

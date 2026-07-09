@@ -34,7 +34,7 @@ class WompiGatewayTest extends TestCase
         // Crear usuario y workspace de prueba
         $this->user = User::factory()->create();
         $this->workspace = Workspace::factory()->create([
-            'owner_id' => $this->user->id,
+            'created_by' => $this->user->id,
         ]);
     }
 

@@ -411,22 +411,29 @@ class RoleMigrationService
      */
     private function clearUserPermissionCache(User $user, Workspace $workspace): void
     {
-        // This mirrors the cache clearing logic from RoleService
-        $allPermissionsKey = "permissions:user:{$user->id}:workspace:{$workspace->id}";
-        \Illuminate\Support\Facades\Redis::del($allPermissionsKey);
+        // Cache invalidation is a best-effort side effect: a cache backend outage
+        // must not roll back an otherwise successful role migration. Stale entries
+        // expire on their own, so we log and continue on failure.
+        try {
+            // This mirrors the cache clearing logic from RoleService
+            $allPermissionsKey = "permissions:user:{$user->id}:workspace:{$workspace->id}";
+            \Illuminate\Support\Facades\Redis::del($allPermissionsKey);
 
-        // Clear individual permission caches
-        $permissions = [
-            Permission::VIEW_CONTENT,
-            Permission::CREATE_CONTENT,
-            Permission::MANAGE_CONTENT,
-            Permission::PUBLISH_CONTENT,
-            Permission::MANAGE_WORKSPACE,
-        ];
+            // Clear individual permission caches
+            $permissions = [
+                Permission::VIEW_CONTENT,
+                Permission::CREATE_CONTENT,
+                Permission::MANAGE_CONTENT,
+                Permission::PUBLISH_CONTENT,
+                Permission::MANAGE_WORKSPACE,
+            ];
 
-        foreach ($permissions as $permission) {
-            $key = "permission:user:{$user->id}:workspace:{$workspace->id}:permission:{$permission}";
-            \Illuminate\Support\Facades\Redis::del($key);
+            foreach ($permissions as $permission) {
+                $key = "permission:user:{$user->id}:workspace:{$workspace->id}:permission:{$permission}";
+                \Illuminate\Support\Facades\Redis::del($key);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Failed to clear permission cache for user {$user->id} in workspace {$workspace->id}: " . $e->getMessage());
         }
     }
 }

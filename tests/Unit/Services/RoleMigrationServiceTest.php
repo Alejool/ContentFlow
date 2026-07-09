@@ -46,11 +46,13 @@ class RoleMigrationServiceTest extends TestCase
         ];
 
         foreach ($permissions as $name => $data) {
-            Permission::create([
-                'name' => $name,
-                'slug' => $data['slug'],
-                'description' => "Permission to {$data['display']}",
-            ]);
+            Permission::firstOrCreate(
+                ['name' => $name],
+                [
+                    'slug' => $data['slug'],
+                    'description' => "Permission to {$data['display']}",
+                ],
+            );
         }
 
         // Create predefined roles
@@ -104,17 +106,22 @@ class RoleMigrationServiceTest extends TestCase
         ];
 
         foreach ($roles as $roleData) {
-            $role = Role::create([
-                'name' => $roleData['name'],
-                'display_name' => $roleData['display_name'],
-                'description' => $roleData['description'],
-                'approval_participant' => $roleData['approval_participant'],
-                'is_system_role' => true,
-            ]);
+            // Migrations already seed these roles (with capitalized names), so
+            // upsert by slug and normalize the name to the model constants
+            $role = Role::updateOrCreate(
+                ['slug' => $roleData['name']],
+                [
+                    'name' => $roleData['name'],
+                    'display_name' => $roleData['display_name'],
+                    'description' => $roleData['description'],
+                    'approval_participant' => $roleData['approval_participant'],
+                    'is_system_role' => true,
+                ],
+            );
 
-            // Attach permissions
+            // Sync permissions (idempotent)
             $permissionIds = Permission::whereIn('name', $roleData['permissions'])->pluck('id');
-            $role->permissions()->attach($permissionIds);
+            $role->permissions()->sync($permissionIds);
         }
     }
 
@@ -358,8 +365,10 @@ class RoleMigrationServiceTest extends TestCase
         // Migrate all workspaces
         $report = $this->service->migrateAllWorkspaces();
 
-        // Assert report contains correct data
-        $this->assertEquals(2, $report->totalWorkspaces);
+        // Assert report contains correct data. Note: the UserObserver auto-creates
+        // a personal workspace per user, so totalWorkspaces reflects every workspace
+        // in the DB, not just the two created here. Assert against the real count.
+        $this->assertEquals(Workspace::count(), $report->totalWorkspaces);
         $this->assertEquals(2, $report->totalUsersAffected);
         $this->assertArrayHasKey('legacy_publisher', $report->roleMapping);
         $this->assertArrayHasKey('legacy_editor', $report->roleMapping);

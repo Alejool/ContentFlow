@@ -9,6 +9,10 @@ return new class extends Migration
 {
   public function up(): void
   {
+    if (config('database.default') !== 'pgsql') {
+      return; // check constraints managed via raw SQL only on PostgreSQL
+    }
+
     // For PostgreSQL, we need to alter the enum type
     DB::statement("ALTER TABLE media_files DROP CONSTRAINT IF EXISTS media_files_file_type_check");
     DB::statement("ALTER TABLE media_files ADD CONSTRAINT media_files_file_type_check CHECK (file_type IN ('image', 'video', 'reel'))");
@@ -16,6 +20,10 @@ return new class extends Migration
 
   public function down(): void
   {
+    if (config('database.default') !== 'pgsql') {
+      return;
+    }
+
     // Revert back to original constraint
     DB::statement("ALTER TABLE media_files DROP CONSTRAINT IF EXISTS media_files_file_type_check");
     DB::statement("ALTER TABLE media_files ADD CONSTRAINT media_files_file_type_check CHECK (file_type IN ('image', 'video'))");

@@ -24,7 +24,7 @@ class SocialMediaLimitsValidationTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        $this->workspace = Workspace::factory()->create(['owner_id' => $this->user->id]);
+        $this->workspace = Workspace::factory()->create(['created_by' => $this->user->id]);
         $this->user->update(['current_workspace_id' => $this->workspace->id]);
         
         $this->limitsService = app(SocialMediaLimitsService::class);

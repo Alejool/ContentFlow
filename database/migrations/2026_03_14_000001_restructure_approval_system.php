@@ -159,9 +159,9 @@ return new class extends Migration
                 // Constraint might not exist
             }
             
-            // Add index on publication_id instead
+            // Add index on publication_id instead (driver-agnostic check)
             Schema::table('approval_requests', function (Blueprint $table) {
-                if (!collect(DB::select("SELECT indexname FROM pg_indexes WHERE tablename = 'approval_requests' AND indexname = 'idx_requests_publication'"))->count()) {
+                if (! Schema::hasIndex('approval_requests', 'idx_requests_publication')) {
                     $table->index('publication_id', 'idx_requests_publication');
                 }
             });

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Auth\Role;
 use App\Models\Calendar\BulkOperationHistory;
 use App\Models\Publications\Publication;
 use App\Models\User;
@@ -27,8 +28,7 @@ class CalendarBulkUndoTest extends TestCase
         
         // Assign user to workspace
         $this->user->workspaces()->attach($this->workspace->id, [
-            'role' => 'admin',
-            'permissions' => json_encode(['manage-content' => true]),
+            'role_id' => Role::where('slug', 'admin')->first()->id,
         ]);
         
         $this->user->current_workspace_id = $this->workspace->id;
@@ -159,8 +159,7 @@ class CalendarBulkUndoTest extends TestCase
         // Create user without manage-content permission
         $userWithoutPermission = User::factory()->create();
         $userWithoutPermission->workspaces()->attach($this->workspace->id, [
-            'role' => 'viewer',
-            'permissions' => json_encode(['manage-content' => false]),
+            'role_id' => Role::where('slug', 'viewer')->first()->id,
         ]);
         $userWithoutPermission->current_workspace_id = $this->workspace->id;
         $userWithoutPermission->save();
@@ -201,8 +200,7 @@ class CalendarBulkUndoTest extends TestCase
         // Create another user
         $otherUser = User::factory()->create();
         $otherUser->workspaces()->attach($this->workspace->id, [
-            'role' => 'admin',
-            'permissions' => json_encode(['manage-content' => true]),
+            'role_id' => Role::where('slug', 'admin')->first()->id,
         ]);
         $otherUser->current_workspace_id = $this->workspace->id;
         $otherUser->save();

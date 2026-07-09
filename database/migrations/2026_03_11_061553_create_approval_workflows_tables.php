@@ -23,29 +23,50 @@ return new class extends Migration
             }
         });
         
-        // Make workspace_id unique
-        $uniqueConstraints = DB::select("
-            SELECT constraint_name 
-            FROM information_schema.table_constraints 
-            WHERE table_name = 'approval_workflows' 
-            AND constraint_type = 'UNIQUE'
-            AND constraint_name LIKE '%workspace_id%'
-        ");
-        
-        if (empty($uniqueConstraints)) {
+        // Make workspace_id unique (driver-agnostic check)
+        if (! Schema::hasIndex('approval_workflows', ['workspace_id'])) {
             Schema::table('approval_workflows', function (Blueprint $table) {
                 $table->unique('workspace_id');
             });
         }
 
-        // Rename approval_steps to approval_levels if it exists
+        // On SQLite the in-place transform below is not possible (dropping the
+        // user_id column that participates in a foreign key fails on table rebuild).
+        // Rename first so the publications.current_approval_step_id foreign key is
+        // repointed to approval_levels (SQLite >= 3.25 updates references on rename),
+        // then rebuild the table under the same name with foreign keys disabled so
+        // that repointed reference stays valid. Safe: non-pgsql runs start fresh.
+        if (config('database.default') !== 'pgsql' && Schema::hasTable('approval_steps')) {
+            Schema::rename('approval_steps', 'approval_levels');
+
+            Schema::disableForeignKeyConstraints();
+            Schema::drop('approval_levels');
+            Schema::create('approval_levels', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('approval_workflow_id')->constrained('approval_workflows')->cascadeOnDelete();
+                $table->foreignId('role_id')->nullable()->constrained()->nullOnDelete();
+                $table->integer('level_number');
+                $table->string('level_name', 100);
+                $table->timestamps();
+
+                $table->unique(['approval_workflow_id', 'level_number']);
+                $table->unique(['approval_workflow_id', 'role_id']);
+                $table->index('approval_workflow_id', 'idx_approval_levels_workflow');
+            });
+            Schema::enableForeignKeyConstraints();
+        }
+
+        // Rename approval_steps to approval_levels if it exists (PostgreSQL path)
         if (Schema::hasTable('approval_steps')) {
             Schema::rename('approval_steps', 'approval_levels');
             
             // Update structure - drop user_id if it exists
             if (Schema::hasColumn('approval_levels', 'user_id')) {
-                // Drop foreign key using raw SQL to avoid transaction issues
-                DB::statement('ALTER TABLE approval_levels DROP CONSTRAINT IF EXISTS approval_levels_user_id_foreign');
+                // Drop foreign key using raw SQL to avoid transaction issues (PostgreSQL only;
+                // SQLite rebuilds the table on dropColumn so no explicit FK drop is needed)
+                if (config('database.default') === 'pgsql') {
+                    DB::statement('ALTER TABLE approval_levels DROP CONSTRAINT IF EXISTS approval_levels_user_id_foreign');
+                }
                 
                 Schema::table('approval_levels', function (Blueprint $table) {
                     $table->dropColumn('user_id');
@@ -139,15 +160,7 @@ return new class extends Migration
 
         // Revert approval_workflows changes
         Schema::table('approval_workflows', function (Blueprint $table) {
-            $uniqueConstraints = DB::select("
-                SELECT constraint_name 
-                FROM information_schema.table_constraints 
-                WHERE table_name = 'approval_workflows' 
-                AND constraint_type = 'UNIQUE'
-                AND constraint_name LIKE '%workspace_id%'
-            ");
-            
-            if (!empty($uniqueConstraints)) {
+            if (Schema::hasIndex('approval_workflows', ['workspace_id'])) {
                 $table->dropUnique(['workspace_id']);
             }
             

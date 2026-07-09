@@ -83,15 +83,15 @@ return new class extends Migration
                 }
                 
                 // Update action_type enum if needed
-                if (Schema::hasColumn('approval_actions', 'action_type')) {
+                if (Schema::hasColumn('approval_actions', 'action_type') && config('database.default') === 'pgsql') {
                     // PostgreSQL: Need to use raw SQL to modify enum
                     DB::statement("
-                        ALTER TABLE approval_actions 
+                        ALTER TABLE approval_actions
                         DROP CONSTRAINT IF EXISTS approval_actions_action_type_check
                     ");
                     DB::statement("
-                        ALTER TABLE approval_actions 
-                        ADD CONSTRAINT approval_actions_action_type_check 
+                        ALTER TABLE approval_actions
+                        ADD CONSTRAINT approval_actions_action_type_check
                         CHECK (action_type IN ('submitted', 'approved', 'rejected', 'cancelled', 'reassigned', 'timeout', 'auto_advanced', 'manual_resolution'))
                     ");
                 }

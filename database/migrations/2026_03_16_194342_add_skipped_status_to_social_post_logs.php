@@ -18,8 +18,10 @@ return new class extends Migration
         });
         
         // Update the check constraint to include 'skipped' status
-        DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
-        DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted', 'skipped'))");
+        if (config('database.default') === 'pgsql') {
+            DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
+            DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted', 'skipped'))");
+        }
     }
 
     /**
@@ -31,7 +33,9 @@ return new class extends Migration
             // Revert to original constraint without 'skipped'
         });
         
-        DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
-        DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted'))");
+        if (config('database.default') === 'pgsql') {
+            DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
+            DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted'))");
+        }
     }
 };

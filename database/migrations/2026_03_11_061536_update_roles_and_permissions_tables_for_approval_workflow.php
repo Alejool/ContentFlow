@@ -29,16 +29,8 @@ return new class extends Migration
             Schema::rename('permission_role', 'role_permission');
         }
         
-        // Check if unique constraint exists before adding
-        $hasUniqueConstraint = DB::select("
-            SELECT constraint_name 
-            FROM information_schema.table_constraints 
-            WHERE table_name = 'role_permission' 
-            AND constraint_type = 'UNIQUE'
-            AND constraint_name LIKE '%role_id%permission_id%'
-        ");
-        
-        if (empty($hasUniqueConstraint)) {
+        // Check if unique constraint exists before adding (driver-agnostic)
+        if (! Schema::hasIndex('role_permission', ['role_id', 'permission_id'])) {
             Schema::table('role_permission', function (Blueprint $table) {
                 $table->unique(['role_id', 'permission_id']);
             });
@@ -61,19 +53,12 @@ return new class extends Migration
             // Keep created_at and updated_at - they are useful for auditing
         });
         
-        // Add indexes if they don't exist
-        $indexes = DB::select("
-            SELECT indexname 
-            FROM pg_indexes 
-            WHERE tablename = 'role_user'
-        ");
-        $indexNames = array_column($indexes, 'indexname');
-        
-        Schema::table('role_user', function (Blueprint $table) use ($indexNames) {
-            if (!in_array('idx_role_user_workspace', $indexNames)) {
+        // Add indexes if they don't exist (driver-agnostic)
+        Schema::table('role_user', function (Blueprint $table) {
+            if (! Schema::hasIndex('role_user', 'idx_role_user_workspace')) {
                 $table->index('workspace_id', 'idx_role_user_workspace');
             }
-            if (!in_array('idx_role_user_user', $indexNames)) {
+            if (! Schema::hasIndex('role_user', 'idx_role_user_user')) {
                 $table->index('user_id', 'idx_role_user_user');
             }
         });

@@ -14,7 +14,9 @@ return new class extends Migration
     {
         // Drop the check constraint if it exists (names varies but usually publications_status_check)
         // In PostgreSQL, Laravel's enum creates a check constraint.
-        DB::statement('ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check');
+        if (config('database.default') === 'pgsql') {
+            DB::statement('ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check');
+        }
         
         Schema::table('publications', function (Blueprint $table) {
             $table->string('status')->default('draft')->change();

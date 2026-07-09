@@ -11,8 +11,10 @@ return new class extends Migration
     public function up(): void
     {
         // Update the check constraint to include 'orphaned' status
-        DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
-        DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted', 'skipped', 'orphaned'))");
+        if (config('database.default') === 'pgsql') {
+            DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
+            DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted', 'skipped', 'orphaned'))");
+        }
     }
 
     /**
@@ -21,7 +23,9 @@ return new class extends Migration
     public function down(): void
     {
         // Revert to constraint without 'orphaned'
-        DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
-        DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted', 'skipped'))");
+        if (config('database.default') === 'pgsql') {
+            DB::statement("ALTER TABLE social_post_logs DROP CONSTRAINT IF EXISTS social_post_logs_status_check");
+            DB::statement("ALTER TABLE social_post_logs ADD CONSTRAINT social_post_logs_status_check CHECK (status IN ('pending', 'publishing', 'published', 'failed', 'removed_on_platform', 'deleted', 'skipped'))");
+        }
     }
 };

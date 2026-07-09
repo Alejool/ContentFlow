@@ -28,7 +28,7 @@ class ApprovalWorkflowCachingTest extends TestCase
         
         // Create test user and workspace
         $this->user = User::factory()->create();
-        $this->workspace = Workspace::factory()->create(['owner_id' => $this->user->id]);
+        $this->workspace = Workspace::factory()->create(['created_by' => $this->user->id]);
         
         // Seed roles if not exists
         $this->seedRoles();

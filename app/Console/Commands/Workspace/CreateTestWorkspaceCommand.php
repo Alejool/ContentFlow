@@ -29,7 +29,6 @@ class CreateTestWorkspaceCommand extends Command
         $workspace = Workspace::firstOrCreate(
             ['name' => $name],
             [
-                'creator_id' => $user->id,
                 'created_by' => $user->id,
                 'slug' => str($name)->slug(),
                 'description' => 'Test workspace for idempotency testing',

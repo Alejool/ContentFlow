@@ -5,7 +5,7 @@ namespace Tests\Feature\Console;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
-use App\Models\Workspace\Subscription as WorkspaceSubscription;
+use App\Models\Subscription\Subscription as WorkspaceSubscription;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;

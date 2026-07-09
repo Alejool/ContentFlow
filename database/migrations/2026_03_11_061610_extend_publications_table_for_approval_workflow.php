@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // SQLite does not cascade-drop dependent indexes like PostgreSQL,
+        // so any index on status must be removed before dropping the column
+        if (Schema::hasIndex('publications', 'idx_status')) {
+            Schema::table('publications', function (Blueprint $table) {
+                $table->dropIndex('idx_status');
+            });
+        }
+
         Schema::table('publications', function (Blueprint $table) {
             // Modify existing status column to include new values
             $table->dropColumn('status');

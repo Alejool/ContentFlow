@@ -25,6 +25,17 @@ class UserFactory extends Factory
             'password' => fake()->password(),
             'provider' => fake()->word(),
             'provider_id' => fake()->word(),
+            'email_verified_at' => now(),
         ];
+    }
+
+    /**
+     * Indicate that the user's email address is unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
     }
 }
