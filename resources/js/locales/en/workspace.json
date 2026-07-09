@@ -4,30 +4,21 @@
     "create_new": "Create New Workspace",
     "manage_workspaces": "Manage Workspaces",
     "create_new_workspace": "Create a New Workspace",
-    "workspaces_one": "Workspace",
-    "workspaces_other": "Workspaces",
     "workspaces": "Workspaces",
     "select_workspace": "Select Workspace",
     "settings": "Workspace Settings",
     "public_workspace": "Public Workspace",
     "private_workspace": "Private Workspace",
     "active": "Active",
-    "switch": "Switch",
     "switched_successfully": "Switched successfully",
     "active_context": "Active Workspace",
-    "role": "Role",
-    "settings_description": "Manage your workspace members and configurations.",
     "no_description": "No description provided.",
     "member": "Member",
     "workspace_members": "Workspace Members",
-    "members": "Members",
     "members_one": "member",
     "members_other": "members",
-    "team_members": "Team Members",
     "invite_member": "Invite Member",
     "invite": "Invite",
-    "role_permissions": "Role & Permissions",
-    "permissions_preview": "Full Access",
     "name": "Workspace Name",
     "name_placeholder": "e.g. My Agency",
     "description": "Description",
@@ -42,21 +33,10 @@
     "delete_confirmation_message": "Are you sure you want to delete this workspace? All data including content, campaigns, and team members will be permanently removed. This action cannot be undone.",
     "confirm_delete": "Yes, delete workspace",
     "general_settings": "General Settings",
-    "manage_workspace": "Manage {{name}} workspace",
     "owners": "Owners",
-    "admins": "Admins",
-    "editors": "Editors",
-    "creator": "Creator",
-    "total_in_workspace": "Total in workspace",
-    "viewers": "Viewers",
     "loading": "Loading members...",
-    "you": "You",
     "remove_member": "Remove Member",
     "remove_confirm": "Are you sure you want to remove this member from the workspace?",
-    "remove_success": "Member removed successfully",
-    "remove_error": "Error removing member",
-    "owner_required": "At least one owner is required",
-    "owner_note": "Note: Integration settings can only be fully managed by workspace owners.",
     "invite_modal": {
       "title": "Invite Member",
       "subtitle": "Add a member to {{name}}",
@@ -79,14 +59,6 @@
     },
     "integrations": {
       "title": "Integrations",
-      "webhooks_title": "Webhook Integrations",
-      "webhooks_description": "Configure Slack or Discord webhooks to receive real-time notifications about publishing failures, approval requests, and more.",
-      "slack_webhook": "Slack Webhook URL",
-      "discord_webhook": "Discord Webhook URL",
-      "test_slack": "Test Slack",
-      "test_discord": "Test Discord",
-      "save_integrations": "Save Integration Settings",
-      "owner_note": "Note: Integration settings can only be fully managed by workspace owners.",
       "messages": {
         "success": "Integrations updated successfully",
         "test_success": "Connection tested successfully",
@@ -99,7 +71,6 @@
       "discord_description": "Send updates to your Discord server",
       "webhook_url": "Webhook URL",
       "slack_placeholder": "https://hooks.slack.com/services/...",
-      "discord_placeholder": "https://discord.com/api/webhooks/...",
       "test_connection": "Test Connection",
       "webhook_security": "Webhook Security",
       "webhook_security_description": "Configure security settings for incoming webhooks",
@@ -111,7 +82,6 @@
       "owner_exclusive_description": "Only workspace owners can manage integrations."
     },
     "activity": {
-      "title": "Notification Activity",
       "time": "Time",
       "channel": "Channel",
       "event": "Event",
@@ -131,15 +101,12 @@
       "usage": "Usage",
       "roles": "Roles",
       "integrations": "Integrations",
-      "notifications": "Notifications",
       "white_label": "White-label",
-      "api": "API Access",
-      "support": "Enterprise Support"
+      "api": "API Access"
     },
     "roles_management": {
       "title": "Roles & Permissions",
       "description": "Summary of available roles and their associated permissions in Intellipost.",
-      "no_permissions": "No permissions assigned.",
       "create_role": "Create New Role",
       "create_role_subtitle": "Define a new role and its permissions for the workspace.",
       "role_name": "Role Name",
@@ -147,50 +114,15 @@
       "role_description": "Description",
       "role_description_placeholder": "Describe the responsibilities of this role...",
       "key_permissions_label": "Key Permissions",
-      "can_approve_content": "Can approve content in workflows",
       "role_created_success": "Role created successfully",
-      "role_created_error": "Error creating role",
-      "name_required": "Name is required",
-      "loading_permissions": "Loading permissions..."
-    },
-    "permissions": {
-      "publish": {
-        "name": "Publish",
-        "description": "Allow publishing content to social media"
-      },
-      "approve": {
-        "name": "Approve",
-        "description": "Allow approving content for publication"
-      },
-      "view-analytics": {
-        "name": "View Analytics",
-        "description": "Allow viewing workspace analytics"
-      },
-      "manage-accounts": {
-        "name": "Manage Accounts",
-        "description": "Allow adding/removing social accounts"
-      },
-      "manage-team": {
-        "name": "Manage Team",
-        "description": "Allow inviting/removing members"
-      },
-      "manage-content": {
-        "name": "Manage Content",
-        "description": "Allow creating and editing publications"
-      },
-      "manage-campaigns": {
-        "name": "Manage Campaigns",
-        "description": "Allow creating and editing campaigns"
-      },
-      "view-content": {
-        "name": "View Content",
-        "description": "Allow viewing workspace content (read-only)"
-      }
+      "role_created_error": "Error creating role"
     },
     "messages": {
       "update_success": "Workspace created successfully",
       "delete_success": "Workspace deleted successfully",
-      "delete_error": "Failed to delete workspace"
+      "delete_error": "Failed to delete workspace",
+      "member_removed": "Member removed successfully",
+      "member_remove_error": "Failed to remove the member"
     },
     "subtitle": "Manage and switch between your workspaces",
     "create_button_subtitle": "Get Started",
@@ -209,22 +141,14 @@
     },
     "tooltips": {
       "public": "Public Workspace",
-      "private": "Private Workspace",
-      "manage": "Manage Workspace",
-      "view": "View Details"
+      "private": "Private Workspace"
     },
     "modal": {
       "subtitle": "Set up a new space for your team to collaborate",
-      "name_label": "Workspace Name",
-      "description_hint": "A good description helps members understand the purpose of the space",
       "footer_note": "You can customize settings and invite members after creating the workspace"
     },
-    "settings_title": "Workspace Settings",
-    "manage_general_settings": "Configure your workspace's basic information and visibility",
     "configure_basic_info": "Configure your workspace's basic information and visibility",
     "visibility": "Workspace Visibility",
-    "public": "Public Workspace",
-    "private": "Private Workspace",
     "public_description": "Visible to anyone with the link",
     "private_description": "Only invited members can access",
     "public_invites": "Public Invites",
@@ -232,32 +156,20 @@
     "workspace_id": "Workspace ID",
     "id_copied": "Workspace ID copied!",
     "id_description": "Use this ID for API integrations and support requests",
-    "save_changes": "Save Changes",
-    "saving": "Saving Changes...",
     "active_integrations": "Active Integrations",
     "total_notifications": "Total Notifications",
-    "webhook_security": "Webhook Security",
-    "webhook_security_description": "Configure security settings for incoming webhooks",
-    "webhook_secret": "Webhook Secret",
     "secret_generated": "New secret generated!",
-    "secret_description": "This secret will be used to verify incoming webhook requests",
     "activity_log": "Notification Activity Log",
     "recent_webhook_activity": "Recent webhook delivery attempts",
-    "showing_activities": "Showing {{count}} recent activities",
     "failed_to_fetch_activity": "Failed to load activity log",
     "no_activity": "No activity yet",
     "activity_will_appear": "Notifications will appear here once sent",
     "your_role": "Your Role",
-    "key_permissions": "Key Permissions",
-    "more": "more",
     "permissions_required": "Permissions Required",
     "owner_admin_required": "You need owner or admin permissions to modify role settings",
-    "workspace_updated_by": "Workspace updated by {{name}}",
     "stats": {
       "total_members": "Total Members",
-      "projects": "Projects",
-      "active_integrations": "Active Integrations",
-      "workspace_age": "Workspace Age"
+      "active_integrations": "Active Integrations"
     },
     "quick_actions": {
       "title": "Quick Actions",
@@ -270,12 +182,6 @@
       "integrations": "Integrations",
       "integrations_description": "Connect apps & services"
     },
-    "show_advanced": "Show Advanced",
-    "hide_advanced": "Hide Advanced",
-    "generate": "Generate",
-    "refresh": "Refresh",
-    "recent_activity": "Recent Activity",
-    "workspace_age": "Workspace Age",
     "timezone": {
       "title": "Workspace Timezone",
       "description": "All dates and times in this workspace will be displayed in this timezone. This affects scheduled posts, analytics, and calendar events.",
@@ -315,8 +221,6 @@
       "color_help": "This color will be used for buttons, links, and reports.",
       "update_success": "Branding updated successfully",
       "update_error": "Failed to update branding",
-      "enterprise_exclusive": "Enterprise-exclusive Feature",
-      "enterprise_description": "These branding settings are applied workspace-wide and will be visible to all members and in generated reports.",
       "live_preview": "Live Preview",
       "buttons_actions": "BUTTONS & ACTIONS",
       "primary_button": "Primary Button",
@@ -419,6 +323,10 @@
         "description": "Need to connect Intellipost with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.",
         "action": "Request Integration"
       }
+    },
+    "roles": {
+      "owners": "Owners",
+      "admins": "Admins"
     }
   }
 }

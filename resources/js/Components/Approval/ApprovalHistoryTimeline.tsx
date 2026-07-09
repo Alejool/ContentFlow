@@ -60,7 +60,7 @@ export default function ApprovalHistoryTimeline({
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-theme-bg-secondary">
         <Clock className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-        <p className="text-gray-500 dark:text-neutral-400">{t('approval.no_history')}</p>
+        <p className="text-gray-500 dark:text-neutral-400">{t('approvalWorkflow.no_history')}</p>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function ApprovalHistoryTimeline({
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
       <h4 className="mb-6 font-bold text-gray-900 dark:text-white">
-        {t('approval.history_title')}
+        {t('approvalWorkflow.history_title')}
       </h4>
 
       <div className="space-y-6">
@@ -82,9 +82,9 @@ export default function ApprovalHistoryTimeline({
 
           const label =
             {
-              submitted: t('approval.action.submitted'),
-              approved: t('approval.action.approved'),
-              rejected: t('approval.action.rejected'),
+              submitted: t('approvalWorkflow.action.submitted'),
+              approved: t('approvalWorkflow.action.approved'),
+              rejected: t('approvalWorkflow.action.rejected'),
             }[entry.action_type] ?? entry.action_type;
 
           return (
@@ -110,7 +110,7 @@ export default function ApprovalHistoryTimeline({
                         </span>
                         {entry.approval_level && (
                           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-theme-bg-secondary dark:text-neutral-400">
-                            {t('approval.level')} {entry.approval_level}
+                            {t('approvalWorkflow.level')} {entry.approval_level}
                           </span>
                         )}
                       </div>

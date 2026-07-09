@@ -4,14 +4,7 @@
     "subtitle": "Activity Logs",
     "refresh": "Refresh",
     "viewPost": "View Post",
-    "filter": "Filter",
     "filters": {
-      "campaign": "Filter by Campaign",
-      "dateRange": "Date Range",
-      "allCampaigns": "All Campaigns",
-      "from": "From",
-      "to": "To",
-      "apply": "Apply Filters",
       "clear": "Clear"
     },
     "table": {
@@ -21,13 +14,11 @@
       "campaign": "Campaign",
       "status": "Status",
       "description": "Description",
-      "message": "Message",
-      "error": "Error",
-      "video": "Video",
       "link": "Link",
-      "copy": "Copy",
       "less": "Less",
-      "more": "More"
+      "more": "More",
+      "clickMore": "Show more",
+      "clickLess": "Show less"
     },
     "status": {
       "all": "All",
@@ -41,13 +32,6 @@
       "publishing": "Publishing"
     },
     "empty": "No logs found",
-    "noLogsDesc": "There are no activity logs matching your current filters or in this workspace.",
-    "loading": "Loading logs...",
-    "pagination": {
-      "previous": "Previous",
-      "next": "Next",
-      "page": "Page",
-      "of": "of"
-    }
+    "noLogsDesc": "There are no activity logs matching your current filters or in this workspace."
   }
 }

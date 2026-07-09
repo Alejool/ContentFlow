@@ -1,0 +1,115 @@
+{
+  "approvalWorkflow": {
+    "configuration": {
+      "title": "Flujo de aprobación",
+      "subtitle": "Configura cómo se revisa y aprueba el contenido"
+    },
+    "enable_workflow": "Activar flujo de aprobación",
+    "enable_workflow_description": "Exige que el contenido se apruebe antes de publicar",
+    "multi_level_workflow": "Flujo multinivel",
+    "multi_level_description": "Exige aprobaciones de varios roles en secuencia",
+    "approval_levels": "Niveles de aprobación",
+    "add_level": "Añadir nivel",
+    "level_name": "Nombre del nivel",
+    "no_levels_configured": "No hay niveles configurados",
+    "click_add_level": "Haz clic en \"Añadir nivel\" para empezar",
+    "simple_workflow_info": "El contenido requerirá una única aprobación antes de poder publicarse.",
+    "insufficient_permissions": "No tienes permiso para gestionar este flujo",
+    "level_1": "Nivel 1",
+    "level_n": "Nivel {{n}}",
+    "level": "Nivel",
+    "current_status": "Estado actual",
+    "progress": "Progreso",
+    "submit_for_approval": "Enviar a aprobación",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "approve_content": "Aprobar contenido",
+    "reject_content": "Rechazar contenido",
+    "comment_optional": "Comentario (opcional)",
+    "add_comment": "Añade un comentario...",
+    "rejection_reason": "Motivo del rechazo",
+    "explain_rejection": "Explica por qué se rechaza este contenido...",
+    "pending_review_by_role": "Pendiente de revisión por {{role}}",
+    "pending_review_by_any_admin": "Pendiente de revisión por cualquier administrador",
+    "history_title": "Historial de aprobación",
+    "no_history": "Aún no hay historial de aprobación",
+    "action": {
+      "submitted": "Enviado",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "status": {
+      "draft": "Borrador",
+      "pending_review": "En revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "published": "Publicado"
+    },
+    "success": {
+      "submitted": "Enviado a revisión correctamente",
+      "approved": "Contenido aprobado correctamente",
+      "rejected": "Contenido rechazado",
+      "disabled": "Flujo de aprobación desactivado",
+      "enabled": "Flujo de aprobación activado",
+      "configured": "Flujo guardado correctamente"
+    },
+    "warnings": {
+      "pending_content": "Hay contenido pendiente de revisión. Algunas opciones están bloqueadas hasta resolverlo."
+    },
+    "errors": {
+      "insufficient_permissions": "No tienes permiso para realizar esta acción",
+      "toggle_failed": "No se pudo cambiar el estado del flujo",
+      "pending_content_warning": "No puedes cambiar la configuración mientras haya contenido pendiente de revisión",
+      "multi_level_requires_enterprise": "Los flujos multinivel requieren un plan Enterprise",
+      "multi_level_requires_levels": "Agrega al menos un nivel para el flujo multinivel",
+      "duplicate_roles": "No puedes asignar el mismo rol a varios niveles",
+      "invalid_role_selection": "Selecciona un rol válido para cada nivel",
+      "duplicate_role_selected": "Rol duplicado",
+      "save_failed": "No se pudo guardar la configuración",
+      "approve_failed": "No se pudo aprobar el contenido",
+      "rejection_reason_required": "Indica un motivo para el rechazo",
+      "reject_failed": "No se pudo rechazar el contenido",
+      "submit_failed": "No se pudo enviar a revisión"
+    },
+    "analytics": {
+      "title": "Analíticas de aprobación",
+      "subtitle": "Métricas de rendimiento e información de tu flujo de aprobación",
+      "export_csv": "Exportar CSV",
+      "export_json": "Exportar JSON",
+      "avg_publication_time": "Tiempo medio de publicación",
+      "from_submission_to_publish": "Desde el envío hasta la publicación",
+      "total_pending": "Total pendiente",
+      "across_all_levels": "En todos los niveles",
+      "stale_content": "Contenido estancado",
+      "pending_over_7_days": "Pendiente por más de 7 días",
+      "avg_time_per_level": "Tiempo medio de aprobación por nivel",
+      "minutes": "Minutos",
+      "no_data_available": "No hay datos disponibles",
+      "approval_rejection_rates": "Tasas de aprobación / rechazo por rol",
+      "approvals": "Aprobaciones",
+      "rejections": "Rechazos",
+      "pending_by_level": "Contenido pendiente por nivel",
+      "pending_count": "Pendiente",
+      "approval_rate_distribution": "Distribución de la tasa de aprobación",
+      "approver_workload": "Carga de trabajo de los aprobadores",
+      "pending_tasks": "Tareas pendientes",
+      "stale_content_details": "Detalle del contenido estancado",
+      "content_title": "Título",
+      "submitted_at": "Enviado el",
+      "days_pending": "Días pendiente",
+      "current_level": "Nivel actual",
+      "days": "días",
+      "detailed_stats": "Estadísticas detalladas",
+      "role": "Rol",
+      "total_actions": "Acciones totales",
+      "approval_rate": "Tasa de aprobación",
+      "level": "Nivel",
+      "success": {
+        "exported": "Analíticas exportadas correctamente"
+      },
+      "errors": {
+        "export_failed": "No se pudieron exportar las analíticas"
+      }
+    }
+  }
+}

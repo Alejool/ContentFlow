@@ -2,7 +2,6 @@
   "analytics": {
     "title": "Analíticas",
     "subtitle": "Visualiza el rendimiento de tus campañas y publicaciones",
-    "days": "días",
     "vistas": "Vistas",
     "clics": "Clics",
     "engagement": "Engagement",
@@ -47,15 +46,13 @@
       "title": "Detalle de Rendimiento"
     },
     "emptyState": {
-      "title": "No hay datos disponibles",
-      "description": "Comienza a crear campañas y conecta tus cuentas de redes sociales para ver tus analíticas aquí."
+      "title": "No hay datos disponibles"
     },
     "advanced": {
       "locked_title": "Analytics Avanzados",
       "locked_description": "Obtén análisis detallado por plataforma, rendimiento de publicaciones y reportes exportables con los planes Professional y Enterprise.",
       "upgrade_cta": "Actualizar Plan",
-      "daily_metrics": "Métricas diarias actualizadas por cron jobs",
-      "platform_breakdown": "Desglose por plataforma y evolución diaria"
+      "daily_metrics": "Métricas diarias actualizadas por cron jobs"
     },
     "tabs": {
       "general": "General",
@@ -82,6 +79,7 @@
       "subtitle": "Momentos de mayor actividad de tu audiencia",
       "emptyTitle": "Recopilando tendencias",
       "emptyDesc": "Continúa publicando para que el sistema encuentre el momento óptimo para tu audiencia."
-    }
+    },
+    "lastSynced": "Última actualización"
   }
 }

@@ -1,27 +1,5 @@
 {
   "calendar": {
-    "weekdays": {
-      "sun": "Dom",
-      "mon": "Lun",
-      "tue": "Mar",
-      "wed": "Mié",
-      "thu": "Jue",
-      "fri": "Vie",
-      "sat": "Sáb"
-    },
-    "views": {
-      "month": "Mes",
-      "week": "Semana",
-      "day": "Día"
-    },
-    "actions": {
-      "today": "Hoy",
-      "export": "Exportar",
-      "selectAll": "Seleccionar todos",
-      "clearSelection": "Limpiar selección",
-      "moveEvents": "Mover eventos",
-      "bulkMove": "Mover seleccionados"
-    },
     "navigation": {
       "previous": "Anterior",
       "next": "Siguiente",
@@ -35,35 +13,14 @@
       "status": "Estado",
       "campaign": "Campaña"
     },
-    "export": {
-      "title": "Exportar calendario",
-      "google": "Google Calendar",
-      "outlook": "Outlook Calendar",
-      "description": "El archivo .ics se puede importar en cualquier aplicación de calendario compatible",
-      "success": "Calendario exportado exitosamente",
-      "error": "Error al exportar el calendario",
-      "eventsCount": "eventos"
-    },
     "bulkActions": {
-      "selected": "seleccionado",
-      "selectedPlural": "seleccionados",
-      "event": "evento",
-      "eventPlural": "eventos",
-      "of": "de",
-      "total": "total",
-      "moveTitle": "Mover eventos seleccionados",
-      "moveDescription": "Selecciona la nueva fecha y hora para mover los {count} eventos seleccionados.",
       "moveSuccess": "Eventos movidos exitosamente",
       "moveError": "Error al mover los eventos",
       "undoSuccess": "Operación deshecha exitosamente",
-      "undoError": "Error al deshacer la operación",
-      "cancel": "Cancelar",
-      "move": "Mover"
+      "undoError": "Error al deshacer la operación"
     },
     "event": "evento",
     "selected": "seleccionados",
-    "of": "de",
-    "total": "total",
     "allSelected": "Todos seleccionados",
     "select": "Seleccionar",
     "selectAll": "Seleccionar todos",
@@ -74,33 +31,24 @@
     "selectAllDescription": "Todos los eventos visibles en el calendario",
     "clearSelection": "Limpiar selección",
     "moveEvents": "Mover eventos",
-    "delete": "Eliminar",
     "undo": "Deshacer",
     "undoLastOperation": "Deshacer última operación",
     "moveSelectedEvents": "Mover eventos seleccionados",
     "movingEvents": "Moviendo {{count}} eventos",
-    "movingEvents_one": "Moviendo 1 evento",
     "selectNewDateTime": "Selecciona la nueva fecha y hora para los eventos seleccionados.",
     "newDateAndTime": "Nueva fecha y hora",
     "preserveOriginalTime": "Los eventos mantendrán su hora original",
     "moveCount": "Mover {{count}} eventos",
-    "moveCount_one": "Mover 1 evento",
     "deleteSelectedEvents": "Eliminar eventos seleccionados",
     "confirmDelete": "Confirmar eliminación",
     "deleteWarning": "¿Estás seguro de que deseas eliminar {{count}} eventos? Esta acción no se puede deshacer.",
     "deleteCount": "Eliminar {{count}} eventos",
-    "deleteCount_one": "Eliminar 1 evento",
     "events": {
       "count": "eventos",
-      "empty": "No hay eventos para este día",
-      "noScheduled": "Sin eventos programados"
+      "empty": "No hay eventos para este día"
     },
     "userEvents": {
       "modal": {
-        "title": {
-          "edit": "Editar Evento",
-          "new": "Nuevo Evento Personal"
-        },
         "fields": {
           "title": "Título",
           "description": "Descripción",
@@ -131,11 +79,6 @@
           "errorDelete": "Error al eliminar el evento",
           "validationError": "Por favor, corrige los errores en el formulario"
         },
-        "validation": {
-          "titleRequired": "El título es obligatorio",
-          "startDateRequired": "La fecha de inicio es obligatoria",
-          "pastDate": "No se pueden crear eventos en el pasado"
-        },
         "visibility": {
           "public": "Público",
           "private": "Privado",
@@ -157,9 +100,6 @@
       "connect": "Conectar",
       "connecting": "Conectando...",
       "disconnect": "Desconectar",
-      "syncNow": "Sincronizar Ahora",
-      "configure": "Configurar",
-      "lastSync": "Última sincronización",
       "disconnectConfirm": {
         "title": "¿Desconectar calendario?",
         "message": "¿Estás seguro de que deseas desconectar este calendario? Los eventos sincronizados se eliminarán del calendario externo.",
@@ -171,18 +111,7 @@
       "disconnectError": "Error al desconectar el calendario",
       "syncSuccess": "Sincronización completada exitosamente",
       "syncError": "Error al sincronizar el calendario",
-      "fetchError": "Error al obtener el estado de conexión",
       "connectionSuccess": "Calendario {{provider}} conectado exitosamente",
-      "syncSettings": "Configuración de Sincronización",
-      "enableSync": "Habilitar sincronización automática",
-      "syncCampaigns": "Sincronizar solo estas campañas (dejar vacío para todas)",
-      "syncPlatforms": "Sincronizar solo estas plataformas (dejar vacío para todas)",
-      "syncSettingsSaved": "Configuración guardada exitosamente",
-      "syncSettingsError": "Error al guardar la configuración",
-      "save": "Guardar",
-      "cancel": "Cancelar",
-      "retrySuccess": "Sincronización reintentada exitosamente",
-      "retryError": "Error al reintentar la sincronización",
       "errors": {
         "invalidState": "Estado de autenticación inválido",
         "expiredState": "La sesión de autenticación ha expirado",
@@ -194,7 +123,6 @@
     },
     "error": {
       "title": "Algo salió mal",
-      "description": "Ocurrió un error al renderizar el calendario. Intenta de nuevo.",
       "retry": "Intentar de nuevo",
       "retry_button": "Reintentar",
       "persist": "Si el problema persiste contacta con soporte."
@@ -202,9 +130,7 @@
     "validation": {
       "invalid_date": "Fecha Inválida",
       "past_date_error": "No se Puede Programar en el Pasado",
-      "past_date_message": "No puedes programar eventos para fechas pasadas. Selecciona una fecha y hora futura.",
-      "date_required": "La fecha es obligatoria",
-      "invalid_format": "Formato de fecha inválido. Usa una fecha válida."
+      "past_date_message": "No puedes programar eventos para fechas pasadas. Selecciona una fecha y hora futura."
     },
     "warnings": {
       "pastDate": "¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?"
@@ -217,9 +143,6 @@
     "sync": {
       "error": {
         "title": "Error de Sincronización",
-        "failed": "Error al sincronizar con {provider}",
-        "token_expired": "Tu conexión con {provider} ha expirado. Reconecta.",
-        "unavailable": "{provider} no está disponible actualmente. Intenta más tarde.",
         "unknown": "Ocurrió un error de sincronización desconocido",
         "dismiss": "Descartar error",
         "retry": "Reintentar sincronización",
@@ -231,7 +154,6 @@
     },
     "conflict": {
       "title": "Conflicto de Datos Detectado",
-      "description": "Este evento ha sido modificado por otro usuario. Elige qué versión mantener.",
       "event": "Evento",
       "field_label": "Campo en conflicto",
       "your_version": "Tu Versión",
@@ -240,7 +162,6 @@
       "server": "Servidor",
       "select_local": "Seleccionar tu versión",
       "select_server": "Seleccionar versión del servidor",
-      "info": "La versión que elijas será guardada. La otra versión será descartada.",
       "cancel": "Cancelar",
       "resolve": "Aplicar Versión Seleccionada",
       "field": {
@@ -251,6 +172,12 @@
         "platform": "Plataforma",
         "campaign": "Campaña"
       }
-    }
+    },
+    "clear_all": "Limpiar todo",
+    "filter_by_campaign": "Campaña",
+    "filter_by_platform": "Plataforma",
+    "filter_by_status": "Estado",
+    "showing_filtered": "Mostrando {{count}} de {{total}} eventos",
+    "move": "Mover"
   }
 }

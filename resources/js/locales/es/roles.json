@@ -6,26 +6,13 @@
     "permissions": "Permisos",
     "protected": "Protegido",
     "role_color": "Color del rol",
-    "color_hint": "Se usa en toda la interfaz para identificar este rol",
     "select_all": "Todos",
     "deselect_all": "Ninguno",
     "search_permissions": "Buscar permisos…",
     "no_permissions_found": "Ningún permiso coincide con la búsqueda",
-    "groups": {
-      "content":    "Contenido",
-      "publishing": "Publicación y Aprobación",
-      "team":       "Gestión de Equipo",
-      "workspace":  "Workspace",
-      "analytics":  "Analíticas",
-      "campaigns":  "Campañas",
-      "other":      "Otros"
-    },
-    "editor_publish_info": "Al publicar, el contenido se enviará a revisión si no eres Admin. En workspaces con flujo multinivel, debe pasar por todas las etapas de aprobación configuradas.",
-    "admin_publish_info": "Puede publicar directamente sin revisión y aprobar contenido de otros usuarios.",
-    "owner_info": "Control total del workspace. Este rol no puede ser editado ni eliminado.",
     "descriptions": {
-      "owner":  "Control total del workspace. Gestiona ajustes, miembros y facturación.",
-      "admin":  "Administrador de confianza. Gestiona contenido, miembros y flujos de aprobación.",
+      "owner": "Control total del workspace. Gestiona ajustes, miembros y facturación.",
+      "admin": "Administrador de confianza. Gestiona contenido, miembros y flujos de aprobación.",
       "editor": "Creador de contenido. Puede crear, editar y enviar publicaciones a revisión.",
       "member": "Colaborador estándar. Puede ver e interactuar con el contenido.",
       "viewer": "Solo lectura. Puede ver el contenido sin realizar cambios."
@@ -61,40 +48,6 @@
     "users_list": "Lista de Usuarios",
     "users_list_subtitle": "Asigna roles a los miembros del equipo",
     "insufficient_permissions_title": "Permisos Insuficientes",
-    "insufficient_permissions_message": "Solo los administradores y propietarios pueden gestionar roles",
-    "permissions_list": {
-      "publish": {
-        "name": "Publicar",
-        "description": "Permite publicar contenido en redes sociales"
-      },
-      "approve": {
-        "name": "Aprobar",
-        "description": "Permite aprobar contenido para publicación"
-      },
-      "view-analytics": {
-        "name": "Ver Analíticas",
-        "description": "Permite ver las analíticas del workspace"
-      },
-      "manage-accounts": {
-        "name": "Gestionar Cuentas",
-        "description": "Permite agregar/eliminar cuentas sociales"
-      },
-      "manage-team": {
-        "name": "Gestionar Equipo",
-        "description": "Permite invitar/eliminar miembros"
-      },
-      "manage-content": {
-        "name": "Gestionar Contenido",
-        "description": "Permite crear y editar publicaciones"
-      },
-      "manage-campaigns": {
-        "name": "Gestionar Campañas",
-        "description": "Permite crear y editar campañas"
-      },
-      "view-content": {
-        "name": "Ver Contenido",
-        "description": "Permite ver el contenido del workspace (solo lectura)"
-      }
-    }
+    "insufficient_permissions_message": "Solo los administradores y propietarios pueden gestionar roles"
   }
 }

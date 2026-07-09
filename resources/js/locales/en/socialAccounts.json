@@ -1,0 +1,29 @@
+{
+  "socialAccounts": {
+    "title": "Social Accounts",
+    "subtitle": "Manage your connected social media accounts",
+    "connectAccount": "Connect Social Account",
+    "connectedAccounts": "Connected Accounts",
+    "availablePlatforms": "Available Platforms",
+    "connect": "Connect",
+    "connected": "Connected",
+    "connectedAt": "Connected",
+    "connectedBy": "Connected by",
+    "connectError": "Failed to connect the account",
+    "alreadyConnected": "Already connected",
+    "disconnect": "Disconnect",
+    "disconnected": "Account disconnected",
+    "disconnectError": "Failed to disconnect",
+    "confirmDisconnect": "Are you sure you want to disconnect this account?",
+    "active": "Active",
+    "expired": "Expired",
+    "tokenExpired": "Token expired",
+    "needsReconnection": "Reconnect",
+    "reconnect": "Reconnect",
+    "reconnectButton": "Reconnect account",
+    "reconnecting": "Verifying…",
+    "demoMode": {
+      "title": "Demo Data"
+    }
+  }
+}

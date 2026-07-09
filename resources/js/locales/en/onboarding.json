@@ -37,19 +37,16 @@
       "sizeRequired": "Select your team size"
     },
     "optional": "Optional",
-    "skip": "Skip this step",
     "continue": "Continue"
   },
   "planSelection": {
     "title": "Choose the perfect plan for you",
     "description": "Start free or choose a plan that fits your needs",
-    "recommended": "Recommended",
     "intervals": {
       "month": "month",
-      "forever": "forever"
+      "forever": "forever",
+      "year": "year"
     },
-    "startFree": "Start Free",
-    "selectPlan": "Select Plan",
     "decideLater": "I'll decide later"
   },
   "tour": {
@@ -62,7 +59,8 @@
     "nextStep": "Go to next tour step",
     "completeTour": "Complete the guided tour",
     "skipGuidedTour": "Skip the guided tour",
-    "progress": "Tour progress"
+    "progress": "Tour progress",
+    "navigating": "Navigating to next section..."
   },
   "wizard": {
     "title": {
@@ -118,7 +116,8 @@
       "accounts": "accounts",
       "connectedAccounts": "Connected Accounts",
       "nextStep": "Next, we'll help you create your first publication using a template."
-    }
+    },
+    "continueWithout": "Continue Without Connecting"
   },
   "templates": {
     "title": "Choose a Template",
@@ -131,16 +130,6 @@
     "filterBy": "Filter by {{category}} category",
     "useTemplate": "Use This Template",
     "selecting": "Selecting...",
-    "categories": {
-      "all": "All",
-      "promotional": "Promotional",
-      "educational": "Educational",
-      "engagement": "Engagement"
-    },
-    "noTemplates": {
-      "title": "No templates found",
-      "description": "Try adjusting your search or filter to find what you're looking for."
-    },
     "available": "{{count}} {{templateText}} available",
     "template": "template",
     "templates": "templates",
@@ -148,19 +137,10 @@
     "skipping": "Skipping...",
     "skipAndCreate": "Skip template selection and create blank publication",
     "list": "Publication templates",
-    "select": "Select {{name}} template",
-    "preview": "Preview {{name}} template"
+    "select": "Select {{name}} template"
   },
   "progress": {
-    "title": "Setup Progress",
-    "complete": "Complete",
-    "inProgress": "In progress",
-    "stages": {
-      "businessInfo": "Business Info",
-      "plan": "Plan Selection",
-      "tour": "Guided Tour",
-      "connect": "Connect Accounts"
-    }
+    "title": "Setup Progress"
   },
   "platform": {
     "connect": "Connect",
@@ -176,16 +156,6 @@
     "linkedin": "Share professional content on LinkedIn"
   },
   "errors": {
-    "loadFailed": "Failed to load onboarding",
-    "actionFailed": "Failed to perform action",
-    "tryAgain": "Try again",
-    "networkError": "Network error occurred",
     "retry": "Try Again"
-  },
-  "settings": {
-    "restart": "Restart Onboarding",
-    "restartDescription": "Go through the onboarding process again",
-    "restartConfirm": "Are you sure you want to restart onboarding?",
-    "restartSuccess": "Onboarding restarted successfully"
   }
 }

@@ -51,27 +51,27 @@ export default function ContentApprovalStatus({
         draft: {
           color: 'bg-gray-100 text-gray-700 dark:bg-neutral-900/30 dark:text-neutral-400',
           icon: AlertCircle,
-          label: t('approval.status.draft'),
+          label: t('approvalWorkflow.status.draft'),
         },
         pending_review: {
           color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
           icon: Clock,
-          label: t('approval.status.pending_review'),
+          label: t('approvalWorkflow.status.pending_review'),
         },
         approved: {
           color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
           icon: CheckCircle,
-          label: t('approval.status.approved'),
+          label: t('approvalWorkflow.status.approved'),
         },
         rejected: {
           color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
           icon: XCircle,
-          label: t('approval.status.rejected'),
+          label: t('approvalWorkflow.status.rejected'),
         },
         published: {
           color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
           icon: CheckCircle,
-          label: t('approval.status.published'),
+          label: t('approvalWorkflow.status.published'),
         },
       };
 
@@ -139,42 +139,42 @@ export default function ContentApprovalStatus({
           manageContentUIStoreModule.useManageContentUIStore.getState().updateSelectedItem(pub);
         }
       }
-      toast.success(t('approval.success.submitted'));
+      toast.success(t('approvalWorkflow.success.submitted'));
       onStatusChange?.();
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
-      toast.error(axiosError.response?.data?.message || t('approval.errors.submit_failed'));
+      toast.error(axiosError.response?.data?.message || t('approvalWorkflow.errors.submit_failed'));
     }
   };
 
   const handleApprove = async () => {
     try {
       await approveContent.mutateAsync({ id: content.id, comment: comment || undefined });
-      toast.success(t('approval.success.approved'));
+      toast.success(t('approvalWorkflow.success.approved'));
       setShowApproveModal(false);
       setComment('');
       onStatusChange?.();
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
-      toast.error(axiosError.response?.data?.message || t('approval.errors.approve_failed'));
+      toast.error(axiosError.response?.data?.message || t('approvalWorkflow.errors.approve_failed'));
     }
   };
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      toast.error(t('approval.errors.rejection_reason_required'));
+      toast.error(t('approvalWorkflow.errors.rejection_reason_required'));
       return;
     }
 
     try {
       await rejectContent.mutateAsync({ id: content.id, reason: rejectionReason });
-      toast.success(t('approval.success.rejected'));
+      toast.success(t('approvalWorkflow.success.rejected'));
       setShowRejectModal(false);
       setRejectionReason('');
       onStatusChange?.();
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
-      toast.error(axiosError.response?.data?.message || t('approval.errors.reject_failed'));
+      toast.error(axiosError.response?.data?.message || t('approvalWorkflow.errors.reject_failed'));
     }
   };
 
@@ -185,12 +185,12 @@ export default function ContentApprovalStatus({
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="mb-2 font-bold text-gray-900 dark:text-white">
-              {t('approval.current_status')}
+              {t('approvalWorkflow.current_status')}
             </h4>
             <div className="flex items-center gap-3">
               {getStatusBadge()}
               <span className={`rounded-full px-3 py-1 text-xs font-bold ${isMultiLevel ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
-                {isMultiLevel ? (t('approvals.multiLevelFlow') || 'Flujo Multinivel') : (t('approvals.directFlow') || 'Flujo Directo')}
+                {isMultiLevel ? t('approvals.multiLevelFlow') : t('approvals.directFlow')}
               </span>
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function ContentApprovalStatus({
             <Clock className="mt-0.5 h-4 w-4 text-gray-500" />
             <div>
               <p className="text-xs text-gray-500 dark:text-neutral-400">
-                {t('approvals.last_submission') || 'Último envío por'}: <span className="font-semibold text-gray-700 dark:text-neutral-300">{approvalStatus.last_action_by || t('common.system')}</span>
+                {t('approvals.last_submission')}: <span className="font-semibold text-gray-700 dark:text-neutral-300">{approvalStatus.last_action_by || t('common.system')}</span>
               </p>
               {approvalStatus.last_action_at && (
                 <p className="text-2xs text-gray-400">
@@ -218,10 +218,10 @@ export default function ContentApprovalStatus({
           <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
               {isMultiLevel
-                ? t('approval.pending_review_by_role', {
+                ? t('approvalWorkflow.pending_review_by_role', {
                     role: approvalStatus.next_approver_role,
                   })
-                : t('approval.pending_review_by_any_admin')}
+                : t('approvalWorkflow.pending_review_by_any_admin')}
             </p>
           </div>
         )}
@@ -230,7 +230,7 @@ export default function ContentApprovalStatus({
         {isMultiLevel && approvalStatus.status === 'pending_review' && (
           <div className="mt-4">
             <p className="mb-3 text-sm font-medium text-gray-700 dark:text-neutral-300">
-              {t('approval.progress')}
+              {t('approvalWorkflow.progress')}
             </p>
             {getProgressIndicator()}
           </div>
@@ -249,7 +249,7 @@ export default function ContentApprovalStatus({
               disabled={isSubmitting}
               icon={Send}
             >
-              {t('approval.submit_for_approval')}
+              {t('approvalWorkflow.submit_for_approval')}
             </Button>
           )}
 
@@ -262,7 +262,7 @@ export default function ContentApprovalStatus({
               disabled={isSubmitting}
               icon={ThumbsUp}
             >
-              {t('approval.approve')}
+              {t('approvalWorkflow.approve')}
             </Button>
           )}
 
@@ -275,7 +275,7 @@ export default function ContentApprovalStatus({
               disabled={isSubmitting}
               icon={ThumbsDown}
             >
-              {t('approval.reject')}
+              {t('approvalWorkflow.reject')}
             </Button>
           )}
         </div>
@@ -286,15 +286,15 @@ export default function ContentApprovalStatus({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-theme-bg-secondary">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-              {t('approval.approve_content')}
+              {t('approvalWorkflow.approve_content')}
             </h3>
 
             <Input
               id="approve-comment"
-              label={t('approval.comment_optional')}
+              label={t('approvalWorkflow.comment_optional')}
               value={comment}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
-              placeholder={t('approval.add_comment')}
+              placeholder={t('approvalWorkflow.add_comment')}
               multiline
               rows={3}
             />
@@ -319,7 +319,7 @@ export default function ContentApprovalStatus({
                 className="flex-1"
                 icon={ThumbsUp}
               >
-                {t('approval.approve')}
+                {t('approvalWorkflow.approve')}
               </Button>
             </div>
           </div>
@@ -331,17 +331,17 @@ export default function ContentApprovalStatus({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-theme-bg-secondary">
             <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-              {t('approval.reject_content')}
+              {t('approvalWorkflow.reject_content')}
             </h3>
 
             <Input
               id="reject-reason"
-              label={t('approval.rejection_reason')}
+              label={t('approvalWorkflow.rejection_reason')}
               value={rejectionReason}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setRejectionReason(e.target.value)
               }
-              placeholder={t('approval.explain_rejection')}
+              placeholder={t('approvalWorkflow.explain_rejection')}
               required
             />
 
@@ -365,7 +365,7 @@ export default function ContentApprovalStatus({
                 className="flex-1"
                 icon={ThumbsDown}
               >
-                {t('approval.reject')}
+                {t('approvalWorkflow.reject')}
               </Button>
             </div>
           </div>

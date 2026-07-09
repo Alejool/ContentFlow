@@ -1,55 +1,32 @@
 {
   "profile": {
-    "menu_title": "Configuración",
     "tabs": {
       "general": "General",
       "security": "Seguridad",
-      "subscription": "Suscripción y Plan",
-      "accounts": "Conexiones",
-      "ai": "Inteligencia Artificial",
-      "appearance": "Apariencia",
-      "onboarding": "Incorporación"
-    },
-    "title": "Perfil",
-    "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
-    "theme": {
-      "title": "Color del Tema",
-      "description": "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.",
-      "success_title": "¡Tema actualizado!",
-      "success_message": "El color del sistema se ha actualizado correctamente.",
-      "close": "Cerrar"
+      "subscription": "Suscripción y Plan"
     },
     "appearance": {
       "title": "Modo de Apariencia",
       "light": "Claro",
       "dark": "Oscuro",
-      "system": "Sistema"
+      "system": "Sistema",
+      "color": "Color"
+    },
+    "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
+    "theme": {
+      "title": "Color del Tema",
+      "description": "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.",
+      "success_message": "El color del sistema se ha actualizado correctamente."
     },
     "language": {
-      "title": "Idioma",
-      "success_message": "Idioma actualizado correctamente"
+      "title": "Idioma"
     },
-    "editProfile": "Editar Perfil",
-    "changePassword": "Cambiar Contraseña",
-    "name": "Nombre",
-    "email": "Correo Electrónico",
-    "currentPassword": "Contraseña Actual",
-    "newPassword": "Nueva Contraseña",
-    "confirmPassword": "Confirmar Contraseña",
-    "updateProfile": "Actualizar Perfil",
     "update_success": "Perfil actualizado exitosamente.",
     "update_error": "Error al actualizar el perfil.",
-    "deleteAccount": "Eliminar Cuenta",
     "actions": {
       "saveChanges": "Guardar Cambios"
     },
-    "messages": {
-      "unsavedChanges": "Tienes cambios no guardados. ¿Deseas continuar?"
-    },
     "information": {
-      "title": "Información del Perfil",
-      "description": "Actualiza la información de tu cuenta y dirección de correo electrónico.",
-      "saved": "Guardado.",
       "nameLabel": "Nombre",
       "namePlaceholder": "Tu Nombre",
       "emailLabel": "Correo Electrónico",
@@ -57,38 +34,29 @@
       "emailUnverified": "Tu dirección de correo electrónico no está verificada. Verifícala para acceder a todas las funciones.",
       "sendVerification": "Enviar Correo de Verificación",
       "verificationSent": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
-      "applicationLanguage": "Idioma de la Aplicación",
-      "languageDescription": "Selecciona tu idioma preferido para la interfaz de la aplicación.",
-      "currentLanguage": "Idioma Actual",
       "phoneLabel": "Teléfono",
       "phonePlaceholder": "Tu número de teléfono",
       "bioLabel": "Biografía",
       "bioPlaceholder": "Háblanos un poco de ti...",
       "sections": {
         "personal": "Información Personal",
-        "contact": "Detalles de Contacto",
-        "bio": "Sobre Mí",
-        "language": "Idioma y Preferencias"
+        "contact": "Detalles de Contacto"
       }
     },
     "statistics": {
-      "title": "Estadísticas de la Cuenta",
-      "description": "Resumen de la actividad y estado de tu cuenta.",
       "memberSince": "Miembro Desde",
       "daysActive": "Días Activo",
       "days": "días",
       "accountStatus": "Estado de la Cuenta",
       "active": "Activa",
       "emailStatus": "Estado del Correo",
-      "verified": "Verificado",
-      "unverified": "No Verificado"
+      "unverified": "No Verificado",
+      "notAvailable": "No disponible"
     },
     "connectedAccounts": {
-      "title": "Cuentas Sociales Conectadas",
-      "description": "Administra tus perfiles de redes sociales conectados para publicación de contenido.",
-      "connected": "Conectadas",
-      "notConnected": "No Conectadas",
-      "manageLink": "Administrar conexiones en el Gestor de Contenido"
+      "manageLink": "Administrar conexiones en el Gestor de Contenido",
+      "active": "Activa",
+      "inactive": "No conectada"
     },
     "password": {
       "title": "Actualizar Contraseña",
@@ -100,10 +68,6 @@
       "successTitle": "¡Contraseña actualizada exitosamente!",
       "successMessage": "La seguridad de tu cuenta ha sido mejorada.",
       "errorTitle": "Corrige los siguientes errores:",
-      "securityTips": "Consejos de Seguridad para Contraseñas:",
-      "tip1": "Usa al menos 8 caracteres con una mezcla de letras, números y símbolos",
-      "tip2": "Evita usar información personal o palabras comunes",
-      "tip3": "Considera usar un administrador de contraseñas para mayor seguridad",
       "placeholders": {
         "current": "Ingresa tu contraseña actual",
         "new": "Ingresa tu nueva contraseña",
@@ -148,11 +112,39 @@
       "restartHint": "Revisa las características de la plataforma y el proceso de configuración nuevamente",
       "restartButton": "Reiniciar"
     },
-    "usage": {
-      "title": "Uso del Plan",
-      "publications": "Publicaciones",
-      "used": "usado",
-      "viewDetails": "Ver detalles →"
-    }
+    "avatar_remove_error": "Ocurrió un error al eliminar el avatar",
+    "avatar_remove_failed": "Error al eliminar el avatar",
+    "avatar_removed": "Avatar eliminado correctamente",
+    "avatar_requirements": "Máximo 2MB. Formatos: JPG, PNG, GIF, WebP",
+    "avatar_too_large": "La imagen es muy grande. Máximo 2MB",
+    "avatar_update_failed": "Error al subir la foto",
+    "avatar_upload_error": "Ocurrió un error al subir la foto",
+    "avatar_uploaded": "Foto subida correctamente",
+    "choose_file": "Elegir Archivo",
+    "notifications": {
+      "title": "Preferencias de notificaciones",
+      "description": "Configura cómo quieres recibir notificaciones sobre la finalización de subidas y procesamiento",
+      "in_app": "Notificaciones en la app",
+      "in_app_description": "Muestra notificaciones dentro de la aplicación",
+      "browser": "Notificaciones del navegador",
+      "browser_description": "Muestra notificaciones del sistema incluso cuando la app está en segundo plano",
+      "enable": "Activar",
+      "requesting": "Solicitando...",
+      "permission_granted": "Notificaciones del navegador activadas",
+      "permission_denied": "Permiso de notificaciones del navegador denegado",
+      "permission_denied_help": "Permiso denegado. Activa las notificaciones en la configuración de tu navegador.",
+      "permission_error": "No se pudo solicitar el permiso de notificaciones",
+      "saved": "Preferencias guardadas",
+      "upload_complete": "Subidas completadas",
+      "upload_complete_description": "Notificar cuando terminen las subidas de archivos",
+      "processing_complete": "Procesamiento completado",
+      "processing_complete_description": "Notificar cuando termine el procesamiento de video",
+      "info_title": "Acerca de las notificaciones",
+      "info_description": "Las notificaciones te ayudan a estar al tanto de operaciones largas. Puedes personalizar qué tipos de notificaciones recibes y cómo se entregan."
+    },
+    "remove_photo": "Eliminar Foto",
+    "uploading": "Subiendo...",
+    "using_initials": "Usando iniciales",
+    "using_photo": "Usando foto personalizada"
   }
 }

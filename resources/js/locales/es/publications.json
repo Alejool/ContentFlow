@@ -3,18 +3,23 @@
     "title": "Publicaciones",
     "subtitle": "Gestionar tus publicaciones",
     "modal": {
-      "sections": {
-        "details": "Detalles del Contenido"
-      },
       "contentType": {
         "label": "Tipo de contenido",
-        "value": "Video",
         "filteredByPlatforms": "Filtrado por plataformas seleccionadas",
-        "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia"
+        "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia",
+        "changed": "Tipo de contenido cambiado",
+        "autoChanged": "Tipo de contenido cambiado automáticamente",
+        "mediaAllowed": "Medios permitidos:",
+        "platforms": "Plataformas:",
+        "rules": "Reglas de contenido",
+        "suggestion": {
+          "title": "Sugerencia de tipo de contenido",
+          "reason": "Según los archivos que agregaste, sugerimos un tipo de contenido diferente.",
+          "apply": "Cambiar a {{type}}",
+          "keep": "Mantener {{type}}"
+        }
       },
       "poll": {
-        "question": "Pregunta de la Encuesta",
-        "questionPlaceholder": "Escribe tu pregunta aqui",
         "title": "Opciones de Encuesta",
         "options": "Opciones de la Encuesta (2-4 opciones)",
         "optionPlaceholder": "Opción",
@@ -25,105 +30,26 @@
         "note": "Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles."
       },
       "media": {
-        "uploadingPending": "Subiendo Pendiente",
-        "backgroundUpload": "Guardado! Los archivos multimedia se están subiendo en segundo plano."
+        "backgroundUpload": "Guardado! Los archivos multimedia se están subiendo en segundo plano.",
+        "attachFailed": "No se pudo adjuntar el archivo",
+        "lockFailed": "Advertencia: No se pudo bloquear el archivo para edición"
       },
       "upload": {
-        "activeTasks": "Archivos y Publicaciones ({{count}})...",
-        "uploadingFiles": "Subiendo archivos ({{count}})...",
-        "uploadFailed": "Error al subir",
-        "uploadsCompleted": "Cargas Completadas",
-        "publishingSocial": "Publicando en redes ({{count}})...",
         "done": "Listo",
         "pending": "Pendiente",
         "left": "restante",
         "paused": "Pausado",
         "cancelled": "Cancelado",
-        "cancel_message": "¿Estás seguro de que deseas cancelar esta subida? Los archivos parcialmente subidos serán eliminados."
+        "errors": {
+          "svgNotAllowed": "Los archivos SVG no son compatibles con las redes sociales"
+        },
+        "uploadingInBackground": "{{count}} archivo(s) se están subiendo en segundo plano. Se vincularán automáticamente cuando se completen."
       },
       "show": {
-        "title": "Vista Detallada",
-        "subtitle": "Ver la publicación",
-        "goal": "Objetivo",
-        "status": "Estado",
-        "campaigns": "Campañas",
-        "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
-        "publishDate": "Fecha de publicación",
-        "publishedOn": "Publicado el",
-        "publications": "Publicaciones",
-        "scheduledPosts": "Publicaciones Programadas",
-        "socialNetworkPublications": "Publicaciones en Redes Sociales",
-        "associatedPublications": "Publicaciones Asociadas",
-        "accountMissingTitle": "Cuenta Desconectada",
-        "accountMissingText": "Esta publicación se publica en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
-        "created": "Creado",
-        "lastUpdated": "ltima Actualizacin",
-        "selectSocialAccounts": "Seleccionar Cuentas",
-        "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
-        "lockedBySession": "Bloqueado por sesión",
-        "noCampaigns": "No hay campañas",
-        "dragDrop": {
-          "title": "Arrastra y suelta para ordenar",
-          "subtitle": "Sube tus archivos multimedia aquí"
-        },
-        "placeholders": {
-          "title": "título",
-          "description": "descripción",
-          "hashtags": "Hashtags",
-          "schedulePublication": "Programar publicación",
-          "goal": "Objetivo",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
-        },
-        "validation": {
-          "mediaRequired": "Archivo es requerido",
-          "titleRequired": "El título es obligatorio",
-          "titleLength": "El título no puede exceder los 70 caracteres",
-          "descMin": "La descripción debe tener al menos 10 caracteres",
-          "descMax": "La descripción no puede exceder los {{max}} caracteres",
-          "objRequired": "El objetivo es obligatorio",
-          "objMax": "El objetivo no puede exceder los 200 caracteres",
-          "hashtagsRequired": "Los hashtags son obligatorios",
-          "hashtagValid": "Los hashtags deben estar separados por comas",
-          "hashtagMax": "Máximo 10 hashtags permitidos",
-          "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
-          "scheduledAtRequired": "La fecha es requerida si la programación global está activada",
-          "pollScheduleRequired": "La fecha de programación es requerida para encuestas cuando se activa la programación global",
-          "recurrenceDaysRequired": "Selected al menos un día para la recurrencia semanal",
-          "recurrence_days": "Días de repetición no válidos",
-          "durationErrors": "Corrige los errores de duracin antes de guardar.",
-          "recurrenceEndDateRequired": "La fecha de finalización es requerida para publicaciones recurrentes",
-          "pollOptionsRequired": "Las encuestas requieren al menos 2 opciones",
-          "pollDurationRequired": "La duración de la encuesta debe estar entre 1 y 168 horas",
-          "imageRequired": "Debes agregar al menos una imagen o video",
-          "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global"
-        },
-        "button": {
-          "save": "Actualizar",
-          "cancel": "Cancelar"
-        },
-        "contentLocked": "Contenido Bloqueado",
-        "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
-        "contentPublishing": "Publicación en Proceso",
-        "contentPublishingHint": "La publicación se está publicando en algunas plataformas. Debes esperar a que termine el proceso para poder editar el contenido.",
-        "approvedEditWarning": "Publicación Aprobada",
-        "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
-        "lockedByOther": "publicación bloqueada por otro usuario",
-        "locking": {
-          "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
-          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos.",
-          "youAreEditor": "Eres el editor actual.",
-          "usersWaiting": "Hay {{count}} usuario(s) en espera para cuando termines."
-        }
+        "title": "Vista Detallada"
       },
       "schedule": {
-        "title": "Fecha para todas las redes",
-        "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
-        "placeholder": "Seleccionar fecha y hora",
         "instantWarning": "Para publicar inmediatamente, usa el botón Publicar del modal.",
-        "useGlobal": "Programación Global",
         "recurrence": {
           "title": "Repetir publicación (Recurrencia)",
           "locked_title": "Recurrencia bloqueada",
@@ -144,59 +70,24 @@
         }
       },
       "add": {
-        "title": "Agregar publicación",
         "titleField": "título",
-        "subtitle": "Crear una publicación",
         "mediaSection": "Archivos Multimedia",
         "contentSection": "Contenido",
         "socialAccountsSection": "Redes Sociales",
         "scheduleSection": "Programación",
-        "campaignSection": "Campaña",
         "moreOptions": "Más opciones",
-        "name": "Nombre",
         "description": "descripción",
-        "image": "Imagen",
         "hashtags": "Hashtags",
-        "campaigns": "Campañas",
-        "schedulePublication": "Programar publicación",
-        "scheduled_at": "Fecha Programada",
         "goal": "Objetivo",
-        "status": "Estado",
-        "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
-        "publishDate": "Fecha de publicación",
-        "publishedOn": "Publicado el",
-        "publications": "Publicaciones",
-        "creating": "Creando",
-        "optionalSchedule": "Programación Opcional",
-        "selectSocialAccounts": "Seleccionar Cuentas",
         "noCampaigns": "No hay campañas",
-        "dragDrop": {
-          "title": "Arrastra y suelta para ordenar",
-          "subtitle": "Sube tus archivos multimedia aquí"
-        },
-        "recurrence_days": "Días de repetición",
-        "poll_options": "Opciones de encuesta",
-        "poll_duration_hours": "Duración de la encuesta",
         "placeholders": {
           "title": "título",
           "description": "descripción",
           "hashtags": "#marketing #publicidad #comuúnicacin",
-          "schedulePublication": "Programar publicación",
-          "goal": "Objetivo",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
-        },
-        "button": {
-          "save": "Guardar",
-          "cancel": "Cancelar"
+          "goal": "Objetivo"
         }
       },
       "edit": {
-        "title": "Editar publicación",
-        "titleField": "título",
-        "subtitle": "Actualizar la publicación existente",
         "mediaSection": "Archivos Multimedia",
         "contentSection": "Contenido",
         "socialAccountsSection": "Redes Sociales",
@@ -208,51 +99,16 @@
         "historyHint": "Actividad y aprobaciones",
         "commentsSection": "Comentarios Internos",
         "commentsHint": "Notas del equipo sobre esta publicación",
-        "youtubeThumbnailSection": "Miniatura de YouTube",
-        "description": "descripción",
-        "hashtags": "Hashtags",
-        "schedulePublication": "Programar publicación",
-        "addCampaign": "Agregar Campaña",
-        "editCampaign": "Editar Campaña",
-        "deleteCampaign": "Eliminar Campaña",
-        "campaignTitle": "Campaign Title",
-        "name": "Nombre",
-        "image": "Imagen",
-        "goal": "Objetivo",
         "campaigns": "Campañas",
-        "status": "Estado",
-        "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
-        "publishDate": "Fecha de publicación",
-        "publishedOn": "Publicado el",
-        "associatedPublications": "Publicaciones Asociadas",
-        "accountMissingTitle": "Cuenta Desconectada",
-        "accountMissingText": "Esta publicación se public en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
-        "selectSocialAccounts": "Seleccionar Cuentas",
         "lockedBySession": "Bloqueado por sesión",
-        "questionField": "Pregunta",
         "dragDrop": {
-          "title": "Arrastra y suelta para ordenar",
-          "subtitle": "Sube tus archivos multimedia aquí"
+          "title": "Arrastra y suelta para ordenar"
         },
-        "recurrence_days": "Días de repetición",
         "placeholders": {
-          "title": "Arrastra y suelta para ordenar",
           "description": "descripción",
           "hashtags": "Hashtags",
-          "schedulePublication": "Programar publicación",
-          "goal": "Objetivo",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
+          "goal": "Objetivo"
         },
-        "button": {
-          "save": "Actualizar",
-          "cancel": "Cancelar"
-        },
-        "configurationLocked": "Configuracin Bloqueada",
-        "configurationLockedHint": "Necesitas aprobación para configurar las redes y la Programación. Solicita una revisión primero.",
-        "configurationLockedHintAdmin": "Debes aprobar la publicación antes de configurar las redes.",
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
         "contentPublishing": "Publicación en Proceso",
@@ -263,31 +119,14 @@
         "pendingReviewWarningHint": "Esta publicación está esperando aprobación. No puedes editarla hasta que sea aprobada o rechazada.",
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
-          "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
-          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos.",
           "youAreEditor": "Eres el editor actual.",
           "usersWaiting": "Hay {{count}} usuario(s) en espera para cuando termines."
         }
       },
-      "approvals": {
-        "noPending": "Sin aprobaciones pendientes",
-        "noPendingDesc": "¡Genial! Todas las publicaciones están al da.",
-        "approve": "Aprobar",
-        "approvedSuccess": "publicación aprobada con éxito",
-        "title": "Aprobaciones",
-        "historyTitle": "Historial de Aprobaciones",
-        "historySubtitle": "Registros de estados y revisiones",
-        "date": "Fecha",
-        "user": "Usuario",
-        "publication": "publicación",
-        "actions": "Acciones"
-      },
       "comments": {
-        "title": "Comentarios Internos",
         "placeholder": "Escribe un comentario...",
         "noComments": "No hay comentarios aún. ¡Inicia la conversación!",
         "loading": "Cargando comentarios...",
-        "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
         "deleteConfirmTitle": "Eliminar Comentario",
         "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar este comentario? Esta accin no se puede deshacer.",
         "deleteSuccess": "Comentario eliminado",
@@ -296,14 +135,8 @@
         "delete": "Eliminar",
         "replyingTo": "Respondiendo a"
       },
-      "manageContent": {
-        "configureNetworks": "Programadas tus publicaciones"
-      },
       "publish": {
         "title": "Publicar",
-        "selectPlatforms": "Seleccionar Plataformas",
-        "selectAll": "Seleccionar Todo",
-        "deselectAll": "Deseleccionar Todo",
         "noConnectedAccounts": "No se encontraron cuentas sociales conectadas.",
         "connectAccounts": "Conecta tus cuentas primero.",
         "noCompatibleAccounts": "No hay cuentas compatibles con este tipo de contenido.",
@@ -315,19 +148,9 @@
         "platforms": "plataformas",
         "removed": "Removido",
         "failed": "Fallido",
-        "scheduled": "Programado",
         "recurringPosts": "Publicaciones Recurrentes",
-        "youtube": "YouTube",
         "youtubeThumbnails": "Thumbnails de YouTube",
-        "author": "@Alejandro Olarte",
         "unpublishing": "Despublicando...",
-        "publishingSocial": "Publicando en redes ({{count}})...",
-        "allPublished": "Todas las publicaciones completadas",
-        "completed": "completadas",
-        "inProgress": "en curso",
-        "sending": "Enviando",
-        "duplicate": "Intento duplicado",
-        "original_attempt": "Intento original:",
         "oauth1_required": "Requiere reconexión",
         "oauth1_video_message": "Esta cuenta necesita credenciales OAuth 1.0a para subir videos",
         "reconnect_account": "Reconectar cuenta",
@@ -340,13 +163,6 @@
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
         },
-        "modal": {
-          "title": "Despublicar",
-          "message": "¿Estás seguro de despublicar? Esto eliminar la publicación de esta plataforma.",
-          "confirmText": "Despublicar",
-          "cancelText": "Cancelar",
-          "unpublishing": "Despublicando..."
-        },
         "unpublish": {
           "title": "¿Despublicar de {{platform}}?",
           "message": "¿Estás seguro de que deseas despublicar este contenido de {{platform}}? Esta acción no se puede deshacer.",
@@ -357,30 +173,14 @@
           "publish": "Publicar",
           "requestApproval": "Solicitar aprobación",
           "pendingReview": "Pendiente de revisión",
-          "approve": "Aprobar",
-          "reject": "Rechazar",
           "cancel": "Cancelar",
-          "cancelPublication": "Cancelar Publicación",
           "cancelAll": "Cancelar Todas ({{count}})",
-          "change": "Cambiar",
-          "preview": "Vista Previa"
-        },
-        "cancelConfirm": {
-          "title": "¿Cancelar publicación?",
-          "message": "¿Estás seguro de que deseas cancelar esta publicación? Las plataformas que ya se publicaron no se verán afectadas.",
-          "confirm": "Sí, cancelar",
-          "cancel": "No"
+          "change": "Cambiar"
         },
         "pendingReviewBanner": {
           "title": "publicación en revisión",
           "message": "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."
         },
-        "videoSplitter": "Herramienta de Recorte de Video",
-        "editSegments": "Editar Segmentos",
-        "replaceVideo": "Reemplazar Video",
-        "splitToNew": "Crear Nuevas Pub.",
-        "splitSuccess": "Video recortado con éxito",
-        "editVideo": "Editar Video",
         "rejectedBanner": {
           "title": "publicación Rechazada",
           "message": "Esta publicación ha sido rechazada por {{name}}.",
@@ -393,23 +193,19 @@
         },
         "incompatibleAccountsBanner": {
           "title": "Cuentas No Compatibles",
-          "message": "Las siguientes cuentas no son compatibles con el tipo de contenido \"{contentType}\":",
           "hint": "Estas cuentas no aparecerán en las opciones de publicación."
         },
-        "publishedInOtherAccountBanner": {
-          "title": "Publicado en Cuenta Diferente",
-          "message": "Esta publicación fue publicada en una cuenta de {{platform}} que ya no está conectada.",
-          "hint": "Puedes publicar en la cuenta actual seleccionándola a continuación. La publicación anterior permanecerá en la cuenta desconectada."
+        "loadingAccounts": "Cargando cuentas...",
+        "publishingBanner": {
+          "title": "Publicación en curso…",
+          "message": "Tu contenido se está publicando en las plataformas seleccionadas."
+        },
+        "retryingBanner": {
+          "title": "Reintentando publicación…"
         }
       },
       "preview": {
-        "title": "Vistas Previas en Vivo",
-        "disclaimer": "La vista previa es una aproximación. El aspecto real puede variar segn la plataforma.",
-        "simulated": "Simulado",
-        "real": "Real",
-        "realInfo": "Vista Previa Real",
-        "view": "Ver vista previa",
-        "notAvailable": "Vista previa no disponible para esta plataforma"
+        "disclaimer": "La vista previa es una aproximación. El aspecto real puede variar segn la plataforma."
       },
       "validation": {
         "descMin": "descripción debe tener al menos 10 caracteres",
@@ -464,10 +260,8 @@
         "invalid_media_type": "Tipo de archivo multimedia no válido para el tipo de contenido seleccionado",
         "media_required": "Se requieren archivos multimedia para este tipo de contenido",
         "media_min_count": "Se requieren al menos :min archivos multimedia",
-        "media_max_count": "Máximo :max archivos multimedia permitidos"
-      },
-      "processing": {
-        "cancel_message": "¿Estás seguro de que deseas cancelar este proceso? El trabajo en curso se detendrá."
+        "media_max_count": "Máximo :max archivos multimedia permitidos",
+        "mediaRequired": "Se requieren archivos multimedia"
       },
       "cancel_confirmation": {
         "title": "Cancelar publicación",
@@ -487,11 +281,15 @@
         "confirm": "Sí, cancelar todas",
         "cancel": "No"
       },
-      "unpublish": {
-        "title": "¿Despublicar de {{platform}}?",
-        "message": "¿Estás seguro de que deseas despublicar este contenido de {{platform}}? Esta acción no se puede deshacer.",
-        "confirm": "Sí, despublicar",
-        "cancel": "Cancelar"
+      "button": {
+        "saveBackground": "Guardar y subir en segundo plano"
+      },
+      "live": {
+        "title": "Configuración de transmisión en vivo",
+        "startTime": "Hora de inicio",
+        "duration": "Duración estimada",
+        "minutes": "minutos",
+        "note": "La hora programada es cuando comenzará tu transmisión en vivo."
       }
     },
     "status": {
@@ -502,7 +300,6 @@
       "published": "Publicado",
       "published_with_errors": "Publicado con errores",
       "partially_published": "Publicado parcialmente",
-      "publis": "Publicado",
       "scheduled": "Programado",
       "approved": "Aprobado",
       "instant": "Instantneo",
@@ -516,13 +313,9 @@
       "retrying": "Reintentando"
     },
     "scheduled_for": "Programado para",
-    "scheduledPosts": "Publicaciones Programadas",
     "button": {
       "add": "Agregar publicación",
       "edit": "Editar publicación",
-      "delete": "Eliminar publicación",
-      "close": "Cerrar",
-      "save": "Guardar cambios",
       "approve": "Aprobar",
       "reject": "Rechazar",
       "publish": "Publicar",
@@ -532,81 +325,49 @@
       "request": "Solicitar",
       "sendForReview": "Enviar a Revisión",
       "sending": "Enviando...",
-      "inReview": "En Revisión"
+      "inReview": "En Revisión",
+      "submitForReview": "Enviar a Revisión",
+      "submitting": "Enviando..."
     },
     "table": {
       "name": "Nombre",
       "description": "descripción",
-      "publications": "Publicaciones",
       "media": "Archivos",
       "campaign": "Campaña",
       "status": "Estado",
       "actions": "Acciones",
       "noCampaign": "Sin Campaña",
-      "noPlatforms": "Sin Plataformas",
       "noMedia": "Sin multimedia",
-      "loading": "Cargando...",
       "linkedAccount": "Cuentas Asociadas",
       "untitled": "Sin título",
       "noDescription": "Sin descripción",
-      "platforms": "Plataformas",
-      "linkedAccounts": "Cuentas vinculadas",
       "createdBy": "Creado por",
       "manualEvent": "Evento Manual",
       "socialNetworkEvent": "Evento de Red Social",
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
-        "searchEmpty": "No se encontraron publicaciones que coincidan con la búsqueda.",
-        "button": "Agregar publicación"
+        "searchEmpty": "No se encontraron publicaciones que coincidan con la búsqueda."
       },
       "lockedBy": "Bloqueado por:",
       "publishingBy": "Publicando por",
-      "publishingOn": "Publicando en {{platform}}",
-      "publishingOnMultiple": "Publicando en {{count}} redes",
-      "publishingOnBy": "Publicando en {{platform}} por {{user}}",
-      "publishingOnMultipleBy": "Publicando en {{count}} redes por {{user}}",
       "rejectedBy": "Rechazado por",
       "pendingAdminReview": "Pendiente de revisión",
-      "editingBy": "Editando:"
+      "editingBy": "Editando:",
+      "publishedOn": "Publicado en"
     },
     "messages": {
-      "addSuccess": "publicación agregada éxitosamente!",
       "createSuccess": "publicación creada éxitosamente!",
-      "duplicateSuccess": "publicación duplicada con éxito!",
-      "addError": "Error al agregar publicación",
       "updateSuccess": "publicación actualizada éxitosamente!",
-      "updateError": "Error al actualizar publicación",
       "mediaAttached": "Archivo multimedia adjuntado con éxito a '{{title}}' (Carga en segundo plano)",
       "deleteSuccess": "publicación eliminada éxitosamente!",
       "deleteError": "Error al eliminar publicación",
       "cancelSuccess": "Publicación cancelada exitosamente",
       "platformCancelSuccess": "Plataforma cancelada exitosamente",
       "platformCancelError": "Error al cancelar la plataforma",
-      "fetchError": "Error al cargar Campañas",
       "error": "Ha ocurrido un error inesperado",
-      "confirmDelete": {
-        "title": "¿Estás seguro?",
-        "text": "No podrs recuperar esta Campaña!",
-        "confirmButton": "S, eliminarla!",
-        "cancelButton": "Cancelar"
-      }
-    },
-    "actions": {
-      "viewCampaign": "Ver Campaña",
-      "edit": "Editar",
-      "publishNow": "Publicar Ahora",
-      "viewDetails": "Ver Detalles",
-      "delete": "Eliminar",
-      "active": "Activa",
-      "remove": "Eliminar",
-      "change": "Cambiar"
-    },
-    "headers": {
-      "status": "Estado",
-      "duration": "Duracin",
-      "mediaFiles": "Archivos",
-      "actions": "Acciones"
+      "uploadFailed": "Error al subir",
+      "uploadSuccess": "Subido correctamente"
     },
     "filters": {
       "title": "Filtros de publicación",
@@ -615,10 +376,8 @@
       "content_type": "Tipo de contenido",
       "published": "Publicadas",
       "draft": "Borrador",
-      "approved": "Aprobadas",
       "scheduled": "Programadas",
       "pending_review": "Pendiente de revisión",
-      "rejected": "Rechazadas",
       "failed": "Fallidas"
     },
     "content_types": {
@@ -630,11 +389,41 @@
     },
     "gallery": {
       "sendingToSocial": "Enviando a plataformas sociales...",
-      "processing": "Procesando en segundo plano..."
+      "processing": "Procesando en segundo plano...",
+      "retrying": "Reintentando..."
     },
     "toast": {
       "publishedSuccess": "¡Publicación publicada exitosamente!",
       "publishedError": "Error al publicar la publicación."
+    },
+    "platformValidation": {
+      "title": "Compatibilidad de Plataformas",
+      "publishedWarning": "Publicación Activa"
+    },
+    "publish": {
+      "button": {
+        "cancel": "Cancelar"
+      }
+    },
+    "recurring": "Recurrente",
+    "viewPost": "Ver publicación",
+    "validation": {
+      "carousel_requires_multiple": "Un carrusel requiere varios archivos multimedia",
+      "content_type_auto_changed": "Tipo de contenido cambiado automáticamente a {{to}}",
+      "content_type_not_supported": "El tipo de contenido :type no es compatible con: :platforms",
+      "durationErrors": "Algunas plataformas tienen errores de duración",
+      "max_files_exceeded": "Máximo {{max}} archivo(s) permitido(s)",
+      "max_images_exceeded": "Máximo {{max}} imagen(es) permitida(s)",
+      "max_videos_exceeded": "Máximo {{max}} video(s) permitido(s)",
+      "media_max_count": "Máximo :max archivo(s) multimedia permitido(s)",
+      "media_min_count": "Se requieren al menos :min archivo(s) multimedia",
+      "media_required": "Se requiere al menos un archivo multimedia",
+      "no_images_allowed": "Este tipo de contenido no permite imágenes",
+      "no_videos_allowed": "Este tipo de contenido no permite videos",
+      "reel_requires_one_video": "Un reel requiere exactamente un video",
+      "reel_requires_video_only": "Un reel solo permite video",
+      "story_requires_one": "Una historia requiere exactamente un archivo multimedia",
+      "videoTooLong": "El video supera la duración máxima para {{platform}} ({{max}})"
     }
   }
 }

@@ -1,3 +1,20 @@
 {
-  "published": "Publicado exitosamente"
+  "publish": {
+    "accountName": "Cuenta",
+    "allPublished": "Todas las publicaciones completadas",
+    "canPublishToNewAccount": "Puedes publicar en esta cuenta",
+    "canUnpublish": "Puedes despublicar este contenido",
+    "cannotUnpublishDifferentAccount": "No puedes despublicar contenido de otra cuenta",
+    "completed": "completadas",
+    "inProgress": "en curso",
+    "multipleAccountsAllowed": "Se permiten varias cuentas",
+    "platforms": "plataformas",
+    "published": "Publicado",
+    "publishedAt": "Publicado el",
+    "publishedOnCurrentAccount": "Publicado en cuenta actual",
+    "publishedOnDifferentAccount": "Publicado en otra cuenta",
+    "publishingSocial": "Publicando en redes sociales...",
+    "sending": "Enviando",
+    "viewPost": "Ver publicación"
+  }
 }

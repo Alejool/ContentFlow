@@ -1,0 +1,24 @@
+{
+  "jsonImport": {
+    "title": "Import from JSON",
+    "menuDescription": "Import publications from a JSON file",
+    "downloadTemplateTitle": "Step 1: Download the template",
+    "downloadTemplateDesc": "Download a sample JSON file with the correct format.",
+    "downloadTemplate": "Download Template",
+    "templateDownloaded": "Template downloaded successfully",
+    "downloadError": "Failed to download the template",
+    "uploadFileTitle": "Step 2: Upload your JSON file",
+    "dragDropText": "Drag your .json file here",
+    "supportedFormats": "Format: .json (Max. 10MB)",
+    "noFileSelected": "Please select a file",
+    "invalidFileType": "Invalid file type. Use .json",
+    "fileTooLarge": "The file is too large. Maximum 10MB",
+    "import": "IMPORT",
+    "importSuccess": "Import successful",
+    "importPartial": "Import completed with errors",
+    "importError": "Import failed",
+    "total": "Total",
+    "successful": "Successful",
+    "failed": "Failed"
+  }
+}

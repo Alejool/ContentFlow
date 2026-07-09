@@ -1,8 +1,6 @@
 {
   "dashboard": {
     "title": "Dashboard",
-    "welcomeMessage": "Welcome, {{name}}!",
-    "systemStats": "System Statistics",
     "totalViews": "Total Views",
     "totalClicks": "Total Clicks",
     "conversions": "Conversions",
@@ -10,17 +8,7 @@
     "totalEngagement": "Total Engagement",
     "avgEngagementRate": "Average Engagement Rate",
     "engagementTrends": "Engagement Trends",
-    "followersByPlatform": "Followers by Platform",
-    "campaignPerformance": "Campaign Performance",
     "platformPerformance": "Global Performance by Platform",
-    "views": "Views",
-    "clicks": "Clicks",
-    "engagement": "Engagement",
-    "emptyState": {
-      "title": "No Data",
-      "message": "Run the command to generate test data:",
-      "command": "php artisan statistics:seed"
-    },
     "quickActions": {
       "campaigns": {
         "title": "Campaigns",
@@ -34,6 +22,22 @@
         "title": "Content",
         "description": "Manage media and publications"
       }
+    },
+    "subtitle": "General system statistics.",
+    "tabs": {
+      "overview": "Overview",
+      "engagement": "Engagement",
+      "social": "Social Networks"
+    },
+    "sections": {
+      "accounts": "Connected Accounts Status",
+      "interaction": "Interaction Metrics",
+      "interactionDesc": "Detailed analysis of how users interact with your brand.",
+      "performance": "Performance Overview",
+      "performanceDesc": "Key metrics on the reach and engagement of your content.",
+      "platforms": "Platform Comparison",
+      "publications": "Publications Status",
+      "publicationsDesc": "Report on the current status of your campaigns and recent publications."
     }
   }
 }

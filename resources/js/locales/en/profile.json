@@ -1,55 +1,32 @@
 {
   "profile": {
-    "menu_title": "Settings",
     "tabs": {
       "general": "General",
       "security": "Security",
-      "subscription": "Subscription & Plan",
-      "accounts": "Connected Accounts",
-      "ai": "Artificial Intelligence",
-      "appearance": "Appearance",
-      "onboarding": "Onboarding"
+      "subscription": "Subscription & Plan"
     },
-    "title": "Profile",
     "appearance": {
       "title": "Appearance Mode",
       "light": "Light",
       "dark": "Dark",
-      "system": "System"
+      "system": "System",
+      "color": "Color"
     },
     "settings_description": "Update your personal information and security settings.",
     "theme": {
       "title": "Color Theme",
       "description": "Select the primary system color. This will affect buttons, links, and other highlighted elements.",
-      "success_title": "Theme Updated!",
-      "success_message": "The system color has been updated successfully.",
-      "close": "Close"
+      "success_message": "The system color has been updated successfully."
     },
     "language": {
-      "title": "Language",
-      "success_message": "Language updated successfully"
+      "title": "Language"
     },
-    "editProfile": "Edit Profile",
-    "changePassword": "Change Password",
-    "name": "Name",
-    "email": "Email",
-    "currentPassword": "Current Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password",
-    "updateProfile": "Update Profile",
     "update_success": "Profile updated successfully.",
     "update_error": "Failed to update profile.",
-    "deleteAccount": "Delete Account",
     "actions": {
       "saveChanges": "Save changes"
     },
-    "messages": {
-      "unsavedChanges": "You have unsaved changes. Do you want to continue?"
-    },
     "information": {
-      "title": "Profile Information",
-      "description": "Update your account's profile information and email address.",
-      "saved": "Saved.",
       "nameLabel": "Name",
       "namePlaceholder": "Your Name",
       "emailLabel": "Email",
@@ -57,38 +34,29 @@
       "emailUnverified": "Your email address is not verified. Verify it to access all features.",
       "sendVerification": "Send Verification Email",
       "verificationSent": "A new verification link has been sent to your email address.",
-      "applicationLanguage": "Application Language",
-      "languageDescription": "Select your preferred language for the application interface.",
-      "currentLanguage": "Current Language",
       "phoneLabel": "Phone",
       "phonePlaceholder": "Your phone number",
       "bioLabel": "Bio",
       "bioPlaceholder": "Tell us a bit about yourself...",
       "sections": {
         "personal": "Personal Information",
-        "contact": "Contact Details",
-        "bio": "About Me",
-        "language": "Language & Preferences"
+        "contact": "Contact Details"
       }
     },
     "statistics": {
-      "title": "Account Statistics",
-      "description": "Overview of your account activity and status.",
       "memberSince": "Member Since",
       "daysActive": "Days Active",
       "days": "days",
       "accountStatus": "Account Status",
       "active": "Active",
       "emailStatus": "Email Status",
-      "verified": "Verified",
-      "unverified": "Unverified"
+      "unverified": "Unverified",
+      "notAvailable": "Not available"
     },
     "connectedAccounts": {
-      "title": "Connected Social Accounts",
-      "description": "Manage your connected social media profiles for content publishing.",
-      "connected": "Connected",
-      "notConnected": "Not Connected",
-      "manageLink": "Manage connections in Content Manager"
+      "manageLink": "Manage connections in Content Manager",
+      "active": "Active",
+      "inactive": "Not connected"
     },
     "password": {
       "title": "Update Password",
@@ -100,10 +68,6 @@
       "successTitle": "Password updated successfully!",
       "successMessage": "Your account security has been enhanced.",
       "errorTitle": "Correct the following errors:",
-      "securityTips": "Password Security Tips:",
-      "tip1": "Use at least 8 characters with a mix of letters, numbers, and symbols",
-      "tip2": "Avoid using personal information or common words",
-      "tip3": "Consider using a password manager for better security",
       "placeholders": {
         "current": "Enter your current password",
         "new": "Enter your new password",
@@ -148,11 +112,39 @@
       "restartHint": "Review the platform features and setup process again",
       "restartButton": "Restart"
     },
-    "usage": {
-      "title": "Plan Usage",
-      "publications": "Publications",
-      "used": "used",
-      "viewDetails": "View details →"
-    }
+    "avatar_remove_error": "An error occurred while removing the avatar",
+    "avatar_remove_failed": "Failed to remove the avatar",
+    "avatar_removed": "Avatar removed successfully",
+    "avatar_requirements": "Maximum 2MB. Formats: JPG, PNG, GIF, WebP",
+    "avatar_too_large": "The image is too large. Maximum 2MB",
+    "avatar_update_failed": "Failed to upload the photo",
+    "avatar_upload_error": "An error occurred while uploading the photo",
+    "avatar_uploaded": "Photo uploaded successfully",
+    "choose_file": "Choose File",
+    "notifications": {
+      "title": "Notification Preferences",
+      "description": "Configure how you want to be notified about upload and processing completions",
+      "in_app": "In-App Notifications",
+      "in_app_description": "Show notifications within the application",
+      "browser": "Browser Notifications",
+      "browser_description": "Show system notifications even when the app is in the background",
+      "enable": "Enable",
+      "requesting": "Requesting...",
+      "permission_granted": "Browser notifications enabled",
+      "permission_denied": "Browser notification permission denied",
+      "permission_denied_help": "Permission denied. Please enable notifications in your browser settings.",
+      "permission_error": "Failed to request notification permission",
+      "saved": "Preferences saved",
+      "upload_complete": "Upload Completions",
+      "upload_complete_description": "Notify when file uploads complete",
+      "processing_complete": "Processing Completions",
+      "processing_complete_description": "Notify when video processing completes",
+      "info_title": "About Notifications",
+      "info_description": "Notifications help you stay informed about long-running operations. You can customize which types of notifications you receive and how they are delivered."
+    },
+    "remove_photo": "Remove Photo",
+    "uploading": "Uploading...",
+    "using_initials": "Using initials",
+    "using_photo": "Using custom photo"
   }
 }

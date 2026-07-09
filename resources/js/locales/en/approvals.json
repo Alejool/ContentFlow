@@ -17,29 +17,15 @@
     "rejectionReason": "Rejection Reason",
     "rejectionReasonDescription": "Provide a detailed reason for the rejection of",
     "rejectionReasonPlaceholder": "e.g. Content does not meet company policies...",
-    "rejectionReasonTooShort": "The reason must have at least 10 characters",
-    "rejectionReasonTooLong": "The reason cannot exceed 500 characters",
-    "validation": {
-      "reasonMin": "The reason must have at least 10 characters",
-      "reasonMax": "The reason cannot exceed 500 characters"
-    },
     "approvalSuccess": "Publication Approved!",
     "approvalSuccessMessage": "The publication has been successfully approved and is ready to be published.",
     "approvedBy": "Approved by",
     "rejectedBy": "Rejected by",
     "submittedBy": "Submitted by",
-    "cancelledBy": "Cancelled by",
-    "reassignedBy": "Reassigned by",
     "publicationRejected": "Publication Rejected",
     "rejectionMessage": "Your publication has been rejected. Review the comments and make the necessary adjustments.",
     "noReasonProvided": "No reason provided.",
     "editPublication": "Edit Publication",
-    "searchPlaceholder": "Search by publication title...",
-    "requestedBy": "Requested by",
-    "requestedAt": "Request Date",
-    "reviewedBy": "Reviewed by",
-    "reviewedAt": "Review Date",
-    "action": "Action",
     "reason": "Reason",
     "noHistory": "No approval history found",
     "stats": {
@@ -52,6 +38,9 @@
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
+      "draft": "Draft",
+      "pending_review": "In Review",
+      "ready_to_submit": "Ready to Submit",
       "submitted": "Submitted for Review",
       "cancelled": "Cancelled",
       "reassigned": "Reassigned",
@@ -64,19 +53,12 @@
       "status": "Status",
       "currentReviewer": "Current Reviewer",
       "completedBy": "Completed by",
-      "actions": "Actions",
-      "requestedBy": "Requested by",
-      "requestedAt": "Request Date",
-      "reviewedBy": "Reviewed by",
-      "reviewedAt": "Review Date",
-      "action": "Action",
-      "reason": "Reason"
+      "actions": "Actions"
     },
     "filters": {
       "all": "All",
       "approved": "Approved",
-      "rejected": "Rejected",
-      "dateRange": "Date Range"
+      "rejected": "Rejected"
     },
     "tabs": {
       "pending": "Pending",
@@ -90,24 +72,63 @@
     "workflow_status": "Workflow Status",
     "progress": "Progress",
     "in_progress": "In Progress",
-    "rejected_here": "Rejected Here",
-    "rejected_at_level": "Rejected at level {{level}}",
     "approver_role": "Approver Role",
     "no_role_assigned": "No role assigned",
     "step": "Level",
     "approved_ready_to_publish": "Approved! Ready to publish",
     "next_action": {
-      "submit_for_approval": "Submit this publication for review to start the approval process",
-      "awaiting_level_approval": "Awaiting approval from {{role}} ({{level}})",
-      "awaiting_final_approval": "Awaiting final approval from {{role}}",
       "ready_to_publish": "The publication has been approved and is ready to be published"
     },
     "errors": {
-      "submit_failed": "Error submitting for review"
+      "submit_failed": "Error submitting for review",
+      "reasonRequired": "The reason is required",
+      "approveFailed": "Failed to approve",
+      "rejectFailed": "Failed to reject"
     },
     "workflowAssignment": {
       "title": "Assigned Approvals",
       "description": "You are viewing only the content that requires your approval based on your role or assignment in the workflow. Administrators can view all pending content."
+    },
+    "multiLevelFlow": "Multi-Level Flow",
+    "directFlow": "Direct Flow",
+    "last_submission": "Last submitted by",
+    "upgrade": {
+      "title": "Approvals not available",
+      "description": "Approvals are a premium feature available on the Professional and Enterprise plans. Upgrade your plan to get access to approval workflows and content control.",
+      "viewPlans": "View Plans"
+    },
+    "submissionDetails": "Submission Details",
+    "currentStatus": "Status",
+    "flowVisualization": {
+      "title": "Approval flow",
+      "completedLevels": "Completed levels"
+    },
+    "workflowProgress": "Workflow progress",
+    "inProgress": "In review",
+    "rejectedHere": "Rejected here",
+    "rejectedAtLevel": "At level",
+    "approverRole": "Reviewed by Role",
+    "timeoutLimit": "Time limit",
+    "auditTrail": "Action History",
+    "yourAction": "Your action",
+    "commentOptional": "Optional comment...",
+    "rejectionReasonRequired": "Rejection reason (required)...",
+    "confirmReject": "Confirm rejection",
+    "confirmRejection": "Confirm Rejection",
+    "approvedReadyToPublish": "Approved. Ready to publish.",
+    "requestRejected": "Request rejected",
+    "noActiveRequest": "There is no active approval request.",
+    "awaitingLevel": "Awaiting approval at",
+    "levelCard": {
+      "title": "Level {{number}}: {{name}}",
+      "approvedBy": "Approved by",
+      "rejectedBy": "Rejected by",
+      "requiresRole": "This level requires approval from the role",
+      "waitingFor": "Awaiting approval from"
+    },
+    "messages": {
+      "finalApproval": "Final approval completed.",
+      "levelApproved": "{{level}} approved"
     }
   }
 }

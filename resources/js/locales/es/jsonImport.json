@@ -1,0 +1,24 @@
+{
+  "jsonImport": {
+    "title": "Importar desde JSON",
+    "menuDescription": "Importa publicaciones desde un archivo JSON",
+    "downloadTemplateTitle": "Paso 1: Descarga la plantilla",
+    "downloadTemplateDesc": "Descarga un archivo JSON de ejemplo con el formato correcto.",
+    "downloadTemplate": "Descargar Plantilla",
+    "templateDownloaded": "Plantilla descargada correctamente",
+    "downloadError": "Error al descargar la plantilla",
+    "uploadFileTitle": "Paso 2: Sube tu archivo JSON",
+    "dragDropText": "Arrastra tu archivo .json aquí",
+    "supportedFormats": "Formato: .json (Máx. 10MB)",
+    "noFileSelected": "Por favor selecciona un archivo",
+    "invalidFileType": "Tipo de archivo inválido. Use .json",
+    "fileTooLarge": "El archivo es demasiado grande. Máximo 10MB",
+    "import": "IMPORTAR",
+    "importSuccess": "Importación exitosa",
+    "importPartial": "Importación completada con errores",
+    "importError": "Error en la importación",
+    "total": "Total",
+    "successful": "Exitosos",
+    "failed": "Fallidos"
+  }
+}

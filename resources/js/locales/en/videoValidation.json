@@ -14,7 +14,6 @@
     "changeTo": "Change to {{type}}",
     "requirements": "Platform requirements",
     "maxDuration": "Maximum duration",
-    "minDuration": "Minimum duration",
     "aspectRatio": "Aspect ratio",
     "minResolution": "Minimum resolution",
     "anyAspectRatio": "Any aspect ratio",
@@ -23,14 +22,6 @@
     "resolution": "Resolution",
     "orientation": "Orientation",
     "vertical": "Vertical",
-    "horizontal": "Horizontal",
-    "configureManually": "Configure publication type manually",
-    "autoDetected": "Auto-detected",
-    "manualOverride": "Manual configuration required",
-    "incompatibleFormat": "Format incompatible with {{type}}",
-    "recommendedSettings": "Recommended settings",
-    "currentSettings": "Current settings",
-    "mustConfigureBeforePublish": "You must configure the publication type before publishing",
-    "videoDoesNotMeetRequirements": "Video does not meet {{type}} requirements for {{platform}}"
+    "horizontal": "Horizontal"
   }
 }

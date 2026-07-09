@@ -50,8 +50,6 @@
   },
   "admin": {
     "navigation": {
-      "title": "Panel de Administración",
-      "subtitle": "Gestión centralizada del sistema",
       "dashboard": "Dashboard",
       "system_settings": "Configuración del Sistema",
       "system_notifications": "Notificaciones del Sistema"
@@ -69,8 +67,6 @@
         "active_subscriptions": "Suscripciones Activas",
         "publications": "Publicaciones",
         "system_health": "Estado del Sistema",
-        "healthy": "Saludable",
-        "review": "Revisar",
         "workspaces": "Espacios de Trabajo",
         "verified_users": "Usuarios Verificados",
         "social_accounts": "Cuentas Sociales",
@@ -95,21 +91,12 @@
         "warning": "Advertencia",
         "critical": "Crítico"
       },
-      "system_issues": {
-        "title": "Problemas del sistema detectados",
-        "unverified_users": "{{count}} de {{total}} usuarios sin verificar ({{percent}}%)"
-      },
       "subscriptions_by_plan": "Suscripciones activas por plan",
       "plans": {
         "free": "Gratuito",
         "basic": "Básico",
         "professional": "Profesional",
         "enterprise": "Empresarial"
-      },
-      "activity": {
-        "system_started": "Sistema iniciado correctamente",
-        "config_loaded": "Todas las configuraciones cargadas",
-        "cache_optimized": "Caché optimizado"
       },
       "info": {
         "exclusive_access": "Acceso Exclusivo",
@@ -190,58 +177,20 @@
       "page_subtitle": "Envía notificaciones globales a todos los usuarios del sistema"
     }
   },
-  "aiChat": {
-    "title": "Asistente IA",
-    "subtitle": "Recomendaciones inteligentes para tus campañas",
-    "campaignsAvailable": "campañas disponibles",
-    "chatTitle": "Chat Intellipost",
-    "online": "En línea",
-    "thinking": "Pensando...",
-    "welcomeMessage": "¡Hola! Soy tu asistente de IA. ¿Cómo puedo ayudarte hoy?",
-    "inputPlaceholder": "Escribe tu mensaje...",
-    "enterToSend": "Enter para enviar",
-    "send": "Enviar",
-    "ideas": {
-      "title": "Ideas",
-      "panelTitle": "Ideas de Campaña",
-      "visualMarketing": {
-        "title": "Marketing Visual",
-        "description": "El contenido visual genera un 40% más de engagement"
-      },
-      "sustainability": {
-        "title": "Sostenibilidad",
-        "description": "Las marcas ecológicas retienen un 25% más de clientes"
-      },
-      "microInfluencers": {
-        "title": "Micro-Influencers",
-        "description": "Mayor conversión que las celebridades"
-      },
-      "ugcContent": {
-        "title": "Contenido UGC",
-        "description": "Aumenta la autenticidad y reduce costos"
-      }
-    },
-    "stats": {
-      "active": "Activas",
-      "total": "Total"
-    }
-  },
   "aiAssistant": {
     "welcomeMessage": "Estoy aquí para ayudarte con tus campañas de redes sociales. Puedes preguntarme sobre la creación de nuevas campañas, la mejora de las existentes o el análisis del rendimiento de tu contenido.",
     "error": "Lo siento, pero encontré un error al procesar tu solicitud. Intenta de nuevo más tarde.",
-    "notEnabled": "El servicio de IA no está habilitado o configurado.",
     "suggestion": "Sugerencia",
     "thinking": "Pensando...",
     "askPlaceholder": "Pregunta sobre tus campañas...",
     "buttonLabel": "Preguntar a la IA",
     "headerTitle": "Asistente IA",
-    "tips": "Tips",
-    "subtitle": "Hazle cualquier pregunta a tu asistente de IA."
+    "subtitle": "Hazle cualquier pregunta a tu asistente de IA.",
+    "tips": "Tips"
   },
   "analytics": {
     "title": "Analíticas",
     "subtitle": "Visualiza el rendimiento de tus campañas y publicaciones",
-    "days": "días",
     "vistas": "Vistas",
     "clics": "Clics",
     "engagement": "Engagement",
@@ -286,15 +235,13 @@
       "title": "Detalle de Rendimiento"
     },
     "emptyState": {
-      "title": "No hay datos disponibles",
-      "description": "Comienza a crear campañas y conecta tus cuentas de redes sociales para ver tus analíticas aquí."
+      "title": "No hay datos disponibles"
     },
     "advanced": {
       "locked_title": "Analytics Avanzados",
       "locked_description": "Obtén análisis detallado por plataforma, rendimiento de publicaciones y reportes exportables con los planes Professional y Enterprise.",
       "upgrade_cta": "Actualizar Plan",
-      "daily_metrics": "Métricas diarias actualizadas por cron jobs",
-      "platform_breakdown": "Desglose por plataforma y evolución diaria"
+      "daily_metrics": "Métricas diarias actualizadas por cron jobs"
     },
     "tabs": {
       "general": "General",
@@ -321,6 +268,120 @@
       "subtitle": "Momentos de mayor actividad de tu audiencia",
       "emptyTitle": "Recopilando tendencias",
       "emptyDesc": "Continúa publicando para que el sistema encuentre el momento óptimo para tu audiencia."
+    },
+    "lastSynced": "Última actualización"
+  },
+  "approvalWorkflow": {
+    "configuration": {
+      "title": "Flujo de aprobación",
+      "subtitle": "Configura cómo se revisa y aprueba el contenido"
+    },
+    "enable_workflow": "Activar flujo de aprobación",
+    "enable_workflow_description": "Exige que el contenido se apruebe antes de publicar",
+    "multi_level_workflow": "Flujo multinivel",
+    "multi_level_description": "Exige aprobaciones de varios roles en secuencia",
+    "approval_levels": "Niveles de aprobación",
+    "add_level": "Añadir nivel",
+    "level_name": "Nombre del nivel",
+    "no_levels_configured": "No hay niveles configurados",
+    "click_add_level": "Haz clic en \"Añadir nivel\" para empezar",
+    "simple_workflow_info": "El contenido requerirá una única aprobación antes de poder publicarse.",
+    "insufficient_permissions": "No tienes permiso para gestionar este flujo",
+    "level_1": "Nivel 1",
+    "level_n": "Nivel {{n}}",
+    "level": "Nivel",
+    "current_status": "Estado actual",
+    "progress": "Progreso",
+    "submit_for_approval": "Enviar a aprobación",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "approve_content": "Aprobar contenido",
+    "reject_content": "Rechazar contenido",
+    "comment_optional": "Comentario (opcional)",
+    "add_comment": "Añade un comentario...",
+    "rejection_reason": "Motivo del rechazo",
+    "explain_rejection": "Explica por qué se rechaza este contenido...",
+    "pending_review_by_role": "Pendiente de revisión por {{role}}",
+    "pending_review_by_any_admin": "Pendiente de revisión por cualquier administrador",
+    "history_title": "Historial de aprobación",
+    "no_history": "Aún no hay historial de aprobación",
+    "action": {
+      "submitted": "Enviado",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "status": {
+      "draft": "Borrador",
+      "pending_review": "En revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "published": "Publicado"
+    },
+    "success": {
+      "submitted": "Enviado a revisión correctamente",
+      "approved": "Contenido aprobado correctamente",
+      "rejected": "Contenido rechazado",
+      "disabled": "Flujo de aprobación desactivado",
+      "enabled": "Flujo de aprobación activado",
+      "configured": "Flujo guardado correctamente"
+    },
+    "warnings": {
+      "pending_content": "Hay contenido pendiente de revisión. Algunas opciones están bloqueadas hasta resolverlo."
+    },
+    "errors": {
+      "insufficient_permissions": "No tienes permiso para realizar esta acción",
+      "toggle_failed": "No se pudo cambiar el estado del flujo",
+      "pending_content_warning": "No puedes cambiar la configuración mientras haya contenido pendiente de revisión",
+      "multi_level_requires_enterprise": "Los flujos multinivel requieren un plan Enterprise",
+      "multi_level_requires_levels": "Agrega al menos un nivel para el flujo multinivel",
+      "duplicate_roles": "No puedes asignar el mismo rol a varios niveles",
+      "invalid_role_selection": "Selecciona un rol válido para cada nivel",
+      "duplicate_role_selected": "Rol duplicado",
+      "save_failed": "No se pudo guardar la configuración",
+      "approve_failed": "No se pudo aprobar el contenido",
+      "rejection_reason_required": "Indica un motivo para el rechazo",
+      "reject_failed": "No se pudo rechazar el contenido",
+      "submit_failed": "No se pudo enviar a revisión"
+    },
+    "analytics": {
+      "title": "Analíticas de aprobación",
+      "subtitle": "Métricas de rendimiento e información de tu flujo de aprobación",
+      "export_csv": "Exportar CSV",
+      "export_json": "Exportar JSON",
+      "avg_publication_time": "Tiempo medio de publicación",
+      "from_submission_to_publish": "Desde el envío hasta la publicación",
+      "total_pending": "Total pendiente",
+      "across_all_levels": "En todos los niveles",
+      "stale_content": "Contenido estancado",
+      "pending_over_7_days": "Pendiente por más de 7 días",
+      "avg_time_per_level": "Tiempo medio de aprobación por nivel",
+      "minutes": "Minutos",
+      "no_data_available": "No hay datos disponibles",
+      "approval_rejection_rates": "Tasas de aprobación / rechazo por rol",
+      "approvals": "Aprobaciones",
+      "rejections": "Rechazos",
+      "pending_by_level": "Contenido pendiente por nivel",
+      "pending_count": "Pendiente",
+      "approval_rate_distribution": "Distribución de la tasa de aprobación",
+      "approver_workload": "Carga de trabajo de los aprobadores",
+      "pending_tasks": "Tareas pendientes",
+      "stale_content_details": "Detalle del contenido estancado",
+      "content_title": "Título",
+      "submitted_at": "Enviado el",
+      "days_pending": "Días pendiente",
+      "current_level": "Nivel actual",
+      "days": "días",
+      "detailed_stats": "Estadísticas detalladas",
+      "role": "Rol",
+      "total_actions": "Acciones totales",
+      "approval_rate": "Tasa de aprobación",
+      "level": "Nivel",
+      "success": {
+        "exported": "Analíticas exportadas correctamente"
+      },
+      "errors": {
+        "export_failed": "No se pudieron exportar las analíticas"
+      }
     }
   },
   "approvals": {
@@ -341,29 +402,15 @@
     "rejectionReason": "Razón del Rechazo",
     "rejectionReasonDescription": "Proporciona una razón detallada para el rechazo de",
     "rejectionReasonPlaceholder": "Ej. El contenido no cumple con las políticas de la empresa...",
-    "rejectionReasonTooShort": "La razón debe tener al menos 10 caracteres",
-    "rejectionReasonTooLong": "La razón no puede exceder 500 caracteres",
-    "validation": {
-      "reasonMin": "La razón debe tener al menos 10 caracteres",
-      "reasonMax": "La razón no puede exceder 500 caracteres"
-    },
     "approvalSuccess": "¡Publicación Aprobada!",
     "approvalSuccessMessage": "La publicación ha sido aprobada exitosamente y está lista para ser publicada.",
     "approvedBy": "Aprobado por",
     "rejectedBy": "Rechazado por",
     "submittedBy": "Enviado por",
-    "cancelledBy": "Cancelado por",
-    "reassignedBy": "Reasignado por",
     "publicationRejected": "Publicación Rechazada",
     "rejectionMessage": "Tu publicación ha sido rechazada. Revisa los comentarios y realiza los ajustes necesarios.",
     "noReasonProvided": "No se proporcionó una razón.",
     "editPublication": "Editar Publicación",
-    "searchPlaceholder": "Buscar por título de publicación...",
-    "requestedBy": "Solicitado por",
-    "requestedAt": "Fecha Solicitud",
-    "reviewedBy": "Revisado por",
-    "reviewedAt": "Fecha Revisión",
-    "action": "Acción",
     "reason": "Razón",
     "noHistory": "No se encontró historial de aprobaciones",
     "stats": {
@@ -391,19 +438,12 @@
       "status": "Estado",
       "currentReviewer": "Revisor Actual",
       "completedBy": "Completado por",
-      "actions": "Acciones",
-      "requestedBy": "Solicitado por",
-      "requestedAt": "Fecha Solicitud",
-      "reviewedBy": "Revisado por",
-      "reviewedAt": "Fecha Revisión",
-      "action": "Acción",
-      "reason": "Razón"
+      "actions": "Acciones"
     },
     "filters": {
       "all": "Todas",
       "approved": "Aprobadas",
-      "rejected": "Rechazadas",
-      "dateRange": "Rango de Fechas"
+      "rejected": "Rechazadas"
     },
     "tabs": {
       "pending": "Pendientes",
@@ -414,28 +454,66 @@
       "description": "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel."
     },
     "workflow_progress": "Progreso del Flujo",
-    "workflow_flow": "Flujo de Aprobación",
     "workflow_status": "Estado del Flujo",
     "progress": "Progreso",
     "in_progress": "En Proceso",
-    "rejected_here": "Rechazado Aquí",
-    "rejected_at_level": "Rechazado en el nivel {{level}}",
     "approver_role": "Rol Aprobador",
     "no_role_assigned": "Sin rol asignado",
     "step": "Nivel",
     "approved_ready_to_publish": "¡Aprobado! Listo para publicar",
     "next_action": {
-      "submit_for_approval": "Envía esta publicación a revisión para comenzar el proceso de aprobación",
-      "awaiting_level_approval": "Esperando aprobación de {{role}} ({{level}})",
-      "awaiting_final_approval": "Esperando aprobación final de {{role}}",
       "ready_to_publish": "La publicación ha sido aprobada y está lista para publicarse"
     },
     "errors": {
-      "submit_failed": "Error al enviar a revisión"
+      "submit_failed": "Error al enviar a revisión",
+      "reasonRequired": "La razón es requerida",
+      "approveFailed": "Error al aprobar",
+      "rejectFailed": "Error al rechazar"
     },
     "workflowAssignment": {
       "title": "Aprobaciones asignadas",
       "description": "Estás viendo solo el contenido que requiere tu aprobación según tu rol o asignación en el flujo de trabajo. Los administradores pueden ver todo el contenido pendiente."
+    },
+    "multiLevelFlow": "Flujo multinivel",
+    "directFlow": "Flujo directo",
+    "last_submission": "Último envío por",
+    "upgrade": {
+      "title": "Aprobaciones no disponibles",
+      "description": "Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido.",
+      "viewPlans": "Ver planes"
+    },
+    "submissionDetails": "Detalles del Envío",
+    "currentStatus": "Estado",
+    "flowVisualization": {
+      "title": "Flujo de aprobación",
+      "completedLevels": "Niveles completados"
+    },
+    "workflowProgress": "Progreso del flujo",
+    "inProgress": "En revisión",
+    "rejectedHere": "Rechazado aquí",
+    "rejectedAtLevel": "En nivel",
+    "approverRole": "Revisado por Rol",
+    "timeoutLimit": "Tiempo límite",
+    "auditTrail": "Historial de acciones",
+    "yourAction": "Tu acción",
+    "commentOptional": "Comentario opcional...",
+    "rejectionReasonRequired": "Razón del rechazo (requerida)...",
+    "confirmReject": "Confirmar rechazo",
+    "confirmRejection": "Confirmar Rechazo",
+    "approvedReadyToPublish": "Aprobado. Listo para publicar.",
+    "requestRejected": "Solicitud rechazada",
+    "noActiveRequest": "No hay solicitud de aprobación activa.",
+    "awaitingLevel": "Esperando aprobación en",
+    "levelCard": {
+      "title": "Nivel {{number}}: {{name}}",
+      "approvedBy": "Aprobado por",
+      "rejectedBy": "Rechazado por",
+      "requiresRole": "Este nivel requiere aprobación del rol",
+      "waitingFor": "Esperando aprobación de"
+    },
+    "messages": {
+      "finalApproval": "Aprobación final completada.",
+      "levelApproved": "{{level}} aprobado"
     }
   },
   "auth": {
@@ -549,8 +627,10 @@
           "title": "Recibe el enlace",
           "subtitle": "Revisa tu bandeja de entrada"
         },
-        "step3": "Nueva contraseña",
-        "step3.subtitle": "Elige una contraseña segura",
+        "3": {
+          "title": "Nueva contraseña",
+          "subtitle": "Elige una contraseña segura"
+        },
         "secureProcess": "Proceso Seguro",
         "privacyPolicy": "Tu información está protegida con encriptación de grado bancario"
       },
@@ -649,28 +729,6 @@
     "returnToLogin": "Volver"
   },
   "calendar": {
-    "weekdays": {
-      "sun": "Dom",
-      "mon": "Lun",
-      "tue": "Mar",
-      "wed": "Mié",
-      "thu": "Jue",
-      "fri": "Vie",
-      "sat": "Sáb"
-    },
-    "views": {
-      "month": "Mes",
-      "week": "Semana",
-      "day": "Día"
-    },
-    "actions": {
-      "today": "Hoy",
-      "export": "Exportar",
-      "selectAll": "Seleccionar todos",
-      "clearSelection": "Limpiar selección",
-      "moveEvents": "Mover eventos",
-      "bulkMove": "Mover seleccionados"
-    },
     "navigation": {
       "previous": "Anterior",
       "next": "Siguiente",
@@ -684,35 +742,14 @@
       "status": "Estado",
       "campaign": "Campaña"
     },
-    "export": {
-      "title": "Exportar calendario",
-      "google": "Google Calendar",
-      "outlook": "Outlook Calendar",
-      "description": "El archivo .ics se puede importar en cualquier aplicación de calendario compatible",
-      "success": "Calendario exportado exitosamente",
-      "error": "Error al exportar el calendario",
-      "eventsCount": "eventos"
-    },
     "bulkActions": {
-      "selected": "seleccionado",
-      "selectedPlural": "seleccionados",
-      "event": "evento",
-      "eventPlural": "eventos",
-      "of": "de",
-      "total": "total",
-      "moveTitle": "Mover eventos seleccionados",
-      "moveDescription": "Selecciona la nueva fecha y hora para mover los {count} eventos seleccionados.",
       "moveSuccess": "Eventos movidos exitosamente",
       "moveError": "Error al mover los eventos",
       "undoSuccess": "Operación deshecha exitosamente",
-      "undoError": "Error al deshacer la operación",
-      "cancel": "Cancelar",
-      "move": "Mover"
+      "undoError": "Error al deshacer la operación"
     },
     "event": "evento",
     "selected": "seleccionados",
-    "of": "de",
-    "total": "total",
     "allSelected": "Todos seleccionados",
     "select": "Seleccionar",
     "selectAll": "Seleccionar todos",
@@ -723,33 +760,24 @@
     "selectAllDescription": "Todos los eventos visibles en el calendario",
     "clearSelection": "Limpiar selección",
     "moveEvents": "Mover eventos",
-    "delete": "Eliminar",
     "undo": "Deshacer",
     "undoLastOperation": "Deshacer última operación",
     "moveSelectedEvents": "Mover eventos seleccionados",
     "movingEvents": "Moviendo {{count}} eventos",
-    "movingEvents_one": "Moviendo 1 evento",
     "selectNewDateTime": "Selecciona la nueva fecha y hora para los eventos seleccionados.",
     "newDateAndTime": "Nueva fecha y hora",
     "preserveOriginalTime": "Los eventos mantendrán su hora original",
     "moveCount": "Mover {{count}} eventos",
-    "moveCount_one": "Mover 1 evento",
     "deleteSelectedEvents": "Eliminar eventos seleccionados",
     "confirmDelete": "Confirmar eliminación",
     "deleteWarning": "¿Estás seguro de que deseas eliminar {{count}} eventos? Esta acción no se puede deshacer.",
     "deleteCount": "Eliminar {{count}} eventos",
-    "deleteCount_one": "Eliminar 1 evento",
     "events": {
       "count": "eventos",
-      "empty": "No hay eventos para este día",
-      "noScheduled": "Sin eventos programados"
+      "empty": "No hay eventos para este día"
     },
     "userEvents": {
       "modal": {
-        "title": {
-          "edit": "Editar Evento",
-          "new": "Nuevo Evento Personal"
-        },
         "fields": {
           "title": "Título",
           "description": "Descripción",
@@ -780,11 +808,6 @@
           "errorDelete": "Error al eliminar el evento",
           "validationError": "Por favor, corrige los errores en el formulario"
         },
-        "validation": {
-          "titleRequired": "El título es obligatorio",
-          "startDateRequired": "La fecha de inicio es obligatoria",
-          "pastDate": "No se pueden crear eventos en el pasado"
-        },
         "visibility": {
           "public": "Público",
           "private": "Privado",
@@ -806,9 +829,6 @@
       "connect": "Conectar",
       "connecting": "Conectando...",
       "disconnect": "Desconectar",
-      "syncNow": "Sincronizar Ahora",
-      "configure": "Configurar",
-      "lastSync": "Última sincronización",
       "disconnectConfirm": {
         "title": "¿Desconectar calendario?",
         "message": "¿Estás seguro de que deseas desconectar este calendario? Los eventos sincronizados se eliminarán del calendario externo.",
@@ -820,18 +840,7 @@
       "disconnectError": "Error al desconectar el calendario",
       "syncSuccess": "Sincronización completada exitosamente",
       "syncError": "Error al sincronizar el calendario",
-      "fetchError": "Error al obtener el estado de conexión",
       "connectionSuccess": "Calendario {{provider}} conectado exitosamente",
-      "syncSettings": "Configuración de Sincronización",
-      "enableSync": "Habilitar sincronización automática",
-      "syncCampaigns": "Sincronizar solo estas campañas (dejar vacío para todas)",
-      "syncPlatforms": "Sincronizar solo estas plataformas (dejar vacío para todas)",
-      "syncSettingsSaved": "Configuración guardada exitosamente",
-      "syncSettingsError": "Error al guardar la configuración",
-      "save": "Guardar",
-      "cancel": "Cancelar",
-      "retrySuccess": "Sincronización reintentada exitosamente",
-      "retryError": "Error al reintentar la sincronización",
       "errors": {
         "invalidState": "Estado de autenticación inválido",
         "expiredState": "La sesión de autenticación ha expirado",
@@ -843,7 +852,6 @@
     },
     "error": {
       "title": "Algo salió mal",
-      "description": "Ocurrió un error al renderizar el calendario. Intenta de nuevo.",
       "retry": "Intentar de nuevo",
       "retry_button": "Reintentar",
       "persist": "Si el problema persiste contacta con soporte."
@@ -851,9 +859,7 @@
     "validation": {
       "invalid_date": "Fecha Inválida",
       "past_date_error": "No se Puede Programar en el Pasado",
-      "past_date_message": "No puedes programar eventos para fechas pasadas. Selecciona una fecha y hora futura.",
-      "date_required": "La fecha es obligatoria",
-      "invalid_format": "Formato de fecha inválido. Usa una fecha válida."
+      "past_date_message": "No puedes programar eventos para fechas pasadas. Selecciona una fecha y hora futura."
     },
     "warnings": {
       "pastDate": "¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?"
@@ -866,9 +872,6 @@
     "sync": {
       "error": {
         "title": "Error de Sincronización",
-        "failed": "Error al sincronizar con {provider}",
-        "token_expired": "Tu conexión con {provider} ha expirado. Reconecta.",
-        "unavailable": "{provider} no está disponible actualmente. Intenta más tarde.",
         "unknown": "Ocurrió un error de sincronización desconocido",
         "dismiss": "Descartar error",
         "retry": "Reintentar sincronización",
@@ -880,7 +883,6 @@
     },
     "conflict": {
       "title": "Conflicto de Datos Detectado",
-      "description": "Este evento ha sido modificado por otro usuario. Elige qué versión mantener.",
       "event": "Evento",
       "field_label": "Campo en conflicto",
       "your_version": "Tu Versión",
@@ -889,7 +891,6 @@
       "server": "Servidor",
       "select_local": "Seleccionar tu versión",
       "select_server": "Seleccionar versión del servidor",
-      "info": "La versión que elijas será guardada. La otra versión será descartada.",
       "cancel": "Cancelar",
       "resolve": "Aplicar Versión Seleccionada",
       "field": {
@@ -900,30 +901,26 @@
         "platform": "Plataforma",
         "campaign": "Campaña"
       }
-    }
+    },
+    "clear_all": "Limpiar todo",
+    "filter_by_campaign": "Campaña",
+    "filter_by_platform": "Plataforma",
+    "filter_by_status": "Estado",
+    "showing_filtered": "Mostrando {{count}} de {{total}} eventos",
+    "move": "Mover"
   },
   "campaigns": {
     "title": "Resumen de Rendimiento",
     "subtitle": "Analiza el impacto y rendimiento de tus campañas y publicaciones.",
     "noPublications": "No hay publicaciones asociadas",
-    "scheduledPosts": "Publicaciones Programadas",
-    "inCampaigns": "En {{count}} campaña",
-    "inCampaigns_plural": "En {{count}} campañas",
-    "create": "Crear Campaña",
     "table": {
       "name": "Nombre",
-      "description": "Descripción",
       "publications": "Publicaciones",
-      "media": "Archivos",
       "status": "Estado",
       "actions": "Acciones",
-      "loading": "Cargando...",
-      "timeline": "Línea de Tiempo",
-      "performance": "Rendimiento",
       "emptyState": {
         "title": "No se encontraron campañas",
-        "description": "Crea una campaña para comenzar a publicar contenido.",
-        "button": "Agregar Campaña"
+        "description": "Crea una campaña para comenzar a publicar contenido."
       }
     },
     "filters": {
@@ -936,21 +933,12 @@
       "paused": "Pausada"
     },
     "actions": {
-      "viewCampaign": "Ver Campaña",
-      "edit": "Editar",
-      "publishNow": "Publicar Ahora",
-      "viewDetails": "Ver Detalles",
-      "delete": "Eliminar",
-      "active": "Activa",
-      "remove": "Eliminar",
-      "change": "Cambiar",
       "showPublications": "Ver publicaciones",
       "hidePublications": "Ocultar publicaciones"
     },
     "messages": {
       "fetchError": "Error al cargar campañas",
       "addSuccess": "Campaña creada exitosamente",
-      "duplicateSuccess": "Campaña duplicada correctamente",
       "addError": "Error al crear campaña",
       "updateSuccess": "Campaña actualizada exitosamente",
       "updateError": "Error al actualizar campaña",
@@ -960,12 +948,7 @@
       "error": "Error"
     },
     "modal": {
-      "sections": {
-        "details": "Detalles de la Campaña"
-      },
       "add": {
-        "title": "Crear Campaña",
-        "subtitle": "Puedes crear una campaña para organizar y publicar tu contenido.",
         "name": "Nombre de la campaña",
         "description": "Descripción",
         "goal": "Objetivo",
@@ -976,8 +959,6 @@
         "loadingPublications": "Cargando publicaciones...",
         "noPublications": "No se encontraron publicaciones. ¡Crea algunas primero!",
         "associatedPublicationsRequired": "Se requiere asociar al menos una publicación",
-        "status": "Estado",
-        "media": "Archivos",
         "placeholders": {
           "name": "Ej: Campaña de Verano",
           "description": "Breve descripción de la campaña",
@@ -989,14 +970,8 @@
         }
       },
       "edit": {
-        "title": "Editar Campaña",
-        "subtitle": "Actualiza la información de tu campaña.",
-        "name": "Nombre de la campaña",
-        "description": "Descripción",
         "goal": "Objetivo",
         "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
         "associatedPublications": "Publicaciones Asociadas",
         "noPublications": "No se encontraron publicaciones.",
         "placeholders": {
@@ -1031,6 +1006,15 @@
       "edit": "Guardar Cambios"
     }
   },
+  "checkout": {
+    "success": {
+      "activated": "Tu suscripción ha sido activada correctamente.",
+      "activating": "Estamos activando tu suscripción...",
+      "goToDashboard": "Ir al Dashboard",
+      "title": "Pago Exitoso",
+      "updating": "Actualizando tu cuenta..."
+    }
+  },
   "colors": {
     "default": "Predeterminado (Naranja)",
     "blue": "Azul",
@@ -1041,59 +1025,39 @@
     "orange": "Naranja"
   },
   "common": {
-    "locale": "es-ES",
+    "system": "Sistema",
     "deleteConfirmTitle": "Confirmar eliminación",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.",
     "deleteSuccess": "Elemento eliminado correctamente",
     "deleteError": "Error al eliminar el elemento",
-    "welcome": "Bienvenido",
     "loading": "Cargando...",
     "deleting": "Eliminando...",
-    "select": "Seleccionar",
     "more": "Más",
     "active": "Activa",
     "selected": "Seleccionado",
-    "inactive": "Inactiva",
     "completed": "Completada",
-    "paused": "Pausada",
     "available": "Disponible",
-    "name": "Nombre",
     "type": "Tipo",
     "confirm": "Confirmar",
-    "progress": "Progreso",
     "dismiss": "Descartar",
-    "never": "Nunca",
-    "never_expires": "No expira",
     "viewAll": "Ver todo",
-    "new": "Nuevo",
     "saving": "Guardando...",
     "listView": "Vista de Lista",
     "gridView": "Vista de Grilla",
     "none": "Ninguna",
-    "totalSettings": "Total de Ajustes",
-    "unsavedChanges": "Cambios no guardados",
     "configured": "Configurado",
     "notConfigured": "No Configurado",
-    "allSaved": "Todo guardado",
     "refresh": "Recargar",
     "save": "Guardar",
     "reply": "Responder",
-    "apply": "Aplicar",
     "cancel": "Cancelar",
-    "continue": "Continuar",
     "delete": "Eliminar",
-    "duplicate": "Duplicar",
     "edit": "Editar",
     "view": "Ver",
     "viewDetails": "Ver Detalles",
     "approved": "Aprobado",
     "rejected": "Rechazado",
-    "pending": "Pendiente",
     "upgradePlan": "Actualizar Plan",
-    "analytics": "Analíticas",
-    "aiChat": "Chat IA",
-    "logout": "Cerrar Sesión",
-    "localizationExamples": "Ejemplos de Localización",
     "read_more": "Leer más",
     "show_less": "Leer menos",
     "affected_publications": "Publicaciones afectadas:",
@@ -1107,26 +1071,11 @@
       "dark": "🌙 Oscuro",
       "system": "💻 Sistema"
     },
-    "shortcuts": {
-      "title": "Atajos de Teclado",
-      "theme": {
-        "toggle": "Cambiar tema (Claro/Oscuro/Sistema)"
-      },
-      "help": {
-        "show": "Mostrar atajos de teclado"
-      },
-      "category": {
-        "appearance": "Apariencia",
-        "help": "Ayuda"
-      }
-    },
     "ai": {
-      "suggest": "Sugerir con IA",
       "improve": "Mejorar con IA",
       "thinking": "Pensando...",
       "suggestions_generated": "Sugerencias generadas con éxito",
       "suggestion_failed": "No se pudieron generar sugerencias",
-      "get_suggestions": "Obtener sugerencias con IA",
       "idea_prompt": "Prompt de Idea (IA)",
       "idea_prompt_placeholder": "Describe tu idea para autocompletar el formulario...",
       "generate": "Generar todo",
@@ -1146,23 +1095,15 @@
       "approvals": "Aprobaciones"
     },
     "previous": "Anterior",
-    "showing": "Mostrando",
-    "of": "de",
-    "results": "resultados",
-    "perPage": "por página",
     "noResults": "No se encontraron resultados",
     "search": "Buscar por nombre",
-    "preview": "Vista Previa",
-    "settings": "Configuración",
     "done": "Listo",
     "processing": "Procesando...",
     "publishing": "Publicando",
     "creating": "Creando...",
     "save_changes": "Guardar Cambios",
-    "noCreditCard": "No requiere tarjeta de crédito",
     "unknown": "Desconocido",
     "notSet": "No establecido",
-    "platformConnect": "Plataforma",
     "understood": "Entendido",
     "untitled": "Sin título",
     "noDate": "Sin fecha",
@@ -1171,25 +1112,14 @@
     "copy": "Copiar",
     "download": "Descargar",
     "openInNewTab": "Abrir en nueva pestaña",
-    "created": "Fecha de creación",
-    "expires": "Expiración",
-    "actions": "Acciones",
     "creator": "Creador",
     "me": "Yo",
     "readOnly": "Solo lectura",
-    "lastUpdated": "Última Actualización",
-    "last_used": "Último uso",
-    "startDate": "Fecha de Inicio",
-    "endDate": "Fecha de Fin",
-    "viewOnPlatform": "Ver en plataforma",
-    "viewDirectly": "Ver pantalla completa",
     "editInPanel": "Editar en el panel",
     "yes": "Sí",
     "no": "No",
     "required": "Requerido",
-    "optional": "Opcional",
     "configure": "Configurar",
-    "noSettings": "Sin ajustes por defecto",
     "adjustOptions": "Ajustar opciones específicas",
     "remove": "Eliminar",
     "generate": "Generar",
@@ -1208,11 +1138,7 @@
     "socialAccount": "red social",
     "socialAccounts": "redes sociales",
     "storage": "almacenamiento",
-    "vistas": "Vistas",
-    "clics": "Clics",
-    "engagement": "Engagement",
     "filters": {
-      "all": "Todos",
       "title": "Filtros",
       "startDate": "Inicio",
       "endDate": "Fin"
@@ -1236,27 +1162,14 @@
       "title": "Ninguna plataforma"
     },
     "errors": {
-      "checkFormErrors": "Revisa los errores en el formulario",
-      "ffmpeg_load": "Error al cargar el procesador de video. Asegúrate de tener una conexión estable y soporte para SharedArrayBuffer.",
-      "processing_failed": "Error al procesar el video.",
-      "no_shared_array_buffer": "Tu navegador o entorno no soporta las funciones necesarias para procesar video localmente (SharedArrayBuffer).",
-      "video_load": "Error al cargar el video para procesar."
+      "checkFormErrors": "Revisa los errores en el formulario"
     },
-    "vsLastPeriod": "vs periodo anterior",
     "pagination": {
       "show": "Mostrar",
       "entries": "entradas",
       "info": "Mostrando {{from}} a {{to}} de {{total}} resultados"
     },
     "approvals": {
-      "tabs": {
-        "pending": "Pendientes",
-        "history": "Historial"
-      },
-      "locked": {
-        "title": "Aprobaciones básicas habilitadas",
-        "description": "Actualmente tienes acceso a aprobaciones básicas. Para configurar flujos de aprobación multi-nivel, sube de plan."
-      },
       "title": "Flujos de Aprobación",
       "subtitle": "Define rutas de revisión secuenciales para tus publicaciones.",
       "invite": "Invitar",
@@ -1289,18 +1202,30 @@
         "updated": "Flujo actualizado con éxito",
         "deleted": "Flujo eliminado"
       },
-      "confirmDelete": "¿Estás seguro de que quieres eliminar este flujo?"
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este flujo?",
+      "basic_enabled": {
+        "title": "Aprobaciones básicas habilitadas",
+        "description": "Tu plan incluye aprobaciones de un nivel. Mejora tu plan para configurar flujos multinivel."
+      },
+      "upgrade": {
+        "title": "Desbloquea aprobaciones avanzadas",
+        "description": "Mejora tu plan para acceder a flujos de aprobación multinivel y control total del contenido.",
+        "benefits_title": "Qué obtienes",
+        "benefits": {
+          "custom_workflows": "Flujos de aprobación personalizados",
+          "role_assignment": "Asignación de roles por nivel",
+          "content_control": "Control total del contenido",
+          "approval_history": "Historial de aprobación completo"
+        }
+      }
     },
     "upload": {
       "progress": "Progreso de carga",
-      "percentage": "{{percentage}}% completado",
       "eta": "Tiempo estimado restante",
       "speed": "Velocidad de carga",
       "left": "restante",
       "pending": "Pendiente",
-      "uploading": "Cargando",
       "paused": "Pausado",
-      "completed": "Completado",
       "cancelled": "Cancelado",
       "processing": "Procesando",
       "done": "Listo",
@@ -1310,10 +1235,6 @@
       "dismiss": "Descartar",
       "retryAttempt": "Intento {{count}} de 3",
       "maxRetriesReached": "Se alcanzó el máximo de intentos. Verifica tu conexión o intenta cargar un archivo más pequeño.",
-      "networkError": "Error de red. Verifica tu conexión e intenta nuevamente.",
-      "validationError": "Falló la validación del archivo. Verifica el archivo e intenta nuevamente.",
-      "uploadFailed": "Falló la carga. Intenta nuevamente.",
-      "processingFailed": "Falló el procesamiento. Intenta nuevamente.",
       "resume_prompt": {
         "title": "Cargas Incompletas Detectadas",
         "description": "Tienes {{count}} carga incompleta de una sesión anterior.",
@@ -1392,12 +1313,49 @@
       "checkingSubscription": "Verificando suscripción...",
       "loadingPlans": "Cargando planes...",
       "generationInProgress": "Ya hay una generación en proceso. Espera."
+    },
+    "back": "Volver",
+    "change": "Cambiar",
+    "notAvailable": "No disponible",
+    "skipToMainContent": "Saltar al contenido principal",
+    "back_to_settings": "Volver a ajustes",
+    "copied": "Copiado",
+    "downloadError": "Error al descargar",
+    "exportCompleted": "Exportación completada",
+    "exportError": "Error al exportar",
+    "limit": "Límite",
+    "minCharacters": "Mínimo de caracteres",
+    "page": "Página",
+    "publication": "Publicación",
+    "retrying": "Reintentando...",
+    "tip": "Consejo",
+    "updating": "Actualizando...",
+    "upgrade_plan": "Mejorar plan",
+    "view_plans": "Ver planes",
+    "you": "Tú",
+    "yourVideo": "Tu video"
+  },
+  "confirm-password": {
+    "title": "Confirmar contraseña",
+    "description": "Esta es un área segura. Confirma tu contraseña para continuar.",
+    "label": "Contraseña",
+    "placeholder": "Ingresa tu contraseña",
+    "button": "Confirmar"
+  },
+  "content": {
+    "publish": {
+      "button": "Publicar",
+      "ready": "Listo para publicar",
+      "pending_review": "Pendiente de revisión",
+      "approval_required": "Aprobación requerida",
+      "approval_required_message": "Este contenido debe aprobarse antes de publicar.",
+      "no_permission": "No tienes permiso para publicar",
+      "owner_bypass": "Como propietario, puedes publicar sin aprobación",
+      "rejected_message": "Este contenido fue rechazado. Revisa los comentarios antes de volver a publicar."
     }
   },
   "dashboard": {
     "title": "Panel",
-    "welcomeMessage": "Bienvenido, {{name}}!",
-    "systemStats": "Estadísticas generales del sistema",
     "totalViews": "Total Vistas",
     "totalClicks": "Total Clicks",
     "conversions": "Conversiones",
@@ -1405,17 +1363,7 @@
     "totalEngagement": "Engagement Total",
     "avgEngagementRate": "Tasa de Engagement Promedio",
     "engagementTrends": "Tendencia de Engagement",
-    "followersByPlatform": "Seguidores por Plataforma",
-    "campaignPerformance": "Rendimiento de Campañas",
     "platformPerformance": "Rendimiento Global por Plataforma",
-    "views": "Vistas",
-    "clicks": "Clicks",
-    "engagement": "Engagement",
-    "emptyState": {
-      "title": "Sin Datos",
-      "message": "Ejecuta el comando para generar datos de prueba:",
-      "command": "php artisan statistics:seed"
-    },
     "quickActions": {
       "campaigns": {
         "title": "Campañas",
@@ -1429,6 +1377,22 @@
         "title": "Contenido",
         "description": "Gestionar medios y publicaciones"
       }
+    },
+    "subtitle": "Estadísticas generales del sistema.",
+    "tabs": {
+      "overview": "Resumen",
+      "engagement": "Interacción",
+      "social": "Redes Sociales"
+    },
+    "sections": {
+      "accounts": "Estado de Cuentas Conectadas",
+      "interaction": "Métricas de Interacción",
+      "interactionDesc": "Análisis detallado de cómo los usuarios interactúan con tu marca.",
+      "performance": "Resumen de Rendimiento",
+      "performanceDesc": "Métricas clave sobre el alcance y la interacción de tu contenido.",
+      "platforms": "Comparativa de Plataformas",
+      "publications": "Estado de Publicaciones",
+      "publicationsDesc": "Reporte del estado actual de tus campañas y publicaciones recientes."
     }
   },
   "excel": {
@@ -1440,9 +1404,7 @@
     "uploadFileTitle": "Paso 2: Sube tu archivo",
     "dragDropText": "Arrastra tu archivo aquí",
     "orClickToSelect": "o haz clic para seleccionar",
-    "selectFile": "Seleccionar Archivo",
     "supportedFormats": "Formatos: .xlsx, .xls, .csv (Máx. 10MB)",
-    "removeFile": "Quitar archivo",
     "import": "Importar",
     "templateDownloaded": "Plantilla descargada correctamente",
     "downloadError": "Error al descargar la plantilla",
@@ -1462,56 +1424,25 @@
   },
   "jsonImport": {
     "title": "Importar desde JSON",
-    "menuDescription": "Publicaciones y campañas en lote",
+    "menuDescription": "Importa publicaciones desde un archivo JSON",
     "downloadTemplateTitle": "Paso 1: Descarga la plantilla",
-    "downloadTemplateDesc": "Descarga el JSON de ejemplo con publicaciones únicas y campañas con publicaciones anidadas.",
+    "downloadTemplateDesc": "Descarga un archivo JSON de ejemplo con el formato correcto.",
     "downloadTemplate": "Descargar Plantilla",
+    "templateDownloaded": "Plantilla descargada correctamente",
+    "downloadError": "Error al descargar la plantilla",
     "uploadFileTitle": "Paso 2: Sube tu archivo JSON",
     "dragDropText": "Arrastra tu archivo .json aquí",
     "supportedFormats": "Formato: .json (Máx. 10MB)",
-    "import": "Importar",
-    "templateDownloaded": "Plantilla descargada correctamente",
-    "downloadError": "Error al descargar la plantilla",
+    "noFileSelected": "Por favor selecciona un archivo",
     "invalidFileType": "Tipo de archivo inválido. Use .json",
     "fileTooLarge": "El archivo es demasiado grande. Máximo 10MB",
-    "noFileSelected": "Selecciona un archivo",
+    "import": "IMPORTAR",
     "importSuccess": "Importación exitosa",
     "importPartial": "Importación completada con errores",
-    "importError": "Error al importar el archivo",
+    "importError": "Error en la importación",
+    "total": "Total",
     "successful": "Exitosos",
-    "failed": "Fallidos",
-    "total": "Total"
-  },
-  "formats": {
-    "excel": {
-      "importPublications": "Importar Publicaciones",
-      "importCampaigns": "Importar Campañas",
-      "downloadTemplateTitle": "Paso 1: Descarga la plantilla",
-      "downloadTemplateDesc": "Descarga la plantilla oficial con el formato correcto y ejemplos.",
-      "downloadTemplate": "Descargar Plantilla",
-      "uploadFileTitle": "Paso 2: Sube tu archivo",
-      "dragDropText": "Arrastra tu archivo aquí",
-      "orClickToSelect": "o haz clic para seleccionar",
-      "selectFile": "Seleccionar Archivo",
-      "supportedFormats": "Formatos: .xlsx, .xls, .csv (Máx. 10MB)",
-      "removeFile": "Quitar archivo",
-      "import": "Importar",
-      "templateDownloaded": "Plantilla descargada correctamente",
-      "downloadError": "Error al descargar la plantilla",
-      "invalidFileType": "Tipo de archivo inválido. Use .xlsx, .xls o .csv",
-      "fileTooLarge": "El archivo es demasiado grande. Máximo 10MB",
-      "noFileSelected": "Selecciona un archivo",
-      "importSuccess": "Importación exitosa",
-      "importPartial": "Importación parcial",
-      "importError": "Error al importar el archivo",
-      "publications": "publicaciones",
-      "campaigns": "campañas",
-      "successful": "Exitosos",
-      "failed": "Fallidos",
-      "total": "Total",
-      "errors": "Errores encontrados",
-      "row": "Fila"
-    }
+    "failed": "Fallidos"
   },
   "legal": {
     "common": {
@@ -1664,7 +1595,6 @@
       "subtitle": "¿Tienes preguntas o sugerencias? Estamos aquí para ayudarte.",
       "support": {
         "title": "Atención y Sugerencias",
-        "description": "Este es el canal oficial para que nos hagas llegar tus comentarios. Puedes enviarnos cualquier <strong>sugerencia de mejora</strong>, informarnos sobre <strong>errores de la aplicación</strong> o consultarnos sobre nuestras <strong>políticas</strong>.",
         "note": "Tu feedback es fundamental para nosotros; revisamos cada mensaje para seguir mejorando la experiencia de Intellipost.",
         "writeTo": "Escríbenos a"
       },
@@ -1676,30 +1606,21 @@
     "subtitle": "Registros de actividad",
     "refresh": "Actualizar",
     "viewPost": "Ver publicación",
-    "filter": "Filtrar",
     "filters": {
-      "campaign": "Filtrar por Campaña",
-      "dateRange": "Rango de Fechas",
-      "allCampaigns": "Todas las Campañas",
-      "from": "Desde",
-      "to": "Hasta",
-      "apply": "Aplicar Filtros",
       "clear": "Limpiar"
     },
     "table": {
       "date": "Fecha",
       "platform": "Plataforma",
       "source": "Origen",
-      "description": "Descripción",
       "campaign": "Campaña",
       "status": "Estado",
-      "message": "Mensaje",
-      "error": "Error",
-      "video": "Video",
+      "description": "Descripción",
       "link": "Enlace",
-      "copy": "Copiar",
       "less": "Menos",
-      "more": "Mas"
+      "more": "Mas",
+      "clickMore": "Ver más",
+      "clickLess": "Ver menos"
     },
     "status": {
       "all": "Todos",
@@ -1713,27 +1634,15 @@
       "publishing": "Publicando"
     },
     "empty": "No se encontraron registros",
-    "noLogsDesc": "No hay registros de actividad que coincidan con tus filtros o en este espacio de trabajo.",
-    "loading": "Cargando registros...",
-    "pagination": {
-      "previous": "Anterior",
-      "next": "Siguiente",
-      "page": "Página",
-      "of": "de"
-    }
+    "noLogsDesc": "No hay registros de actividad que coincidan con tus filtros o en este espacio de trabajo."
   },
   "manageContent": {
     "configureNetworks": "Programa tus publicaciones",
-    "index": "Gestión de Contenido",
     "title": "Gestión de Contenido",
     "subtitle": "Organiza y gestiona tu contenido multimedia de forma elegante y eficiente",
     "createNew": "Crear Nuevo",
     "createPublication": "Post, reel, historia...",
     "createCampaign": "Agrupa publicaciones",
-    "importExcel": "Importar Excel",
-    "publications": "Publicaciones",
-    "campaigns": "Campañas",
-    "logs": "Registros",
     "tabs": {
       "publications": "Publicaciones",
       "campaigns": "Campañas",
@@ -1741,34 +1650,13 @@
       "logs": "Registros",
       "approvals": "Aprobaciones"
     },
-    "status": {
-      "all": "Todos",
-      "draft": "Borradores",
-      "scheduled": "Programados",
-      "pending_review": "Pendiente de Revisión",
-      "rejected": "Rechazados",
-      "published": "Publicados"
-    },
     "socialMedia": {
       "title": "Conecta tus Redes Sociales",
-      "description": "Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido. Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.",
-      "whyConnect": "¿Por qué conectar tus redes sociales?",
-      "connectedAccounts": "Cuentas Conectadas",
-      "of": "de",
       "accounts": "cuentas",
       "seeAccounts": "Ver redes",
       "hide": "Ocultar",
       "connected": "Conectado",
-      "notConnected": "No Conectada",
-      "connectToShare": "Conecta para comenzar a compartir",
       "connectedBy": "Conectado por",
-      "benefits": {
-        "autoPublish": "Publicar contenido automáticamente",
-        "manageAll": "Gestionar todas las cuentas en un solo lugar",
-        "schedule": "Programar publicaciones para momentos óptimos",
-        "control": "Mantener el control total siempre"
-      },
-      "disclaimer": "Puedes desconectar tus cuentas en cualquier momento. No publicaremos nada sin tu permiso.",
       "status": {
         "connected": "Conectado",
         "notConnected": "No Conectado",
@@ -1785,9 +1673,6 @@
       "oauth1Required": "OAuth 1.0a requerido",
       "oauth1Message": "Necesario para subir videos",
       "reconnect": "Reconectar",
-      "reconnecting": "Reconectando...",
-      "reconnectWindow": "Abriendo ventana de reconexión...",
-      "reconnectError": "Error al reconectar",
       "apiLimits": "Límites API",
       "limits": {
         "requestsPerHour": "Peticiones/hora",
@@ -1798,46 +1683,11 @@
         "dailyQuota": "Cuota diaria",
         "uploadCost": "Costo subida"
       },
-      "validation": {
-        "facebook": {
-          "typeRequired": "Debes seleccionar un tipo de publicación para Facebook",
-          "typeInvalid": "Tipo de publicación inválido para Facebook"
-        },
-        "instagram": {
-          "typeRequired": "Debes seleccionar un tipo de publicación para Instagram",
-          "typeInvalid": "Tipo de publicación inválido para Instagram"
-        },
-        "twitter": {
-          "typeRequired": "Debes seleccionar un tipo de publicación para Twitter",
-          "pollOptionsMin": "Las encuestas requieren al menos 2 opciones",
-          "pollOptionEmpty": "Las opciones de la encuesta no pueden estar vacías"
-        },
-        "youtube": {
-          "typeRequired": "Debes seleccionar un tipo de video para YouTube",
-          "typeInvalid": "Tipo de video inválido para YouTube"
-        },
-        "tiktok": {
-          "typeRequired": "Formato requerido para TikTok",
-          "typeInvalid": "Formato inválido"
-        }
-      },
       "messages": {
-        "settingsUpdated": {
-          "facebook": "Configuración de Facebook actualizada correctamente",
-          "instagram": "Configuración de Instagram actualizada correctamente",
-          "twitter": "Configuración de Twitter actualizada correctamente",
-          "tiktok": "Configuración de TikTok actualizada correctamente",
-          "youtube": "Configuración de YouTube actualizada correctamente",
-          "default": "Configuración actualizada correctamente"
-        },
-        "connectSuccess": "Cuenta conectada exitosamente",
         "disconnectSuccess": "Cuenta desconectada exitosamente",
-        "authError": "Error de autenticación",
         "unauthorized": "No autorizado. Inicia sesión nuevamente.",
         "loadError": "No se pudieron cargar las cuentas conectadas",
         "disconnectError": "Error al desconectar",
-        "popupBlocked": "El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.",
-        "urlError": "No se pudo obtener la URL de autenticación",
         "connectError": "Error al conectar con",
         "cannotDisconnectPublishing": "No puedes desconectar esta cuenta mientras hay publicaciones en proceso",
         "noPermission": "No tienes permiso para gestionar cuentas de redes sociales. Solo usuarios con el permiso 'manage-accounts' pueden conectar o desconectar cuentas."
@@ -1867,100 +1717,12 @@
         "waitForPublishing": "Espera a que las publicaciones terminen de publicarse.",
         "removeScheduled": "Ve a la sección de Contenido y elimina estas publicaciones de la programación."
       }
-    },
-    "modals": {
-      "add": {
-        "title": "Nueva Campaña",
-        "subtitle": "Crea una campaña impactante y atractiva",
-        "createButton": "Crear Campaña",
-        "creating": "Creando...",
-        "save": "Crear"
-      },
-      "edit": {
-        "title": "Editar Campaña",
-        "subtitle": "Actualiza tu campaña con nueva información",
-        "saveButton": "Guardar Cambios",
-        "saving": "Guardando...",
-        "save": "Actualizar"
-      },
-      "fields": {
-        "title": "Título de la Campaña",
-        "description": "Descripción",
-        "image": "Imagen de la Campaña",
-        "goal": "Objetivo de la Campaña",
-        "hashtags": "Hashtags",
-        "optional": "(Opcional)",
-        "schedulePublication": "Programar Publicación (Opcional)",
-        "optionalSchedule": "Dejar vacío para guardar como borrador o publicar inmediatamente.",
-        "selectSocialAccounts": "Seleccionar Redes Sociales",
-        "socialAccounts": "Seleccionar Redes Sociales",
-        "noConnectedAccounts": "No se encontraron cuentas conectadas.",
-        "alreadyScheduled": "Ya se programó una publicación para esta fecha.",
-        "placeholders": {
-          "title": "Ej: Campaña de Verano 2024",
-          "description": "Describe tu campaña de manera detallada y atractiva...",
-          "goal": "Ej: Aumentar el engagement en redes sociales",
-          "hashtags": "#marketing #campaña #verano2024"
-        },
-        "dragDrop": {
-          "title": "Arrastra tu imagen aquí o haz clic para seleccionar",
-          "subtitle": "JPG, PNG o WebP • Máximo 5MB"
-        }
-      },
-      "validation": {
-        "titleRequired": "El título es obligatorio",
-        "titleLength": "El título no puede exceder los 100 caracteres",
-        "descRequired": "La descripción es obligatoria",
-        "descMin": "La descripción debe tener al menos 10 caracteres",
-        "descMax": "La descripción no puede exceder los 200 caracteres",
-        "imageRequired": "La imagen es obligatoria",
-        "imageSize": "La imagen debe ser menor a 5MB",
-        "imageType": "Solo se permiten archivos JPG, PNG o WebP",
-        "objRequired": "El objetivo es obligatorio",
-        "objMin": "El objetivo debe tener al menos 5 caracteres",
-        "objMax": "El objetivo no puede exceder los 200 caracteres",
-        "hashtagsRequired": "Los hashtags son obligatorios",
-        "hashtagValid": "Debe incluir al menos un hashtag válido (#ejemplo)",
-        "hashtagMax": "Máximo 10 hashtags permitidos",
-        "confirmDeleteSchedule": "¿Estás seguro de que deseas eliminar esta publicación programada? Esta acción no se puede deshacer.",
-        "deleteScheduleTitle": "¿Eliminar publicación programada?",
-        "scheduleDeleted": "Publicación programada eliminada correctamente",
-        "scheduleDeleteError": "Error al eliminar la publicación programada"
-      }
-    }
-  },
-  "media": {
-    "crop": {
-      "title": "Recortar Imagen"
     }
   },
   "nav": {
-    "dashboard": "Panel",
-    "calendar": "Calendario",
     "profile": "Perfil",
-    "settings": "Configuración",
-    "content": "Contenido",
-    "content.records": "Registros",
-    "content.publications": "Publicaciones",
-    "content.campaigns": "Campañas",
-    "content.approvals": "Aprobaciones",
-    "analytics": "Analíticas",
-    "aiChat": "Chat IA",
-    "socialNetworks": "Redes Sociales",
     "logout": "Cerrar Sesión",
     "notifications": "Notificaciones",
-    "workspaces": "Espacios",
-    "workspaces.overview": "Vista general",
-    "workspaces.usage": "Uso",
-    "workspaces.general": "Configuración",
-    "workspaces.members": "Miembros",
-    "workspaces.integrations": "Integraciones",
-    "workspace_branding": "Marca del Espacio",
-    "reels": "Reels",
-    "billing": "Facturación",
-    "addons": "Créditos",
-    "adminDashboard": "Admin Panel",
-    "adminSettings": "Config. Sistema",
     "search": "Buscar rutas...",
     "noResults": "No se encontraron rutas",
     "search.clear": "Limpiar búsqueda",
@@ -1970,16 +1732,16 @@
     "sidebar.expand": "Expandir menú",
     "menu.navigation": "Menú de navegación",
     "mainNavigation": "Navegación principal",
-    "content_records": "Registros",
-    "workspaces_overview": "Vista general",
+    "content.records": "Registros",
+    "content.publications": "Publicaciones",
+    "content.campaigns": "Campañas",
+    "content.approvals": "Aprobaciones",
+    "workspaces.overview": "Vista general",
+    "workspaces.usage": "Uso",
+    "workspaces.general": "Configuración",
+    "workspaces.members": "Miembros",
+    "workspaces.integrations": "Integraciones",
     "section": {
-      "dashboard": "Panel",
-      "content": "Contenido",
-      "analytics": "Analíticas",
-      "workspaces": "Espacios",
-      "subscription": "Suscripción",
-      "settings": "Configuración",
-      "admin": "Administración",
       "quickNavHint": "para navegar"
     }
   },
@@ -1987,18 +1749,6 @@
     "title": "Notificaciones",
     "new": "nuevas",
     "mark_all_read": "Marcar todo como leído",
-    "new_content": "Nuevo contenido disponible",
-    "content_ready": "Tu contenido ha sido procesado y está listo para publicar.",
-    "analytics_ready": "Reporte de analíticas",
-    "report_generated": "El reporte mensual de rendimiento está disponible.",
-    "scheduled_post": "Publicación programada",
-    "post_scheduled": "Tu publicación ha sido programada exitosamente.",
-    "warning": "Advertencia de sistema",
-    "api_limit": "Estás cerca de alcanzar tu límite de API mensual.",
-    "high_priority": "Alta prioridad",
-    "normal_priority": "Normal",
-    "low_priority": "Baja prioridad",
-    "all": "Todo",
     "types": {
       "all": "Todas",
       "publications": "Publicaciones",
@@ -2014,43 +1764,14 @@
       "normal": "Normal",
       "low": "Baja"
     },
-    "priority_label": "Prioridad",
     "no_notifications_filtered": "Sin notificaciones para los filtros seleccionados",
-    "video_uploaded": "Video subido exitosamente a {{platform}}",
-    "video_deleted": "Video eliminado de {{platform}}",
-    "status_update": "Actualización de estado",
-    "status_update_description": "{{type}} {{platform}}",
-    "playlist_processed": "Video agregado a playlist de {{platform}}",
-    "playlist_processedVideo": "'{{video_title}}' agregado a la playlist '{{playlist_name}}'",
-    "playlist_processedNoVideo": "Agregado a la playlist '{{playlist_name}}'",
-    "playlist_failed": "Error al agregar video a playlist de {{platform}}",
-    "playlist_failed_description": "No se pudo agregar '{{video_title}}' a la playlist '{{playlist_name}}' en la cuenta {{account}}",
-    "retry_max_reached": "Se alcanzó el máximo de intentos.",
-    "retry_auto": "Se reintentará automáticamente.",
     "modal": {
-      "title": "Notificaciones",
-      "new": "nuevas",
-      "mark_all_read": "Marcar todo como leído",
-      "new_content": "Nuevo contenido disponible",
-      "content_ready": "Tu contenido ha sido procesado y está listo para publicar.",
-      "analytics_ready": "Reporte de analíticas",
-      "report_generated": "El reporte mensual de rendimiento está disponible.",
-      "scheduled_post": "Publicación programada",
-      "post_scheduled": "Tu publicación ha sido programada exitosamente.",
-      "warning": "Advertencia de sistema",
-      "api_limit": "Estás cerca de alcanzar tu límite de API mensual.",
-      "no_notifications": "No tienes notificaciones pendientes",
-      "empty_description": "El sistema no tiene notificaciones para mostrar",
       "categories": {
-        "all": "Todo",
         "application": "Aplicación",
-        "content": "Contenido",
-        "system": "Sistema",
-        "analytics": "Analíticas"
+        "system": "Sistema"
       }
     },
     "admin": {
-      "page_title": "Notificaciones del Sistema",
       "card_title": "Enviar Notificación Global",
       "card_description": "Esta notificación será enviada a TODOS los usuarios del sistema en tiempo real y se guardará en su historial.",
       "form": {
@@ -2111,19 +1832,16 @@
       "sizeRequired": "Selecciona el tamaño de tu equipo"
     },
     "optional": "Opcional",
-    "skip": "Saltar este paso",
     "continue": "Continuar"
   },
   "planSelection": {
     "title": "Elige el plan perfecto para ti",
     "description": "Comienza gratis o elige un plan que se ajuste a tus necesidades",
-    "recommended": "Recomendado",
     "intervals": {
       "month": "mes",
-      "forever": "siempre"
+      "forever": "siempre",
+      "year": "año"
     },
-    "startFree": "Comenzar Gratis",
-    "selectPlan": "Seleccionar Plan",
     "decideLater": "Decidiré más tarde"
   },
   "tour": {
@@ -2136,7 +1854,8 @@
     "nextStep": "Ir al siguiente paso del tour",
     "completeTour": "Completar el tour guiado",
     "skipGuidedTour": "Saltar el tour guiado",
-    "progress": "Progreso del tour"
+    "progress": "Progreso del tour",
+    "navigating": "Navegando a la siguiente sección..."
   },
   "wizard": {
     "title": {
@@ -2192,7 +1911,8 @@
       "accounts": "cuentas",
       "connectedAccounts": "Cuentas Conectadas",
       "nextStep": "A continuación, te ayudaremos a crear tu primera publicación usando una plantilla."
-    }
+    },
+    "continueWithout": "Continuar sin conectar"
   },
   "templates": {
     "title": "Elige una Plantilla",
@@ -2205,16 +1925,6 @@
     "filterBy": "Filtrar por categoría {{category}}",
     "useTemplate": "Usar Esta Plantilla",
     "selecting": "Seleccionando...",
-    "categories": {
-      "all": "Todas",
-      "promotional": "Promocional",
-      "educational": "Educativa",
-      "engagement": "Interacción"
-    },
-    "noTemplates": {
-      "title": "No se encontraron plantillas",
-      "description": "Intenta ajustar tu búsqueda o filtro para encontrar lo que buscas."
-    },
     "available": "{{count}} {{templateText}} disponibles",
     "template": "plantilla",
     "templates": "plantillas",
@@ -2222,19 +1932,10 @@
     "skipping": "Saltando...",
     "skipAndCreate": "Saltar selección de plantilla y crear publicación en blanco",
     "list": "Plantillas de publicación",
-    "select": "Seleccionar plantilla {{name}}",
-    "preview": "Vista previa de plantilla {{name}}"
+    "select": "Seleccionar plantilla {{name}}"
   },
   "progress": {
-    "title": "Progreso de Configuración",
-    "complete": "Completado",
-    "inProgress": "En progreso",
-    "stages": {
-      "businessInfo": "Información del Negocio",
-      "plan": "Selección de Plan",
-      "tour": "Tour Guiado",
-      "connect": "Conectar Cuentas"
-    }
+    "title": "Progreso de Configuración"
   },
   "platform": {
     "connect": "Conectar",
@@ -2250,40 +1951,11 @@
     "linkedin": "Comparte contenido profesional en LinkedIn"
   },
   "errors": {
-    "loadFailed": "Error al cargar la incorporación",
-    "actionFailed": "Error al realizar la acción",
-    "tryAgain": "Inténtalo de nuevo",
-    "networkError": "Ocurrió un error de red",
     "retry": "Reintentar"
-  },
-  "settings": {
-    "social": {
-      "title": "Configuración Global de Redes Sociales",
-      "subtitle": "Configura los ajustes por defecto que se aplicarán a todas tus nuevas publicaciones en las diferentes plataformas.",
-      "save": "Guardar Configuración Global",
-      "success": "Configuración global guardada exitosamente",
-      "error": "Error al guardar la configuración global"
-    }
-  },
-  "pagination": {
-    "next": "Siguiente",
-    "previous": "Anterior"
   },
   "payment": {
     "paymentMethod": "Método de pago",
     "selectPaymentMethod": "Selecciona un método de pago",
-    "noPaymentMethods": "No hay métodos de pago disponibles",
-    "loadingMethods": "Cargando métodos de pago...",
-    "stripe": "Tarjeta de crédito/débito",
-    "mercadopago": "Mercado Pago",
-    "epayco": "ePayco",
-    "payu": "PayU",
-    "wompi": "Wompi",
-    "processing": "Procesando pago...",
-    "success": "Pago exitoso",
-    "failed": "Pago fallido",
-    "cancelled": "Pago cancelado",
-    "selectToContine": "Selecciona un método de pago para continuar",
     "addonPurchaseSuccess": {
       "title": "¡Compra Exitosa!",
       "subtitle": "Tu paquete adicional ha sido activado correctamente",
@@ -2291,7 +1963,6 @@
       "amount": "Cantidad",
       "price": "Precio",
       "date": "Fecha",
-      "sessionId": "ID de Sesión",
       "addonUsage": "Estado de tus Addons",
       "nextSteps": "¿Qué sigue?",
       "step1": "Tu paquete adicional ya está activo y disponible para usar",
@@ -2373,10 +2044,10 @@
       "subtitle": "Ajustar opciones específicas de TikTok",
       "privacy": "Privacidad",
       "public": "Público",
-      "publicDescription": "Todos pueden ver",
       "friends": "Solo Amigos",
-      "friendsDescription": "Solo tus amigos pueden ver",
       "private": "Privado",
+      "publicDescription": "Todos pueden ver",
+      "friendsDescription": "Solo tus amigos pueden ver",
       "privateDescription": "Solo tú",
       "interactions": "Interacciones",
       "interactionsDescription": "Permitir interacciones",
@@ -2417,9 +2088,6 @@
   "portal": {
     "title": "Revisión de Contenido",
     "clientPortal": "Portal de Clientes",
-    "header": {
-      "workspace": "Espacio de Trabajo"
-    },
     "info": {
       "title": "Revisión de Contenido",
       "description": "Has recibido este enlace para revisar y aprobar el contenido preparado por {{creator}} para el workspace {{workspace}}."
@@ -2435,45 +2103,12 @@
       "alreadyReviewed": "Esta publicación ya ha sido revisada."
     },
     "details": {
-      "title": "Detalles de la Publicación",
-      "sentBy": "Enviado por",
-      "sentAt": "Enviado el",
-      "role": "Rol",
-      "workspace": "Espacio de Trabajo",
-      "scheduledFor": "Programado para",
-      "targetPlatforms": "Plataformas Objetivo",
-      "platforms": "{{count}} plataforma",
-      "platforms_plural": "{{count}} plataformas",
-      "createdAt": "Creado el",
-      "updatedAt": "Última actualización"
-    },
-    "content": {
-      "messageBody": "Cuerpo del Mensaje",
-      "mediaPreview": "Vista Previa de Medios",
-      "mediaCount": "{{current}} de {{total}}",
-      "noMedia": "Sin medios adjuntos",
-      "limitedPreview": "Vista Previa Limitada",
-      "limitedPreviewDesc": "Este archivo de tipo \"{{type}}\" se procesará para el canal final.",
-      "contentType": "Tipo de Contenido",
-      "hashtags": "Hashtags",
-      "noHashtags": "Sin hashtags",
-      "goal": "Objetivo de la Campaña",
-      "noGoal": "Sin objetivo específico definido",
-      "pollOptions": "Opciones de Encuesta",
-      "pollDuration": "Duración de la Encuesta",
-      "hours": "{{count}} hora",
-      "hours_plural": "{{count}} horas"
-    },
-    "socialAccounts": {
-      "title": "Cuentas Sociales",
-      "description": "Este contenido se publicará en las siguientes cuentas:",
-      "noAccounts": "No hay cuentas sociales configuradas"
+      "targetPlatforms": "Plataformas Objetivo"
     },
     "actions": {
       "approve": "Aprobar Contenido",
       "reject": "Solicitar Cambios",
       "approving": "Aprobando...",
-      "rejecting": "Rechazando...",
       "back": "Volver",
       "submitRejection": "Enviar Comentarios de Rechazo"
     },
@@ -2491,8 +2126,7 @@
     },
     "error": {
       "approve": "Error al aprobar el contenido",
-      "reject": "Error al rechazar el contenido",
-      "loadImage": "Error al cargar la imagen"
+      "reject": "Error al rechazar el contenido"
     },
     "footer": {
       "secureLink": "Este es un enlace seguro generado por {{app}} para {{workspace}}.",
@@ -2500,24 +2134,25 @@
     },
     "confirm": {
       "approve": "¿Estás seguro de que deseas aprobar este contenido?"
-    }
+    },
+    "copyLink": "Copiar link del portal",
+    "linkCopied": "Link copiado al portapapeles",
+    "linkError": "Error al generar el link",
+    "openPortal": "Abrir portal",
+    "shareWithClient": "Compartir con cliente"
   },
   "pricing": {
     "title": "Elige el plan perfecto para ti",
     "subtitle": "Empieza gratis y escala cuando lo necesites. Sin compromisos, cancela cuando quieras.",
     "flexiblePlans": "Planes flexibles para cada necesidad",
     "monthly": "Mensual",
-    "yearly": "Anual",
-    "yearlyDiscount": "-20%",
     "annualPricing": "Anual: {{price}}/mes — ahorras {{savings}}/año",
-    "purchasedPlans": "Planes comprados — cambiar sin pagar",
     "expiredPlans": "Planes expirados — renovar con pago",
     "currentPlanLabel": "Plan actual",
     "autoRenewal": "Renovación automática",
     "endsOn": "Finaliza el {{date}}",
     "statusActive": "Activa",
     "activePlanNow": "Plan activo ahora",
-    "activeSubscriptionLabel": "Suscripción activa",
     "expired": "Expirado",
     "use": "Usar",
     "renew": "Renovar",
@@ -2527,31 +2162,20 @@
     "demoTemporal": "Demo Temporal",
     "currentPlan": "Plan Actual",
     "perMonth": "/mes",
-    "perYear": "/año",
     "selectPlan": "Seleccionar Plan",
-    "startFree": "Comenzar Gratis",
     "processing": "Procesando...",
     "comingSoon": "Próximamente",
     "paymentSetup": "Configuración de pagos en proceso",
-    "noCreditCard": "Sin tarjeta de crédito",
-    "cancelAnytime": "Cancela cuando quieras",
-    "support247": "Soporte 24/7",
     "faq": "¿Tienes preguntas?",
     "faqSubtitle": "Estamos aquí para ayudarte a elegir el mejor plan",
     "contactUs": "Contáctanos en",
-    "changeToPlan": "Cambiar a este plan",
-    "cancelRequired": "Gestión de suscripción requerida",
     "cancelSubscriptionFirst": "Para volver al plan gratuito, primero debes cancelar tu suscripción de pago actual. El cambio se aplicará al finalizar tu periodo de facturación.",
     "missingFeatures": "Lo que te estás perdiendo",
     "showMore": "Ver más",
     "showLess": "Ver menos",
     "activeSubscription": {
       "title": "Ya tienes una suscripción activa",
-      "description": "Tu plan actual está activo. Para cambiar de plan o gestionar tu suscripción, visita la página de facturación.",
-      "changeDescription": "Puedes cambiar a cualquier plan a continuación. El cambio se aplicará inmediatamente y se ajustará tu facturación de forma prorrateada.",
-      "prorationExplanation": "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.",
-      "manageBilling": "Gestionar Facturación",
-      "viewUsage": "Ver Uso del Plan"
+      "manageBilling": "Gestionar Facturación"
     },
     "plans": {
       "demo": {
@@ -2649,61 +2273,52 @@
       "exportHistoryLimitYear": "Tu plan permite exportar hasta {{days}} días de historial (1 año)"
     },
     "billing": {
-      "month": "mes",
-      "year": "año"
-    }
+      "month": "mes"
+    },
+    "purchasedPlansAvailable": "Planes comprados — cambiar sin pago",
+    "status": {
+      "active": "Activo",
+      "available": "Disponible",
+      "expired": "Expirado",
+      "purchased": "Comprado"
+    },
+    "taglines": {
+      "demo": "Explora todo sin compromisos",
+      "enterprise": "Control total de tu marca",
+      "free": "Empieza gratis, sin tarjeta",
+      "professional": "Escala tu contenido con tu equipo",
+      "starter": "Para creadores individuales"
+    },
+    "timeAvailable": "Tiempo disponible"
   },
   "profile": {
-    "menu_title": "Configuración",
     "tabs": {
       "general": "General",
       "security": "Seguridad",
-      "subscription": "Suscripción y Plan",
-      "accounts": "Conexiones",
-      "ai": "Inteligencia Artificial",
-      "appearance": "Apariencia",
-      "onboarding": "Incorporación"
-    },
-    "title": "Perfil",
-    "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
-    "theme": {
-      "title": "Color del Tema",
-      "description": "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.",
-      "success_title": "¡Tema actualizado!",
-      "success_message": "El color del sistema se ha actualizado correctamente.",
-      "close": "Cerrar"
+      "subscription": "Suscripción y Plan"
     },
     "appearance": {
       "title": "Modo de Apariencia",
       "light": "Claro",
       "dark": "Oscuro",
-      "system": "Sistema"
+      "system": "Sistema",
+      "color": "Color"
+    },
+    "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
+    "theme": {
+      "title": "Color del Tema",
+      "description": "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.",
+      "success_message": "El color del sistema se ha actualizado correctamente."
     },
     "language": {
-      "title": "Idioma",
-      "success_message": "Idioma actualizado correctamente"
+      "title": "Idioma"
     },
-    "editProfile": "Editar Perfil",
-    "changePassword": "Cambiar Contraseña",
-    "name": "Nombre",
-    "email": "Correo Electrónico",
-    "currentPassword": "Contraseña Actual",
-    "newPassword": "Nueva Contraseña",
-    "confirmPassword": "Confirmar Contraseña",
-    "updateProfile": "Actualizar Perfil",
     "update_success": "Perfil actualizado exitosamente.",
     "update_error": "Error al actualizar el perfil.",
-    "deleteAccount": "Eliminar Cuenta",
     "actions": {
       "saveChanges": "Guardar Cambios"
     },
-    "messages": {
-      "unsavedChanges": "Tienes cambios no guardados. ¿Deseas continuar?"
-    },
     "information": {
-      "title": "Información del Perfil",
-      "description": "Actualiza la información de tu cuenta y dirección de correo electrónico.",
-      "saved": "Guardado.",
       "nameLabel": "Nombre",
       "namePlaceholder": "Tu Nombre",
       "emailLabel": "Correo Electrónico",
@@ -2711,38 +2326,29 @@
       "emailUnverified": "Tu dirección de correo electrónico no está verificada. Verifícala para acceder a todas las funciones.",
       "sendVerification": "Enviar Correo de Verificación",
       "verificationSent": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
-      "applicationLanguage": "Idioma de la Aplicación",
-      "languageDescription": "Selecciona tu idioma preferido para la interfaz de la aplicación.",
-      "currentLanguage": "Idioma Actual",
       "phoneLabel": "Teléfono",
       "phonePlaceholder": "Tu número de teléfono",
       "bioLabel": "Biografía",
       "bioPlaceholder": "Háblanos un poco de ti...",
       "sections": {
         "personal": "Información Personal",
-        "contact": "Detalles de Contacto",
-        "bio": "Sobre Mí",
-        "language": "Idioma y Preferencias"
+        "contact": "Detalles de Contacto"
       }
     },
     "statistics": {
-      "title": "Estadísticas de la Cuenta",
-      "description": "Resumen de la actividad y estado de tu cuenta.",
       "memberSince": "Miembro Desde",
       "daysActive": "Días Activo",
       "days": "días",
       "accountStatus": "Estado de la Cuenta",
       "active": "Activa",
       "emailStatus": "Estado del Correo",
-      "verified": "Verificado",
-      "unverified": "No Verificado"
+      "unverified": "No Verificado",
+      "notAvailable": "No disponible"
     },
     "connectedAccounts": {
-      "title": "Cuentas Sociales Conectadas",
-      "description": "Administra tus perfiles de redes sociales conectados para publicación de contenido.",
-      "connected": "Conectadas",
-      "notConnected": "No Conectadas",
-      "manageLink": "Administrar conexiones en el Gestor de Contenido"
+      "manageLink": "Administrar conexiones en el Gestor de Contenido",
+      "active": "Activa",
+      "inactive": "No conectada"
     },
     "password": {
       "title": "Actualizar Contraseña",
@@ -2754,10 +2360,6 @@
       "successTitle": "¡Contraseña actualizada exitosamente!",
       "successMessage": "La seguridad de tu cuenta ha sido mejorada.",
       "errorTitle": "Corrige los siguientes errores:",
-      "securityTips": "Consejos de Seguridad para Contraseñas:",
-      "tip1": "Usa al menos 8 caracteres con una mezcla de letras, números y símbolos",
-      "tip2": "Evita usar información personal o palabras comunes",
-      "tip3": "Considera usar un administrador de contraseñas para mayor seguridad",
       "placeholders": {
         "current": "Ingresa tu contraseña actual",
         "new": "Ingresa tu nueva contraseña",
@@ -2802,29 +2404,62 @@
       "restartHint": "Revisa las características de la plataforma y el proceso de configuración nuevamente",
       "restartButton": "Reiniciar"
     },
-    "usage": {
-      "title": "Uso del Plan",
-      "publications": "Publicaciones",
-      "used": "usado",
-      "viewDetails": "Ver detalles →"
-    }
+    "avatar_remove_error": "Ocurrió un error al eliminar el avatar",
+    "avatar_remove_failed": "Error al eliminar el avatar",
+    "avatar_removed": "Avatar eliminado correctamente",
+    "avatar_requirements": "Máximo 2MB. Formatos: JPG, PNG, GIF, WebP",
+    "avatar_too_large": "La imagen es muy grande. Máximo 2MB",
+    "avatar_update_failed": "Error al subir la foto",
+    "avatar_upload_error": "Ocurrió un error al subir la foto",
+    "avatar_uploaded": "Foto subida correctamente",
+    "choose_file": "Elegir Archivo",
+    "notifications": {
+      "title": "Preferencias de notificaciones",
+      "description": "Configura cómo quieres recibir notificaciones sobre la finalización de subidas y procesamiento",
+      "in_app": "Notificaciones en la app",
+      "in_app_description": "Muestra notificaciones dentro de la aplicación",
+      "browser": "Notificaciones del navegador",
+      "browser_description": "Muestra notificaciones del sistema incluso cuando la app está en segundo plano",
+      "enable": "Activar",
+      "requesting": "Solicitando...",
+      "permission_granted": "Notificaciones del navegador activadas",
+      "permission_denied": "Permiso de notificaciones del navegador denegado",
+      "permission_denied_help": "Permiso denegado. Activa las notificaciones en la configuración de tu navegador.",
+      "permission_error": "No se pudo solicitar el permiso de notificaciones",
+      "saved": "Preferencias guardadas",
+      "upload_complete": "Subidas completadas",
+      "upload_complete_description": "Notificar cuando terminen las subidas de archivos",
+      "processing_complete": "Procesamiento completado",
+      "processing_complete_description": "Notificar cuando termine el procesamiento de video",
+      "info_title": "Acerca de las notificaciones",
+      "info_description": "Las notificaciones te ayudan a estar al tanto de operaciones largas. Puedes personalizar qué tipos de notificaciones recibes y cómo se entregan."
+    },
+    "remove_photo": "Eliminar Foto",
+    "uploading": "Subiendo...",
+    "using_initials": "Usando iniciales",
+    "using_photo": "Usando foto personalizada"
   },
   "publications": {
     "title": "Publicaciones",
     "subtitle": "Gestionar tus publicaciones",
     "modal": {
-      "sections": {
-        "details": "Detalles del Contenido"
-      },
       "contentType": {
         "label": "Tipo de contenido",
-        "value": "Video",
         "filteredByPlatforms": "Filtrado por plataformas seleccionadas",
-        "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia"
+        "locked": "El tipo de contenido está bloqueado después de subir archivos multimedia",
+        "changed": "Tipo de contenido cambiado",
+        "autoChanged": "Tipo de contenido cambiado automáticamente",
+        "mediaAllowed": "Medios permitidos:",
+        "platforms": "Plataformas:",
+        "rules": "Reglas de contenido",
+        "suggestion": {
+          "title": "Sugerencia de tipo de contenido",
+          "reason": "Según los archivos que agregaste, sugerimos un tipo de contenido diferente.",
+          "apply": "Cambiar a {{type}}",
+          "keep": "Mantener {{type}}"
+        }
       },
       "poll": {
-        "question": "Pregunta de la Encuesta",
-        "questionPlaceholder": "Escribe tu pregunta aqui",
         "title": "Opciones de Encuesta",
         "options": "Opciones de la Encuesta (2-4 opciones)",
         "optionPlaceholder": "Opción",
@@ -2835,105 +2470,26 @@
         "note": "Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles."
       },
       "media": {
-        "uploadingPending": "Subiendo Pendiente",
-        "backgroundUpload": "Guardado! Los archivos multimedia se están subiendo en segundo plano."
+        "backgroundUpload": "Guardado! Los archivos multimedia se están subiendo en segundo plano.",
+        "attachFailed": "No se pudo adjuntar el archivo",
+        "lockFailed": "Advertencia: No se pudo bloquear el archivo para edición"
       },
       "upload": {
-        "activeTasks": "Archivos y Publicaciones ({{count}})...",
-        "uploadingFiles": "Subiendo archivos ({{count}})...",
-        "uploadFailed": "Error al subir",
-        "uploadsCompleted": "Cargas Completadas",
-        "publishingSocial": "Publicando en redes ({{count}})...",
         "done": "Listo",
         "pending": "Pendiente",
         "left": "restante",
         "paused": "Pausado",
         "cancelled": "Cancelado",
-        "cancel_message": "¿Estás seguro de que deseas cancelar esta subida? Los archivos parcialmente subidos serán eliminados."
+        "errors": {
+          "svgNotAllowed": "Los archivos SVG no son compatibles con las redes sociales"
+        },
+        "uploadingInBackground": "{{count}} archivo(s) se están subiendo en segundo plano. Se vincularán automáticamente cuando se completen."
       },
       "show": {
-        "title": "Vista Detallada",
-        "subtitle": "Ver la publicación",
-        "goal": "Objetivo",
-        "status": "Estado",
-        "campaigns": "Campañas",
-        "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
-        "publishDate": "Fecha de publicación",
-        "publishedOn": "Publicado el",
-        "publications": "Publicaciones",
-        "scheduledPosts": "Publicaciones Programadas",
-        "socialNetworkPublications": "Publicaciones en Redes Sociales",
-        "associatedPublications": "Publicaciones Asociadas",
-        "accountMissingTitle": "Cuenta Desconectada",
-        "accountMissingText": "Esta publicación se publica en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
-        "created": "Creado",
-        "lastUpdated": "ltima Actualizacin",
-        "selectSocialAccounts": "Seleccionar Cuentas",
-        "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
-        "lockedBySession": "Bloqueado por sesión",
-        "noCampaigns": "No hay campañas",
-        "dragDrop": {
-          "title": "Arrastra y suelta para ordenar",
-          "subtitle": "Sube tus archivos multimedia aquí"
-        },
-        "placeholders": {
-          "title": "título",
-          "description": "descripción",
-          "hashtags": "Hashtags",
-          "schedulePublication": "Programar publicación",
-          "goal": "Objetivo",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
-        },
-        "validation": {
-          "mediaRequired": "Archivo es requerido",
-          "titleRequired": "El título es obligatorio",
-          "titleLength": "El título no puede exceder los 70 caracteres",
-          "descMin": "La descripción debe tener al menos 10 caracteres",
-          "descMax": "La descripción no puede exceder los {{max}} caracteres",
-          "objRequired": "El objetivo es obligatorio",
-          "objMax": "El objetivo no puede exceder los 200 caracteres",
-          "hashtagsRequired": "Los hashtags son obligatorios",
-          "hashtagValid": "Los hashtags deben estar separados por comas",
-          "hashtagMax": "Máximo 10 hashtags permitidos",
-          "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
-          "scheduledAtRequired": "La fecha es requerida si la programación global está activada",
-          "pollScheduleRequired": "La fecha de programación es requerida para encuestas cuando se activa la programación global",
-          "recurrenceDaysRequired": "Selected al menos un día para la recurrencia semanal",
-          "recurrence_days": "Días de repetición no válidos",
-          "durationErrors": "Corrige los errores de duracin antes de guardar.",
-          "recurrenceEndDateRequired": "La fecha de finalización es requerida para publicaciones recurrentes",
-          "pollOptionsRequired": "Las encuestas requieren al menos 2 opciones",
-          "pollDurationRequired": "La duración de la encuesta debe estar entre 1 y 168 horas",
-          "imageRequired": "Debes agregar al menos una imagen o video",
-          "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global"
-        },
-        "button": {
-          "save": "Actualizar",
-          "cancel": "Cancelar"
-        },
-        "contentLocked": "Contenido Bloqueado",
-        "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
-        "contentPublishing": "Publicación en Proceso",
-        "contentPublishingHint": "La publicación se está publicando en algunas plataformas. Debes esperar a que termine el proceso para poder editar el contenido.",
-        "approvedEditWarning": "Publicación Aprobada",
-        "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
-        "lockedByOther": "publicación bloqueada por otro usuario",
-        "locking": {
-          "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
-          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos.",
-          "youAreEditor": "Eres el editor actual.",
-          "usersWaiting": "Hay {{count}} usuario(s) en espera para cuando termines."
-        }
+        "title": "Vista Detallada"
       },
       "schedule": {
-        "title": "Fecha para todas las redes",
-        "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
-        "placeholder": "Seleccionar fecha y hora",
         "instantWarning": "Para publicar inmediatamente, usa el botón Publicar del modal.",
-        "useGlobal": "Programación Global",
         "recurrence": {
           "title": "Repetir publicación (Recurrencia)",
           "locked_title": "Recurrencia bloqueada",
@@ -2954,59 +2510,24 @@
         }
       },
       "add": {
-        "title": "Agregar publicación",
         "titleField": "título",
-        "subtitle": "Crear una publicación",
         "mediaSection": "Archivos Multimedia",
         "contentSection": "Contenido",
         "socialAccountsSection": "Redes Sociales",
         "scheduleSection": "Programación",
-        "campaignSection": "Campaña",
         "moreOptions": "Más opciones",
-        "name": "Nombre",
         "description": "descripción",
-        "image": "Imagen",
         "hashtags": "Hashtags",
-        "campaigns": "Campañas",
-        "schedulePublication": "Programar publicación",
-        "scheduled_at": "Fecha Programada",
         "goal": "Objetivo",
-        "status": "Estado",
-        "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
-        "publishDate": "Fecha de publicación",
-        "publishedOn": "Publicado el",
-        "publications": "Publicaciones",
-        "creating": "Creando",
-        "optionalSchedule": "Programación Opcional",
-        "selectSocialAccounts": "Seleccionar Cuentas",
         "noCampaigns": "No hay campañas",
-        "dragDrop": {
-          "title": "Arrastra y suelta para ordenar",
-          "subtitle": "Sube tus archivos multimedia aquí"
-        },
-        "recurrence_days": "Días de repetición",
-        "poll_options": "Opciones de encuesta",
-        "poll_duration_hours": "Duración de la encuesta",
         "placeholders": {
           "title": "título",
           "description": "descripción",
           "hashtags": "#marketing #publicidad #comuúnicacin",
-          "schedulePublication": "Programar publicación",
-          "goal": "Objetivo",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
-        },
-        "button": {
-          "save": "Guardar",
-          "cancel": "Cancelar"
+          "goal": "Objetivo"
         }
       },
       "edit": {
-        "title": "Editar publicación",
-        "titleField": "título",
-        "subtitle": "Actualizar la publicación existente",
         "mediaSection": "Archivos Multimedia",
         "contentSection": "Contenido",
         "socialAccountsSection": "Redes Sociales",
@@ -3018,51 +2539,16 @@
         "historyHint": "Actividad y aprobaciones",
         "commentsSection": "Comentarios Internos",
         "commentsHint": "Notas del equipo sobre esta publicación",
-        "youtubeThumbnailSection": "Miniatura de YouTube",
-        "description": "descripción",
-        "hashtags": "Hashtags",
-        "schedulePublication": "Programar publicación",
-        "addCampaign": "Agregar Campaña",
-        "editCampaign": "Editar Campaña",
-        "deleteCampaign": "Eliminar Campaña",
-        "campaignTitle": "Campaign Title",
-        "name": "Nombre",
-        "image": "Imagen",
-        "goal": "Objetivo",
         "campaigns": "Campañas",
-        "status": "Estado",
-        "budget": "Presupuesto",
-        "startDate": "Fecha de Inicio",
-        "endDate": "Fecha de Fin",
-        "publishDate": "Fecha de publicación",
-        "publishedOn": "Publicado el",
-        "associatedPublications": "Publicaciones Asociadas",
-        "accountMissingTitle": "Cuenta Desconectada",
-        "accountMissingText": "Esta publicación se public en una cuenta ({{account}}) que ya no está conectada. Al editarla se crear una nueva versión para tu cuenta actual. ¿Continuar?",
-        "selectSocialAccounts": "Seleccionar Cuentas",
         "lockedBySession": "Bloqueado por sesión",
-        "questionField": "Pregunta",
         "dragDrop": {
-          "title": "Arrastra y suelta para ordenar",
-          "subtitle": "Sube tus archivos multimedia aquí"
+          "title": "Arrastra y suelta para ordenar"
         },
-        "recurrence_days": "Días de repetición",
         "placeholders": {
-          "title": "Arrastra y suelta para ordenar",
           "description": "descripción",
           "hashtags": "Hashtags",
-          "schedulePublication": "Programar publicación",
-          "goal": "Objetivo",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
+          "goal": "Objetivo"
         },
-        "button": {
-          "save": "Actualizar",
-          "cancel": "Cancelar"
-        },
-        "configurationLocked": "Configuracin Bloqueada",
-        "configurationLockedHint": "Necesitas aprobación para configurar las redes y la Programación. Solicita una revisión primero.",
-        "configurationLockedHintAdmin": "Debes aprobar la publicación antes de configurar las redes.",
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
         "contentPublishing": "Publicación en Proceso",
@@ -3073,31 +2559,14 @@
         "pendingReviewWarningHint": "Esta publicación está esperando aprobación. No puedes editarla hasta que sea aprobada o rechazada.",
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
-          "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
-          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos.",
           "youAreEditor": "Eres el editor actual.",
           "usersWaiting": "Hay {{count}} usuario(s) en espera para cuando termines."
         }
       },
-      "approvals": {
-        "noPending": "Sin aprobaciones pendientes",
-        "noPendingDesc": "¡Genial! Todas las publicaciones están al da.",
-        "approve": "Aprobar",
-        "approvedSuccess": "publicación aprobada con éxito",
-        "title": "Aprobaciones",
-        "historyTitle": "Historial de Aprobaciones",
-        "historySubtitle": "Registros de estados y revisiones",
-        "date": "Fecha",
-        "user": "Usuario",
-        "publication": "publicación",
-        "actions": "Acciones"
-      },
       "comments": {
-        "title": "Comentarios Internos",
         "placeholder": "Escribe un comentario...",
         "noComments": "No hay comentarios aún. ¡Inicia la conversación!",
         "loading": "Cargando comentarios...",
-        "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
         "deleteConfirmTitle": "Eliminar Comentario",
         "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar este comentario? Esta accin no se puede deshacer.",
         "deleteSuccess": "Comentario eliminado",
@@ -3106,14 +2575,8 @@
         "delete": "Eliminar",
         "replyingTo": "Respondiendo a"
       },
-      "manageContent": {
-        "configureNetworks": "Programadas tus publicaciones"
-      },
       "publish": {
         "title": "Publicar",
-        "selectPlatforms": "Seleccionar Plataformas",
-        "selectAll": "Seleccionar Todo",
-        "deselectAll": "Deseleccionar Todo",
         "noConnectedAccounts": "No se encontraron cuentas sociales conectadas.",
         "connectAccounts": "Conecta tus cuentas primero.",
         "noCompatibleAccounts": "No hay cuentas compatibles con este tipo de contenido.",
@@ -3125,19 +2588,9 @@
         "platforms": "plataformas",
         "removed": "Removido",
         "failed": "Fallido",
-        "scheduled": "Programado",
         "recurringPosts": "Publicaciones Recurrentes",
-        "youtube": "YouTube",
         "youtubeThumbnails": "Thumbnails de YouTube",
-        "author": "@Alejandro Olarte",
         "unpublishing": "Despublicando...",
-        "publishingSocial": "Publicando en redes ({{count}})...",
-        "allPublished": "Todas las publicaciones completadas",
-        "completed": "completadas",
-        "inProgress": "en curso",
-        "sending": "Enviando",
-        "duplicate": "Intento duplicado",
-        "original_attempt": "Intento original:",
         "oauth1_required": "Requiere reconexión",
         "oauth1_video_message": "Esta cuenta necesita credenciales OAuth 1.0a para subir videos",
         "reconnect_account": "Reconectar cuenta",
@@ -3150,13 +2603,6 @@
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
         },
-        "modal": {
-          "title": "Despublicar",
-          "message": "¿Estás seguro de despublicar? Esto eliminar la publicación de esta plataforma.",
-          "confirmText": "Despublicar",
-          "cancelText": "Cancelar",
-          "unpublishing": "Despublicando..."
-        },
         "unpublish": {
           "title": "¿Despublicar de {{platform}}?",
           "message": "¿Estás seguro de que deseas despublicar este contenido de {{platform}}? Esta acción no se puede deshacer.",
@@ -3167,30 +2613,14 @@
           "publish": "Publicar",
           "requestApproval": "Solicitar aprobación",
           "pendingReview": "Pendiente de revisión",
-          "approve": "Aprobar",
-          "reject": "Rechazar",
           "cancel": "Cancelar",
-          "cancelPublication": "Cancelar Publicación",
           "cancelAll": "Cancelar Todas ({{count}})",
-          "change": "Cambiar",
-          "preview": "Vista Previa"
-        },
-        "cancelConfirm": {
-          "title": "¿Cancelar publicación?",
-          "message": "¿Estás seguro de que deseas cancelar esta publicación? Las plataformas que ya se publicaron no se verán afectadas.",
-          "confirm": "Sí, cancelar",
-          "cancel": "No"
+          "change": "Cambiar"
         },
         "pendingReviewBanner": {
           "title": "publicación en revisión",
           "message": "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."
         },
-        "videoSplitter": "Herramienta de Recorte de Video",
-        "editSegments": "Editar Segmentos",
-        "replaceVideo": "Reemplazar Video",
-        "splitToNew": "Crear Nuevas Pub.",
-        "splitSuccess": "Video recortado con éxito",
-        "editVideo": "Editar Video",
         "rejectedBanner": {
           "title": "publicación Rechazada",
           "message": "Esta publicación ha sido rechazada por {{name}}.",
@@ -3203,23 +2633,19 @@
         },
         "incompatibleAccountsBanner": {
           "title": "Cuentas No Compatibles",
-          "message": "Las siguientes cuentas no son compatibles con el tipo de contenido \"{contentType}\":",
           "hint": "Estas cuentas no aparecerán en las opciones de publicación."
         },
-        "publishedInOtherAccountBanner": {
-          "title": "Publicado en Cuenta Diferente",
-          "message": "Esta publicación fue publicada en una cuenta de {{platform}} que ya no está conectada.",
-          "hint": "Puedes publicar en la cuenta actual seleccionándola a continuación. La publicación anterior permanecerá en la cuenta desconectada."
+        "loadingAccounts": "Cargando cuentas...",
+        "publishingBanner": {
+          "title": "Publicación en curso…",
+          "message": "Tu contenido se está publicando en las plataformas seleccionadas."
+        },
+        "retryingBanner": {
+          "title": "Reintentando publicación…"
         }
       },
       "preview": {
-        "title": "Vistas Previas en Vivo",
-        "disclaimer": "La vista previa es una aproximación. El aspecto real puede variar segn la plataforma.",
-        "simulated": "Simulado",
-        "real": "Real",
-        "realInfo": "Vista Previa Real",
-        "view": "Ver vista previa",
-        "notAvailable": "Vista previa no disponible para esta plataforma"
+        "disclaimer": "La vista previa es una aproximación. El aspecto real puede variar segn la plataforma."
       },
       "validation": {
         "descMin": "descripción debe tener al menos 10 caracteres",
@@ -3274,10 +2700,8 @@
         "invalid_media_type": "Tipo de archivo multimedia no válido para el tipo de contenido seleccionado",
         "media_required": "Se requieren archivos multimedia para este tipo de contenido",
         "media_min_count": "Se requieren al menos :min archivos multimedia",
-        "media_max_count": "Máximo :max archivos multimedia permitidos"
-      },
-      "processing": {
-        "cancel_message": "¿Estás seguro de que deseas cancelar este proceso? El trabajo en curso se detendrá."
+        "media_max_count": "Máximo :max archivos multimedia permitidos",
+        "mediaRequired": "Se requieren archivos multimedia"
       },
       "cancel_confirmation": {
         "title": "Cancelar publicación",
@@ -3297,11 +2721,15 @@
         "confirm": "Sí, cancelar todas",
         "cancel": "No"
       },
-      "unpublish": {
-        "title": "¿Despublicar de {{platform}}?",
-        "message": "¿Estás seguro de que deseas despublicar este contenido de {{platform}}? Esta acción no se puede deshacer.",
-        "confirm": "Sí, despublicar",
-        "cancel": "Cancelar"
+      "button": {
+        "saveBackground": "Guardar y subir en segundo plano"
+      },
+      "live": {
+        "title": "Configuración de transmisión en vivo",
+        "startTime": "Hora de inicio",
+        "duration": "Duración estimada",
+        "minutes": "minutos",
+        "note": "La hora programada es cuando comenzará tu transmisión en vivo."
       }
     },
     "status": {
@@ -3312,7 +2740,6 @@
       "published": "Publicado",
       "published_with_errors": "Publicado con errores",
       "partially_published": "Publicado parcialmente",
-      "publis": "Publicado",
       "scheduled": "Programado",
       "approved": "Aprobado",
       "instant": "Instantneo",
@@ -3326,13 +2753,9 @@
       "retrying": "Reintentando"
     },
     "scheduled_for": "Programado para",
-    "scheduledPosts": "Publicaciones Programadas",
     "button": {
       "add": "Agregar publicación",
       "edit": "Editar publicación",
-      "delete": "Eliminar publicación",
-      "close": "Cerrar",
-      "save": "Guardar cambios",
       "approve": "Aprobar",
       "reject": "Rechazar",
       "publish": "Publicar",
@@ -3342,81 +2765,49 @@
       "request": "Solicitar",
       "sendForReview": "Enviar a Revisión",
       "sending": "Enviando...",
-      "inReview": "En Revisión"
+      "inReview": "En Revisión",
+      "submitForReview": "Enviar a Revisión",
+      "submitting": "Enviando..."
     },
     "table": {
       "name": "Nombre",
       "description": "descripción",
-      "publications": "Publicaciones",
       "media": "Archivos",
       "campaign": "Campaña",
       "status": "Estado",
       "actions": "Acciones",
       "noCampaign": "Sin Campaña",
-      "noPlatforms": "Sin Plataformas",
       "noMedia": "Sin multimedia",
-      "loading": "Cargando...",
       "linkedAccount": "Cuentas Asociadas",
       "untitled": "Sin título",
       "noDescription": "Sin descripción",
-      "platforms": "Plataformas",
-      "linkedAccounts": "Cuentas vinculadas",
       "createdBy": "Creado por",
       "manualEvent": "Evento Manual",
       "socialNetworkEvent": "Evento de Red Social",
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
-        "searchEmpty": "No se encontraron publicaciones que coincidan con la búsqueda.",
-        "button": "Agregar publicación"
+        "searchEmpty": "No se encontraron publicaciones que coincidan con la búsqueda."
       },
       "lockedBy": "Bloqueado por:",
       "publishingBy": "Publicando por",
-      "publishingOn": "Publicando en {{platform}}",
-      "publishingOnMultiple": "Publicando en {{count}} redes",
-      "publishingOnBy": "Publicando en {{platform}} por {{user}}",
-      "publishingOnMultipleBy": "Publicando en {{count}} redes por {{user}}",
       "rejectedBy": "Rechazado por",
       "pendingAdminReview": "Pendiente de revisión",
-      "editingBy": "Editando:"
+      "editingBy": "Editando:",
+      "publishedOn": "Publicado en"
     },
     "messages": {
-      "addSuccess": "publicación agregada éxitosamente!",
       "createSuccess": "publicación creada éxitosamente!",
-      "duplicateSuccess": "publicación duplicada con éxito!",
-      "addError": "Error al agregar publicación",
       "updateSuccess": "publicación actualizada éxitosamente!",
-      "updateError": "Error al actualizar publicación",
       "mediaAttached": "Archivo multimedia adjuntado con éxito a '{{title}}' (Carga en segundo plano)",
       "deleteSuccess": "publicación eliminada éxitosamente!",
       "deleteError": "Error al eliminar publicación",
       "cancelSuccess": "Publicación cancelada exitosamente",
       "platformCancelSuccess": "Plataforma cancelada exitosamente",
       "platformCancelError": "Error al cancelar la plataforma",
-      "fetchError": "Error al cargar Campañas",
       "error": "Ha ocurrido un error inesperado",
-      "confirmDelete": {
-        "title": "¿Estás seguro?",
-        "text": "No podrs recuperar esta Campaña!",
-        "confirmButton": "S, eliminarla!",
-        "cancelButton": "Cancelar"
-      }
-    },
-    "actions": {
-      "viewCampaign": "Ver Campaña",
-      "edit": "Editar",
-      "publishNow": "Publicar Ahora",
-      "viewDetails": "Ver Detalles",
-      "delete": "Eliminar",
-      "active": "Activa",
-      "remove": "Eliminar",
-      "change": "Cambiar"
-    },
-    "headers": {
-      "status": "Estado",
-      "duration": "Duracin",
-      "mediaFiles": "Archivos",
-      "actions": "Acciones"
+      "uploadFailed": "Error al subir",
+      "uploadSuccess": "Subido correctamente"
     },
     "filters": {
       "title": "Filtros de publicación",
@@ -3425,10 +2816,8 @@
       "content_type": "Tipo de contenido",
       "published": "Publicadas",
       "draft": "Borrador",
-      "approved": "Aprobadas",
       "scheduled": "Programadas",
       "pending_review": "Pendiente de revisión",
-      "rejected": "Rechazadas",
       "failed": "Fallidas"
     },
     "content_types": {
@@ -3440,19 +2829,65 @@
     },
     "gallery": {
       "sendingToSocial": "Enviando a plataformas sociales...",
-      "processing": "Procesando en segundo plano..."
+      "processing": "Procesando en segundo plano...",
+      "retrying": "Reintentando..."
     },
     "toast": {
       "publishedSuccess": "¡Publicación publicada exitosamente!",
       "publishedError": "Error al publicar la publicación."
+    },
+    "platformValidation": {
+      "title": "Compatibilidad de Plataformas",
+      "publishedWarning": "Publicación Activa"
+    },
+    "publish": {
+      "button": {
+        "cancel": "Cancelar"
+      }
+    },
+    "recurring": "Recurrente",
+    "viewPost": "Ver publicación",
+    "validation": {
+      "carousel_requires_multiple": "Un carrusel requiere varios archivos multimedia",
+      "content_type_auto_changed": "Tipo de contenido cambiado automáticamente a {{to}}",
+      "content_type_not_supported": "El tipo de contenido :type no es compatible con: :platforms",
+      "durationErrors": "Algunas plataformas tienen errores de duración",
+      "max_files_exceeded": "Máximo {{max}} archivo(s) permitido(s)",
+      "max_images_exceeded": "Máximo {{max}} imagen(es) permitida(s)",
+      "max_videos_exceeded": "Máximo {{max}} video(s) permitido(s)",
+      "media_max_count": "Máximo :max archivo(s) multimedia permitido(s)",
+      "media_min_count": "Se requieren al menos :min archivo(s) multimedia",
+      "media_required": "Se requiere al menos un archivo multimedia",
+      "no_images_allowed": "Este tipo de contenido no permite imágenes",
+      "no_videos_allowed": "Este tipo de contenido no permite videos",
+      "reel_requires_one_video": "Un reel requiere exactamente un video",
+      "reel_requires_video_only": "Un reel solo permite video",
+      "story_requires_one": "Una historia requiere exactamente un archivo multimedia",
+      "videoTooLong": "El video supera la duración máxima para {{platform}} ({{max}})"
     }
   },
-  "published": "Publicado exitosamente",
+  "publish": {
+    "accountName": "Cuenta",
+    "allPublished": "Todas las publicaciones completadas",
+    "canPublishToNewAccount": "Puedes publicar en esta cuenta",
+    "canUnpublish": "Puedes despublicar este contenido",
+    "cannotUnpublishDifferentAccount": "No puedes despublicar contenido de otra cuenta",
+    "completed": "completadas",
+    "inProgress": "en curso",
+    "multipleAccountsAllowed": "Se permiten varias cuentas",
+    "platforms": "plataformas",
+    "published": "Publicado",
+    "publishedAt": "Publicado el",
+    "publishedOnCurrentAccount": "Publicado en cuenta actual",
+    "publishedOnDifferentAccount": "Publicado en otra cuenta",
+    "publishingSocial": "Publicando en redes sociales...",
+    "sending": "Enviando",
+    "viewPost": "Ver publicación"
+  },
   "reels": {
     "button": {
       "generate": "Generar Reels con IA",
-      "generating": "Generando...",
-      "viewReel": "Ver reel"
+      "generating": "Generando..."
     },
     "messages": {
       "generating": "🎬 Generando reels. Te notificaremos cuando estén listos.",
@@ -3462,36 +2897,24 @@
       "deleted": "Reels eliminados correctamente",
       "deleteError": "Error al eliminar los reels",
       "deletedWithVideo": "Video y reels asociados eliminados",
-      "alreadyGenerated": "Ya existen reels generados. Elimínalos primero para generar nuevos.",
       "alreadyProcessing": "Ya hay reels en proceso de generación. Espera a que terminen.",
       "confirmRegenerate": "Ya existen reels generados. ¿Deseas eliminarlos y generar nuevos?",
       "confirmDelete": "¿Estás seguro de que deseas eliminar este reel?",
       "reelDeleted": "Reel eliminado correctamente"
     },
     "actions": {
-      "delete": "Eliminar reel",
-      "download": "Descargar reel",
-      "openInNewTab": "Abrir en nueva pestaña"
+      "delete": "Eliminar reel"
     },
     "list": {
-      "title": "Reels generados",
-      "reelsGenerated": "{{count}} reel generado",
-      "reelsGenerated_plural": "{{count}} reels generados",
-      "noReels": "No hay reels generados aún"
+      "reelsGenerated": "{{count}} reel generado"
     },
     "section": {
       "title": "Reels Generados con IA",
-      "description": "{{count}} reels optimizados para diferentes plataformas",
       "empty": "No hay reels generados",
       "emptyDescription": "Genera reels optimizados automáticamente desde tu video para Instagram, TikTok y YouTube Shorts",
       "deleteAll": "Eliminar todos",
       "generated": "{{count}} Reels Generados",
       "generatedDescription": "Optimizados para redes sociales"
-    },
-    "status": {
-      "completed": "Completado",
-      "processing": "Procesando",
-      "failed": "Error"
     }
   },
   "roles": {
@@ -3501,23 +2924,10 @@
     "permissions": "Permisos",
     "protected": "Protegido",
     "role_color": "Color del rol",
-    "color_hint": "Se usa en toda la interfaz para identificar este rol",
     "select_all": "Todos",
     "deselect_all": "Ninguno",
     "search_permissions": "Buscar permisos…",
     "no_permissions_found": "Ningún permiso coincide con la búsqueda",
-    "groups": {
-      "content": "Contenido",
-      "publishing": "Publicación y Aprobación",
-      "team": "Gestión de Equipo",
-      "workspace": "Workspace",
-      "analytics": "Analíticas",
-      "campaigns": "Campañas",
-      "other": "Otros"
-    },
-    "editor_publish_info": "Al publicar, el contenido se enviará a revisión si no eres Admin. En workspaces con flujo multinivel, debe pasar por todas las etapas de aprobación configuradas.",
-    "admin_publish_info": "Puede publicar directamente sin revisión y aprobar contenido de otros usuarios.",
-    "owner_info": "Control total del workspace. Este rol no puede ser editado ni eliminado.",
     "descriptions": {
       "owner": "Control total del workspace. Gestiona ajustes, miembros y facturación.",
       "admin": "Administrador de confianza. Gestiona contenido, miembros y flujos de aprobación.",
@@ -3556,41 +2966,7 @@
     "users_list": "Lista de Usuarios",
     "users_list_subtitle": "Asigna roles a los miembros del equipo",
     "insufficient_permissions_title": "Permisos Insuficientes",
-    "insufficient_permissions_message": "Solo los administradores y propietarios pueden gestionar roles",
-    "permissions_list": {
-      "publish": {
-        "name": "Publicar",
-        "description": "Permite publicar contenido en redes sociales"
-      },
-      "approve": {
-        "name": "Aprobar",
-        "description": "Permite aprobar contenido para publicación"
-      },
-      "view-analytics": {
-        "name": "Ver Analíticas",
-        "description": "Permite ver las analíticas del workspace"
-      },
-      "manage-accounts": {
-        "name": "Gestionar Cuentas",
-        "description": "Permite agregar/eliminar cuentas sociales"
-      },
-      "manage-team": {
-        "name": "Gestionar Equipo",
-        "description": "Permite invitar/eliminar miembros"
-      },
-      "manage-content": {
-        "name": "Gestionar Contenido",
-        "description": "Permite crear y editar publicaciones"
-      },
-      "manage-campaigns": {
-        "name": "Gestionar Campañas",
-        "description": "Permite crear y editar campañas"
-      },
-      "view-content": {
-        "name": "Ver Contenido",
-        "description": "Permite ver el contenido del workspace (solo lectura)"
-      }
-    }
+    "insufficient_permissions_message": "Solo los administradores y propietarios pueden gestionar roles"
   },
   "shortcuts": {
     "title": "Atajos de Teclado",
@@ -3598,16 +2974,46 @@
       "appearance": "Apariencia",
       "navigation": "Navegación",
       "help": "Ayuda"
-    },
-    "theme": {
-      "toggle": "Cambiar tema (Claro/Oscuro)"
-    },
-    "search": {
-      "open": "Abrir búsqueda rápida"
-    },
-    "help": {
-      "show": "Mostrar atajos de teclado"
     }
+  },
+  "socialAccounts": {
+    "title": "Cuentas Sociales",
+    "subtitle": "Gestiona tus cuentas de redes sociales conectadas",
+    "connectAccount": "Conectar Cuenta Social",
+    "connectedAccounts": "Cuentas Conectadas",
+    "availablePlatforms": "Plataformas Disponibles",
+    "connect": "Conectar",
+    "connected": "Conectado",
+    "connectedAt": "Conectado",
+    "connectedBy": "Conectado por",
+    "connectError": "Error al conectar la cuenta",
+    "alreadyConnected": "Ya conectado",
+    "disconnect": "Desconectar",
+    "disconnected": "Cuenta desconectada",
+    "disconnectError": "Error al desconectar",
+    "confirmDisconnect": "¿Estás seguro de desconectar esta cuenta?",
+    "active": "Activo",
+    "expired": "Expirado",
+    "tokenExpired": "Token expirado",
+    "needsReconnection": "Reconectar",
+    "reconnect": "Reconectar",
+    "reconnectButton": "Reconectar cuenta",
+    "reconnecting": "Verificando…",
+    "demoMode": {
+      "title": "Datos de Demostración"
+    }
+  },
+  "status": {
+    "draft": "Borrador",
+    "scheduled": "Programado",
+    "publishing": "Publicando",
+    "processing": "Procesando",
+    "pending_review": "En revisión",
+    "approved": "Aprobado",
+    "published": "Publicado",
+    "rejected": "Rechazado",
+    "failed": "Fallido",
+    "cancelled": "Cancelado"
   },
   "subscription": {
     "billing": {
@@ -3623,30 +3029,23 @@
       "amount": "Monto",
       "dueDate": "Fecha de vencimiento",
       "invoiceHistory": "Historial de Facturas",
-      "invoiceHistoryDescription": "Todas tus facturas anteriores",
       "noInvoices": "No hay facturas disponibles",
       "download": "Descargar",
-      "workspaceNote": "Este plan aplica para todos los miembros de este workspace",
       "noSubscription": "No tienes una suscripción activa",
       "choosePlan": "Elegir un Plan",
-      "manageBilling": "Gestionar Facturación",
-      "freePlanNote": "Estás en el plan gratuito. Para acceder al portal de facturación, necesitas suscribirte a un plan de pago.",
       "viewPlans": "Ver planes disponibles",
       "cancelSubscription": "Cancelar Suscripción",
-      "cancelConfirm": "¿Estás seguro de que deseas cancelar tu suscripción? Tendrás acceso hasta el final del período de facturación actual.",
       "cancelSuccess": "Suscripción cancelada exitosamente. Tendrás acceso hasta el final del período de facturación.",
       "cancelError": "No se pudo cancelar la suscripción. Intenta más tarde.",
       "portalError": "No se pudo acceder al portal de facturación. Intenta más tarde.",
-      "activeSubscriptionNote": "Tienes una suscripción activa. Puedes cambiar a cualquier plan de pago desde la página de Pricing. Para cambiar a Free, primero cancela tu suscripción.",
       "exportToExcel": "Exportar a Excel",
       "loadingPortal": "Abriendo portal de facturación...",
       "cancelWarningTitle": "Importante",
       "cancelDetails": "Al cancelar tu suscripción:",
-      "cancelPoint1": "Mantendrás acceso hasta el final del período pagado",
       "cancelPoint2": "No se realizarán más cobros automáticos",
-      "cancelPoint3": "Podrás reactivar tu suscripción en cualquier momento",
       "cancelling": "Cancelando...",
-      "confirmCancel": "Sí, cancelar suscripción"
+      "confirmCancel": "Sí, cancelar suscripción",
+      "noDownload": "No disponible"
     },
     "usage": {
       "title": "Uso y Facturación",
@@ -3692,7 +3091,6 @@
       "pending": "Pendiente"
     },
     "actions": {
-      "title": "Acciones Rápidas",
       "upgrade": "Actualizar Plan",
       "manageBilling": "Gestionar Facturación",
       "viewPlans": "Ver Todos los Planes"
@@ -3701,18 +3099,11 @@
       "planUsage": "Uso del Plan",
       "monitorMonthlyUsage": "Monitorea tu consumo mensual",
       "powerUpWorkspace": "Potencia tu Workspace",
-      "monitorUsage": "Monitorea tu Uso",
-      "highUsageMessage": "Estás usando mucho tu plan. ¡Expande tu capacidad!",
-      "trackUsageMessage": "Mantén el control de tus recursos y expande cuando lo necesites",
       "publications": "Publicaciones",
       "aiCredits": "Créditos IA",
       "socialAccounts": "Cuentas Sociales",
       "teamMembers": "Miembros del Equipo",
-      "critical": "¡Crítico!",
-      "high": "Muy Alto",
-      "warning": "Alto",
       "remaining": "restantes",
-      "free": "libres",
       "noLimits": "Sin límites",
       "buyMore": "Comprar Más",
       "upgradePlan": "Actualizar Plan",
@@ -3723,35 +3114,16 @@
       "noCommitment": "Sin compromisos • Cancela cuando quieras",
       "storage": "Almacenamiento",
       "title": "Paquetes Adicionales",
-      "subtitle": "Extiende tu capacidad con créditos de IA, almacenamiento, publicaciones y miembros del equipo",
       "buyCredits": "Comprar Créditos",
       "totalSpent": "Total Gastado",
-      "activeAddons": "add-on activo",
       "activeAddonsPlural": "add-ons activos",
-      "purchaseHistory": "Historial de Compras",
-      "purchaseHistoryDescription": "Tus compras de add-ons y su estado actual",
       "noPurchases": "No has realizado compras de add-ons aún",
-      "date": "Fecha",
-      "package": "Paquete",
-      "quantity": "Cantidad",
       "total": "Total",
       "used": "Usado",
-      "status": "Estado",
-      "actions": "Acciones",
       "active": "Activo",
-      "inactive": "Inactivo",
-      "refund": "Reembolsar",
-      "refundConfirm": "¿Estás seguro de que deseas solicitar un reembolso?",
-      "refundSuccess": "Reembolso procesado",
-      "refundSuccessDescription": "El reembolso ha sido procesado exitosamente",
-      "refundError": "Error al procesar el reembolso",
-      "purchaseError": "Error al iniciar el proceso de compra",
       "loadingError": "Error al cargar add-ons",
       "howItWorks": "¿Cómo funcionan los add-ons?",
       "howItWorksPoint1": "Los add-ons se usan automáticamente cuando excedes el límite de tu plan",
-      "howItWorksPoint2": "Primero se usa el límite de tu plan, luego los add-ons",
-      "howItWorksPoint3": "Los créditos no expiran y se acumulan si compras múltiples paquetes",
-      "howItWorksPoint4": "Puedes solicitar reembolso dentro de los 7 días si no has usado el add-on",
       "newTrackingSystem": {
         "title": "Nuevo Sistema de Trazabilidad por Plan",
         "independentUsage": "Uso independiente por plan",
@@ -3782,7 +3154,6 @@
       "posts": "publicaciones",
       "members": "miembros",
       "buyNow": "Comprar Ahora",
-      "noPackages": "No hay paquetes disponibles en esta categoría",
       "additionalPackages": "Paquetes Adicionales",
       "basePlan": "Plan Base",
       "usedFromPlan": "usado del plan",
@@ -3791,9 +3162,7 @@
       "usedFromAddons": "usado de addons",
       "usingAddons": "Usando addons:",
       "exceededPlanBy": "Has excedido tu plan base por",
-      "addonsConsumingAutomatically": "Los addons se están consumiendo automáticamente.",
       "addonsAvailable": "Addons disponibles:",
-      "addonsWillActivateWhenExceeding": "Tus addons se activarán automáticamente cuando excedas el límite de tu plan base",
       "totalAvailableUsage": "Uso Total Disponible",
       "planLabel": "Plan:",
       "addonsLabel": "Addons:",
@@ -3864,11 +3233,17 @@
           "name": "25 Miembros Adicionales",
           "description": "Agrega 25 miembros más a tu equipo"
         }
-      }
+      },
+      "currencyBanner": {
+        "title": "Precios en tu Moneda Local",
+        "automatic": "Conversión automática",
+        "noHiddenFees": "Sin cargos ocultos"
+      },
+      "currentUsage": "Uso Actual",
+      "showingUsage": "Mostrando uso actual",
+      "multiplePurchases": "{{count}} compras",
+      "unlimited": "Ilimitado"
     },
-    "socialAccounts": "Cuentas Sociales",
-    "limitReached": "Has alcanzado el límite de tu plan",
-    "downloadAll": "Descargar",
     "success": {
       "title": "Pago Exitoso",
       "heading": "¡Pago Exitoso!",
@@ -3906,6 +3281,9 @@
       "backToDashboard": "Ir al Dashboard",
       "needHelp": "¿Necesitas ayuda con el proceso de pago?",
       "contactSupport": "Contacta a nuestro equipo de soporte"
+    },
+    "enterprise": {
+      "title": "Características Enterprise"
     }
   },
   "twoFactor": {
@@ -3919,8 +3297,7 @@
       "step1": {
         "title": "Paso 1: Escanear Código QR",
         "description": "Escanea este código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc.)",
-        "manualEntry": "¿No puedes escanear? Ingresa este código manualmente:",
-        "troubleshooting": "Si tienes problemas, asegúrate de que la hora de tu dispositivo esté sincronizada correctamente."
+        "manualEntry": "¿No puedes escanear? Ingresa este código manualmente:"
       },
       "step2": {
         "title": "Paso 2: Guardar Códigos de Respaldo",
@@ -3941,24 +3318,9 @@
       "copy": "Copiar",
       "copied": "¡Copiado!"
     },
-    "verify": {
-      "title": "Verificación de Dos Factores",
-      "description": "Ingresa el código de 6 dígitos de tu aplicación de autenticación",
-      "verificationCode": "Código de Verificación",
-      "placeholder": "000000",
-      "verifyButton": "Verificar",
-      "verifying": "Verificando...",
-      "useBackupCode": "Usar código de respaldo",
-      "hint": "Esta verificación será válida por 30 días en este dispositivo."
-    },
     "errors": {
-      "invalidCode": "Código de verificación inválido. Verifica tu aplicación de autenticación e intenta nuevamente.",
       "codeMustBe6Digits": "El código debe tener 6 dígitos",
-      "codeOnlyNumbers": "El código debe contener solo números",
-      "sessionExpired": "La sesión ha expirado. Actualiza la página e intenta nuevamente.",
-      "alreadyConfigured": "2FA ya está configurado para tu cuenta",
-      "notConfigured": "2FA no está configurado para tu cuenta",
-      "verificationExpired": "Tu verificación de 2FA ha expirado. Verifica nuevamente."
+      "codeOnlyNumbers": "El código debe contener solo números"
     }
   },
   "validation": {
@@ -3994,35 +3356,91 @@
     "api_token_name_max": "El nombre del token no puede superar 255 caracteres.",
     "api_token_name_chars": "El nombre solo puede contener letras, números, espacios, guiones, guiones bajos y puntos."
   },
+  "verification": {
+    "title": "Verifica tu correo",
+    "security": "Por tu seguridad, verifica tu dirección de correo.",
+    "banner": {
+      "title": "Verifica tu dirección de correo",
+      "message": "Enviamos un enlace de verificación a tu correo. Verifícalo para desbloquear todas las funciones.",
+      "resendButton": "Reenviar correo",
+      "sending": "Enviando...",
+      "successMessage": "Correo de verificación enviado"
+    },
+    "didNotReceive": "¿No recibiste el correo?",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contactar soporte",
+    "logout": "Cerrar sesión"
+  },
+  "videoValidation": {
+    "platformNotSupported": "Plataforma {{platform}} no soportada",
+    "durationTooLong": "{{type}}: Duración demasiado larga. Máximo {{max}}, actual {{current}}",
+    "durationTooShort": "{{type}}: Duración demasiado corta. Mínimo {{min}}, actual {{current}}",
+    "invalidAspectRatio": "{{type}}: Relación de aspecto inválida. Esperado {{expected}}, actual {{current}}",
+    "lowResolution": "{{type}}: Resolución baja. Mínimo recomendado {{min}}, actual {{current}}",
+    "valid": "Video válido para publicación",
+    "invalid": "El video no cumple con los requisitos",
+    "warnings": "Advertencias de calidad",
+    "readyToPublish": "Listo para publicar en {{platform}} como {{type}}",
+    "suggestion": "Sugerencia de configuración",
+    "suggestedType": "Este video es más adecuado para el tipo: {{type}}",
+    "changeTo": "Cambiar a {{type}}",
+    "requirements": "Requisitos de la plataforma",
+    "maxDuration": "Duración máxima",
+    "aspectRatio": "Relación de aspecto",
+    "minResolution": "Resolución mínima",
+    "anyAspectRatio": "Cualquier relación de aspecto",
+    "videoInfo": "Información del video",
+    "duration": "Duración",
+    "resolution": "Resolución",
+    "orientation": "Orientación",
+    "vertical": "Vertical",
+    "horizontal": "Horizontal"
+  },
+  "welcome": {
+    "title": "Gestiona tu contenido",
+    "titleHighlight": "con inteligencia artificial",
+    "subtitle": "Organiza, optimiza y programa tu contenido multimedia con herramientas impulsadas por IA para maximizar tu presencia en redes sociales.",
+    "startFree": "Comienza gratis",
+    "beta": "Beta",
+    "featuresTitle": "Características",
+    "featuresSubtitle": "Gestiona tu contenido con herramientas impulsadas por IA",
+    "login": "Iniciar Sesión",
+    "getStarted": "Comienza Ahora",
+    "readyToStart": "Listo para comenzar",
+    "joinNow": "Únete Ahora",
+    "createAccount": "Crea una Cuenta",
+    "demoAccess": "Demo de 30 días disponible",
+    "viewPricing": "Ver Planes",
+    "viewAllPlans": "Ver todos los planes y características",
+    "pricingTitle": "Planes para cada necesidad",
+    "pricingSubtitle": "Desde planes gratuitos hasta soluciones empresariales",
+    "continue": "Continuar al Dashboard",
+    "goToDashboard": "Ir al Dashboard",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "contact": "Contacto",
+    "connectsWith": "Se integra perfectamente con"
+  },
   "workspace": {
     "my_workspaces": "Mis Espacios de Trabajo",
     "create_new": "Crear Nuevo Espacio",
     "manage_workspaces": "Gestionar Espacios",
     "create_new_workspace": "Crear un Nuevo Espacio de Trabajo",
-    "workspaces_one": "Espacio",
-    "workspaces_other": "Espacios",
     "workspaces": "Espacios",
     "select_workspace": "Seleccionar Espacio",
     "settings": "Ajustes del Espacio",
     "public_workspace": "Espacio Público",
     "private_workspace": "Espacio Privado",
     "active": "Activo",
-    "switch": "Cambiar",
     "switched_successfully": "Cambiado exitosamente",
     "active_context": "Espacio Activo",
-    "role": "Rol",
-    "settings_description": "Gestiona los miembros y configuraciones de tu espacio.",
     "no_description": "Sin descripción proporcionada.",
     "member": "Miembro",
     "workspace_members": "Miembros del Espacio",
-    "members": "Miembros",
     "members_one": "miembro",
     "members_other": "miembros",
-    "team_members": "Miembros del Equipo",
     "invite_member": "Invitar Miembro",
     "invite": "Invitar",
-    "role_permissions": "Roles y Permisos",
-    "permissions_preview": "Acceso Total",
     "name": "Nombre del Espacio",
     "name_placeholder": "ej. Mi Agencia",
     "description": "Descripción",
@@ -4037,21 +3455,10 @@
     "delete_confirmation_message": "¿Estás seguro de que quieres eliminar este espacio de trabajo? Todos los datos, incluyendo contenido, campañas y miembros del equipo serán eliminados permanentemente. Esta acción no se puede deshacer.",
     "confirm_delete": "Sí, eliminar espacio",
     "general_settings": "Ajustes Generales",
-    "manage_workspace": "Gestionar espacio {{name}}",
     "owners": "Propietario",
-    "admins": "Administrador",
-    "editors": "Editor",
-    "creator": "Creador",
-    "total_in_workspace": "Total en el espacio",
-    "viewers": "Visores",
     "loading": "Cargando miembros...",
-    "you": "Tú",
     "remove_member": "Eliminar Miembro",
     "remove_confirm": "¿Estás seguro de que deseas eliminar a este miembro del espacio de trabajo?",
-    "remove_success": "Miembro eliminado exitosamente",
-    "remove_error": "Error al eliminar miembro",
-    "owner_required": "Se requiere al menos un propietario",
-    "owner_note": "Nota: Los ajustes de integración solo pueden ser gestionados completamente por los propietarios del espacio de trabajo.",
     "invite_modal": {
       "title": "Invitar Miembro",
       "subtitle": "Añadir un miembro a {{name}}",
@@ -4074,14 +3481,6 @@
     },
     "integrations": {
       "title": "Integraciones",
-      "webhooks_title": "Integraciones de Webhook",
-      "webhooks_description": "Configura webhooks de Slack o Discord para recibir notificaciones en tiempo real sobre fallos de publicación, solicitudes de aprobación y más.",
-      "slack_webhook": "URL de Webhook de Slack",
-      "discord_webhook": "URL de Webhook de Discord",
-      "test_slack": "Probar Slack",
-      "test_discord": "Probar Discord",
-      "save_integrations": "Guardar Ajustes de Integración",
-      "owner_note": "Nota: Los ajustes de integración solo pueden ser gestionados completamente por los propietarios del espacio de trabajo.",
       "messages": {
         "success": "Integraciones actualizadas exitosamente",
         "test_success": "Conexión probada exitosamente",
@@ -4094,7 +3493,6 @@
       "discord_description": "Envía actualizaciones a tu servidor de Discord",
       "webhook_url": "URL de Webhook",
       "slack_placeholder": "https://hooks.slack.com/services/...",
-      "discord_placeholder": "https://discord.com/api/webhooks/...",
       "test_connection": "Probar Conexión",
       "webhook_security": "Seguridad de Webhooks",
       "webhook_security_description": "Configura la seguridad para webhooks entrantes",
@@ -4106,7 +3504,6 @@
       "owner_exclusive_description": "Solo los propietarios del workspace pueden gestionar integraciones."
     },
     "activity": {
-      "title": "Actividad de Notificaciones",
       "time": "Hora",
       "channel": "Canal",
       "event": "Evento",
@@ -4126,15 +3523,12 @@
       "usage": "Uso",
       "roles": "Roles",
       "integrations": "Integraciones",
-      "notifications": "Notificaciones",
       "white_label": "Marca Blanca",
-      "api": "Acceso API",
-      "support": "Soporte Enterprise"
+      "api": "Acceso API"
     },
     "roles_management": {
       "title": "Roles y Permisos",
       "description": "Resumen de roles disponibles y sus permisos asociados en Intellipost.",
-      "no_permissions": "No hay permisos asignados.",
       "create_role": "Crear Nuevo Rol",
       "create_role_subtitle": "Define un nuevo rol y sus permisos para el workspace.",
       "role_name": "Nombre del Rol",
@@ -4142,16 +3536,15 @@
       "role_description": "Descripción",
       "role_description_placeholder": "Describe las responsabilidades de este rol...",
       "key_permissions_label": "Permisos Clave",
-      "can_approve_content": "Puede aprobar contenido en flujos de trabajo",
       "role_created_success": "Rol creado con éxito",
-      "role_created_error": "Error al crear el rol",
-      "name_required": "El nombre es obligatorio",
-      "loading_permissions": "Cargando permisos..."
+      "role_created_error": "Error al crear el rol"
     },
     "messages": {
       "update_success": "Espacio de trabajo creado exitosamente",
       "delete_success": "Espacio eliminado exitosamente",
-      "delete_error": "Error al eliminar el espacio"
+      "delete_error": "Error al eliminar el espacio",
+      "member_removed": "Miembro eliminado correctamente",
+      "member_remove_error": "Error al eliminar el miembro"
     },
     "subtitle": "Gestiona y cambia entre tus espacios de trabajo",
     "create_button_subtitle": "Empezar",
@@ -4170,22 +3563,14 @@
     },
     "tooltips": {
       "public": "Espacio Público",
-      "private": "Espacio Privado",
-      "manage": "Gestionar Espacio",
-      "view": "Ver Detalles"
+      "private": "Espacio Privado"
     },
     "modal": {
       "subtitle": "Configura un nuevo espacio para que tu equipo colabore",
-      "name_label": "Nombre del Espacio",
-      "description_hint": "Una buena descripción ayuda a los miembros a entender el propósito del espacio",
       "footer_note": "Podrás personalizar los ajustes e invitar miembros después de crear el espacio"
     },
-    "settings_title": "Ajustes del Espacio",
-    "manage_general_settings": "Configura la información básica y visibilidad de tu espacio",
     "configure_basic_info": "Configura la información básica y visibilidad de tu espacio",
     "visibility": "Visibilidad del Espacio",
-    "public": "Espacio Público",
-    "private": "Espacio Privado",
     "public_description": "Visible para cualquiera con el enlace",
     "private_description": "Solo los miembros invitados pueden acceder",
     "public_invites": "Invitaciones Públicas",
@@ -4193,32 +3578,20 @@
     "workspace_id": "ID del Espacio",
     "id_copied": "¡ID del Espacio copiado!",
     "id_description": "Usa este ID para integraciones API y solicitudes de soporte",
-    "save_changes": "Guardar Cambios",
-    "saving": "Guardando Cambios...",
     "active_integrations": "Integraciones Activas",
     "total_notifications": "Notificaciones Totales",
-    "webhook_security": "Seguridad de Webhooks",
-    "webhook_security_description": "Configura la seguridad para webhooks entrantes",
-    "webhook_secret": "Secreto de Webhook",
     "secret_generated": "¡Nuevo secreto generado!",
-    "secret_description": "Este secreto se usará para verificar las solicitudes de webhook entrantes",
     "activity_log": "Registro de Actividad de Notificaciones",
     "recent_webhook_activity": "Intentos recientes de envío de webhook",
-    "showing_activities": "Mostrando {{count}} actividades recientes",
     "failed_to_fetch_activity": "Error al cargar el registro de actividad",
     "no_activity": "Sin actividad aún",
     "activity_will_appear": "Las notificaciones aparecerán aquí una vez enviadas",
     "your_role": "Tu Rol",
-    "key_permissions": "Permisos Clave",
-    "more": "más",
     "permissions_required": "Permisos Requeridos",
     "owner_admin_required": "Necesitas permisos de propietario o administrador para modificar los roles",
-    "workspace_updated_by": "Espacio actualizado por {{name}}",
     "stats": {
       "total_members": "Miembros Totales",
-      "projects": "Proyectos",
-      "active_integrations": "Integraciones Activas",
-      "workspace_age": "Antigüedad"
+      "active_integrations": "Integraciones Activas"
     },
     "quick_actions": {
       "title": "Acciones Rápidas",
@@ -4231,8 +3604,6 @@
       "integrations": "Integraciones",
       "integrations_description": "Conectar aplicaciones y servicios"
     },
-    "recent_activity": "Actividad Reciente",
-    "workspace_age": "Antigüedad del Espacio",
     "timezone": {
       "title": "Zona Horaria del Espacio",
       "description": "Todas las fechas y horas en este espacio se mostrarán en esta zona horaria. Esto afecta las publicaciones programadas, analíticas y eventos del calendario.",
@@ -4272,8 +3643,6 @@
       "color_help": "Este color se usará en botones, enlaces y reportes.",
       "update_success": "Branding actualizado exitosamente",
       "update_error": "Error al actualizar el branding",
-      "enterprise_exclusive": "Función Exclusiva Enterprise",
-      "enterprise_description": "Estos ajustes de marca se aplican a todo el espacio de trabajo y serán visibles para todos los miembros y en los reportes generados.",
       "live_preview": "Vista Previa en Vivo",
       "buttons_actions": "BOTONES Y ACCIONES",
       "primary_button": "Botón Principal",
@@ -4376,135 +3745,10 @@
         "description": "¿Necesitas conectar Intellipost con tu propio CRM o ERP? Nuestro equipo puede construir integraciones a medida.",
         "action": "Solicitar Integración"
       }
+    },
+    "roles": {
+      "owners": "Propietarios",
+      "admins": "Administradores"
     }
-  },
-  "welcome": {
-    "title": "Gestiona tu contenido",
-    "titleHighlight": "con inteligencia artificial",
-    "subtitle": "Organiza, optimiza y programa tu contenido multimedia con herramientas impulsadas por IA para maximizar tu presencia en redes sociales.",
-    "featured": "Destacado",
-    "featuredCollection": "Colección Destacada",
-    "startFree": "Comienza gratis",
-    "demo": "Demo",
-    "beta": "Beta",
-    "featuresTitle": "Características",
-    "featuresSubtitle": "Gestiona tu contenido con herramientas impulsadas por IA",
-    "login": "Iniciar Sesión",
-    "getStarted": "Comienza Ahora",
-    "readyToStart": "Listo para comenzar",
-    "joinNow": "Únete Ahora",
-    "createAccount": "Crea una Cuenta",
-    "noCreditCard": "No requiere tarjeta de crédito",
-    "noCreditCardRequired": "No requiere tarjeta de crédito",
-    "freePlanForever": "Plan gratuito para siempre",
-    "demoAccess": "Demo de 30 días disponible",
-    "viewPricing": "Ver Planes",
-    "viewAllPlans": "Ver todos los planes y características",
-    "pricingTitle": "Planes para cada necesidad",
-    "pricingSubtitle": "Desde planes gratuitos hasta soluciones empresariales",
-    "continue": "Continuar al Dashboard",
-    "goToDashboard": "Ir al Dashboard",
-    "privacy": "Política de Privacidad",
-    "terms": "Términos de Servicio",
-    "contact": "Contacto",
-    "aiOrganization": {
-      "title": "Organización con IA",
-      "description": "Categoriza, etiqueta y busca fácilmente tus archivos multimedia con organización impulsada por IA",
-      "tags": {
-        "smartAlbums": "Álbumes Inteligentes",
-        "autoOrganization": "Auto-Organización",
-        "customTags": "Etiquetas Personalizadas"
-      }
-    },
-    "multiPlatform": {
-      "title": "Publicación Multiplataforma",
-      "description": "Optimiza y comparte contenido sin problemas en múltiples plataformas de redes sociales"
-    },
-    "analytics": {
-      "title": "Analíticas de Rendimiento",
-      "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
-    },
-    "pricing": {
-      "title": "Precios",
-      "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
-    },
-    "connectsWith": "Se integra perfectamente con",
-    "goViral": "ser viral",
-    "watchDemo": "Ver Demo",
-    "contentManagement": {
-      "title": "Hub de Contenido Inteligente",
-      "description": "Centraliza tus activos creativos con filtrado y etiquetado impulsado por IA."
-    },
-    "socialIntegration": {
-      "title": "Sincronización Multiplataforma",
-      "description": "Publica directamente en Instagram, TikTok, YouTube y más desde un solo lugar."
-    },
-    "scheduling": {
-      "title": "Auto-Programación",
-      "description": "La IA predice los mejores momentos para publicar y maximizar el engagement."
-    },
-    "aiTools": {
-      "title": "Optimización con IA",
-      "description": "Genera hashtags, descripciones y mejoras instantáneamente."
-    },
-    "tags": {
-      "multimedia": "Multimedia",
-      "organization": "Organización",
-      "advanced_search": "Búsqueda Avanzada",
-      "tags": "Etiquetas",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "youtube": "YouTube",
-      "twitter": "Twitter",
-      "calendar": "Calendario",
-      "scheduling": "Programación",
-      "ai": "IA",
-      "optimal_times": "Horas Optimas",
-      "hashtags": "Hashtags",
-      "recommendations": "Recomendaciones",
-      "optimization": "Optimización",
-      "ai_analysis": "Análisis IA",
-      "collections": "Colecciones",
-      "filters": "Filtros",
-      "auto_post": "Auto-Post",
-      "time_zones": "Zonas Horarias",
-      "search": "Búsqueda",
-      "queue": "Cola"
-    }
-  },
-  "videoValidation": {
-    "platformNotSupported": "Plataforma {{platform}} no soportada",
-    "durationTooLong": "{{type}}: Duración demasiado larga. Máximo {{max}}, actual {{current}}",
-    "durationTooShort": "{{type}}: Duración demasiado corta. Mínimo {{min}}, actual {{current}}",
-    "invalidAspectRatio": "{{type}}: Relación de aspecto inválida. Esperado {{expected}}, actual {{current}}",
-    "lowResolution": "{{type}}: Resolución baja. Mínimo recomendado {{min}}, actual {{current}}",
-    "valid": "Video válido para publicación",
-    "invalid": "El video no cumple con los requisitos",
-    "warnings": "Advertencias de calidad",
-    "readyToPublish": "Listo para publicar en {{platform}} como {{type}}",
-    "suggestion": "Sugerencia de configuración",
-    "suggestedType": "Este video es más adecuado para el tipo: {{type}}",
-    "changeTo": "Cambiar a {{type}}",
-    "requirements": "Requisitos de la plataforma",
-    "maxDuration": "Duración máxima",
-    "minDuration": "Duración mínima",
-    "aspectRatio": "Relación de aspecto",
-    "minResolution": "Resolución mínima",
-    "anyAspectRatio": "Cualquier relación de aspecto",
-    "videoInfo": "Información del video",
-    "duration": "Duración",
-    "resolution": "Resolución",
-    "orientation": "Orientación",
-    "vertical": "Vertical",
-    "horizontal": "Horizontal",
-    "configureManually": "Configura manualmente el tipo de publicación",
-    "autoDetected": "Detectado automáticamente",
-    "manualOverride": "Configuración manual requerida",
-    "incompatibleFormat": "Formato incompatible con {{type}}",
-    "recommendedSettings": "Configuración recomendada",
-    "currentSettings": "Configuración actual",
-    "mustConfigureBeforePublish": "Debes configurar el tipo de publicación antes de publicar",
-    "videoDoesNotMeetRequirements": "El video no cumple con los requisitos de {{type}} para {{platform}}"
   }
 }

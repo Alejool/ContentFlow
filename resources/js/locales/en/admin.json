@@ -1,8 +1,6 @@
 {
   "admin": {
     "navigation": {
-      "title": "Administration Panel",
-      "subtitle": "Centralized system management",
       "dashboard": "Dashboard",
       "system_settings": "System Settings",
       "system_notifications": "System Notifications"
@@ -20,17 +18,36 @@
         "active_subscriptions": "Active Subscriptions",
         "publications": "Publications",
         "system_health": "System Health",
+        "workspaces": "Workspaces",
+        "verified_users": "Verified Users",
+        "social_accounts": "Social Accounts",
+        "pending_review": "Pending Review"
+      },
+      "time_periods": {
+        "last_30d": "last 30d",
+        "last_7d": "last 7d",
+        "active_last_30d": "active last 30d",
+        "new_30d": "new 30d"
+      },
+      "status": {
+        "published": "published",
+        "unverified": "unverified",
+        "no_failures": "No failures",
+        "on_trial": "on trial",
+        "failed": "failed",
+        "all_systems_operational": "All systems operational"
+      },
+      "health_status": {
         "healthy": "Healthy",
-        "review": "Review"
+        "warning": "Warning",
+        "critical": "Critical"
       },
-      "system_issues": {
-        "title": "System issues detected",
-        "unverified_users": "{{count}} of {{total}} unverified users ({{percent}}%)"
-      },
-      "activity": {
-        "system_started": "System started successfully",
-        "config_loaded": "All configurations loaded",
-        "cache_optimized": "Cache optimized"
+      "subscriptions_by_plan": "Active subscriptions by plan",
+      "plans": {
+        "free": "Free",
+        "basic": "Basic",
+        "professional": "Professional",
+        "enterprise": "Enterprise"
       },
       "info": {
         "exclusive_access": "Exclusive Access",

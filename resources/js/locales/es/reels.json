@@ -2,8 +2,7 @@
   "reels": {
     "button": {
       "generate": "Generar Reels con IA",
-      "generating": "Generando...",
-      "viewReel": "Ver reel"
+      "generating": "Generando..."
     },
     "messages": {
       "generating": "🎬 Generando reels. Te notificaremos cuando estén listos.",
@@ -13,36 +12,24 @@
       "deleted": "Reels eliminados correctamente",
       "deleteError": "Error al eliminar los reels",
       "deletedWithVideo": "Video y reels asociados eliminados",
-      "alreadyGenerated": "Ya existen reels generados. Elimínalos primero para generar nuevos.",
       "alreadyProcessing": "Ya hay reels en proceso de generación. Espera a que terminen.",
       "confirmRegenerate": "Ya existen reels generados. ¿Deseas eliminarlos y generar nuevos?",
       "confirmDelete": "¿Estás seguro de que deseas eliminar este reel?",
       "reelDeleted": "Reel eliminado correctamente"
     },
     "actions": {
-      "delete": "Eliminar reel",
-      "download": "Descargar reel",
-      "openInNewTab": "Abrir en nueva pestaña"
+      "delete": "Eliminar reel"
     },
     "list": {
-      "title": "Reels generados",
-      "reelsGenerated": "{{count}} reel generado",
-      "reelsGenerated_plural": "{{count}} reels generados",
-      "noReels": "No hay reels generados aún"
+      "reelsGenerated": "{{count}} reel generado"
     },
     "section": {
       "title": "Reels Generados con IA",
-      "description": "{{count}} reels optimizados para diferentes plataformas",
       "empty": "No hay reels generados",
       "emptyDescription": "Genera reels optimizados automáticamente desde tu video para Instagram, TikTok y YouTube Shorts",
       "deleteAll": "Eliminar todos",
       "generated": "{{count}} Reels Generados",
       "generatedDescription": "Optimizados para redes sociales"
-    },
-    "status": {
-      "completed": "Completado",
-      "processing": "Procesando",
-      "failed": "Error"
     }
   }
 }

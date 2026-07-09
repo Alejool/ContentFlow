@@ -4,17 +4,13 @@
     "subtitle": "Empieza gratis y escala cuando lo necesites. Sin compromisos, cancela cuando quieras.",
     "flexiblePlans": "Planes flexibles para cada necesidad",
     "monthly": "Mensual",
-    "yearly": "Anual",
-    "yearlyDiscount": "-20%",
     "annualPricing": "Anual: {{price}}/mes — ahorras {{savings}}/año",
-    "purchasedPlans": "Planes comprados — cambiar sin pagar",
     "expiredPlans": "Planes expirados — renovar con pago",
     "currentPlanLabel": "Plan actual",
     "autoRenewal": "Renovación automática",
     "endsOn": "Finaliza el {{date}}",
     "statusActive": "Activa",
     "activePlanNow": "Plan activo ahora",
-    "activeSubscriptionLabel": "Suscripción activa",
     "expired": "Expirado",
     "use": "Usar",
     "renew": "Renovar",
@@ -24,34 +20,21 @@
     "demoTemporal": "Demo Temporal",
     "currentPlan": "Plan Actual",
     "perMonth": "/mes",
-    "perYear": "/año",
     "selectPlan": "Seleccionar Plan",
-    "startFree": "Comenzar Gratis",
     "processing": "Procesando...",
     "comingSoon": "Próximamente",
     "paymentSetup": "Configuración de pagos en proceso",
-    "noCreditCard": "Sin tarjeta de crédito",
-    "cancelAnytime": "Cancela cuando quieras",
-    "support247": "Soporte 24/7",
     "faq": "¿Tienes preguntas?",
     "faqSubtitle": "Estamos aquí para ayudarte a elegir el mejor plan",
     "contactUs": "Contáctanos en",
-    "changeToPlan": "Cambiar a este plan",
-    "cancelRequired": "Gestión de suscripción requerida",
     "cancelSubscriptionFirst": "Para volver al plan gratuito, primero debes cancelar tu suscripción de pago actual. El cambio se aplicará al finalizar tu periodo de facturación.",
     "missingFeatures": "Lo que te estás perdiendo",
     "showMore": "Ver más",
     "showLess": "Ver menos",
-
     "activeSubscription": {
       "title": "Ya tienes una suscripción activa",
-      "description": "Tu plan actual está activo. Para cambiar de plan o gestionar tu suscripción, visita la página de facturación.",
-      "changeDescription": "Puedes cambiar a cualquier plan a continuación. El cambio se aplicará inmediatamente y se ajustará tu facturación de forma prorrateada.",
-      "prorationExplanation": "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción.",
-      "manageBilling": "Gestionar Facturación",
-      "viewUsage": "Ver Uso del Plan"
+      "manageBilling": "Gestionar Facturación"
     },
-
     "plans": {
       "demo": {
         "name": "Demo",
@@ -79,7 +62,6 @@
         "description": "Solución completa para grandes organizaciones"
       }
     },
-
     "features": {
       "fullAccessDays": "Acceso completo por 30 días",
       "publications3": "3 publicaciones/mes",
@@ -148,10 +130,23 @@
       "exportHistoryLimit": "Tu plan permite exportar hasta {{days}} días de historial",
       "exportHistoryLimitYear": "Tu plan permite exportar hasta {{days}} días de historial (1 año)"
     },
-
     "billing": {
-      "month": "mes",
-      "year": "año"
-    }
+      "month": "mes"
+    },
+    "purchasedPlansAvailable": "Planes comprados — cambiar sin pago",
+    "status": {
+      "active": "Activo",
+      "available": "Disponible",
+      "expired": "Expirado",
+      "purchased": "Comprado"
+    },
+    "taglines": {
+      "demo": "Explora todo sin compromisos",
+      "enterprise": "Control total de tu marca",
+      "free": "Empieza gratis, sin tarjeta",
+      "professional": "Escala tu contenido con tu equipo",
+      "starter": "Para creadores individuales"
+    },
+    "timeAvailable": "Tiempo disponible"
   }
 }

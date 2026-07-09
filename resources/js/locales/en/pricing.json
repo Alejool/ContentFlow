@@ -4,17 +4,13 @@
     "subtitle": "Start free and scale when you need. No commitments, cancel anytime.",
     "flexiblePlans": "Flexible plans for every need",
     "monthly": "Monthly",
-    "yearly": "Yearly",
-    "yearlyDiscount": "-20%",
     "annualPricing": "Annual: ${{price}}/month — save ${{savings}}/year",
-    "purchasedPlans": "Purchased plans — switch without payment",
     "expiredPlans": "Expired plans — renew with payment",
     "currentPlanLabel": "Current plan",
     "autoRenewal": "Auto-renewal",
     "endsOn": "Ends on {{date}}",
     "statusActive": "Active",
     "activePlanNow": "Active plan now",
-    "activeSubscriptionLabel": "Active subscription",
     "expired": "Expired",
     "use": "Use",
     "renew": "Renew",
@@ -24,34 +20,21 @@
     "demoTemporal": "Temporary Demo",
     "currentPlan": "Current Plan",
     "perMonth": "/month",
-    "perYear": "/year",
     "selectPlan": "Select Plan",
-    "startFree": "Start Free",
     "processing": "Processing...",
     "comingSoon": "Coming Soon",
     "paymentSetup": "Payment setup in progress",
-    "noCreditCard": "No credit card required",
-    "cancelAnytime": "Cancel anytime",
-    "support247": "24/7 Support",
     "faq": "Have questions?",
     "faqSubtitle": "We're here to help you choose the best plan",
     "contactUs": "Contact us at",
-    "changeToPlan": "Change to this plan",
-    "cancelRequired": "Subscription management required",
     "cancelSubscriptionFirst": "To downgrade to the free plan, you must first cancel your current paid subscription. The change will take effect at the end of your billing cycle.",
     "missingFeatures": "What you're missing",
     "showMore": "Show more",
     "showLess": "Show less",
-
     "activeSubscription": {
       "title": "You already have an active subscription",
-      "description": "Your current plan is active. To change plans or manage your subscription, visit the billing page.",
-      "changeDescription": "You can change to any plan below. The change will be applied immediately and your billing will be prorated.",
-      "prorationExplanation": "You can switch to any available plan. The change will be applied immediately and billing will be automatically prorated based on the remaining time of your subscription.",
-      "manageBilling": "Manage Billing",
-      "viewUsage": "View Plan Usage"
+      "manageBilling": "Manage Billing"
     },
-
     "plans": {
       "demo": {
         "name": "Demo",
@@ -79,7 +62,6 @@
         "description": "Complete solution for large organizations"
       }
     },
-
     "features": {
       "fullAccessDays": "Full access for 30 days",
       "publications3": "3 publications/month",
@@ -148,10 +130,23 @@
       "exportHistoryLimit": "Your plan allows exporting up to {{days}} days of history",
       "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)"
     },
-
     "billing": {
-      "month": "month",
-      "year": "year"
-    }
+      "month": "month"
+    },
+    "purchasedPlansAvailable": "Purchased plans — switch without payment",
+    "status": {
+      "active": "Active",
+      "available": "Available",
+      "expired": "Expired",
+      "purchased": "Purchased"
+    },
+    "taglines": {
+      "demo": "Explore everything, no strings attached",
+      "enterprise": "Full control of your brand",
+      "free": "Start free, no card required",
+      "professional": "Scale your content with your team",
+      "starter": "For individual creators"
+    },
+    "timeAvailable": "Time available"
   }
 }

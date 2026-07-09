@@ -1,9 +1,6 @@
 {
   "title": "Revisión de Contenido",
   "clientPortal": "Portal de Clientes",
-  "header": {
-    "workspace": "Espacio de Trabajo"
-  },
   "info": {
     "title": "Revisión de Contenido",
     "description": "Has recibido este enlace para revisar y aprobar el contenido preparado por {{creator}} para el workspace {{workspace}}."
@@ -19,45 +16,12 @@
     "alreadyReviewed": "Esta publicación ya ha sido revisada."
   },
   "details": {
-    "title": "Detalles de la Publicación",
-    "sentBy": "Enviado por",
-    "sentAt": "Enviado el",
-    "role": "Rol",
-    "workspace": "Espacio de Trabajo",
-    "scheduledFor": "Programado para",
-    "targetPlatforms": "Plataformas Objetivo",
-    "platforms": "{{count}} plataforma",
-    "platforms_plural": "{{count}} plataformas",
-    "createdAt": "Creado el",
-    "updatedAt": "Última actualización"
-  },
-  "content": {
-    "messageBody": "Cuerpo del Mensaje",
-    "mediaPreview": "Vista Previa de Medios",
-    "mediaCount": "{{current}} de {{total}}",
-    "noMedia": "Sin medios adjuntos",
-    "limitedPreview": "Vista Previa Limitada",
-    "limitedPreviewDesc": "Este archivo de tipo \"{{type}}\" se procesará para el canal final.",
-    "contentType": "Tipo de Contenido",
-    "hashtags": "Hashtags",
-    "noHashtags": "Sin hashtags",
-    "goal": "Objetivo de la Campaña",
-    "noGoal": "Sin objetivo específico definido",
-    "pollOptions": "Opciones de Encuesta",
-    "pollDuration": "Duración de la Encuesta",
-    "hours": "{{count}} hora",
-    "hours_plural": "{{count}} horas"
-  },
-  "socialAccounts": {
-    "title": "Cuentas Sociales",
-    "description": "Este contenido se publicará en las siguientes cuentas:",
-    "noAccounts": "No hay cuentas sociales configuradas"
+    "targetPlatforms": "Plataformas Objetivo"
   },
   "actions": {
     "approve": "Aprobar Contenido",
     "reject": "Solicitar Cambios",
     "approving": "Aprobando...",
-    "rejecting": "Rechazando...",
     "back": "Volver",
     "submitRejection": "Enviar Comentarios de Rechazo"
   },
@@ -75,8 +39,7 @@
   },
   "error": {
     "approve": "Error al aprobar el contenido",
-    "reject": "Error al rechazar el contenido",
-    "loadImage": "Error al cargar la imagen"
+    "reject": "Error al rechazar el contenido"
   },
   "footer": {
     "secureLink": "Este es un enlace seguro generado por {{app}} para {{workspace}}.",
@@ -84,5 +47,10 @@
   },
   "confirm": {
     "approve": "¿Estás seguro de que deseas aprobar este contenido?"
-  }
+  },
+  "copyLink": "Copiar link del portal",
+  "linkCopied": "Link copiado al portapapeles",
+  "linkError": "Error al generar el link",
+  "openPortal": "Abrir portal",
+  "shareWithClient": "Compartir con cliente"
 }

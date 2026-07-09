@@ -1,0 +1,20 @@
+{
+  "publish": {
+    "accountName": "Account",
+    "allPublished": "All publications completed",
+    "canPublishToNewAccount": "You can publish to this account",
+    "canUnpublish": "You can unpublish this content",
+    "cannotUnpublishDifferentAccount": "You cannot unpublish content from a different account",
+    "completed": "completed",
+    "inProgress": "in progress",
+    "multipleAccountsAllowed": "Multiple accounts allowed",
+    "platforms": "platforms",
+    "published": "Published",
+    "publishedAt": "Published on",
+    "publishedOnCurrentAccount": "Published on current account",
+    "publishedOnDifferentAccount": "Published on another account",
+    "publishingSocial": "Publishing to social networks...",
+    "sending": "Sending",
+    "viewPost": "View post"
+  }
+}

@@ -1,12 +1,9 @@
-﻿{
+{
   "welcome": {
     "title": "Gestiona tu contenido",
     "titleHighlight": "con inteligencia artificial",
     "subtitle": "Organiza, optimiza y programa tu contenido multimedia con herramientas impulsadas por IA para maximizar tu presencia en redes sociales.",
-    "featured": "Destacado",
-    "featuredCollection": "Colección Destacada",
     "startFree": "Comienza gratis",
-    "demo": "Demo",
     "beta": "Beta",
     "featuresTitle": "Características",
     "featuresSubtitle": "Gestiona tu contenido con herramientas impulsadas por IA",
@@ -15,9 +12,6 @@
     "readyToStart": "Listo para comenzar",
     "joinNow": "Únete Ahora",
     "createAccount": "Crea una Cuenta",
-    "noCreditCard": "No requiere tarjeta de crédito",
-    "noCreditCardRequired": "No requiere tarjeta de crédito",
-    "freePlanForever": "Plan gratuito para siempre",
     "demoAccess": "Demo de 30 días disponible",
     "viewPricing": "Ver Planes",
     "viewAllPlans": "Ver todos los planes y características",
@@ -28,71 +22,6 @@
     "privacy": "Política de Privacidad",
     "terms": "Términos de Servicio",
     "contact": "Contacto",
-    "aiOrganization": {
-      "title": "Organización con IA",
-      "description": "Categoriza, etiqueta y busca fácilmente tus archivos multimedia con organización impulsada por IA",
-      "tags": {
-        "smartAlbums": "Álbumes Inteligentes",
-        "autoOrganization": "Auto-Organización",
-        "customTags": "Etiquetas Personalizadas"
-      }
-    },
-    "multiPlatform": {
-      "title": "Publicación Multiplataforma",
-      "description": "Optimiza y comparte contenido sin problemas en múltiples plataformas de redes sociales"
-    },
-    "analytics": {
-      "title": "Analíticas de Rendimiento",
-      "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
-    },
-
-    "pricing": {
-      "title": "Precios",
-      "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
-    },
-    "connectsWith": "Se integra perfectamente con",
-    "goViral": "ser viral",
-    "watchDemo": "Ver Demo",
-    "contentManagement": {
-      "title": "Hub de Contenido Inteligente",
-      "description": "Centraliza tus activos creativos con filtrado y etiquetado impulsado por IA."
-    },
-    "socialIntegration": {
-      "title": "Sincronización Multiplataforma",
-      "description": "Publica directamente en Instagram, TikTok, YouTube y más desde un solo lugar."
-    },
-    "scheduling": {
-      "title": "Auto-Programación",
-      "description": "La IA predice los mejores momentos para publicar y maximizar el engagement."
-    },
-    "aiTools": {
-      "title": "Optimización con IA",
-      "description": "Genera hashtags, descripciones y mejoras instantáneamente."
-    },
-    "tags": {
-      "multimedia": "Multimedia",
-      "organization": "Organización",
-      "advanced_search": "Búsqueda Avanzada",
-      "tags": "Etiquetas",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "youtube": "YouTube",
-      "twitter": "Twitter",
-      "calendar": "Calendario",
-      "scheduling": "Programación",
-      "ai": "IA",
-      "optimal_times": "Horas Optimas",
-      "hashtags": "Hashtags",
-      "recommendations": "Recomendaciones",
-      "optimization": "Optimización",
-      "ai_analysis": "Análisis IA",
-      "collections": "Colecciones",
-      "filters": "Filtros",
-      "auto_post": "Auto-Post",
-      "time_zones": "Zonas Horarias",
-      "search": "Búsqueda",
-      "queue": "Cola"
-    }
+    "connectsWith": "Se integra perfectamente con"
   }
 }

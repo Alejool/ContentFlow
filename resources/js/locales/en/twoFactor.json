@@ -9,8 +9,7 @@
     "step1": {
       "title": "Step 1: Scan QR Code",
       "description": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
-      "manualEntry": "Can't scan? Enter this code manually:",
-      "troubleshooting": "If you're having trouble, make sure your device's time is synchronized correctly."
+      "manualEntry": "Can't scan? Enter this code manually:"
     },
     "step2": {
       "title": "Step 2: Save Backup Codes",
@@ -31,23 +30,8 @@
     "copy": "Copy",
     "copied": "Copied!"
   },
-  "verify": {
-    "title": "Two-Factor Verification",
-    "description": "Enter the 6-digit code from your authenticator app",
-    "verificationCode": "Verification Code",
-    "placeholder": "000000",
-    "verifyButton": "Verify",
-    "verifying": "Verifying...",
-    "useBackupCode": "Use backup code",
-    "hint": "This verification will be valid for 30 days on this device."
-  },
   "errors": {
-    "invalidCode": "Invalid verification code. Check your authenticator app and try again.",
     "codeMustBe6Digits": "Code must be 6 digits",
-    "codeOnlyNumbers": "Code must contain only numbers",
-    "sessionExpired": "Session expired. Refresh the page and try again.",
-    "alreadyConfigured": "2FA is already configured for your account",
-    "notConfigured": "2FA is not configured for your account",
-    "verificationExpired": "Your 2FA verification has expired. Verify again."
+    "codeOnlyNumbers": "Code must contain only numbers"
   }
 }

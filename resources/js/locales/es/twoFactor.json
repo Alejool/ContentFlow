@@ -9,8 +9,7 @@
     "step1": {
       "title": "Paso 1: Escanear Código QR",
       "description": "Escanea este código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc.)",
-      "manualEntry": "¿No puedes escanear? Ingresa este código manualmente:",
-      "troubleshooting": "Si tienes problemas, asegúrate de que la hora de tu dispositivo esté sincronizada correctamente."
+      "manualEntry": "¿No puedes escanear? Ingresa este código manualmente:"
     },
     "step2": {
       "title": "Paso 2: Guardar Códigos de Respaldo",
@@ -31,23 +30,8 @@
     "copy": "Copiar",
     "copied": "¡Copiado!"
   },
-  "verify": {
-    "title": "Verificación de Dos Factores",
-    "description": "Ingresa el código de 6 dígitos de tu aplicación de autenticación",
-    "verificationCode": "Código de Verificación",
-    "placeholder": "000000",
-    "verifyButton": "Verificar",
-    "verifying": "Verificando...",
-    "useBackupCode": "Usar código de respaldo",
-    "hint": "Esta verificación será válida por 30 días en este dispositivo."
-  },
   "errors": {
-    "invalidCode": "Código de verificación inválido. Verifica tu aplicación de autenticación e intenta nuevamente.",
     "codeMustBe6Digits": "El código debe tener 6 dígitos",
-    "codeOnlyNumbers": "El código debe contener solo números",
-    "sessionExpired": "La sesión ha expirado. Actualiza la página e intenta nuevamente.",
-    "alreadyConfigured": "2FA ya está configurado para tu cuenta",
-    "notConfigured": "2FA no está configurado para tu cuenta",
-    "verificationExpired": "Tu verificación de 2FA ha expirado. Verifica nuevamente."
+    "codeOnlyNumbers": "El código debe contener solo números"
   }
 }

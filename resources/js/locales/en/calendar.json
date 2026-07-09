@@ -1,27 +1,5 @@
 {
   "calendar": {
-    "weekdays": {
-      "sun": "Sun",
-      "mon": "Mon",
-      "tue": "Tue",
-      "wed": "Wed",
-      "thu": "Thu",
-      "fri": "Fri",
-      "sat": "Sat"
-    },
-    "views": {
-      "month": "Month",
-      "week": "Week",
-      "day": "Day"
-    },
-    "actions": {
-      "today": "Today",
-      "export": "Export",
-      "selectAll": "Select all",
-      "clearSelection": "Clear selection",
-      "moveEvents": "Move events",
-      "bulkMove": "Move selected"
-    },
     "navigation": {
       "previous": "Previous",
       "next": "Next",
@@ -35,35 +13,14 @@
       "status": "Status",
       "campaign": "Campaign"
     },
-    "export": {
-      "title": "Export calendar",
-      "google": "Google Calendar",
-      "outlook": "Outlook Calendar",
-      "description": "The .ics file can be imported into any compatible calendar application",
-      "success": "Calendar exported successfully",
-      "error": "Error exporting calendar",
-      "eventsCount": "events"
-    },
     "bulkActions": {
-      "selected": "selected",
-      "selectedPlural": "selected",
-      "event": "event",
-      "eventPlural": "events",
-      "of": "of",
-      "total": "total",
-      "moveTitle": "Move selected events",
-      "moveDescription": "Select the new date and time to move the {count} selected events.",
       "moveSuccess": "Events moved successfully",
       "moveError": "Error moving events",
       "undoSuccess": "Operation undone successfully",
-      "undoError": "Error undoing operation",
-      "cancel": "Cancel",
-      "move": "Move"
+      "undoError": "Error undoing operation"
     },
     "event": "event",
     "selected": "selected",
-    "of": "of",
-    "total": "total",
     "allSelected": "All selected",
     "select": "Select",
     "selectAll": "Select all",
@@ -74,33 +31,24 @@
     "selectAllDescription": "All visible events in the calendar",
     "clearSelection": "Clear selection",
     "moveEvents": "Move events",
-    "delete": "Delete",
     "undo": "Undo",
     "undoLastOperation": "Undo last operation",
     "moveSelectedEvents": "Move selected events",
     "movingEvents": "Moving {{count}} events",
-    "movingEvents_one": "Moving 1 event",
     "selectNewDateTime": "Select the new date and time for the selected events.",
     "newDateAndTime": "New date and time",
     "preserveOriginalTime": "Events will keep their original time",
     "moveCount": "Move {{count}} events",
-    "moveCount_one": "Move 1 event",
     "deleteSelectedEvents": "Delete selected events",
     "confirmDelete": "Confirm deletion",
     "deleteWarning": "Are you sure you want to delete {{count}} events? This action cannot be undone.",
     "deleteCount": "Delete {{count}} events",
-    "deleteCount_one": "Delete 1 event",
     "events": {
       "count": "events",
-      "empty": "No events for this day",
-      "noScheduled": "No scheduled events"
+      "empty": "No events for this day"
     },
     "userEvents": {
       "modal": {
-        "title": {
-          "edit": "Edit Event",
-          "new": "New Personal Event"
-        },
         "fields": {
           "title": "Title",
           "description": "Description",
@@ -131,11 +79,6 @@
           "errorDelete": "Error deleting event",
           "validationError": "Please correct the errors in the form"
         },
-        "validation": {
-          "titleRequired": "Title is required",
-          "startDateRequired": "Start date is required",
-          "pastDate": "Events cannot be created in the past"
-        },
         "visibility": {
           "public": "Public",
           "private": "Private",
@@ -157,9 +100,6 @@
       "connect": "Connect",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
-      "syncNow": "Sync Now",
-      "configure": "Configure",
-      "lastSync": "Last sync",
       "disconnectConfirm": {
         "title": "Disconnect calendar?",
         "message": "Are you sure you want to disconnect this calendar? Synced events will be removed from the external calendar.",
@@ -171,18 +111,7 @@
       "disconnectError": "Error disconnecting calendar",
       "syncSuccess": "Synchronization completed successfully",
       "syncError": "Error synchronizing calendar",
-      "fetchError": "Error fetching connection status",
       "connectionSuccess": "{{provider}} calendar connected successfully",
-      "syncSettings": "Sync Settings",
-      "enableSync": "Enable automatic sync",
-      "syncCampaigns": "Sync only these campaigns (leave empty for all)",
-      "syncPlatforms": "Sync only these platforms (leave empty for all)",
-      "syncSettingsSaved": "Settings saved successfully",
-      "syncSettingsError": "Error saving settings",
-      "save": "Save",
-      "cancel": "Cancel",
-      "retrySuccess": "Sync retried successfully",
-      "retryError": "Error retrying sync",
       "errors": {
         "invalidState": "Invalid authentication state",
         "expiredState": "Authentication session has expired",
@@ -194,7 +123,6 @@
     },
     "error": {
       "title": "Something went wrong",
-      "description": "An error occurred while rendering the calendar. Try again.",
       "retry": "Try again",
       "retry_button": "Retry",
       "persist": "If the problem persists contact support."
@@ -202,9 +130,7 @@
     "validation": {
       "invalid_date": "Invalid Date",
       "past_date_error": "Cannot Schedule in the Past",
-      "past_date_message": "You cannot schedule events for past dates. Select a future date and time.",
-      "date_required": "Date is required",
-      "invalid_format": "Invalid date format. Use a valid date."
+      "past_date_message": "You cannot schedule events for past dates. Select a future date and time."
     },
     "warnings": {
       "pastDate": "Are you sure you want to move this event to a past date/time?"
@@ -217,9 +143,6 @@
     "sync": {
       "error": {
         "title": "Sync Error",
-        "failed": "Failed to sync with {provider}",
-        "token_expired": "Your connection with {provider} has expired. Reconnect.",
-        "unavailable": "{provider} is currently unavailable. Try again later.",
         "unknown": "An unknown sync error occurred",
         "dismiss": "Dismiss error",
         "retry": "Retry sync",
@@ -231,7 +154,6 @@
     },
     "conflict": {
       "title": "Data Conflict Detected",
-      "description": "This event has been modified by another user. Choose which version to keep.",
       "event": "Event",
       "field_label": "Conflicting field",
       "your_version": "Your Version",
@@ -240,7 +162,6 @@
       "server": "Server",
       "select_local": "Select your version",
       "select_server": "Select server version",
-      "info": "The version you choose will be saved. The other version will be discarded.",
       "cancel": "Cancel",
       "resolve": "Apply Selected Version",
       "field": {
@@ -251,6 +172,12 @@
         "platform": "Platform",
         "campaign": "Campaign"
       }
-    }
+    },
+    "clear_all": "Clear All",
+    "filter_by_campaign": "Campaign",
+    "filter_by_platform": "Platform",
+    "filter_by_status": "Status",
+    "showing_filtered": "Showing {{count}} of {{total}} events",
+    "move": "Move"
   }
 }

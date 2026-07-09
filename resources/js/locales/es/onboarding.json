@@ -37,19 +37,16 @@
       "sizeRequired": "Selecciona el tamaño de tu equipo"
     },
     "optional": "Opcional",
-    "skip": "Saltar este paso",
     "continue": "Continuar"
   },
   "planSelection": {
     "title": "Elige el plan perfecto para ti",
     "description": "Comienza gratis o elige un plan que se ajuste a tus necesidades",
-    "recommended": "Recomendado",
     "intervals": {
       "month": "mes",
-      "forever": "siempre"
+      "forever": "siempre",
+      "year": "año"
     },
-    "startFree": "Comenzar Gratis",
-    "selectPlan": "Seleccionar Plan",
     "decideLater": "Decidiré más tarde"
   },
   "tour": {
@@ -62,7 +59,8 @@
     "nextStep": "Ir al siguiente paso del tour",
     "completeTour": "Completar el tour guiado",
     "skipGuidedTour": "Saltar el tour guiado",
-    "progress": "Progreso del tour"
+    "progress": "Progreso del tour",
+    "navigating": "Navegando a la siguiente sección..."
   },
   "wizard": {
     "title": {
@@ -118,7 +116,8 @@
       "accounts": "cuentas",
       "connectedAccounts": "Cuentas Conectadas",
       "nextStep": "A continuación, te ayudaremos a crear tu primera publicación usando una plantilla."
-    }
+    },
+    "continueWithout": "Continuar sin conectar"
   },
   "templates": {
     "title": "Elige una Plantilla",
@@ -131,16 +130,6 @@
     "filterBy": "Filtrar por categoría {{category}}",
     "useTemplate": "Usar Esta Plantilla",
     "selecting": "Seleccionando...",
-    "categories": {
-      "all": "Todas",
-      "promotional": "Promocional",
-      "educational": "Educativa",
-      "engagement": "Interacción"
-    },
-    "noTemplates": {
-      "title": "No se encontraron plantillas",
-      "description": "Intenta ajustar tu búsqueda o filtro para encontrar lo que buscas."
-    },
     "available": "{{count}} {{templateText}} disponibles",
     "template": "plantilla",
     "templates": "plantillas",
@@ -148,19 +137,10 @@
     "skipping": "Saltando...",
     "skipAndCreate": "Saltar selección de plantilla y crear publicación en blanco",
     "list": "Plantillas de publicación",
-    "select": "Seleccionar plantilla {{name}}",
-    "preview": "Vista previa de plantilla {{name}}"
+    "select": "Seleccionar plantilla {{name}}"
   },
   "progress": {
-    "title": "Progreso de Configuración",
-    "complete": "Completado",
-    "inProgress": "En progreso",
-    "stages": {
-      "businessInfo": "Información del Negocio",
-      "plan": "Selección de Plan",
-      "tour": "Tour Guiado",
-      "connect": "Conectar Cuentas"
-    }
+    "title": "Progreso de Configuración"
   },
   "platform": {
     "connect": "Conectar",
@@ -176,16 +156,6 @@
     "linkedin": "Comparte contenido profesional en LinkedIn"
   },
   "errors": {
-    "loadFailed": "Error al cargar la incorporación",
-    "actionFailed": "Error al realizar la acción",
-    "tryAgain": "Inténtalo de nuevo",
-    "networkError": "Ocurrió un error de red",
     "retry": "Reintentar"
-  },
-  "settings": {
-    "restart": "Reiniciar Incorporación",
-    "restartDescription": "Volver a realizar el proceso de incorporación",
-    "restartConfirm": "¿Estás seguro de que deseas reiniciar la incorporación?",
-    "restartSuccess": "Incorporación reiniciada exitosamente"
   }
 }

@@ -1,0 +1,14 @@
+{
+  "content": {
+    "publish": {
+      "button": "Publicar",
+      "ready": "Listo para publicar",
+      "pending_review": "Pendiente de revisión",
+      "approval_required": "Aprobación requerida",
+      "approval_required_message": "Este contenido debe aprobarse antes de publicar.",
+      "no_permission": "No tienes permiso para publicar",
+      "owner_bypass": "Como propietario, puedes publicar sin aprobación",
+      "rejected_message": "Este contenido fue rechazado. Revisa los comentarios antes de volver a publicar."
+    }
+  }
+}

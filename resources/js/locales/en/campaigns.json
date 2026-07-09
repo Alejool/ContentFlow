@@ -3,24 +3,14 @@
     "title": "Performance Summary",
     "subtitle": "Analyze the impact and performance of your campaigns and publications.",
     "noPublications": "No associated publications",
-    "scheduledPosts": "Scheduled Posts",
-    "inCampaigns": "In {{count}} campaign",
-    "inCampaigns_plural": "In {{count}} campaigns",
-    "create": "Create Campaign",
     "table": {
       "name": "Name",
-      "description": "Description",
       "publications": "Publications",
-      "media": "Media",
       "status": "Status",
       "actions": "Actions",
-      "loading": "Loading...",
-      "timeline": "Timeline",
-      "performance": "Performance",
       "emptyState": {
         "title": "No campaigns found",
-        "description": "Create a campaign to start publishing content.",
-        "button": "Add Campaign"
+        "description": "Create a campaign to start publishing content."
       }
     },
     "filters": {
@@ -33,21 +23,12 @@
       "paused": "Paused"
     },
     "actions": {
-      "viewCampaign": "View Campaign",
-      "edit": "Edit",
-      "publishNow": "Publish Now",
-      "viewDetails": "View Details",
-      "delete": "Delete",
-      "active": "Active",
-      "remove": "Remove",
-      "change": "Change",
       "showPublications": "Show publications",
       "hidePublications": "Hide publications"
     },
     "messages": {
       "fetchError": "Error fetching campaigns",
       "addSuccess": "Campaign created successfully",
-      "duplicateSuccess": "Campaign duplicated successfully",
       "addError": "Error creating campaign",
       "updateSuccess": "Campaign updated successfully",
       "updateError": "Error updating campaign",
@@ -57,12 +38,7 @@
       "error": "Error"
     },
     "modal": {
-      "sections": {
-        "details": "Campaign Details"
-      },
       "add": {
-        "title": "Create Campaign",
-        "subtitle": "You can create a campaign to organize and publish your content.",
         "name": "Campaign Name",
         "description": "Description",
         "goal": "Goal",
@@ -73,8 +49,6 @@
         "loadingPublications": "Loading publications...",
         "noPublications": "No publications found. Create some first!",
         "associatedPublicationsRequired": "Associated Publications is required",
-        "status": "Status",
-        "media": "Media",
         "placeholders": {
           "name": "e.g. Summer Campaign",
           "description": "Brief campaign description",
@@ -86,14 +60,8 @@
         }
       },
       "edit": {
-        "title": "Edit Campaign",
-        "subtitle": "Update your campaign information.",
-        "name": "Campaign Name",
-        "description": "Description",
         "goal": "Goal",
         "budget": "Budget",
-        "startDate": "Start Date",
-        "endDate": "End Date",
         "associatedPublications": "Associated Publications",
         "noPublications": "No publications found.",
         "placeholders": {

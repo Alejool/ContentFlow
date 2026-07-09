@@ -1,0 +1,115 @@
+{
+  "approvalWorkflow": {
+    "configuration": {
+      "title": "Approval Workflow",
+      "subtitle": "Set up how content is reviewed and approved"
+    },
+    "enable_workflow": "Enable Approval Workflow",
+    "enable_workflow_description": "Require content to be approved before publishing",
+    "multi_level_workflow": "Multi-Level Workflow",
+    "multi_level_description": "Require approvals from multiple roles in sequence",
+    "approval_levels": "Approval Levels",
+    "add_level": "Add Level",
+    "level_name": "Level name",
+    "no_levels_configured": "No levels configured",
+    "click_add_level": "Click \"Add Level\" to get started",
+    "simple_workflow_info": "Content will require a single approval before it can be published.",
+    "insufficient_permissions": "You don't have permission to manage this workflow",
+    "level_1": "Level 1",
+    "level_n": "Level {{n}}",
+    "level": "Level",
+    "current_status": "Current Status",
+    "progress": "Progress",
+    "submit_for_approval": "Submit for Approval",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approve_content": "Approve Content",
+    "reject_content": "Reject Content",
+    "comment_optional": "Comment (optional)",
+    "add_comment": "Add a comment...",
+    "rejection_reason": "Rejection Reason",
+    "explain_rejection": "Explain why this content is being rejected...",
+    "pending_review_by_role": "Pending review by {{role}}",
+    "pending_review_by_any_admin": "Pending review by any administrator",
+    "history_title": "Approval History",
+    "no_history": "No approval history yet",
+    "action": {
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_review": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "published": "Published"
+    },
+    "success": {
+      "submitted": "Submitted for review successfully",
+      "approved": "Content approved successfully",
+      "rejected": "Content rejected",
+      "disabled": "Approval workflow disabled",
+      "enabled": "Approval workflow enabled",
+      "configured": "Workflow saved successfully"
+    },
+    "warnings": {
+      "pending_content": "There is content pending review. Some settings are locked until it is resolved."
+    },
+    "errors": {
+      "insufficient_permissions": "You don't have permission to perform this action",
+      "toggle_failed": "Failed to change the workflow status",
+      "pending_content_warning": "You cannot change the configuration while there is content pending review",
+      "multi_level_requires_enterprise": "Multi-level workflows require an Enterprise plan",
+      "multi_level_requires_levels": "Add at least one level for the multi-level workflow",
+      "duplicate_roles": "You cannot assign the same role to multiple levels",
+      "invalid_role_selection": "Select a valid role for each level",
+      "duplicate_role_selected": "Duplicate role",
+      "save_failed": "Failed to save the configuration",
+      "approve_failed": "Failed to approve the content",
+      "rejection_reason_required": "Please provide a reason for the rejection",
+      "reject_failed": "Failed to reject the content",
+      "submit_failed": "Failed to submit for review"
+    },
+    "analytics": {
+      "title": "Approval Analytics",
+      "subtitle": "Performance metrics and insights for your approval workflow",
+      "export_csv": "Export CSV",
+      "export_json": "Export JSON",
+      "avg_publication_time": "Avg. Publication Time",
+      "from_submission_to_publish": "From submission to publish",
+      "total_pending": "Total Pending",
+      "across_all_levels": "Across all levels",
+      "stale_content": "Stale Content",
+      "pending_over_7_days": "Pending over 7 days",
+      "avg_time_per_level": "Average Approval Time by Level",
+      "minutes": "Minutes",
+      "no_data_available": "No data available",
+      "approval_rejection_rates": "Approval / Rejection Rates by Role",
+      "approvals": "Approvals",
+      "rejections": "Rejections",
+      "pending_by_level": "Pending Content by Level",
+      "pending_count": "Pending",
+      "approval_rate_distribution": "Approval Rate Distribution",
+      "approver_workload": "Approver Workload",
+      "pending_tasks": "Pending Tasks",
+      "stale_content_details": "Stale Content Details",
+      "content_title": "Title",
+      "submitted_at": "Submitted At",
+      "days_pending": "Days Pending",
+      "current_level": "Current Level",
+      "days": "days",
+      "detailed_stats": "Detailed Statistics",
+      "role": "Role",
+      "total_actions": "Total Actions",
+      "approval_rate": "Approval Rate",
+      "level": "Level",
+      "success": {
+        "exported": "Analytics exported successfully"
+      },
+      "errors": {
+        "export_failed": "Failed to export analytics"
+      }
+    }
+  }
+}

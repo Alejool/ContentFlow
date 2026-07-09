@@ -1,8 +1,6 @@
 {
   "admin": {
     "navigation": {
-      "title": "Panel de Administración",
-      "subtitle": "Gestión centralizada del sistema",
       "dashboard": "Dashboard",
       "system_settings": "Configuración del Sistema",
       "system_notifications": "Notificaciones del Sistema"
@@ -20,8 +18,6 @@
         "active_subscriptions": "Suscripciones Activas",
         "publications": "Publicaciones",
         "system_health": "Estado del Sistema",
-        "healthy": "Saludable",
-        "review": "Revisar",
         "workspaces": "Espacios de Trabajo",
         "verified_users": "Usuarios Verificados",
         "social_accounts": "Cuentas Sociales",
@@ -46,21 +42,12 @@
         "warning": "Advertencia",
         "critical": "Crítico"
       },
-      "system_issues": {
-        "title": "Problemas del sistema detectados",
-        "unverified_users": "{{count}} de {{total}} usuarios sin verificar ({{percent}}%)"
-      },
       "subscriptions_by_plan": "Suscripciones activas por plan",
       "plans": {
         "free": "Gratuito",
         "basic": "Básico",
         "professional": "Profesional",
         "enterprise": "Empresarial"
-      },
-      "activity": {
-        "system_started": "Sistema iniciado correctamente",
-        "config_loaded": "Todas las configuraciones cargadas",
-        "cache_optimized": "Caché optimizado"
       },
       "info": {
         "exclusive_access": "Acceso Exclusivo",

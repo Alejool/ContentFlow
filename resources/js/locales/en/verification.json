@@ -1,0 +1,17 @@
+{
+  "verification": {
+    "title": "Verify your email",
+    "security": "For your security, verify your email address.",
+    "banner": {
+      "title": "Verify your email address",
+      "message": "We sent a verification link to your email. Please verify to unlock all features.",
+      "resendButton": "Resend email",
+      "sending": "Sending...",
+      "successMessage": "Verification email sent"
+    },
+    "didNotReceive": "Didn't receive the email?",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "logout": "Log out"
+  }
+}

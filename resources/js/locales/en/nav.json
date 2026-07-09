@@ -1,22 +1,8 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
-    "calendar": "Calendar",
     "profile": "Profile",
-    "settings": "Settings",
-    "manageContent": "Manage Content",
-    "analytics": "Analytics",
-    "aiChat": "AI Chat",
-    "socialNetworks": "Social Networks",
     "logout": "Log Out",
     "notifications": "Notifications",
-    "workspaces": "Workspaces",
-    "workspace_branding": "Workspace Branding",
-    "reels": "Reels",
-    "billing": "Billing",
-    "addons": "Add-ons",
-    "adminDashboard": "Admin Dashboard",
-    "adminSettings": "System Settings",
     "search": "Search routes...",
     "noResults": "No routes found",
     "search.clear": "Clear search",
@@ -26,7 +12,6 @@
     "sidebar.expand": "Expand sidebar",
     "menu.navigation": "Navigation menu",
     "mainNavigation": "Main navigation",
-    "content": "Content",
     "content.records": "Records",
     "content.publications": "Publications",
     "content.campaigns": "Campaigns",
@@ -37,13 +22,6 @@
     "workspaces.members": "Members",
     "workspaces.integrations": "Integrations",
     "section": {
-      "dashboard": "Dashboard",
-      "content": "Content",
-      "analytics": "Analytics",
-      "workspaces": "Workspaces",
-      "subscription": "Subscription",
-      "settings": "Settings",
-      "admin": "Administration",
       "quickNavHint": "to navigate"
     }
   }

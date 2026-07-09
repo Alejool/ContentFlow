@@ -1,0 +1,29 @@
+{
+  "socialAccounts": {
+    "title": "Cuentas Sociales",
+    "subtitle": "Gestiona tus cuentas de redes sociales conectadas",
+    "connectAccount": "Conectar Cuenta Social",
+    "connectedAccounts": "Cuentas Conectadas",
+    "availablePlatforms": "Plataformas Disponibles",
+    "connect": "Conectar",
+    "connected": "Conectado",
+    "connectedAt": "Conectado",
+    "connectedBy": "Conectado por",
+    "connectError": "Error al conectar la cuenta",
+    "alreadyConnected": "Ya conectado",
+    "disconnect": "Desconectar",
+    "disconnected": "Cuenta desconectada",
+    "disconnectError": "Error al desconectar",
+    "confirmDisconnect": "¿Estás seguro de desconectar esta cuenta?",
+    "active": "Activo",
+    "expired": "Expirado",
+    "tokenExpired": "Token expirado",
+    "needsReconnection": "Reconectar",
+    "reconnect": "Reconectar",
+    "reconnectButton": "Reconectar cuenta",
+    "reconnecting": "Verificando…",
+    "demoMode": {
+      "title": "Datos de Demostración"
+    }
+  }
+}

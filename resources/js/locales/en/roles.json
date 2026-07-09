@@ -6,26 +6,13 @@
     "permissions": "Permissions",
     "protected": "Protected",
     "role_color": "Role color",
-    "color_hint": "Used across the entire UI to identify this role",
     "select_all": "All",
     "deselect_all": "None",
     "search_permissions": "Search permissions…",
     "no_permissions_found": "No permissions match your search",
-    "groups": {
-      "content":    "Content",
-      "publishing": "Publishing & Approval",
-      "team":       "Team Management",
-      "workspace":  "Workspace",
-      "analytics":  "Analytics",
-      "campaigns":  "Campaigns",
-      "other":      "Other"
-    },
-    "editor_publish_info": "When publishing, content will be sent for review if you're not an Admin. In workspaces with multi-level workflow, it must pass through all configured approval stages.",
-    "admin_publish_info": "Can publish directly without review and approve content from other users.",
-    "owner_info": "Full workspace control. This role cannot be edited or deleted.",
     "descriptions": {
-      "owner":  "Full control over the workspace. Can manage all settings, members and billing.",
-      "admin":  "Trusted administrator. Can manage content, members and approval workflows.",
+      "owner": "Full control over the workspace. Can manage all settings, members and billing.",
+      "admin": "Trusted administrator. Can manage content, members and approval workflows.",
       "editor": "Content creator. Can create, edit and submit publications for review.",
       "member": "Standard collaborator. Can view and interact with content.",
       "viewer": "Read-only access. Can view content but not make changes."
@@ -61,40 +48,6 @@
     "users_list": "User List",
     "users_list_subtitle": "Assign roles to team members",
     "insufficient_permissions_title": "Insufficient Permissions",
-    "insufficient_permissions_message": "Only administrators and owners can manage roles",
-    "permissions_list": {
-      "publish": {
-        "name": "Publish",
-        "description": "Allow publishing content to social media"
-      },
-      "approve": {
-        "name": "Approve",
-        "description": "Allow approving content for publication"
-      },
-      "view-analytics": {
-        "name": "View Analytics",
-        "description": "Allow viewing workspace analytics"
-      },
-      "manage-accounts": {
-        "name": "Manage Accounts",
-        "description": "Allow adding/removing social accounts"
-      },
-      "manage-team": {
-        "name": "Manage Team",
-        "description": "Allow inviting/removing members"
-      },
-      "manage-content": {
-        "name": "Manage Content",
-        "description": "Allow creating and editing publications"
-      },
-      "manage-campaigns": {
-        "name": "Manage Campaigns",
-        "description": "Allow creating and editing campaigns"
-      },
-      "view-content": {
-        "name": "View Content",
-        "description": "Allow viewing workspace content (read-only)"
-      }
-    }
+    "insufficient_permissions_message": "Only administrators and owners can manage roles"
   }
 }

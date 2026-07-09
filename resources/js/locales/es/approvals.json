@@ -17,29 +17,15 @@
     "rejectionReason": "Razón del Rechazo",
     "rejectionReasonDescription": "Proporciona una razón detallada para el rechazo de",
     "rejectionReasonPlaceholder": "Ej. El contenido no cumple con las políticas de la empresa...",
-    "rejectionReasonTooShort": "La razón debe tener al menos 10 caracteres",
-    "rejectionReasonTooLong": "La razón no puede exceder 500 caracteres",
-    "validation": {
-      "reasonMin": "La razón debe tener al menos 10 caracteres",
-      "reasonMax": "La razón no puede exceder 500 caracteres"
-    },
     "approvalSuccess": "¡Publicación Aprobada!",
     "approvalSuccessMessage": "La publicación ha sido aprobada exitosamente y está lista para ser publicada.",
     "approvedBy": "Aprobado por",
     "rejectedBy": "Rechazado por",
     "submittedBy": "Enviado por",
-    "cancelledBy": "Cancelado por",
-    "reassignedBy": "Reasignado por",
     "publicationRejected": "Publicación Rechazada",
     "rejectionMessage": "Tu publicación ha sido rechazada. Revisa los comentarios y realiza los ajustes necesarios.",
     "noReasonProvided": "No se proporcionó una razón.",
     "editPublication": "Editar Publicación",
-    "searchPlaceholder": "Buscar por título de publicación...",
-    "requestedBy": "Solicitado por",
-    "requestedAt": "Fecha Solicitud",
-    "reviewedBy": "Revisado por",
-    "reviewedAt": "Fecha Revisión",
-    "action": "Acción",
     "reason": "Razón",
     "noHistory": "No se encontró historial de aprobaciones",
     "stats": {
@@ -67,19 +53,12 @@
       "status": "Estado",
       "currentReviewer": "Revisor Actual",
       "completedBy": "Completado por",
-      "actions": "Acciones",
-      "requestedBy": "Solicitado por",
-      "requestedAt": "Fecha Solicitud",
-      "reviewedBy": "Revisado por",
-      "reviewedAt": "Fecha Revisión",
-      "action": "Acción",
-      "reason": "Razón"
+      "actions": "Acciones"
     },
     "filters": {
       "all": "Todas",
       "approved": "Aprobadas",
-      "rejected": "Rechazadas",
-      "dateRange": "Rango de Fechas"
+      "rejected": "Rechazadas"
     },
     "tabs": {
       "pending": "Pendientes",
@@ -90,28 +69,66 @@
       "description": "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel."
     },
     "workflow_progress": "Progreso del Flujo",
-    "workflow_flow": "Flujo de Aprobación",
     "workflow_status": "Estado del Flujo",
     "progress": "Progreso",
     "in_progress": "En Proceso",
-    "rejected_here": "Rechazado Aquí",
-    "rejected_at_level": "Rechazado en el nivel {{level}}",
     "approver_role": "Rol Aprobador",
     "no_role_assigned": "Sin rol asignado",
     "step": "Nivel",
     "approved_ready_to_publish": "¡Aprobado! Listo para publicar",
     "next_action": {
-      "submit_for_approval": "Envía esta publicación a revisión para comenzar el proceso de aprobación",
-      "awaiting_level_approval": "Esperando aprobación de {{role}} ({{level}})",
-      "awaiting_final_approval": "Esperando aprobación final de {{role}}",
       "ready_to_publish": "La publicación ha sido aprobada y está lista para publicarse"
     },
     "errors": {
-      "submit_failed": "Error al enviar a revisión"
+      "submit_failed": "Error al enviar a revisión",
+      "reasonRequired": "La razón es requerida",
+      "approveFailed": "Error al aprobar",
+      "rejectFailed": "Error al rechazar"
     },
     "workflowAssignment": {
       "title": "Aprobaciones asignadas",
       "description": "Estás viendo solo el contenido que requiere tu aprobación según tu rol o asignación en el flujo de trabajo. Los administradores pueden ver todo el contenido pendiente."
+    },
+    "multiLevelFlow": "Flujo multinivel",
+    "directFlow": "Flujo directo",
+    "last_submission": "Último envío por",
+    "upgrade": {
+      "title": "Aprobaciones no disponibles",
+      "description": "Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido.",
+      "viewPlans": "Ver planes"
+    },
+    "submissionDetails": "Detalles del Envío",
+    "currentStatus": "Estado",
+    "flowVisualization": {
+      "title": "Flujo de aprobación",
+      "completedLevels": "Niveles completados"
+    },
+    "workflowProgress": "Progreso del flujo",
+    "inProgress": "En revisión",
+    "rejectedHere": "Rechazado aquí",
+    "rejectedAtLevel": "En nivel",
+    "approverRole": "Revisado por Rol",
+    "timeoutLimit": "Tiempo límite",
+    "auditTrail": "Historial de acciones",
+    "yourAction": "Tu acción",
+    "commentOptional": "Comentario opcional...",
+    "rejectionReasonRequired": "Razón del rechazo (requerida)...",
+    "confirmReject": "Confirmar rechazo",
+    "confirmRejection": "Confirmar Rechazo",
+    "approvedReadyToPublish": "Aprobado. Listo para publicar.",
+    "requestRejected": "Solicitud rechazada",
+    "noActiveRequest": "No hay solicitud de aprobación activa.",
+    "awaitingLevel": "Esperando aprobación en",
+    "levelCard": {
+      "title": "Nivel {{number}}: {{name}}",
+      "approvedBy": "Aprobado por",
+      "rejectedBy": "Rechazado por",
+      "requiresRole": "Este nivel requiere aprobación del rol",
+      "waitingFor": "Esperando aprobación de"
+    },
+    "messages": {
+      "finalApproval": "Aprobación final completada.",
+      "levelApproved": "{{level}} aprobado"
     }
   }
 }

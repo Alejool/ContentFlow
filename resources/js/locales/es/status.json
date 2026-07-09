@@ -1,0 +1,14 @@
+{
+  "status": {
+    "draft": "Borrador",
+    "scheduled": "Programado",
+    "publishing": "Publicando",
+    "processing": "Procesando",
+    "pending_review": "En revisión",
+    "approved": "Aprobado",
+    "published": "Publicado",
+    "rejected": "Rechazado",
+    "failed": "Fallido",
+    "cancelled": "Cancelado"
+  }
+}

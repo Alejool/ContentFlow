@@ -1,8 +1,6 @@
 {
   "dashboard": {
     "title": "Panel",
-    "welcomeMessage": "Bienvenido, {{name}}!",
-    "systemStats": "Estadísticas generales del sistema",
     "totalViews": "Total Vistas",
     "totalClicks": "Total Clicks",
     "conversions": "Conversiones",
@@ -10,17 +8,7 @@
     "totalEngagement": "Engagement Total",
     "avgEngagementRate": "Tasa de Engagement Promedio",
     "engagementTrends": "Tendencia de Engagement",
-    "followersByPlatform": "Seguidores por Plataforma",
-    "campaignPerformance": "Rendimiento de Campañas",
     "platformPerformance": "Rendimiento Global por Plataforma",
-    "views": "Vistas",
-    "clicks": "Clicks",
-    "engagement": "Engagement",
-    "emptyState": {
-      "title": "Sin Datos",
-      "message": "Ejecuta el comando para generar datos de prueba:",
-      "command": "php artisan statistics:seed"
-    },
     "quickActions": {
       "campaigns": {
         "title": "Campañas",
@@ -34,6 +22,22 @@
         "title": "Contenido",
         "description": "Gestionar medios y publicaciones"
       }
+    },
+    "subtitle": "Estadísticas generales del sistema.",
+    "tabs": {
+      "overview": "Resumen",
+      "engagement": "Interacción",
+      "social": "Redes Sociales"
+    },
+    "sections": {
+      "accounts": "Estado de Cuentas Conectadas",
+      "interaction": "Métricas de Interacción",
+      "interactionDesc": "Análisis detallado de cómo los usuarios interactúan con tu marca.",
+      "performance": "Resumen de Rendimiento",
+      "performanceDesc": "Métricas clave sobre el alcance y la interacción de tu contenido.",
+      "platforms": "Comparativa de Plataformas",
+      "publications": "Estado de Publicaciones",
+      "publicationsDesc": "Reporte del estado actual de tus campañas y publicaciones recientes."
     }
   }
 }

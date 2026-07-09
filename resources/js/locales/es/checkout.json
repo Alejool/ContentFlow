@@ -1,0 +1,11 @@
+{
+  "checkout": {
+    "success": {
+      "activated": "Tu suscripción ha sido activada correctamente.",
+      "activating": "Estamos activando tu suscripción...",
+      "goToDashboard": "Ir al Dashboard",
+      "title": "Pago Exitoso",
+      "updating": "Actualizando tu cuenta..."
+    }
+  }
+}

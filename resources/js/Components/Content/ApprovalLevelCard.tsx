@@ -122,7 +122,7 @@ export default function ApprovalLevelCard({
 
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white">
-                {t('approvals.level.title', {
+                {t('approvals.levelCard.title', {
                   number: level.level_number,
                   name: level.level_name,
                 })}
@@ -151,7 +151,7 @@ export default function ApprovalLevelCard({
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {t('approvals.level.approvedBy') || 'Aprobado por'}:
+                    {t('approvals.levelCard.approvedBy') || 'Aprobado por'}:
                   </span>
                   <span className="text-sm text-gray-700 dark:text-neutral-300">
                     {level.approved_action.user.name}
@@ -182,7 +182,7 @@ export default function ApprovalLevelCard({
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {t('approvals.level.rejectedBy') || 'Rechazado por'}:
+                    {t('approvals.levelCard.rejectedBy') || 'Rechazado por'}:
                   </span>
                   <span className="text-sm text-gray-700 dark:text-neutral-300">
                     {level.rejected_action.user.name}
@@ -242,7 +242,7 @@ export default function ApprovalLevelCard({
             <div className="flex items-start gap-2">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                {t('approvals.level.requiresRole') || 'Este nivel requiere aprobación del rol'}:{' '}
+                {t('approvals.levelCard.requiresRole') || 'Este nivel requiere aprobación del rol'}:{' '}
                 <strong>{level.role.display_name}</strong>
               </p>
             </div>
@@ -255,7 +255,7 @@ export default function ApprovalLevelCard({
             <div className="flex items-start gap-2">
               <Clock className="mt-0.5 h-4 w-4 shrink-0 text-gray-500 dark:text-neutral-400" />
               <p className="text-sm text-gray-600 dark:text-neutral-400">
-                {t('approvals.level.waitingFor') || 'Esperando aprobación de'}:{' '}
+                {t('approvals.levelCard.waitingFor') || 'Esperando aprobación de'}:{' '}
                 <strong>{level.role.display_name}</strong>
               </p>
             </div>

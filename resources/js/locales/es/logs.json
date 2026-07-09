@@ -4,30 +4,21 @@
     "subtitle": "Registros de actividad",
     "refresh": "Actualizar",
     "viewPost": "Ver publicación",
-    "filter": "Filtrar",
     "filters": {
-      "campaign": "Filtrar por Campaña",
-      "dateRange": "Rango de Fechas",
-      "allCampaigns": "Todas las Campañas",
-      "from": "Desde",
-      "to": "Hasta",
-      "apply": "Aplicar Filtros",
       "clear": "Limpiar"
     },
     "table": {
       "date": "Fecha",
       "platform": "Plataforma",
       "source": "Origen",
-      "description": "Descripción",
       "campaign": "Campaña",
       "status": "Estado",
-      "message": "Mensaje",
-      "error": "Error",
-      "video": "Video",
+      "description": "Descripción",
       "link": "Enlace",
-      "copy": "Copiar",
       "less": "Menos",
-      "more": "Mas"
+      "more": "Mas",
+      "clickMore": "Ver más",
+      "clickLess": "Ver menos"
     },
     "status": {
       "all": "Todos",
@@ -41,13 +32,6 @@
       "publishing": "Publicando"
     },
     "empty": "No se encontraron registros",
-    "noLogsDesc": "No hay registros de actividad que coincidan con tus filtros o en este espacio de trabajo.",
-    "loading": "Cargando registros...",
-    "pagination": {
-      "previous": "Anterior",
-      "next": "Siguiente",
-      "page": "Página",
-      "of": "de"
-    }
+    "noLogsDesc": "No hay registros de actividad que coincidan con tus filtros o en este espacio de trabajo."
   }
 }

@@ -9,7 +9,7 @@ import { join, basename } from 'path';
 const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
 const LANGS = ['es', 'en'];
 // Keys that stay nested (not spread at root level)
-const NESTED = new Set(['portal', 'twoFactor', 'formats']);
+const NESTED = new Set(['portal', 'twoFactor']);
 
 for (const lang of LANGS) {
   const dir = join(ROOT, 'resources/js/locales', lang);

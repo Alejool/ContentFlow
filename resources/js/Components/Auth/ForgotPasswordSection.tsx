@@ -21,8 +21,8 @@ export default function ForgotPasswordSection() {
         />
 
         <PlatformFeatureTag
-          titleKey="auth.forgot-password.tags.step3"
-          subtitleKey="auth.forgot-password.tags.step3.subtitle"
+          titleKey="auth.forgot-password.tags.3.title"
+          subtitleKey="auth.forgot-password.tags.3.subtitle"
           icon={CheckCircle}
         />
       </div>

@@ -17,6 +17,12 @@
     "phoneNotValid": "The number is not valid for the selected country.",
     "phoneInvalid": "Invalid phone number.",
     "phoneValid": "Valid number.",
+    "after": "The {{attribute}} must be a date after {{date}}.",
+    "after_or_equal": "The {{attribute}} must be a date after or equal to {{date}}.",
+    "before": "The {{attribute}} must be a date before {{date}}.",
+    "before_or_equal": "The {{attribute}} must be a date before or equal to {{date}}.",
+    "date": "The {{attribute}} must be a valid date.",
+    "validationError": "Please fix the errors in the form",
     "auth": {
       "failed": "These credentials do not match our records.",
       "password": "The provided password is incorrect.",

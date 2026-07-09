@@ -88,18 +88,17 @@ export default function ApprovalWorkflowConfiguration({
             <Settings className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-            {t('approvals.upgrade.title') || 'Aprobaciones no disponibles'}
+            {t('approvals.upgrade.title')}
           </h3>
           <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-neutral-400">
-            {t('approvals.upgrade.description') ||
-              'Las aprobaciones son una funcionalidad premium disponible en los planes Professional y Enterprise. Actualiza tu plan para obtener acceso a flujos de aprobación y control de contenido.'}
+            {t('approvals.upgrade.description')}
           </p>
           <Button
             variant="primary"
             buttonStyle="solid"
             onClick={() => (window.location.href = route('pricing'))}
           >
-            Ver Planes
+            {t('approvals.upgrade.viewPlans')}
           </Button>
         </div>
       </div>
@@ -108,22 +107,22 @@ export default function ApprovalWorkflowConfiguration({
 
   const handleToggleEnabled = async () => {
     if (!canManageWorkflow) {
-      toast.error(t('approval.errors.insufficient_permissions'));
+      toast.error(t('approvalWorkflow.errors.insufficient_permissions'));
       return;
     }
     try {
       await toggle(!workflow.is_enabled);
       setWorkflow({ ...workflow, is_enabled: !workflow.is_enabled });
-      toast.success(workflow.is_enabled ? t('approval.success.disabled') : t('approval.success.enabled'));
+      toast.success(workflow.is_enabled ? t('approvalWorkflow.success.disabled') : t('approvalWorkflow.success.enabled'));
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
-      toast.error(axiosError.response?.data?.message || t('approval.errors.toggle_failed'));
+      toast.error(axiosError.response?.data?.message || t('approvalWorkflow.errors.toggle_failed'));
     }
   };
 
   const handleToggleMultiLevel = () => {
     if (hasPendingContent) {
-      toast.error(t('approval.errors.pending_content_warning'));
+      toast.error(t('approvalWorkflow.errors.pending_content_warning'));
       return;
     }
 
@@ -135,7 +134,7 @@ export default function ApprovalWorkflowConfiguration({
           ? [
               {
                 level_number: 1,
-                level_name: t('approval.level_1'),
+                level_name: t('approvalWorkflow.level_1'),
                 role_id: availableRoles[0]?.id || 0,
               },
             ]
@@ -145,18 +144,18 @@ export default function ApprovalWorkflowConfiguration({
 
   const handleAddLevel = () => {
     if (hasPendingContent) {
-      toast.error(t('approval.errors.pending_content_warning'));
+      toast.error(t('approvalWorkflow.errors.pending_content_warning'));
       return;
     }
 
     if (!hasAdvancedAccess && workflow.levels.length >= 1) {
-      toast.error(t('approval.errors.multi_level_requires_enterprise'));
+      toast.error(t('approvalWorkflow.errors.multi_level_requires_enterprise'));
       return;
     }
 
     const newLevel: ApprovalLevel = {
       level_number: workflow.levels.length + 1,
-      level_name: t('approval.level_n', { n: workflow.levels.length + 1 }),
+      level_name: t('approvalWorkflow.level_n', { n: workflow.levels.length + 1 }),
       role_id: availableRoles[0]?.id || 0,
     };
 
@@ -168,7 +167,7 @@ export default function ApprovalWorkflowConfiguration({
 
   const handleRemoveLevel = (index: number) => {
     if (hasPendingContent) {
-      toast.error(t('approval.errors.pending_content_warning'));
+      toast.error(t('approvalWorkflow.errors.pending_content_warning'));
       return;
     }
 
@@ -212,13 +211,13 @@ export default function ApprovalWorkflowConfiguration({
 
   const handleSave = async () => {
     if (!canManageWorkflow) {
-      toast.error(t('approval.errors.insufficient_permissions'));
+      toast.error(t('approvalWorkflow.errors.insufficient_permissions'));
       return;
     }
 
     // Validation
     if (workflow.is_multi_level && workflow.levels.length === 0) {
-      toast.error(t('approval.errors.multi_level_requires_levels'));
+      toast.error(t('approvalWorkflow.errors.multi_level_requires_levels'));
       return;
     }
 
@@ -227,14 +226,14 @@ export default function ApprovalWorkflowConfiguration({
       const roleIds = workflow.levels.map((l) => l.role_id);
       const uniqueRoleIds = new Set(roleIds);
       if (roleIds.length !== uniqueRoleIds.size) {
-        toast.error(t('approval.errors.duplicate_roles'));
+        toast.error(t('approvalWorkflow.errors.duplicate_roles'));
         return;
       }
 
       // Check for invalid role selections (role_id = 0 or null)
       const invalidRoles = workflow.levels.filter((l) => !l.role_id || l.role_id === 0);
       if (invalidRoles.length > 0) {
-        toast.error(t('approval.errors.invalid_role_selection'));
+        toast.error(t('approvalWorkflow.errors.invalid_role_selection'));
         return;
       }
     }
@@ -261,10 +260,10 @@ export default function ApprovalWorkflowConfiguration({
       };
 
       await configure(payload);
-      toast.success(t('approval.success.configured'));
+      toast.success(t('approvalWorkflow.success.configured'));
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
-      toast.error(axiosError.response?.data?.message || t('approval.errors.save_failed'));
+      toast.error(axiosError.response?.data?.message || t('approvalWorkflow.errors.save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -289,10 +288,10 @@ export default function ApprovalWorkflowConfiguration({
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {t('approval.configuration.title')}
+                {t('approvalWorkflow.configuration.title')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-neutral-400">
-                {t('approval.configuration.subtitle')}
+                {t('approvalWorkflow.configuration.subtitle')}
               </p>
             </div>
           </div>
@@ -315,7 +314,7 @@ export default function ApprovalWorkflowConfiguration({
       {hasPendingContent && (
         <AlertCard
           type="warning"
-          message={t('approval.warnings.pending_content')}
+          message={t('approvalWorkflow.warnings.pending_content')}
           icon={AlertTriangle}
         />
       )}
@@ -325,10 +324,10 @@ export default function ApprovalWorkflowConfiguration({
         <div className="flex items-center justify-between">
           <div>
             <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
-              {t('approval.enable_workflow')}
+              {t('approvalWorkflow.enable_workflow')}
             </h4>
             <p className="text-sm text-gray-500 dark:text-neutral-400">
-              {t('approval.enable_workflow_description')}
+              {t('approvalWorkflow.enable_workflow_description')}
             </p>
           </div>
           <button
@@ -353,10 +352,10 @@ export default function ApprovalWorkflowConfiguration({
           <div className="flex items-center justify-between">
             <div>
               <h4 className="mb-1 font-bold text-gray-900 dark:text-white">
-                {t('approval.multi_level_workflow')}
+                {t('approvalWorkflow.multi_level_workflow')}
               </h4>
               <p className="text-sm text-gray-500 dark:text-neutral-400">
-                {t('approval.multi_level_description')}
+                {t('approvalWorkflow.multi_level_description')}
               </p>
             </div>
             <button
@@ -381,7 +380,7 @@ export default function ApprovalWorkflowConfiguration({
         <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-theme-bg-secondary">
           <div className="mb-4 flex items-center justify-between">
             <h4 className="font-bold text-gray-900 dark:text-white">
-              {t('approval.approval_levels')}
+              {t('approvalWorkflow.approval_levels')}
             </h4>
             <Button
               variant="ghost"
@@ -396,7 +395,7 @@ export default function ApprovalWorkflowConfiguration({
               icon={Plus}
               size="sm"
             >
-              {t('approval.add_level')}
+              {t('approvalWorkflow.add_level')}
             </Button>
           </div>
 
@@ -417,7 +416,7 @@ export default function ApprovalWorkflowConfiguration({
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleLevelChange(index, 'level_name', e.target.value)
                     }
-                    placeholder={t('approval.level_name')}
+                    placeholder={t('approvalWorkflow.level_name')}
                     disabled={!canManageWorkflow || hasPendingContent}
                     containerClassName="flex-1"
                   />
@@ -444,7 +443,7 @@ export default function ApprovalWorkflowConfiguration({
 
                   {duplicateRoles.has(level.role_id) && (
                     <div className="mt-1 text-xs text-red-500">
-                      {t('approval.errors.duplicate_role_selected')}
+                      {t('approvalWorkflow.errors.duplicate_role_selected')}
                     </div>
                   )}
                 </div>
@@ -471,8 +470,8 @@ export default function ApprovalWorkflowConfiguration({
 
           {workflow.levels.length === 0 && (
             <div className="py-8 text-center text-gray-500 dark:text-neutral-400">
-              <p>{t('approval.no_levels_configured')}</p>
-              <p className="mt-1 text-sm">{t('approval.click_add_level')}</p>
+              <p>{t('approvalWorkflow.no_levels_configured')}</p>
+              <p className="mt-1 text-sm">{t('approvalWorkflow.click_add_level')}</p>
             </div>
           )}
         </div>
@@ -480,11 +479,11 @@ export default function ApprovalWorkflowConfiguration({
 
       {/* Simple Workflow Info */}
       {workflow.is_enabled && !workflow.is_multi_level && (
-        <AlertCard type="info" message={t('approval.simple_workflow_info')} />
+        <AlertCard type="info" message={t('approvalWorkflow.simple_workflow_info')} />
       )}
 
       {!canManageWorkflow && (
-        <AlertCard type="warning" message={t('approval.insufficient_permissions')} />
+        <AlertCard type="warning" message={t('approvalWorkflow.insufficient_permissions')} />
       )}
     </div>
   );

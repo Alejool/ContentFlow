@@ -50,8 +50,6 @@
   },
   "admin": {
     "navigation": {
-      "title": "Administration Panel",
-      "subtitle": "Centralized system management",
       "dashboard": "Dashboard",
       "system_settings": "System Settings",
       "system_notifications": "System Notifications"
@@ -69,17 +67,36 @@
         "active_subscriptions": "Active Subscriptions",
         "publications": "Publications",
         "system_health": "System Health",
+        "workspaces": "Workspaces",
+        "verified_users": "Verified Users",
+        "social_accounts": "Social Accounts",
+        "pending_review": "Pending Review"
+      },
+      "time_periods": {
+        "last_30d": "last 30d",
+        "last_7d": "last 7d",
+        "active_last_30d": "active last 30d",
+        "new_30d": "new 30d"
+      },
+      "status": {
+        "published": "published",
+        "unverified": "unverified",
+        "no_failures": "No failures",
+        "on_trial": "on trial",
+        "failed": "failed",
+        "all_systems_operational": "All systems operational"
+      },
+      "health_status": {
         "healthy": "Healthy",
-        "review": "Review"
+        "warning": "Warning",
+        "critical": "Critical"
       },
-      "system_issues": {
-        "title": "System issues detected",
-        "unverified_users": "{{count}} of {{total}} unverified users ({{percent}}%)"
-      },
-      "activity": {
-        "system_started": "System started successfully",
-        "config_loaded": "All configurations loaded",
-        "cache_optimized": "Cache optimized"
+      "subscriptions_by_plan": "Active subscriptions by plan",
+      "plans": {
+        "free": "Free",
+        "basic": "Basic",
+        "professional": "Professional",
+        "enterprise": "Enterprise"
       },
       "info": {
         "exclusive_access": "Exclusive Access",
@@ -160,46 +177,9 @@
       "page_subtitle": "Send global notifications to all system users"
     }
   },
-  "aiChat": {
-    "title": "AI Assistant",
-    "subtitle": "Intelligent recommendations for your campaigns",
-    "campaignsAvailable": "Campaigns available",
-    "chatTitle": "Chat Intellipost",
-    "online": "Online",
-    "thinking": "Thinking...",
-    "welcomeMessage": "Hi! I'm your AI assistant. How can I help you today?",
-    "inputPlaceholder": "Write your message...",
-    "enterToSend": "Enter to send",
-    "send": "Send",
-    "ideas": {
-      "title": "Ideas",
-      "panelTitle": "Campaign Ideas",
-      "visualMarketing": {
-        "title": "Visual Marketing",
-        "description": "Visual content generates 40% more engagement"
-      },
-      "sustainability": {
-        "title": "Sustainability",
-        "description": "Eco-friendly brands retain 25% more customers"
-      },
-      "microInfluencers": {
-        "title": "Micro-Influencers",
-        "description": "Higher conversion than celebrities"
-      },
-      "ugcContent": {
-        "title": "UGC Content",
-        "description": "Increases authenticity and reduces costs"
-      }
-    },
-    "stats": {
-      "active": "Active",
-      "total": "Total"
-    }
-  },
   "aiAssistant": {
     "welcomeMessage": "I am here to help you with your social media campaigns. You can ask me about creating new campaigns, improving existing ones, or analyzing your content performance.",
     "error": "I apologize, but I encountered an error processing your request. Try again later.",
-    "notEnabled": "AI service is not enabled or configured.",
     "suggestion": "Suggestion",
     "thinking": "Thinking...",
     "askPlaceholder": "Ask about your campaigns...",
@@ -211,10 +191,13 @@
   "analytics": {
     "title": "Analytics",
     "subtitle": "Visualize the performance of your campaigns and publications",
-    "days": "Days",
     "vistas": "Views",
     "clics": "Clicks",
     "engagement": "Engagement",
+    "platform": {
+      "engagement": "Total Engagement",
+      "growth": "Growth"
+    },
     "trends": {
       "likes": "Likes",
       "comments": "Comments",
@@ -252,15 +235,13 @@
       "title": "Performance Detail"
     },
     "emptyState": {
-      "title": "No Data Available",
-      "description": "Start creating campaigns and connecting social media accounts to see your analytics here."
+      "title": "No Data Available"
     },
     "advanced": {
       "locked_title": "Advanced Analytics",
       "locked_description": "Get detailed platform analysis, publication performance, and exportable reports with Professional and Enterprise plans.",
       "upgrade_cta": "Upgrade Plan",
-      "daily_metrics": "Daily metrics updated by cron jobs",
-      "platform_breakdown": "Platform breakdown and daily evolution"
+      "daily_metrics": "Daily metrics updated by cron jobs"
     },
     "tabs": {
       "general": "General",
@@ -287,6 +268,120 @@
       "subtitle": "Peak activity moments of your audience",
       "emptyTitle": "Collecting trends",
       "emptyDesc": "Keep publishing so the system can find the optimal time for your audience."
+    },
+    "lastSynced": "Last synced"
+  },
+  "approvalWorkflow": {
+    "configuration": {
+      "title": "Approval Workflow",
+      "subtitle": "Set up how content is reviewed and approved"
+    },
+    "enable_workflow": "Enable Approval Workflow",
+    "enable_workflow_description": "Require content to be approved before publishing",
+    "multi_level_workflow": "Multi-Level Workflow",
+    "multi_level_description": "Require approvals from multiple roles in sequence",
+    "approval_levels": "Approval Levels",
+    "add_level": "Add Level",
+    "level_name": "Level name",
+    "no_levels_configured": "No levels configured",
+    "click_add_level": "Click \"Add Level\" to get started",
+    "simple_workflow_info": "Content will require a single approval before it can be published.",
+    "insufficient_permissions": "You don't have permission to manage this workflow",
+    "level_1": "Level 1",
+    "level_n": "Level {{n}}",
+    "level": "Level",
+    "current_status": "Current Status",
+    "progress": "Progress",
+    "submit_for_approval": "Submit for Approval",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approve_content": "Approve Content",
+    "reject_content": "Reject Content",
+    "comment_optional": "Comment (optional)",
+    "add_comment": "Add a comment...",
+    "rejection_reason": "Rejection Reason",
+    "explain_rejection": "Explain why this content is being rejected...",
+    "pending_review_by_role": "Pending review by {{role}}",
+    "pending_review_by_any_admin": "Pending review by any administrator",
+    "history_title": "Approval History",
+    "no_history": "No approval history yet",
+    "action": {
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_review": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "published": "Published"
+    },
+    "success": {
+      "submitted": "Submitted for review successfully",
+      "approved": "Content approved successfully",
+      "rejected": "Content rejected",
+      "disabled": "Approval workflow disabled",
+      "enabled": "Approval workflow enabled",
+      "configured": "Workflow saved successfully"
+    },
+    "warnings": {
+      "pending_content": "There is content pending review. Some settings are locked until it is resolved."
+    },
+    "errors": {
+      "insufficient_permissions": "You don't have permission to perform this action",
+      "toggle_failed": "Failed to change the workflow status",
+      "pending_content_warning": "You cannot change the configuration while there is content pending review",
+      "multi_level_requires_enterprise": "Multi-level workflows require an Enterprise plan",
+      "multi_level_requires_levels": "Add at least one level for the multi-level workflow",
+      "duplicate_roles": "You cannot assign the same role to multiple levels",
+      "invalid_role_selection": "Select a valid role for each level",
+      "duplicate_role_selected": "Duplicate role",
+      "save_failed": "Failed to save the configuration",
+      "approve_failed": "Failed to approve the content",
+      "rejection_reason_required": "Please provide a reason for the rejection",
+      "reject_failed": "Failed to reject the content",
+      "submit_failed": "Failed to submit for review"
+    },
+    "analytics": {
+      "title": "Approval Analytics",
+      "subtitle": "Performance metrics and insights for your approval workflow",
+      "export_csv": "Export CSV",
+      "export_json": "Export JSON",
+      "avg_publication_time": "Avg. Publication Time",
+      "from_submission_to_publish": "From submission to publish",
+      "total_pending": "Total Pending",
+      "across_all_levels": "Across all levels",
+      "stale_content": "Stale Content",
+      "pending_over_7_days": "Pending over 7 days",
+      "avg_time_per_level": "Average Approval Time by Level",
+      "minutes": "Minutes",
+      "no_data_available": "No data available",
+      "approval_rejection_rates": "Approval / Rejection Rates by Role",
+      "approvals": "Approvals",
+      "rejections": "Rejections",
+      "pending_by_level": "Pending Content by Level",
+      "pending_count": "Pending",
+      "approval_rate_distribution": "Approval Rate Distribution",
+      "approver_workload": "Approver Workload",
+      "pending_tasks": "Pending Tasks",
+      "stale_content_details": "Stale Content Details",
+      "content_title": "Title",
+      "submitted_at": "Submitted At",
+      "days_pending": "Days Pending",
+      "current_level": "Current Level",
+      "days": "days",
+      "detailed_stats": "Detailed Statistics",
+      "role": "Role",
+      "total_actions": "Total Actions",
+      "approval_rate": "Approval Rate",
+      "level": "Level",
+      "success": {
+        "exported": "Analytics exported successfully"
+      },
+      "errors": {
+        "export_failed": "Failed to export analytics"
+      }
     }
   },
   "approvals": {
@@ -307,29 +402,15 @@
     "rejectionReason": "Rejection Reason",
     "rejectionReasonDescription": "Provide a detailed reason for the rejection of",
     "rejectionReasonPlaceholder": "e.g. Content does not meet company policies...",
-    "rejectionReasonTooShort": "The reason must have at least 10 characters",
-    "rejectionReasonTooLong": "The reason cannot exceed 500 characters",
-    "validation": {
-      "reasonMin": "The reason must have at least 10 characters",
-      "reasonMax": "The reason cannot exceed 500 characters"
-    },
     "approvalSuccess": "Publication Approved!",
     "approvalSuccessMessage": "The publication has been successfully approved and is ready to be published.",
     "approvedBy": "Approved by",
     "rejectedBy": "Rejected by",
     "submittedBy": "Submitted by",
-    "cancelledBy": "Cancelled by",
-    "reassignedBy": "Reassigned by",
     "publicationRejected": "Publication Rejected",
     "rejectionMessage": "Your publication has been rejected. Review the comments and make the necessary adjustments.",
     "noReasonProvided": "No reason provided.",
     "editPublication": "Edit Publication",
-    "searchPlaceholder": "Search by publication title...",
-    "requestedBy": "Requested by",
-    "requestedAt": "Request Date",
-    "reviewedBy": "Reviewed by",
-    "reviewedAt": "Review Date",
-    "action": "Action",
     "reason": "Reason",
     "noHistory": "No approval history found",
     "stats": {
@@ -342,6 +423,9 @@
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
+      "draft": "Draft",
+      "pending_review": "In Review",
+      "ready_to_submit": "Ready to Submit",
       "submitted": "Submitted for Review",
       "cancelled": "Cancelled",
       "reassigned": "Reassigned",
@@ -354,19 +438,12 @@
       "status": "Status",
       "currentReviewer": "Current Reviewer",
       "completedBy": "Completed by",
-      "actions": "Actions",
-      "requestedBy": "Requested by",
-      "requestedAt": "Request Date",
-      "reviewedBy": "Reviewed by",
-      "reviewedAt": "Review Date",
-      "action": "Action",
-      "reason": "Reason"
+      "actions": "Actions"
     },
     "filters": {
       "all": "All",
       "approved": "Approved",
-      "rejected": "Rejected",
-      "dateRange": "Date Range"
+      "rejected": "Rejected"
     },
     "tabs": {
       "pending": "Pending",
@@ -380,24 +457,63 @@
     "workflow_status": "Workflow Status",
     "progress": "Progress",
     "in_progress": "In Progress",
-    "rejected_here": "Rejected Here",
-    "rejected_at_level": "Rejected at level {{level}}",
     "approver_role": "Approver Role",
     "no_role_assigned": "No role assigned",
     "step": "Level",
     "approved_ready_to_publish": "Approved! Ready to publish",
     "next_action": {
-      "submit_for_approval": "Submit this publication for review to start the approval process",
-      "awaiting_level_approval": "Awaiting approval from {{role}} ({{level}})",
-      "awaiting_final_approval": "Awaiting final approval from {{role}}",
       "ready_to_publish": "The publication has been approved and is ready to be published"
     },
     "errors": {
-      "submit_failed": "Error submitting for review"
+      "submit_failed": "Error submitting for review",
+      "reasonRequired": "The reason is required",
+      "approveFailed": "Failed to approve",
+      "rejectFailed": "Failed to reject"
     },
     "workflowAssignment": {
       "title": "Assigned Approvals",
       "description": "You are viewing only the content that requires your approval based on your role or assignment in the workflow. Administrators can view all pending content."
+    },
+    "multiLevelFlow": "Multi-Level Flow",
+    "directFlow": "Direct Flow",
+    "last_submission": "Last submitted by",
+    "upgrade": {
+      "title": "Approvals not available",
+      "description": "Approvals are a premium feature available on the Professional and Enterprise plans. Upgrade your plan to get access to approval workflows and content control.",
+      "viewPlans": "View Plans"
+    },
+    "submissionDetails": "Submission Details",
+    "currentStatus": "Status",
+    "flowVisualization": {
+      "title": "Approval flow",
+      "completedLevels": "Completed levels"
+    },
+    "workflowProgress": "Workflow progress",
+    "inProgress": "In review",
+    "rejectedHere": "Rejected here",
+    "rejectedAtLevel": "At level",
+    "approverRole": "Reviewed by Role",
+    "timeoutLimit": "Time limit",
+    "auditTrail": "Action History",
+    "yourAction": "Your action",
+    "commentOptional": "Optional comment...",
+    "rejectionReasonRequired": "Rejection reason (required)...",
+    "confirmReject": "Confirm rejection",
+    "confirmRejection": "Confirm Rejection",
+    "approvedReadyToPublish": "Approved. Ready to publish.",
+    "requestRejected": "Request rejected",
+    "noActiveRequest": "There is no active approval request.",
+    "awaitingLevel": "Awaiting approval at",
+    "levelCard": {
+      "title": "Level {{number}}: {{name}}",
+      "approvedBy": "Approved by",
+      "rejectedBy": "Rejected by",
+      "requiresRole": "This level requires approval from the role",
+      "waitingFor": "Awaiting approval from"
+    },
+    "messages": {
+      "finalApproval": "Final approval completed.",
+      "levelApproved": "{{level}} approved"
     }
   },
   "auth": {
@@ -613,28 +729,6 @@
     "returnToLogin": "Return"
   },
   "calendar": {
-    "weekdays": {
-      "sun": "Sun",
-      "mon": "Mon",
-      "tue": "Tue",
-      "wed": "Wed",
-      "thu": "Thu",
-      "fri": "Fri",
-      "sat": "Sat"
-    },
-    "views": {
-      "month": "Month",
-      "week": "Week",
-      "day": "Day"
-    },
-    "actions": {
-      "today": "Today",
-      "export": "Export",
-      "selectAll": "Select all",
-      "clearSelection": "Clear selection",
-      "moveEvents": "Move events",
-      "bulkMove": "Move selected"
-    },
     "navigation": {
       "previous": "Previous",
       "next": "Next",
@@ -648,35 +742,14 @@
       "status": "Status",
       "campaign": "Campaign"
     },
-    "export": {
-      "title": "Export calendar",
-      "google": "Google Calendar",
-      "outlook": "Outlook Calendar",
-      "description": "The .ics file can be imported into any compatible calendar application",
-      "success": "Calendar exported successfully",
-      "error": "Error exporting calendar",
-      "eventsCount": "events"
-    },
     "bulkActions": {
-      "selected": "selected",
-      "selectedPlural": "selected",
-      "event": "event",
-      "eventPlural": "events",
-      "of": "of",
-      "total": "total",
-      "moveTitle": "Move selected events",
-      "moveDescription": "Select the new date and time to move the {count} selected events.",
       "moveSuccess": "Events moved successfully",
       "moveError": "Error moving events",
       "undoSuccess": "Operation undone successfully",
-      "undoError": "Error undoing operation",
-      "cancel": "Cancel",
-      "move": "Move"
+      "undoError": "Error undoing operation"
     },
     "event": "event",
     "selected": "selected",
-    "of": "of",
-    "total": "total",
     "allSelected": "All selected",
     "select": "Select",
     "selectAll": "Select all",
@@ -687,33 +760,24 @@
     "selectAllDescription": "All visible events in the calendar",
     "clearSelection": "Clear selection",
     "moveEvents": "Move events",
-    "delete": "Delete",
     "undo": "Undo",
     "undoLastOperation": "Undo last operation",
     "moveSelectedEvents": "Move selected events",
     "movingEvents": "Moving {{count}} events",
-    "movingEvents_one": "Moving 1 event",
     "selectNewDateTime": "Select the new date and time for the selected events.",
     "newDateAndTime": "New date and time",
     "preserveOriginalTime": "Events will keep their original time",
     "moveCount": "Move {{count}} events",
-    "moveCount_one": "Move 1 event",
     "deleteSelectedEvents": "Delete selected events",
     "confirmDelete": "Confirm deletion",
     "deleteWarning": "Are you sure you want to delete {{count}} events? This action cannot be undone.",
     "deleteCount": "Delete {{count}} events",
-    "deleteCount_one": "Delete 1 event",
     "events": {
       "count": "events",
-      "empty": "No events for this day",
-      "noScheduled": "No scheduled events"
+      "empty": "No events for this day"
     },
     "userEvents": {
       "modal": {
-        "title": {
-          "edit": "Edit Event",
-          "new": "New Personal Event"
-        },
         "fields": {
           "title": "Title",
           "description": "Description",
@@ -744,11 +808,6 @@
           "errorDelete": "Error deleting event",
           "validationError": "Please correct the errors in the form"
         },
-        "validation": {
-          "titleRequired": "Title is required",
-          "startDateRequired": "Start date is required",
-          "pastDate": "Events cannot be created in the past"
-        },
         "visibility": {
           "public": "Public",
           "private": "Private",
@@ -770,9 +829,6 @@
       "connect": "Connect",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
-      "syncNow": "Sync Now",
-      "configure": "Configure",
-      "lastSync": "Last sync",
       "disconnectConfirm": {
         "title": "Disconnect calendar?",
         "message": "Are you sure you want to disconnect this calendar? Synced events will be removed from the external calendar.",
@@ -784,18 +840,7 @@
       "disconnectError": "Error disconnecting calendar",
       "syncSuccess": "Synchronization completed successfully",
       "syncError": "Error synchronizing calendar",
-      "fetchError": "Error fetching connection status",
       "connectionSuccess": "{{provider}} calendar connected successfully",
-      "syncSettings": "Sync Settings",
-      "enableSync": "Enable automatic sync",
-      "syncCampaigns": "Sync only these campaigns (leave empty for all)",
-      "syncPlatforms": "Sync only these platforms (leave empty for all)",
-      "syncSettingsSaved": "Settings saved successfully",
-      "syncSettingsError": "Error saving settings",
-      "save": "Save",
-      "cancel": "Cancel",
-      "retrySuccess": "Sync retried successfully",
-      "retryError": "Error retrying sync",
       "errors": {
         "invalidState": "Invalid authentication state",
         "expiredState": "Authentication session has expired",
@@ -807,7 +852,6 @@
     },
     "error": {
       "title": "Something went wrong",
-      "description": "An error occurred while rendering the calendar. Try again.",
       "retry": "Try again",
       "retry_button": "Retry",
       "persist": "If the problem persists contact support."
@@ -815,9 +859,7 @@
     "validation": {
       "invalid_date": "Invalid Date",
       "past_date_error": "Cannot Schedule in the Past",
-      "past_date_message": "You cannot schedule events for past dates. Select a future date and time.",
-      "date_required": "Date is required",
-      "invalid_format": "Invalid date format. Use a valid date."
+      "past_date_message": "You cannot schedule events for past dates. Select a future date and time."
     },
     "warnings": {
       "pastDate": "Are you sure you want to move this event to a past date/time?"
@@ -830,9 +872,6 @@
     "sync": {
       "error": {
         "title": "Sync Error",
-        "failed": "Failed to sync with {provider}",
-        "token_expired": "Your connection with {provider} has expired. Reconnect.",
-        "unavailable": "{provider} is currently unavailable. Try again later.",
         "unknown": "An unknown sync error occurred",
         "dismiss": "Dismiss error",
         "retry": "Retry sync",
@@ -844,7 +883,6 @@
     },
     "conflict": {
       "title": "Data Conflict Detected",
-      "description": "This event has been modified by another user. Choose which version to keep.",
       "event": "Event",
       "field_label": "Conflicting field",
       "your_version": "Your Version",
@@ -853,7 +891,6 @@
       "server": "Server",
       "select_local": "Select your version",
       "select_server": "Select server version",
-      "info": "The version you choose will be saved. The other version will be discarded.",
       "cancel": "Cancel",
       "resolve": "Apply Selected Version",
       "field": {
@@ -864,30 +901,26 @@
         "platform": "Platform",
         "campaign": "Campaign"
       }
-    }
+    },
+    "clear_all": "Clear All",
+    "filter_by_campaign": "Campaign",
+    "filter_by_platform": "Platform",
+    "filter_by_status": "Status",
+    "showing_filtered": "Showing {{count}} of {{total}} events",
+    "move": "Move"
   },
   "campaigns": {
     "title": "Performance Summary",
     "subtitle": "Analyze the impact and performance of your campaigns and publications.",
     "noPublications": "No associated publications",
-    "scheduledPosts": "Scheduled Posts",
-    "inCampaigns": "In {{count}} campaign",
-    "inCampaigns_plural": "In {{count}} campaigns",
-    "create": "Create Campaign",
     "table": {
       "name": "Name",
-      "description": "Description",
       "publications": "Publications",
-      "media": "Media",
       "status": "Status",
       "actions": "Actions",
-      "loading": "Loading...",
-      "timeline": "Timeline",
-      "performance": "Performance",
       "emptyState": {
         "title": "No campaigns found",
-        "description": "Create a campaign to start publishing content.",
-        "button": "Add Campaign"
+        "description": "Create a campaign to start publishing content."
       }
     },
     "filters": {
@@ -900,21 +933,12 @@
       "paused": "Paused"
     },
     "actions": {
-      "viewCampaign": "View Campaign",
-      "edit": "Edit",
-      "publishNow": "Publish Now",
-      "viewDetails": "View Details",
-      "delete": "Delete",
-      "active": "Active",
-      "remove": "Remove",
-      "change": "Change",
       "showPublications": "Show publications",
       "hidePublications": "Hide publications"
     },
     "messages": {
       "fetchError": "Error fetching campaigns",
       "addSuccess": "Campaign created successfully",
-      "duplicateSuccess": "Campaign duplicated successfully",
       "addError": "Error creating campaign",
       "updateSuccess": "Campaign updated successfully",
       "updateError": "Error updating campaign",
@@ -924,12 +948,7 @@
       "error": "Error"
     },
     "modal": {
-      "sections": {
-        "details": "Campaign Details"
-      },
       "add": {
-        "title": "Create Campaign",
-        "subtitle": "You can create a campaign to organize and publish your content.",
         "name": "Campaign Name",
         "description": "Description",
         "goal": "Goal",
@@ -940,8 +959,6 @@
         "loadingPublications": "Loading publications...",
         "noPublications": "No publications found. Create some first!",
         "associatedPublicationsRequired": "Associated Publications is required",
-        "status": "Status",
-        "media": "Media",
         "placeholders": {
           "name": "e.g. Summer Campaign",
           "description": "Brief campaign description",
@@ -953,14 +970,8 @@
         }
       },
       "edit": {
-        "title": "Edit Campaign",
-        "subtitle": "Update your campaign information.",
-        "name": "Campaign Name",
-        "description": "Description",
         "goal": "Goal",
         "budget": "Budget",
-        "startDate": "Start Date",
-        "endDate": "End Date",
         "associatedPublications": "Associated Publications",
         "noPublications": "No publications found.",
         "placeholders": {
@@ -995,6 +1006,15 @@
       "edit": "Save Changes"
     }
   },
+  "checkout": {
+    "success": {
+      "activated": "Your subscription has been activated successfully.",
+      "activating": "We're activating your subscription...",
+      "goToDashboard": "Go to Dashboard",
+      "title": "Payment Successful",
+      "updating": "Updating your account..."
+    }
+  },
   "colors": {
     "default": "Default (Orange)",
     "blue": "Blue",
@@ -1005,52 +1025,39 @@
     "orange": "Orange"
   },
   "common": {
-    "locale": "en-US",
+    "system": "System",
     "deleteConfirmTitle": "Confirm deletion",
     "deleteConfirm": "Are you sure you want to delete this item? This action cannot be undone.",
     "deleteSuccess": "Item deleted successfully",
     "deleteError": "Error deleting item",
-    "welcome": "Welcome",
     "loading": "Loading...",
     "deleting": "Deleting...",
-    "select": "Select",
     "more": "More",
     "active": "Active",
     "selected": "Selected",
     "completed": "Completed",
-    "inactive": "Inactive",
     "available": "Available",
-    "name": "Name",
     "type": "Type",
-    "progress": "Progress",
+    "confirm": "Confirm",
     "dismiss": "Dismiss",
-    "never": "Never",
     "viewAll": "View all",
-    "new": "New",
     "saving": "Saving...",
     "listView": "List View",
     "gridView": "Grid View",
-    "totalSettings": "Total Settings",
-    "unsavedChanges": "Unsaved Changes",
+    "none": "None",
     "configured": "Configured",
     "notConfigured": "Not Configured",
-    "allSaved": "All Saved",
     "refresh": "Refresh",
     "save": "Save",
     "reply": "Reply",
-    "apply": "Apply",
     "cancel": "Cancel",
-    "continue": "Continue",
     "delete": "Delete",
-    "duplicate": "Duplicate",
     "edit": "Edit",
     "view": "View",
     "viewDetails": "View Details",
+    "approved": "Approved",
+    "rejected": "Rejected",
     "upgradePlan": "Upgrade Plan",
-    "analytics": "Analytics",
-    "aiChat": "AI Chat",
-    "logout": "Logout",
-    "localizationExamples": "Localization Examples",
     "read_more": "Read more",
     "show_less": "Show less",
     "affected_publications": "Affected publications:",
@@ -1064,26 +1071,11 @@
       "dark": "🌙 Dark",
       "system": "💻 System"
     },
-    "shortcuts": {
-      "title": "Keyboard Shortcuts",
-      "theme": {
-        "toggle": "Toggle theme (Light/Dark/System)"
-      },
-      "help": {
-        "show": "Show keyboard shortcuts"
-      },
-      "category": {
-        "appearance": "Appearance",
-        "help": "Help"
-      }
-    },
     "ai": {
-      "suggest": "Suggest with AI",
       "improve": "Improve with AI",
       "thinking": "Thinking...",
       "suggestions_generated": "Suggestions generated successfully",
       "suggestion_failed": "Failed to generate suggestions",
-      "get_suggestions": "Get suggestions with AI",
       "idea_prompt": "Idea Prompt (AI)",
       "idea_prompt_placeholder": "Describe your idea to autocomplete the form...",
       "generate": "Generate all",
@@ -1103,42 +1095,31 @@
       "approvals": "Approvals"
     },
     "previous": "Previous",
-    "showing": "Showing",
-    "of": "of",
-    "results": "results",
-    "perPage": "per page",
     "noResults": "No results found",
     "search": "Search by name",
-    "preview": "Preview",
-    "settings": "Settings",
     "done": "Done",
     "processing": "Processing...",
     "publishing": "Publishing",
     "creating": "Creating...",
     "save_changes": "Save Changes",
-    "noCreditCard": "No credit card required",
     "unknown": "Unknown",
     "notSet": "Not set",
-    "platformConnect": "Platform",
+    "understood": "Understood",
+    "untitled": "Untitled",
+    "noDate": "No date",
+    "invalidDate": "Invalid date",
     "close": "Close",
     "copy": "Copy",
     "download": "Download",
     "openInNewTab": "Open in new tab",
-    "created": "Created",
     "creator": "Creator",
     "me": "Me",
-    "lastUpdated": "Last Updated",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "viewOnPlatform": "View on platform",
-    "viewDirectly": "View full screen",
+    "readOnly": "Read only",
     "editInPanel": "Edit in panel",
     "yes": "Yes",
     "no": "No",
     "required": "Required",
-    "optional": "Optional",
     "configure": "Configure",
-    "noSettings": "No default settings",
     "adjustOptions": "Adjust specific options",
     "remove": "Remove",
     "generate": "Generate",
@@ -1146,6 +1127,7 @@
     "connected": "Connected",
     "disconnected": "Disconnected",
     "sent": "Sent",
+    "sending": "Sending",
     "failed": "Failed",
     "show_advanced": "Show Advanced",
     "hide_advanced": "Hide Advanced",
@@ -1156,15 +1138,7 @@
     "socialAccount": "social network",
     "socialAccounts": "social networks",
     "storage": "storage",
-    "vistas": "Views",
-    "clics": "Clicks",
-    "engagement": "Engagement",
-    "understood": "Understood",
-    "untitled": "Untitled",
-    "noDate": "No date",
-    "invalidDate": "Invalid date",
     "filters": {
-      "all": "All",
       "title": "Filters",
       "startDate": "Start",
       "endDate": "End"
@@ -1188,27 +1162,14 @@
       "title": "All platforms"
     },
     "errors": {
-      "checkFormErrors": "Check the errors in the form",
-      "ffmpeg_load": "Error loading the video processor. Ensure you have a stable connection and SharedArrayBuffer support.",
-      "processing_failed": "Error processing the video.",
-      "no_shared_array_buffer": "Your browser or environment does not support the necessary features to process video locally (SharedArrayBuffer).",
-      "video_load": "Error loading the video for processing."
+      "checkFormErrors": "Check the errors in the form"
     },
-    "vsLastPeriod": "vs last period",
     "pagination": {
       "show": "Show",
       "entries": "entries",
       "info": "Showing {{from}} to {{to}} of {{total}} results"
     },
     "approvals": {
-      "tabs": {
-        "pending": "Pending",
-        "history": "History"
-      },
-      "locked": {
-        "title": "Basic approvals enabled",
-        "description": "You currently have access to basic approvals. To set up multi-level approval workflows upgrade your plan."
-      },
       "title": "Approval Workflows",
       "subtitle": "Define sequential review routes for your publications.",
       "invite": "Invite",
@@ -1241,18 +1202,30 @@
         "updated": "Workflow updated successfully",
         "deleted": "Workflow deleted"
       },
-      "confirmDelete": "Are you sure you want to delete this workflow?"
+      "confirmDelete": "Are you sure you want to delete this workflow?",
+      "basic_enabled": {
+        "title": "Basic Approvals Enabled",
+        "description": "Your plan includes single-level approvals. Upgrade to configure multi-level workflows."
+      },
+      "upgrade": {
+        "title": "Unlock Advanced Approvals",
+        "description": "Upgrade your plan to access multi-level approval workflows and full content control.",
+        "benefits_title": "What you get",
+        "benefits": {
+          "custom_workflows": "Custom approval workflows",
+          "role_assignment": "Role assignment per level",
+          "content_control": "Full content control",
+          "approval_history": "Complete approval history"
+        }
+      }
     },
     "upload": {
       "progress": "Upload progress",
-      "percentage": "{{percentage}}% complete",
       "eta": "Estimated time remaining",
       "speed": "Upload speed",
       "left": "remaining",
       "pending": "Pending",
-      "uploading": "Uploading",
       "paused": "Paused",
-      "completed": "Completed",
       "cancelled": "Cancelled",
       "processing": "Processing",
       "done": "Done",
@@ -1262,10 +1235,6 @@
       "dismiss": "Dismiss",
       "retryAttempt": "Retry attempt {{count}} of 3",
       "maxRetriesReached": "Maximum retry attempts reached. Check your connection or try uploading a smaller file.",
-      "networkError": "Network error occurred. Check your connection and try again.",
-      "validationError": "File validation failed. Check the file and try again.",
-      "uploadFailed": "Upload failed. Try again.",
-      "processingFailed": "Processing failed. Try again.",
       "resume_prompt": {
         "title": "Incomplete Uploads Detected",
         "description": "You have {{count}} incomplete upload from a previous session.",
@@ -1344,114 +1313,49 @@
       "checkingSubscription": "Checking subscription...",
       "loadingPlans": "Loading plans...",
       "generationInProgress": "A generation is already in progress. Wait."
-    }
+    },
+    "back": "Back",
+    "change": "Change",
+    "notAvailable": "Not available",
+    "skipToMainContent": "Skip to main content",
+    "back_to_settings": "Back to settings",
+    "copied": "Copied",
+    "downloadError": "Download failed",
+    "exportCompleted": "Export completed",
+    "exportError": "Export failed",
+    "limit": "Limit",
+    "minCharacters": "Minimum characters",
+    "page": "Page",
+    "publication": "Publication",
+    "retrying": "Retrying...",
+    "tip": "Tip",
+    "updating": "Updating...",
+    "upgrade_plan": "Upgrade Plan",
+    "view_plans": "View Plans",
+    "you": "You",
+    "yourVideo": "Your video"
   },
-  "Content": {
-    "configureNetworks": "Scheduled publications",
-    "title": "Content Management",
-    "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
-    "createNew": "Create New",
-    "publications": "Publications",
-    "campaigns": "Campaigns",
-    "logs": "Logs",
-    "tabs": {
-      "publications": "Publications",
-      "campaigns": "Campaigns",
-      "calendar": "Calendar",
-      "logs": "Logs",
-      "approvals": "Approvals"
-    },
-    "status": {
-      "all": "All",
-      "draft": "Drafts",
-      "scheduled": "Scheduled",
-      "pending_review": "Pending Review",
-      "rejected": "Rejected",
-      "published": "Published"
-    },
-    "socialMedia": {
-      "title": "Connect Your Social Networks",
-      "description": "Connect your social media accounts to allow automatic content publishing. Your information will be kept secure and will only be used for the functions you authorize.",
-      "whyConnect": "Why connect your social networks?",
-      "connected": "Connected",
-      "of": "of",
-      "accounts": "accounts",
-      "seeAccounts": "See networks",
-      "hide": "Hide",
-      "benefits": {
-        "autoPublish": "Automatically publish content",
-        "manageAll": "Manage all accounts in one place",
-        "schedule": "Schedule posts for optimal times",
-        "control": "Maintain full control always"
-      },
-      "disclaimer": "You can disconnect your accounts at any time. We will not publish anything without your permission.",
-      "status": {
-        "connected": "Connected",
-        "notConnected": "Not Connected",
-        "connectToShare": "Connect to start sharing",
-        "connectedBy": "Connected by"
-      },
-      "actions": {
-        "connect": "Connect",
-        "disconnect": "Disconnect",
-        "processing": "Processing..."
-      },
-      "disconnectModal": {
-        "title": "Disconnect Account",
-        "warning": "Account has pending posts",
-        "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
-        "table": {
-          "date": "Date",
-          "publication": "Publication"
-        },
-        "cancelButton": "Keep connected",
-        "confirmButton": "Disconnect"
-      },
-      "validation": {
-        "facebook": {
-          "typeRequired": "You must select a post type for Facebook",
-          "typeInvalid": "Invalid post type for Facebook"
-        },
-        "instagram": {
-          "typeRequired": "You must select a post type for Instagram",
-          "typeInvalid": "Invalid post type for Instagram"
-        },
-        "twitter": {
-          "typeRequired": "You must select a post type for Twitter",
-          "pollOptionsMin": "Polls require at least 2 options",
-          "pollOptionEmpty": "Poll options cannot be empty"
-        },
-        "youtube": {
-          "typeRequired": "You must select a video type for YouTube",
-          "typeInvalid": "Invalid video type for YouTube"
-        },
-        "tiktok": {
-          "typeRequired": "Format required for TikTok",
-          "typeInvalid": "Invalid format"
-        }
-      },
-      "messages": {
-        "settingsUpdated": {
-          "facebook": "Facebook settings updated successfully",
-          "instagram": "Instagram settings updated successfully",
-          "twitter": "Twitter settings updated successfully",
-          "tiktok": "TikTok settings updated successfully",
-          "youtube": "YouTube settings updated successfully",
-          "default": "Settings updated successfully"
-        },
-        "connectSuccess": "Account connected successfully",
-        "disconnectSuccess": "Account disconnected successfully",
-        "authError": "Authentication error",
-        "unauthorized": "Unauthorized. Log in again.",
-        "loadError": "Could not load connected accounts",
-        "disconnectError": "Error disconnecting"
-      }
+  "confirm-password": {
+    "title": "Confirm Password",
+    "description": "This is a secure area. Please confirm your password to continue.",
+    "label": "Password",
+    "placeholder": "Enter your password",
+    "button": "Confirm"
+  },
+  "content": {
+    "publish": {
+      "button": "Publish",
+      "ready": "Ready to publish",
+      "pending_review": "Pending review",
+      "approval_required": "Approval required",
+      "approval_required_message": "This content must be approved before publishing.",
+      "no_permission": "You don't have permission to publish",
+      "owner_bypass": "As the owner, you can publish without approval",
+      "rejected_message": "This content was rejected. Review the comments before republishing."
     }
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcomeMessage": "Welcome, {{name}}!",
-    "systemStats": "System Statistics",
     "totalViews": "Total Views",
     "totalClicks": "Total Clicks",
     "conversions": "Conversions",
@@ -1459,17 +1363,7 @@
     "totalEngagement": "Total Engagement",
     "avgEngagementRate": "Average Engagement Rate",
     "engagementTrends": "Engagement Trends",
-    "followersByPlatform": "Followers by Platform",
-    "campaignPerformance": "Campaign Performance",
     "platformPerformance": "Global Performance by Platform",
-    "views": "Views",
-    "clicks": "Clicks",
-    "engagement": "Engagement",
-    "emptyState": {
-      "title": "No Data",
-      "message": "Run the command to generate test data:",
-      "command": "php artisan statistics:seed"
-    },
     "quickActions": {
       "campaigns": {
         "title": "Campaigns",
@@ -1483,6 +1377,22 @@
         "title": "Content",
         "description": "Manage media and publications"
       }
+    },
+    "subtitle": "General system statistics.",
+    "tabs": {
+      "overview": "Overview",
+      "engagement": "Engagement",
+      "social": "Social Networks"
+    },
+    "sections": {
+      "accounts": "Connected Accounts Status",
+      "interaction": "Interaction Metrics",
+      "interactionDesc": "Detailed analysis of how users interact with your brand.",
+      "performance": "Performance Overview",
+      "performanceDesc": "Key metrics on the reach and engagement of your content.",
+      "platforms": "Platform Comparison",
+      "publications": "Publications Status",
+      "publicationsDesc": "Report on the current status of your campaigns and recent publications."
     }
   },
   "excel": {
@@ -1494,9 +1404,7 @@
     "uploadFileTitle": "Step 2: Upload your file",
     "dragDropText": "Drag your file here",
     "orClickToSelect": "or click to select",
-    "selectFile": "Select File",
     "supportedFormats": "Formats: .xlsx, .xls, .csv (Max. 10MB)",
-    "removeFile": "Remove file",
     "import": "Import",
     "templateDownloaded": "Template downloaded successfully",
     "downloadError": "Error downloading template",
@@ -1516,56 +1424,25 @@
   },
   "jsonImport": {
     "title": "Import from JSON",
-    "menuDescription": "Bulk publications and campaigns",
+    "menuDescription": "Import publications from a JSON file",
     "downloadTemplateTitle": "Step 1: Download the template",
-    "downloadTemplateDesc": "Download the example JSON with standalone publications and campaigns with nested publications.",
+    "downloadTemplateDesc": "Download a sample JSON file with the correct format.",
     "downloadTemplate": "Download Template",
+    "templateDownloaded": "Template downloaded successfully",
+    "downloadError": "Failed to download the template",
     "uploadFileTitle": "Step 2: Upload your JSON file",
     "dragDropText": "Drag your .json file here",
     "supportedFormats": "Format: .json (Max. 10MB)",
-    "import": "Import",
-    "templateDownloaded": "Template downloaded successfully",
-    "downloadError": "Error downloading template",
+    "noFileSelected": "Please select a file",
     "invalidFileType": "Invalid file type. Use .json",
-    "fileTooLarge": "File is too large. Maximum 10MB",
-    "noFileSelected": "Select a file",
+    "fileTooLarge": "The file is too large. Maximum 10MB",
+    "import": "IMPORT",
     "importSuccess": "Import successful",
     "importPartial": "Import completed with errors",
-    "importError": "Error importing file",
+    "importError": "Import failed",
+    "total": "Total",
     "successful": "Successful",
-    "failed": "Failed",
-    "total": "Total"
-  },
-  "formats": {
-    "excel": {
-      "importPublications": "Import Publications",
-      "importCampaigns": "Import Campaigns",
-      "downloadTemplateTitle": "Step 1: Download the template",
-      "downloadTemplateDesc": "Download the official template with the correct format and examples.",
-      "downloadTemplate": "Download Template",
-      "uploadFileTitle": "Step 2: Upload your file",
-      "dragDropText": "Drag your file here",
-      "orClickToSelect": "or click to select",
-      "selectFile": "Select File",
-      "supportedFormats": "Formats: .xlsx, .xls, .csv (Max. 10MB)",
-      "removeFile": "Remove file",
-      "import": "Import",
-      "templateDownloaded": "Template downloaded successfully",
-      "downloadError": "Error downloading template",
-      "invalidFileType": "Invalid file type. Use .xlsx, .xls or .csv",
-      "fileTooLarge": "File is too large. Maximum 10MB",
-      "noFileSelected": "Select a file",
-      "importSuccess": "Import successful",
-      "importPartial": "Partial import",
-      "importError": "Error importing file",
-      "publications": "publications",
-      "campaigns": "campaigns",
-      "successful": "Successful",
-      "failed": "Failed",
-      "total": "Total",
-      "errors": "Errors found",
-      "row": "Row"
-    }
+    "failed": "Failed"
   },
   "legal": {
     "common": {
@@ -1718,7 +1595,6 @@
       "subtitle": "Have questions or suggestions? We are here to help.",
       "support": {
         "title": "Support and Suggestions",
-        "description": "This is the official channel for you to send us your feedback. You can send us any <strong>suggestions for improvement</strong>, report <strong>application errors</strong>, or ask us about our <strong>policies</strong>.",
         "note": "Your feedback is fundamental to us; we review every message to keep improving the Intellipost experience.",
         "writeTo": "Write to us at"
       },
@@ -1730,14 +1606,7 @@
     "subtitle": "Activity Logs",
     "refresh": "Refresh",
     "viewPost": "View Post",
-    "filter": "Filter",
     "filters": {
-      "campaign": "Filter by Campaign",
-      "dateRange": "Date Range",
-      "allCampaigns": "All Campaigns",
-      "from": "From",
-      "to": "To",
-      "apply": "Apply Filters",
       "clear": "Clear"
     },
     "table": {
@@ -1747,13 +1616,11 @@
       "campaign": "Campaign",
       "status": "Status",
       "description": "Description",
-      "message": "Message",
-      "error": "Error",
-      "video": "Video",
       "link": "Link",
-      "copy": "Copy",
       "less": "Less",
-      "more": "More"
+      "more": "More",
+      "clickMore": "Show more",
+      "clickLess": "Show less"
     },
     "status": {
       "all": "All",
@@ -1767,14 +1634,7 @@
       "publishing": "Publishing"
     },
     "empty": "No logs found",
-    "noLogsDesc": "There are no activity logs matching your current filters or in this workspace.",
-    "loading": "Loading logs...",
-    "pagination": {
-      "previous": "Previous",
-      "next": "Next",
-      "page": "Page",
-      "of": "of"
-    }
+    "noLogsDesc": "There are no activity logs matching your current filters or in this workspace."
   },
   "manageContent": {
     "configureNetworks": "Scheduled publications",
@@ -1783,9 +1643,6 @@
     "createNew": "Create New",
     "createPublication": "Post, reel, story...",
     "createCampaign": "Group publications",
-    "publications": "Publications",
-    "campaigns": "Campaigns",
-    "logs": "Logs",
     "tabs": {
       "publications": "Publications",
       "campaigns": "Campaigns",
@@ -1793,30 +1650,13 @@
       "logs": "Logs",
       "approvals": "Approvals"
     },
-    "status": {
-      "all": "All",
-      "draft": "Drafts",
-      "scheduled": "Scheduled",
-      "pending_review": "Pending Review",
-      "rejected": "Rejected",
-      "published": "Published"
-    },
     "socialMedia": {
       "title": "Connect Your Social Networks",
-      "description": "Connect your social media accounts to allow automatic content publishing. Your information will be kept secure and will only be used for the functions you authorize.",
-      "whyConnect": "Why connect your social networks?",
-      "connected": "Connected",
-      "of": "of",
       "accounts": "accounts",
       "seeAccounts": "See networks",
       "hide": "Hide",
-      "benefits": {
-        "autoPublish": "Automatically publish content",
-        "manageAll": "Manage all accounts in one place",
-        "schedule": "Schedule posts for optimal times",
-        "control": "Maintain full control always"
-      },
-      "disclaimer": "You can disconnect your accounts at any time. We will not publish anything without your permission.",
+      "connected": "Connected",
+      "connectedBy": "Connected by",
       "status": {
         "connected": "Connected",
         "notConnected": "Not Connected",
@@ -1833,9 +1673,6 @@
       "oauth1Required": "OAuth 1.0a required",
       "oauth1Message": "Required for video uploads",
       "reconnect": "Reconnect",
-      "reconnecting": "Reconnecting...",
-      "reconnectWindow": "Opening reconnection window...",
-      "reconnectError": "Error reconnecting",
       "apiLimits": "API Limits",
       "limits": {
         "requestsPerHour": "Requests/hour",
@@ -1845,6 +1682,15 @@
         "postsPerThreeHours": "Posts/3 hours",
         "dailyQuota": "Daily quota",
         "uploadCost": "Upload cost"
+      },
+      "messages": {
+        "disconnectSuccess": "Account disconnected successfully",
+        "unauthorized": "Unauthorized. Log in again.",
+        "loadError": "Could not load connected accounts",
+        "disconnectError": "Error disconnecting",
+        "connectError": "Failed to connect with",
+        "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress",
+        "noPermission": "You do not have permission to manage social media accounts. Only users with 'manage-accounts' permission can connect or disconnect accounts."
       },
       "disconnectModal": {
         "title": "Disconnect Account",
@@ -1870,73 +1716,13 @@
         "action": "Action Required",
         "waitForPublishing": "Wait for the publications to finish publishing.",
         "removeScheduled": "Go to the Content section and remove these publications from the schedule."
-      },
-      "validation": {
-        "facebook": {
-          "typeRequired": "You must select a post type for Facebook",
-          "typeInvalid": "Invalid post type for Facebook"
-        },
-        "instagram": {
-          "typeRequired": "You must select a post type for Instagram",
-          "typeInvalid": "Invalid post type for Instagram"
-        },
-        "twitter": {
-          "typeRequired": "You must select a post type for Twitter",
-          "pollOptionsMin": "Polls require at least 2 options",
-          "pollOptionEmpty": "Poll options cannot be empty"
-        },
-        "youtube": {
-          "typeRequired": "You must select a video type for YouTube",
-          "typeInvalid": "Invalid video type for YouTube"
-        },
-        "tiktok": {
-          "typeRequired": "Format required for TikTok",
-          "typeInvalid": "Invalid format"
-        }
-      },
-      "messages": {
-        "settingsUpdated": {
-          "facebook": "Facebook settings updated successfully",
-          "instagram": "Instagram settings updated successfully",
-          "twitter": "Twitter settings updated successfully",
-          "tiktok": "TikTok settings updated successfully",
-          "youtube": "YouTube settings updated successfully",
-          "default": "Settings updated successfully"
-        },
-        "connectSuccess": "Account connected successfully",
-        "disconnectSuccess": "Account disconnected successfully",
-        "authError": "Authentication error",
-        "unauthorized": "Unauthorized. Log in again.",
-        "loadError": "Could not load connected accounts",
-        "disconnectError": "Error disconnecting",
-        "cannotDisconnectPublishing": "You cannot disconnect this account while there are publications in progress",
-        "noPermission": "You do not have permission to manage social media accounts. Only users with 'manage-accounts' permission can connect or disconnect accounts."
       }
     }
   },
-  "media": {
-    "crop": {
-      "title": "Crop Image"
-    }
-  },
   "nav": {
-    "dashboard": "Dashboard",
-    "calendar": "Calendar",
     "profile": "Profile",
-    "settings": "Settings",
-    "manageContent": "Manage Content",
-    "analytics": "Analytics",
-    "aiChat": "AI Chat",
-    "socialNetworks": "Social Networks",
     "logout": "Log Out",
     "notifications": "Notifications",
-    "workspaces": "Workspaces",
-    "workspace_branding": "Workspace Branding",
-    "reels": "Reels",
-    "billing": "Billing",
-    "addons": "Add-ons",
-    "adminDashboard": "Admin Dashboard",
-    "adminSettings": "System Settings",
     "search": "Search routes...",
     "noResults": "No routes found",
     "search.clear": "Clear search",
@@ -1946,7 +1732,6 @@
     "sidebar.expand": "Expand sidebar",
     "menu.navigation": "Navigation menu",
     "mainNavigation": "Main navigation",
-    "content": "Content",
     "content.records": "Records",
     "content.publications": "Publications",
     "content.campaigns": "Campaigns",
@@ -1957,13 +1742,6 @@
     "workspaces.members": "Members",
     "workspaces.integrations": "Integrations",
     "section": {
-      "dashboard": "Dashboard",
-      "content": "Content",
-      "analytics": "Analytics",
-      "workspaces": "Workspaces",
-      "subscription": "Subscription",
-      "settings": "Settings",
-      "admin": "Administration",
       "quickNavHint": "to navigate"
     }
   },
@@ -1971,18 +1749,6 @@
     "title": "Notifications",
     "new": "new",
     "mark_all_read": "Mark all as read",
-    "new_content": "New content available",
-    "content_ready": "Your content has been processed and is ready to publish.",
-    "analytics_ready": "Analytics report",
-    "report_generated": "Monthly performance report is available.",
-    "scheduled_post": "Scheduled post",
-    "post_scheduled": "Your post has been successfully scheduled.",
-    "warning": "System warning",
-    "api_limit": "You are approaching your monthly API limit.",
-    "high_priority": "High priority",
-    "normal_priority": "Normal priority",
-    "low_priority": "Low priority",
-    "all": "All",
     "types": {
       "all": "All",
       "publications": "Publications",
@@ -1998,43 +1764,14 @@
       "normal": "Normal",
       "low": "Low"
     },
-    "priority_label": "Priority",
     "no_notifications_filtered": "No notifications for the selected filters",
-    "video_uploaded": "Video uploaded successfully to {{platform}}",
-    "video_deleted": "Video deleted from {{platform}}",
-    "status_update": "Status update",
-    "status_update_description": "{{type}} {{platform}}",
-    "playlist_processed": "Video added to {{platform}} playlist",
-    "playlist_processedVideo": "'{{video_title}}' added to playlist '{{playlist_name}}'",
-    "playlist_processedNoVideo": "Added to playlist '{{playlist_name}}'",
-    "playlist_failed": "Failed to add video to {{platform}} playlist",
-    "playlist_failed_description": "Could not add '{{video_title}}' to playlist '{{playlist_name}}' on account {{account}}",
-    "retry_max_reached": "Maximum retry attempts reached.",
-    "retry_auto": "Will retry automatically.",
     "modal": {
-      "title": "Notifications",
-      "new": "new",
-      "mark_all_read": "Mark all as read",
-      "new_content": "New content available",
-      "content_ready": "Your content has been processed and is ready to publish.",
-      "analytics_ready": "Analytics report",
-      "report_generated": "Monthly performance report is available.",
-      "scheduled_post": "Scheduled post",
-      "post_scheduled": "Your post has been successfully scheduled.",
-      "warning": "System warning",
-      "api_limit": "You are approaching your monthly API limit.",
-      "no_notifications": "You have no pending notifications",
-      "empty_description": "System has no notifications to show",
       "categories": {
-        "all": "All",
         "application": "Application",
-        "content": "Content",
-        "system": "System",
-        "analytics": "Analytics"
+        "system": "System"
       }
     },
     "admin": {
-      "page_title": "System Notifications",
       "card_title": "Send Global Notification",
       "card_description": "This notification will be sent to ALL system users in real-time and will be saved in their history.",
       "form": {
@@ -2095,19 +1832,16 @@
       "sizeRequired": "Select your team size"
     },
     "optional": "Optional",
-    "skip": "Skip this step",
     "continue": "Continue"
   },
   "planSelection": {
     "title": "Choose the perfect plan for you",
     "description": "Start free or choose a plan that fits your needs",
-    "recommended": "Recommended",
     "intervals": {
       "month": "month",
-      "forever": "forever"
+      "forever": "forever",
+      "year": "year"
     },
-    "startFree": "Start Free",
-    "selectPlan": "Select Plan",
     "decideLater": "I'll decide later"
   },
   "tour": {
@@ -2120,7 +1854,8 @@
     "nextStep": "Go to next tour step",
     "completeTour": "Complete the guided tour",
     "skipGuidedTour": "Skip the guided tour",
-    "progress": "Tour progress"
+    "progress": "Tour progress",
+    "navigating": "Navigating to next section..."
   },
   "wizard": {
     "title": {
@@ -2176,7 +1911,8 @@
       "accounts": "accounts",
       "connectedAccounts": "Connected Accounts",
       "nextStep": "Next, we'll help you create your first publication using a template."
-    }
+    },
+    "continueWithout": "Continue Without Connecting"
   },
   "templates": {
     "title": "Choose a Template",
@@ -2189,16 +1925,6 @@
     "filterBy": "Filter by {{category}} category",
     "useTemplate": "Use This Template",
     "selecting": "Selecting...",
-    "categories": {
-      "all": "All",
-      "promotional": "Promotional",
-      "educational": "Educational",
-      "engagement": "Engagement"
-    },
-    "noTemplates": {
-      "title": "No templates found",
-      "description": "Try adjusting your search or filter to find what you're looking for."
-    },
     "available": "{{count}} {{templateText}} available",
     "template": "template",
     "templates": "templates",
@@ -2206,19 +1932,10 @@
     "skipping": "Skipping...",
     "skipAndCreate": "Skip template selection and create blank publication",
     "list": "Publication templates",
-    "select": "Select {{name}} template",
-    "preview": "Preview {{name}} template"
+    "select": "Select {{name}} template"
   },
   "progress": {
-    "title": "Setup Progress",
-    "complete": "Complete",
-    "inProgress": "In progress",
-    "stages": {
-      "businessInfo": "Business Info",
-      "plan": "Plan Selection",
-      "tour": "Guided Tour",
-      "connect": "Connect Accounts"
-    }
+    "title": "Setup Progress"
   },
   "platform": {
     "connect": "Connect",
@@ -2234,40 +1951,11 @@
     "linkedin": "Share professional content on LinkedIn"
   },
   "errors": {
-    "loadFailed": "Failed to load onboarding",
-    "actionFailed": "Failed to perform action",
-    "tryAgain": "Try again",
-    "networkError": "Network error occurred",
     "retry": "Try Again"
-  },
-  "settings": {
-    "social": {
-      "title": "Global Social Media Settings",
-      "subtitle": "Configure default settings that will be applied to all your new publications across different platforms.",
-      "save": "Save Global Configuration",
-      "success": "Global settings saved successfully",
-      "error": "Failed to save global settings"
-    }
-  },
-  "pagination": {
-    "next": "Next",
-    "previous": "Previous"
   },
   "payment": {
     "paymentMethod": "Payment method",
     "selectPaymentMethod": "Select a payment method",
-    "noPaymentMethods": "No payment methods available",
-    "loadingMethods": "Loading payment methods...",
-    "stripe": "Credit/Debit card",
-    "mercadopago": "Mercado Pago",
-    "epayco": "ePayco",
-    "payu": "PayU",
-    "wompi": "Wompi",
-    "processing": "Processing payment...",
-    "success": "Payment successful",
-    "failed": "Payment failed",
-    "cancelled": "Payment cancelled",
-    "selectToContine": "Select a payment method to continue",
     "addonPurchaseSuccess": {
       "title": "Purchase Successful!",
       "subtitle": "Your addon package has been activated successfully",
@@ -2275,7 +1963,6 @@
       "amount": "Amount",
       "price": "Price",
       "date": "Date",
-      "sessionId": "Session ID",
       "addonUsage": "Addons Status",
       "nextSteps": "What's Next?",
       "step1": "Your addon package is now active and ready to use",
@@ -2401,9 +2088,6 @@
   "portal": {
     "title": "Content Review",
     "clientPortal": "Client Portal",
-    "header": {
-      "workspace": "Workspace"
-    },
     "info": {
       "title": "Content Review",
       "description": "You have received this link to review and approve the content prepared by {{creator}} for the workspace {{workspace}}."
@@ -2419,45 +2103,12 @@
       "alreadyReviewed": "This publication has already been reviewed."
     },
     "details": {
-      "title": "Publication Details",
-      "sentBy": "Sent by",
-      "sentAt": "Sent at",
-      "role": "Role",
-      "workspace": "Workspace",
-      "scheduledFor": "Scheduled for",
-      "targetPlatforms": "Target Platforms",
-      "platforms": "{{count}} platform",
-      "platforms_plural": "{{count}} platforms",
-      "createdAt": "Created at",
-      "updatedAt": "Last updated"
-    },
-    "content": {
-      "messageBody": "Message Body",
-      "mediaPreview": "Media Preview",
-      "mediaCount": "{{current}} of {{total}}",
-      "noMedia": "No media attached",
-      "limitedPreview": "Limited Preview",
-      "limitedPreviewDesc": "This file type \"{{type}}\" will be processed for the final channel.",
-      "contentType": "Content Type",
-      "hashtags": "Hashtags",
-      "noHashtags": "No hashtags",
-      "goal": "Campaign Goal",
-      "noGoal": "No specific goal defined",
-      "pollOptions": "Poll Options",
-      "pollDuration": "Poll Duration",
-      "hours": "{{count}} hour",
-      "hours_plural": "{{count}} hours"
-    },
-    "socialAccounts": {
-      "title": "Social Accounts",
-      "description": "This content will be published to the following accounts:",
-      "noAccounts": "No social accounts configured"
+      "targetPlatforms": "Target Platforms"
     },
     "actions": {
       "approve": "Approve Content",
       "reject": "Request Changes",
       "approving": "Approving...",
-      "rejecting": "Rejecting...",
       "back": "Back",
       "submitRejection": "Submit Rejection Comments"
     },
@@ -2475,8 +2126,7 @@
     },
     "error": {
       "approve": "Error approving content",
-      "reject": "Error rejecting content",
-      "loadImage": "Error loading image"
+      "reject": "Error rejecting content"
     },
     "footer": {
       "secureLink": "This is a secure link generated by {{app}} for {{workspace}}.",
@@ -2484,24 +2134,25 @@
     },
     "confirm": {
       "approve": "Are you sure you want to approve this content?"
-    }
+    },
+    "copyLink": "Copy portal link",
+    "linkCopied": "Link copied to clipboard",
+    "linkError": "Failed to generate the link",
+    "openPortal": "Open portal",
+    "shareWithClient": "Share with client"
   },
   "pricing": {
     "title": "Choose the perfect plan for you",
     "subtitle": "Start free and scale when you need. No commitments, cancel anytime.",
     "flexiblePlans": "Flexible plans for every need",
     "monthly": "Monthly",
-    "yearly": "Yearly",
-    "yearlyDiscount": "-20%",
     "annualPricing": "Annual: ${{price}}/month — save ${{savings}}/year",
-    "purchasedPlans": "Purchased plans — switch without payment",
     "expiredPlans": "Expired plans — renew with payment",
     "currentPlanLabel": "Current plan",
     "autoRenewal": "Auto-renewal",
     "endsOn": "Ends on {{date}}",
     "statusActive": "Active",
     "activePlanNow": "Active plan now",
-    "activeSubscriptionLabel": "Active subscription",
     "expired": "Expired",
     "use": "Use",
     "renew": "Renew",
@@ -2511,31 +2162,20 @@
     "demoTemporal": "Temporary Demo",
     "currentPlan": "Current Plan",
     "perMonth": "/month",
-    "perYear": "/year",
     "selectPlan": "Select Plan",
-    "startFree": "Start Free",
     "processing": "Processing...",
     "comingSoon": "Coming Soon",
     "paymentSetup": "Payment setup in progress",
-    "noCreditCard": "No credit card required",
-    "cancelAnytime": "Cancel anytime",
-    "support247": "24/7 Support",
     "faq": "Have questions?",
     "faqSubtitle": "We're here to help you choose the best plan",
     "contactUs": "Contact us at",
-    "changeToPlan": "Change to this plan",
-    "cancelRequired": "Subscription management required",
     "cancelSubscriptionFirst": "To downgrade to the free plan, you must first cancel your current paid subscription. The change will take effect at the end of your billing cycle.",
     "missingFeatures": "What you're missing",
     "showMore": "Show more",
     "showLess": "Show less",
     "activeSubscription": {
       "title": "You already have an active subscription",
-      "description": "Your current plan is active. To change plans or manage your subscription, visit the billing page.",
-      "changeDescription": "You can change to any plan below. The change will be applied immediately and your billing will be prorated.",
-      "prorationExplanation": "You can switch to any available plan. The change will be applied immediately and billing will be automatically prorated based on the remaining time of your subscription.",
-      "manageBilling": "Manage Billing",
-      "viewUsage": "View Plan Usage"
+      "manageBilling": "Manage Billing"
     },
     "plans": {
       "demo": {
@@ -2633,61 +2273,52 @@
       "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)"
     },
     "billing": {
-      "month": "month",
-      "year": "year"
-    }
+      "month": "month"
+    },
+    "purchasedPlansAvailable": "Purchased plans — switch without payment",
+    "status": {
+      "active": "Active",
+      "available": "Available",
+      "expired": "Expired",
+      "purchased": "Purchased"
+    },
+    "taglines": {
+      "demo": "Explore everything, no strings attached",
+      "enterprise": "Full control of your brand",
+      "free": "Start free, no card required",
+      "professional": "Scale your content with your team",
+      "starter": "For individual creators"
+    },
+    "timeAvailable": "Time available"
   },
   "profile": {
-    "menu_title": "Settings",
     "tabs": {
       "general": "General",
       "security": "Security",
-      "subscription": "Subscription & Plan",
-      "accounts": "Connected Accounts",
-      "ai": "Artificial Intelligence",
-      "appearance": "Appearance",
-      "onboarding": "Onboarding"
+      "subscription": "Subscription & Plan"
     },
-    "title": "Profile",
     "appearance": {
       "title": "Appearance Mode",
       "light": "Light",
       "dark": "Dark",
-      "system": "System"
+      "system": "System",
+      "color": "Color"
     },
     "settings_description": "Update your personal information and security settings.",
     "theme": {
       "title": "Color Theme",
       "description": "Select the primary system color. This will affect buttons, links, and other highlighted elements.",
-      "success_title": "Theme Updated!",
-      "success_message": "The system color has been updated successfully.",
-      "close": "Close"
+      "success_message": "The system color has been updated successfully."
     },
     "language": {
-      "title": "Language",
-      "success_message": "Language updated successfully"
+      "title": "Language"
     },
-    "editProfile": "Edit Profile",
-    "changePassword": "Change Password",
-    "name": "Name",
-    "email": "Email",
-    "currentPassword": "Current Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password",
-    "updateProfile": "Update Profile",
     "update_success": "Profile updated successfully.",
     "update_error": "Failed to update profile.",
-    "deleteAccount": "Delete Account",
     "actions": {
       "saveChanges": "Save changes"
     },
-    "messages": {
-      "unsavedChanges": "You have unsaved changes. Do you want to continue?"
-    },
     "information": {
-      "title": "Profile Information",
-      "description": "Update your account's profile information and email address.",
-      "saved": "Saved.",
       "nameLabel": "Name",
       "namePlaceholder": "Your Name",
       "emailLabel": "Email",
@@ -2695,38 +2326,29 @@
       "emailUnverified": "Your email address is not verified. Verify it to access all features.",
       "sendVerification": "Send Verification Email",
       "verificationSent": "A new verification link has been sent to your email address.",
-      "applicationLanguage": "Application Language",
-      "languageDescription": "Select your preferred language for the application interface.",
-      "currentLanguage": "Current Language",
       "phoneLabel": "Phone",
       "phonePlaceholder": "Your phone number",
       "bioLabel": "Bio",
       "bioPlaceholder": "Tell us a bit about yourself...",
       "sections": {
         "personal": "Personal Information",
-        "contact": "Contact Details",
-        "bio": "About Me",
-        "language": "Language & Preferences"
+        "contact": "Contact Details"
       }
     },
     "statistics": {
-      "title": "Account Statistics",
-      "description": "Overview of your account activity and status.",
       "memberSince": "Member Since",
       "daysActive": "Days Active",
       "days": "days",
       "accountStatus": "Account Status",
       "active": "Active",
       "emailStatus": "Email Status",
-      "verified": "Verified",
-      "unverified": "Unverified"
+      "unverified": "Unverified",
+      "notAvailable": "Not available"
     },
     "connectedAccounts": {
-      "title": "Connected Social Accounts",
-      "description": "Manage your connected social media profiles for content publishing.",
-      "connected": "Connected",
-      "notConnected": "Not Connected",
-      "manageLink": "Manage connections in Content Manager"
+      "manageLink": "Manage connections in Content Manager",
+      "active": "Active",
+      "inactive": "Not connected"
     },
     "password": {
       "title": "Update Password",
@@ -2738,10 +2360,6 @@
       "successTitle": "Password updated successfully!",
       "successMessage": "Your account security has been enhanced.",
       "errorTitle": "Correct the following errors:",
-      "securityTips": "Password Security Tips:",
-      "tip1": "Use at least 8 characters with a mix of letters, numbers, and symbols",
-      "tip2": "Avoid using personal information or common words",
-      "tip3": "Consider using a password manager for better security",
       "placeholders": {
         "current": "Enter your current password",
         "new": "Enter your new password",
@@ -2786,29 +2404,62 @@
       "restartHint": "Review the platform features and setup process again",
       "restartButton": "Restart"
     },
-    "usage": {
-      "title": "Plan Usage",
-      "publications": "Publications",
-      "used": "used",
-      "viewDetails": "View details →"
-    }
+    "avatar_remove_error": "An error occurred while removing the avatar",
+    "avatar_remove_failed": "Failed to remove the avatar",
+    "avatar_removed": "Avatar removed successfully",
+    "avatar_requirements": "Maximum 2MB. Formats: JPG, PNG, GIF, WebP",
+    "avatar_too_large": "The image is too large. Maximum 2MB",
+    "avatar_update_failed": "Failed to upload the photo",
+    "avatar_upload_error": "An error occurred while uploading the photo",
+    "avatar_uploaded": "Photo uploaded successfully",
+    "choose_file": "Choose File",
+    "notifications": {
+      "title": "Notification Preferences",
+      "description": "Configure how you want to be notified about upload and processing completions",
+      "in_app": "In-App Notifications",
+      "in_app_description": "Show notifications within the application",
+      "browser": "Browser Notifications",
+      "browser_description": "Show system notifications even when the app is in the background",
+      "enable": "Enable",
+      "requesting": "Requesting...",
+      "permission_granted": "Browser notifications enabled",
+      "permission_denied": "Browser notification permission denied",
+      "permission_denied_help": "Permission denied. Please enable notifications in your browser settings.",
+      "permission_error": "Failed to request notification permission",
+      "saved": "Preferences saved",
+      "upload_complete": "Upload Completions",
+      "upload_complete_description": "Notify when file uploads complete",
+      "processing_complete": "Processing Completions",
+      "processing_complete_description": "Notify when video processing completes",
+      "info_title": "About Notifications",
+      "info_description": "Notifications help you stay informed about long-running operations. You can customize which types of notifications you receive and how they are delivered."
+    },
+    "remove_photo": "Remove Photo",
+    "uploading": "Uploading...",
+    "using_initials": "Using initials",
+    "using_photo": "Using custom photo"
   },
   "publications": {
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
-      "sections": {
-        "details": "Content Details"
-      },
       "contentType": {
         "label": "Content Type",
-        "value": "Video",
         "filteredByPlatforms": "Filtered by selected platforms",
-        "locked": "Content type is locked after uploading media"
+        "locked": "Content type is locked after uploading media",
+        "changed": "Content type changed",
+        "autoChanged": "Content type changed automatically",
+        "mediaAllowed": "Media Allowed:",
+        "platforms": "Platforms:",
+        "rules": "Content Rules",
+        "suggestion": {
+          "title": "Content Type Suggestion",
+          "reason": "Based on the media you added, we suggest a different content type.",
+          "apply": "Change to {{type}}",
+          "keep": "Keep {{type}}"
+        }
       },
       "poll": {
-        "question": "Poll Question",
-        "questionPlaceholder": "Enter your question",
         "title": "Poll Options",
         "options": "Poll Options (2-4 options)",
         "optionPlaceholder": "Option",
@@ -2819,152 +2470,26 @@
         "note": "Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms."
       },
       "media": {
-        "uploadingPending": "Uploading Pending",
-        "backgroundUpload": "Saved! Media is uploading in the background."
+        "backgroundUpload": "Saved! Media is uploading in the background.",
+        "attachFailed": "Failed to attach the file",
+        "lockFailed": "Warning: Could not lock media for editing"
       },
       "upload": {
-        "activeTasks": "Files and Publications ({{count}})...",
-        "uploadingFiles": "Uploading files ({{count}})...",
-        "uploadFailed": "Upload Failed",
-        "uploadsCompleted": "Uploads Completed",
-        "publishingSocial": "Publishing to social ({{count}})...",
         "done": "Done",
         "pending": "Pending",
         "left": "left",
         "paused": "Paused",
         "cancelled": "Cancelled",
-        "cancel_message": "Are you sure you want to cancel this upload? Partially uploaded files will be deleted."
+        "errors": {
+          "svgNotAllowed": "SVG files are not supported by social media platforms"
+        },
+        "uploadingInBackground": "{{count}} file(s) are uploading in the background. They will be linked automatically when complete."
       },
       "show": {
-        "title": "Detailed View",
-        "subtitle": "View the campaign details",
-        "goal": "Goal",
-        "status": "Status",
-        "campaigns": "Campaigns",
-        "budget": "Budget",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "publishDate": "Publish Date",
-        "publishedOn": "Published On",
-        "publications": "Publications",
-        "socialNetworkPublications": "Social Network Publications",
-        "associatedPublications": "Associated Publications",
-        "accountMissingTitle": "Account Disconnected",
-        "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
-        "created": "Created",
-        "lastUpdated": "Last Updated",
-        "selectSocialAccounts": "Select Accounts",
-        "lockedBySession": "Locked by Session",
-        "dragDrop": {
-          "title": "Drag and drop to sort",
-          "subtitle": "Upload your multimedia files here"
-        },
-        "placeholders": {
-          "title": "Title",
-          "description": "Description",
-          "hashtags": "Hashtags",
-          "schedulePublication": "Schedule Publication",
-          "goal": "Goal",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
-        },
-        "button": {
-          "save": "Update",
-          "cancel": "Cancel"
-        },
-        "contentLocked": "Content Locked",
-        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
-        "contentPublishing": "Publishing in Progress",
-        "contentPublishingHint": "The publication is being published to some platforms. You must wait for the process to finish before you can edit the content.",
-        "approvedEditWarning": "Approved Publication",
-        "approvedEditWarningHint": "This publication has already been approved. If you make changes, it will return to 'Pending' status and require a new approval.",
-        "lockedByOther": "Post locked by another user",
-        "locking": {
-          "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
-          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts.",
-          "youAreEditor": "You are the current editor.",
-          "usersWaiting": "There are {{count}} user(s) waiting for you to finish."
-        }
-      },
-      "add": {
-        "title": "Add Publication",
-        "titleField": "Title",
-        "subtitle": "Create a publication",
-        "mediaSection": "Media Files",
-        "contentSection": "Content",
-        "socialAccountsSection": "Social Networks",
-        "scheduleSection": "Scheduling",
-        "campaignSection": "Campaign",
-        "moreOptions": "More options",
-        "name": "Name",
-        "description": "Description",
-        "image": "Image",
-        "hashtags": "Hashtags",
-        "schedulePublication": "Schedule Publication",
-        "scheduled_at": "Scheduled Date",
-        "goal": "Goal",
-        "status": "Status",
-        "campaigns": "Campaigns",
-        "budget": "Budget",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "publishDate": "Publish Date",
-        "publishedOn": "Published On",
-        "publications": "Publications",
-        "creating": "Creating",
-        "optionalSchedule": "Optional Schedule",
-        "selectSocialAccounts": "Select Accounts",
-        "associatedPublicationsRequired": "Associated Publications is required",
-        "lockedBySession": "Locked by Session",
-        "noCampaigns": "no campaign",
-        "dragDrop": {
-          "title": "Drag and drop to sort",
-          "subtitle": "Upload your multimedia files here"
-        },
-        "recurrence_days": "Recurrence Days",
-        "poll_options": "Poll options",
-        "poll_duration_hours": "Poll duration",
-        "placeholders": {
-          "title": "Title",
-          "description": "Description",
-          "hashtags": "#marketing #publicidad #comunicación",
-          "schedulePublication": "Schedule Publication",
-          "goal": "Goal",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
-        },
-        "validation": {
-          "titleRequired": "Title is required",
-          "titleLength": "Title cannot exceed 70 characters",
-          "descMin": "Description must have at least 10 characters",
-          "descMax": "Description cannot exceed {{max}} characters",
-          "objRequired": "Goal is required",
-          "objMax": "Goal cannot exceed 200 characters",
-          "hashtagsRequired": "Hashtags are required",
-          "hashtagValid": "Hashtags must be separated by commas",
-          "hashtagMax": "Maximum 10 hashtags allowed",
-          "scheduledMinDifference": "The date must be at least 1 minute from the current time",
-          "scheduledAtRequired": "Schedule date is required if global schedule is enabled",
-          "recurrenceDaysRequired": "Select at least one day for weekly recurrence",
-          "recurrence_days": "Invalid recurrence days",
-          "durationErrors": "Fix the duration errors before saving.",
-          "recurrenceEndDateRequired": "End date is required for recurring publications",
-          "pollOptionsRequired": "Polls require at least 2 options",
-          "pollDurationRequired": "Poll duration must be between 1 and 168 hours",
-          "imageRequired": "You must add at least one image or video",
-          "scheduleRequired": "You must schedule a date for all selected networks or set a global date"
-        },
-        "button": {
-          "save": "Save",
-          "cancel": "Cancel"
-        }
+        "title": "Detailed View"
       },
       "schedule": {
-        "title": "Date for all networks",
-        "description": "Set a single date to publish on all selected social networks at once.",
-        "placeholder": "Select date and time",
         "instantWarning": "To publish now, use the Publish button after saving.",
-        "useGlobal": "Global",
         "recurrence": {
           "title": "Repeat publication (Recurrence)",
           "locked_title": "Recurrence locked",
@@ -2984,10 +2509,25 @@
           "single_account_note": "This network will publish recurrently according to the configuration."
         }
       },
-      "edit": {
-        "title": "Edit Publication",
+      "add": {
         "titleField": "Title",
-        "subtitle": "Update the existing publication",
+        "mediaSection": "Media Files",
+        "contentSection": "Content",
+        "socialAccountsSection": "Social Networks",
+        "scheduleSection": "Scheduling",
+        "moreOptions": "More options",
+        "description": "Description",
+        "hashtags": "Hashtags",
+        "goal": "Goal",
+        "noCampaigns": "no campaign",
+        "placeholders": {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "#marketing #publicidad #comunicación",
+          "goal": "Goal"
+        }
+      },
+      "edit": {
         "mediaSection": "Media Files",
         "contentSection": "Content",
         "socialAccountsSection": "Social Networks",
@@ -2999,50 +2539,16 @@
         "historyHint": "Activity and approvals",
         "commentsSection": "Internal Comments",
         "commentsHint": "Team notes about this publication",
-        "youtubeThumbnailSection": "YouTube Thumbnail",
-        "description": "Description",
-        "hashtags": "Hashtags",
-        "schedulePublication": "Schedule Publication",
-        "addCampaign": "Add Campaign",
-        "editCampaign": "Edit Campaign",
-        "deleteCampaign": "Delete Campaign",
-        "campaignTitle": "Campaign Title",
-        "name": "Name",
-        "image": "Image",
         "campaigns": "Campaigns",
-        "goal": "Goal",
-        "status": "Status",
-        "budget": "Budget",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "publishDate": "Publish Date",
-        "publishedOn": "Published On",
-        "associatedPublications": "Associated Publications",
-        "accountMissingTitle": "Account Disconnected",
-        "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
-        "selectSocialAccounts": "Select Accounts",
         "lockedBySession": "Locked by Session",
-        "questionField": "Question",
         "dragDrop": {
-          "title": "Drag and drop to sort",
-          "subtitle": "Upload your multimedia files here"
+          "title": "Drag and drop to sort"
         },
         "placeholders": {
-          "title": "Title",
           "description": "Description",
           "hashtags": "Hashtags",
-          "schedulePublication": "Schedule Publication",
-          "goal": "Goal",
-          "startDate": "12/12/2025",
-          "endDate": "12/12/2026"
+          "goal": "Goal"
         },
-        "button": {
-          "save": "Update",
-          "cancel": "Cancel"
-        },
-        "configurationLocked": "Configuration Locked",
-        "configurationLockedHint": "You need approval to configure networks and scheduling. Request a review first.",
-        "configurationLockedHintAdmin": "You must approve the publication before configuring networks.",
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
         "contentPublishing": "Publishing in Progress",
@@ -3053,31 +2559,14 @@
         "pendingReviewWarningHint": "This publication is awaiting approval. You cannot edit it until it is approved or rejected.",
         "lockedByOther": "Post locked by another user",
         "locking": {
-          "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
-          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts.",
           "youAreEditor": "You are the current editor.",
           "usersWaiting": "There are {{count}} user(s) waiting for you to finish."
         }
       },
-      "approvals": {
-        "noPending": "No pending approvals",
-        "noPendingDesc": "Great! All publications are up to date.",
-        "approve": "Approve",
-        "approvedSuccess": "Publication approved successfully",
-        "title": "Approvals",
-        "historyTitle": "Approval History",
-        "historySubtitle": "Logs of status changes and reviews",
-        "date": "Date",
-        "user": "User",
-        "publication": "Publication",
-        "actions": "Actions"
-      },
       "comments": {
-        "title": "Internal Comments",
         "placeholder": "Write a comment...",
         "noComments": "No comments yet. Start the conversation!",
         "loading": "Loading comments...",
-        "deleteConfirm": "Are you sure you want to delete this comment?",
         "deleteConfirmTitle": "Delete Comment",
         "deleteConfirmMessage": "Are you sure you want to delete this comment? This action cannot be undone.",
         "deleteSuccess": "Comment deleted",
@@ -3088,9 +2577,6 @@
       },
       "publish": {
         "title": "Publish",
-        "selectPlatforms": "Select Platforms",
-        "selectAll": "Select All",
-        "deselectAll": "Deselect All",
         "noConnectedAccounts": "No accounts found.",
         "connectAccounts": "Connect your accounts first.",
         "noCompatibleAccounts": "No accounts compatible with this content type.",
@@ -3100,21 +2586,11 @@
         "loading": "Loading...",
         "publishing": "Publishing...",
         "platforms": "Platforms",
-        "failed": "Failed",
-        "scheduled": "scheduled",
-        "recurringPosts": "Recurring Posts",
         "removed": "Removed",
-        "youtube": "YouTube",
+        "failed": "Failed",
+        "recurringPosts": "Recurring Posts",
         "youtubeThumbnails": "YouTube Thumbnails",
-        "author": "@Alejandro Olarte",
         "unpublishing": "Unpublishing...",
-        "publishingSocial": "Publishing to social ({{count}})...",
-        "allPublished": "All publications completed",
-        "completed": "completed",
-        "inProgress": "in progress",
-        "sending": "Sending",
-        "duplicate": "Duplicate attempt",
-        "original_attempt": "Original attempt:",
         "oauth1_required": "Requires reconnection",
         "oauth1_video_message": "This account needs OAuth 1.0a credentials to upload videos",
         "reconnect_account": "Reconnect account",
@@ -3127,28 +2603,19 @@
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
         },
-        "modal": {
-          "title": "Unpublish",
-          "message": "Are you sure you want to unpublish? This will remove the publication from this platform.",
-          "confirmText": "Unpublish",
-          "cancelText": "Cancel",
-          "unpublishing": "Unpublishing..."
+        "unpublish": {
+          "title": "Unpublish from {{platform}}?",
+          "message": "Are you sure you want to unpublish this content from {{platform}}? This action cannot be undone.",
+          "confirm": "Yes, unpublish",
+          "cancel": "Cancel"
         },
         "button": {
           "publish": "Publish",
           "requestApproval": "Request Approval",
           "pendingReview": "Pending Approval",
-          "approve": "Approve",
-          "reject": "Reject",
           "cancel": "Cancel",
-          "cancelPublication": "Cancel Publication",
+          "cancelAll": "Cancel All ({{count}})",
           "change": "Change"
-        },
-        "cancelConfirm": {
-          "title": "Cancel publication?",
-          "message": "Are you sure you want to cancel this publication? Platforms that have already been published will not be affected.",
-          "confirm": "Yes, cancel",
-          "cancel": "No"
         },
         "pendingReviewBanner": {
           "title": "Publication Under Review",
@@ -3166,36 +2633,31 @@
         },
         "incompatibleAccountsBanner": {
           "title": "Incompatible Accounts",
-          "message": "The following accounts are not compatible with the content type \"{contentType}\":",
           "hint": "These accounts will not appear in the publishing options."
         },
-        "publishedInOtherAccountBanner": {
-          "title": "Published in Different Account",
-          "message": "This publication was published on a {{platform}} account that is no longer connected.",
-          "hint": "You can publish to the current account by selecting it below. The previous publication will remain on the disconnected account."
+        "loadingAccounts": "Loading accounts...",
+        "publishingBanner": {
+          "title": "Publishing in progress…",
+          "message": "Your content is being published to the selected platforms."
+        },
+        "retryingBanner": {
+          "title": "Retrying publication…"
         }
       },
       "preview": {
-        "title": "Preview",
-        "disclaimer": "Preview is an approximation. Actual appearance may vary by platform.",
-        "simulated": "Simulated",
-        "real": "Real",
-        "realInfo": "Real Preview",
-        "view": "View preview",
-        "notAvailable": "Preview not available for this platform"
+        "disclaimer": "Preview is an approximation. Actual appearance may vary by platform."
       },
       "validation": {
-        "mediaRequired": "Media files are required",
-        "descRequired": "Description is required",
-        "nameRequired": "Name is required",
         "descMin": "Description must be at least 10 characters long",
         "descMax": "Description cannot exceed {{max}} characters",
         "objMin": "Objective must be at least 5 characters long",
         "objMax": "Objective cannot exceed 200 characters",
         "objRequired": "Objective is required",
-        "goalRequired": "Goal is required",
+        "descRequired": "Description is required",
         "titleRequired": "Title is required",
         "titleLength": "Title must be at least 70 characters long",
+        "nameRequired": "Name is required",
+        "goalRequired": "Goal is required",
         "statusRequired": "Status is required",
         "budgetRequired": "Budget is required",
         "startDateRequired": "Start Date is required",
@@ -3203,10 +2665,11 @@
         "publishDateRequired": "Publish Date is required",
         "publishedOnRequired": "Published On is required",
         "associatedPublicationsRequired": "Associated Publications is required",
+        "descriptionRequired": "Description is required",
         "hashtagsRequired": "Hashtags are required",
         "questionRequired": "Question is required",
-        "descriptionRequired": "Description is required",
         "schedulePublicationRequired": "Schedule Publication is required",
+        "nameLength": "Name must be at least 10 characters",
         "descriptionLength": "Description must be at least 10 characters long",
         "hashtagsLength": "Hashtags must be at least 10 characters long",
         "schedulePublicationLength": "Schedule Publication must be at least 10 characters long",
@@ -3217,6 +2680,7 @@
         "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Select at least one social media account",
+        "allSchedulesRequired": "All networks must have a date or enable the global date",
         "singleVideo": "You can only upload one video per publication.",
         "scheduledMinDifference": "The date must be at least 1 minute after the current time",
         "videoTooLong": "Video too long for {{platform}} (max {{max}})",
@@ -3236,42 +2700,62 @@
         "invalid_media_type": "Invalid media type for the selected content type",
         "media_required": "Media files are required for this content type",
         "media_min_count": "At least :min media files are required",
-        "media_max_count": "Maximum :max media files allowed"
-      },
-      "processing": {
-        "cancel_message": "Are you sure you want to cancel this processing job? The work in progress will be stopped."
+        "media_max_count": "Maximum :max media files allowed",
+        "mediaRequired": "Media files are required"
       },
       "cancel_confirmation": {
         "title": "Cancel Publication",
         "message": "Are you sure you want to cancel this publication? Social media broadcasting will stop.",
         "confirm": "Yes, cancel",
         "cancel": "No, continue"
+      },
+      "cancel_platform": {
+        "title": "Cancel {{platform}}?",
+        "message": "Are you sure you want to cancel publishing on {{platform}}? All retries for this platform will stop.",
+        "confirm": "Yes, cancel",
+        "cancel": "No"
+      },
+      "cancelAllConfirm": {
+        "title": "Cancel ALL platforms?",
+        "message": "Are you sure you want to cancel publishing on ALL platforms ({{count}})? All retries will stop. Platforms that have already been published will not be affected.",
+        "confirm": "Yes, cancel all",
+        "cancel": "No"
+      },
+      "button": {
+        "saveBackground": "Save & Background Upload"
+      },
+      "live": {
+        "title": "Live Stream Settings",
+        "startTime": "Start Time",
+        "duration": "Expected Duration",
+        "minutes": "minutes",
+        "note": "The scheduled time is when your live stream will start."
       }
     },
     "status": {
       "draft": "Draft",
+      "pending_review": "Pending Review",
+      "failed": "Failed",
       "publishing": "Publishing",
       "published": "Published",
+      "published_with_errors": "Published with errors",
+      "partially_published": "Partially published",
       "scheduled": "Scheduled",
-      "failed": "Failed",
-      "pending_review": "Pending Review",
       "approved": "Approved",
-      "rejected": "Rejected",
       "instant": "Instant",
+      "rejected": "Rejected",
       "deleted": "Deleted",
       "progress": "Publication Progress",
       "current": "Current",
       "completed": "Completed",
+      "processing": "Processing",
       "waiting": "waiting",
       "retrying": "Retrying"
     },
     "scheduled_for": "Scheduled for",
-    "scheduledPosts": "Scheduled post",
     "button": {
       "add": "Add Publication",
       "edit": "Edit Publication",
-      "delete": "Delete Publication",
-      "close": "Close",
       "approve": "Approve",
       "reject": "Reject",
       "publish": "Publish",
@@ -3281,75 +2765,49 @@
       "request": "Request",
       "sendForReview": "Send for Review",
       "sending": "Sending...",
-      "inReview": "In Review"
+      "inReview": "In Review",
+      "submitForReview": "Submit for Review",
+      "submitting": "Submitting..."
     },
     "table": {
       "name": "Name",
       "description": "Description",
-      "publications": "Publications",
       "media": "Media",
       "campaign": "Campaign",
       "status": "Status",
       "actions": "Actions",
       "noCampaign": "No Campaign",
-      "noPlatforms": "No platforms configured",
       "noMedia": "No media",
-      "loading": "Loading...",
       "linkedAccount": "Linked Accounts",
       "untitled": "Untitled",
       "noDescription": "No description",
-      "platforms": "Platforms",
-      "linkedAccounts": "Linked Accounts",
       "createdBy": "Created by",
       "manualEvent": "Manual Event",
       "socialNetworkEvent": "Social Network Event",
       "emptyState": {
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",
-        "searchEmpty": "No publications found matching the search.",
-        "button": "Add Publication"
+        "searchEmpty": "No publications found matching the search."
       },
       "lockedBy": "Locked by:",
       "publishingBy": "Publishing by",
       "rejectedBy": "Rejected by",
       "pendingAdminReview": "Pending review",
-      "editingBy": "Editing:"
+      "editingBy": "Editing:",
+      "publishedOn": "Published on"
     },
     "messages": {
-      "addSuccess": "Publication added successfully!",
       "createSuccess": "Publication created successfully!",
-      "duplicateSuccess": "Publication duplicated successfully!",
-      "addError": "Error adding publication",
       "updateSuccess": "Publication updated successfully!",
-      "updateError": "Error updating publication",
       "mediaAttached": "Media file attached successfully to '{{title}}' (Background Upload)",
       "deleteSuccess": "Publication deleted successfully!",
       "deleteError": "Error deleting publication",
       "cancelSuccess": "Publication cancelled successfully",
-      "fetchError": "Error fetching campaigns",
+      "platformCancelSuccess": "Platform cancelled successfully",
+      "platformCancelError": "Failed to cancel the platform",
       "error": "An unexpected error occurred",
-      "confirmDelete": {
-        "title": "Are you sure?",
-        "text": "You won't be able to revert this!",
-        "confirmButton": "Yes, delete it!",
-        "cancelButton": "Cancel"
-      }
-    },
-    "actions": {
-      "viewCampaign": "View publication",
-      "edit": "Edit",
-      "publishNow": "Publish Now",
-      "viewDetails": "View Details",
-      "delete": "Delete",
-      "active": "Active",
-      "remove": "Remove",
-      "change": "Change"
-    },
-    "headers": {
-      "status": "Status",
-      "duration": "Duration",
-      "mediaFiles": "Media Files",
-      "actions": "Actions"
+      "uploadFailed": "Upload failed",
+      "uploadSuccess": "Uploaded successfully"
     },
     "filters": {
       "title": "Publications Filters",
@@ -3357,7 +2815,10 @@
       "all_types": "All types",
       "content_type": "Content type",
       "published": "Published",
-      "draft": "Draft"
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "pending_review": "Pending review",
+      "failed": "Failed"
     },
     "content_types": {
       "post": "Post",
@@ -3368,18 +2829,65 @@
     },
     "gallery": {
       "sendingToSocial": "Sending to social platforms...",
-      "processing": "Processing in background..."
+      "processing": "Processing in background...",
+      "retrying": "Retrying..."
     },
     "toast": {
       "publishedSuccess": "Publication published successfully!",
       "publishedError": "Failed to publish publication."
+    },
+    "platformValidation": {
+      "title": "Platform Compatibility",
+      "publishedWarning": "Active Publication"
+    },
+    "publish": {
+      "button": {
+        "cancel": "Cancel"
+      }
+    },
+    "recurring": "Recurring",
+    "viewPost": "View post",
+    "validation": {
+      "carousel_requires_multiple": "A carousel requires multiple media files",
+      "content_type_auto_changed": "Content type automatically changed to {{to}}",
+      "content_type_not_supported": "The :type content type is not supported by: :platforms",
+      "durationErrors": "Some platforms have duration errors",
+      "max_files_exceeded": "Maximum {{max}} file(s) allowed",
+      "max_images_exceeded": "Maximum {{max}} image(s) allowed",
+      "max_videos_exceeded": "Maximum {{max}} video(s) allowed",
+      "media_max_count": "Maximum :max media file(s) allowed",
+      "media_min_count": "At least :min media file(s) required",
+      "media_required": "At least one media file is required",
+      "no_images_allowed": "This content type does not allow images",
+      "no_videos_allowed": "This content type does not allow videos",
+      "reel_requires_one_video": "A reel requires exactly one video",
+      "reel_requires_video_only": "A reel only allows video",
+      "story_requires_one": "A story requires exactly one media file",
+      "videoTooLong": "The video exceeds the maximum duration for {{platform}} ({{max}})"
     }
+  },
+  "publish": {
+    "accountName": "Account",
+    "allPublished": "All publications completed",
+    "canPublishToNewAccount": "You can publish to this account",
+    "canUnpublish": "You can unpublish this content",
+    "cannotUnpublishDifferentAccount": "You cannot unpublish content from a different account",
+    "completed": "completed",
+    "inProgress": "in progress",
+    "multipleAccountsAllowed": "Multiple accounts allowed",
+    "platforms": "platforms",
+    "published": "Published",
+    "publishedAt": "Published on",
+    "publishedOnCurrentAccount": "Published on current account",
+    "publishedOnDifferentAccount": "Published on another account",
+    "publishingSocial": "Publishing to social networks...",
+    "sending": "Sending",
+    "viewPost": "View post"
   },
   "reels": {
     "button": {
       "generate": "Generate Reels with AI",
-      "generating": "Generating...",
-      "viewReel": "View reel"
+      "generating": "Generating..."
     },
     "messages": {
       "generating": "🎬 Generating reels. We'll notify you when they're ready.",
@@ -3389,36 +2897,24 @@
       "deleted": "Reels deleted successfully",
       "deleteError": "Error deleting reels",
       "deletedWithVideo": "Video and associated reels deleted",
-      "alreadyGenerated": "Reels already exist. Delete them first to generate new ones.",
       "alreadyProcessing": "Reels are already being generated. Wait for them to finish.",
       "confirmRegenerate": "Reels already exist. Do you want to delete them and generate new ones?",
       "confirmDelete": "Are you sure you want to delete this reel?",
       "reelDeleted": "Reel deleted successfully"
     },
     "actions": {
-      "delete": "Delete reel",
-      "download": "Download reel",
-      "openInNewTab": "Open in new tab"
+      "delete": "Delete reel"
     },
     "list": {
-      "title": "Generated reels",
-      "reelsGenerated": "{{count}} reel generated",
-      "reelsGenerated_plural": "{{count}} reels generated",
-      "noReels": "No reels generated yet"
+      "reelsGenerated": "{{count}} reel generated"
     },
     "section": {
       "title": "AI Generated Reels",
-      "description": "{{count}} reels optimized for different platforms",
       "empty": "No reels generated",
       "emptyDescription": "Automatically generate optimized reels from your video for Instagram, TikTok and YouTube Shorts",
       "deleteAll": "Delete all",
       "generated": "{{count}} Reels Generated",
       "generatedDescription": "Optimized for social media"
-    },
-    "status": {
-      "completed": "Completed",
-      "processing": "Processing",
-      "failed": "Failed"
     }
   },
   "roles": {
@@ -3428,23 +2924,10 @@
     "permissions": "Permissions",
     "protected": "Protected",
     "role_color": "Role color",
-    "color_hint": "Used across the entire UI to identify this role",
     "select_all": "All",
     "deselect_all": "None",
     "search_permissions": "Search permissions…",
     "no_permissions_found": "No permissions match your search",
-    "groups": {
-      "content": "Content",
-      "publishing": "Publishing & Approval",
-      "team": "Team Management",
-      "workspace": "Workspace",
-      "analytics": "Analytics",
-      "campaigns": "Campaigns",
-      "other": "Other"
-    },
-    "editor_publish_info": "When publishing, content will be sent for review if you're not an Admin. In workspaces with multi-level workflow, it must pass through all configured approval stages.",
-    "admin_publish_info": "Can publish directly without review and approve content from other users.",
-    "owner_info": "Full workspace control. This role cannot be edited or deleted.",
     "descriptions": {
       "owner": "Full control over the workspace. Can manage all settings, members and billing.",
       "admin": "Trusted administrator. Can manage content, members and approval workflows.",
@@ -3483,41 +2966,7 @@
     "users_list": "User List",
     "users_list_subtitle": "Assign roles to team members",
     "insufficient_permissions_title": "Insufficient Permissions",
-    "insufficient_permissions_message": "Only administrators and owners can manage roles",
-    "permissions_list": {
-      "publish": {
-        "name": "Publish",
-        "description": "Allow publishing content to social media"
-      },
-      "approve": {
-        "name": "Approve",
-        "description": "Allow approving content for publication"
-      },
-      "view-analytics": {
-        "name": "View Analytics",
-        "description": "Allow viewing workspace analytics"
-      },
-      "manage-accounts": {
-        "name": "Manage Accounts",
-        "description": "Allow adding/removing social accounts"
-      },
-      "manage-team": {
-        "name": "Manage Team",
-        "description": "Allow inviting/removing members"
-      },
-      "manage-content": {
-        "name": "Manage Content",
-        "description": "Allow creating and editing publications"
-      },
-      "manage-campaigns": {
-        "name": "Manage Campaigns",
-        "description": "Allow creating and editing campaigns"
-      },
-      "view-content": {
-        "name": "View Content",
-        "description": "Allow viewing workspace content (read-only)"
-      }
-    }
+    "insufficient_permissions_message": "Only administrators and owners can manage roles"
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",
@@ -3525,16 +2974,46 @@
       "appearance": "Appearance",
       "navigation": "Navigation",
       "help": "Help"
-    },
-    "theme": {
-      "toggle": "Toggle theme (Light/Dark)"
-    },
-    "search": {
-      "open": "Open quick search"
-    },
-    "help": {
-      "show": "Show keyboard shortcuts"
     }
+  },
+  "socialAccounts": {
+    "title": "Social Accounts",
+    "subtitle": "Manage your connected social media accounts",
+    "connectAccount": "Connect Social Account",
+    "connectedAccounts": "Connected Accounts",
+    "availablePlatforms": "Available Platforms",
+    "connect": "Connect",
+    "connected": "Connected",
+    "connectedAt": "Connected",
+    "connectedBy": "Connected by",
+    "connectError": "Failed to connect the account",
+    "alreadyConnected": "Already connected",
+    "disconnect": "Disconnect",
+    "disconnected": "Account disconnected",
+    "disconnectError": "Failed to disconnect",
+    "confirmDisconnect": "Are you sure you want to disconnect this account?",
+    "active": "Active",
+    "expired": "Expired",
+    "tokenExpired": "Token expired",
+    "needsReconnection": "Reconnect",
+    "reconnect": "Reconnect",
+    "reconnectButton": "Reconnect account",
+    "reconnecting": "Verifying…",
+    "demoMode": {
+      "title": "Demo Data"
+    }
+  },
+  "status": {
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "publishing": "Publishing",
+    "processing": "Processing",
+    "pending_review": "Pending Review",
+    "approved": "Approved",
+    "published": "Published",
+    "rejected": "Rejected",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
   },
   "subscription": {
     "billing": {
@@ -3550,30 +3029,23 @@
       "amount": "Amount",
       "dueDate": "Due Date",
       "invoiceHistory": "Invoice History",
-      "invoiceHistoryDescription": "All your previous invoices",
       "noInvoices": "No invoices available",
       "download": "Download",
-      "workspaceNote": "This plan applies to all members of this workspace",
       "noSubscription": "You don't have an active subscription",
       "choosePlan": "Choose a Plan",
-      "manageBilling": "Manage Billing",
-      "freePlanNote": "You are on the free plan. To access the billing portal, you need to subscribe to a paid plan.",
       "viewPlans": "View available plans",
       "cancelSubscription": "Cancel Subscription",
-      "cancelConfirm": "Are you sure you want to cancel your subscription? You will have access until the end of the current billing period.",
       "cancelSuccess": "Subscription cancelled successfully. You will have access until the end of the billing period.",
       "cancelError": "Could not cancel subscription. Try again later.",
       "portalError": "Could not access billing portal. Try again later.",
-      "activeSubscriptionNote": "You have an active subscription. You can change to any paid plan from the Pricing page. To change to Free, first cancel your subscription.",
       "exportToExcel": "Export to Excel",
       "loadingPortal": "Opening billing portal...",
       "cancelWarningTitle": "Important",
       "cancelDetails": "When you cancel your subscription:",
-      "cancelPoint1": "You will keep access until the end of the paid period",
       "cancelPoint2": "No more automatic charges will be made",
-      "cancelPoint3": "You can reactivate your subscription at any time",
       "cancelling": "Cancelling...",
-      "confirmCancel": "Yes, cancel subscription"
+      "confirmCancel": "Yes, cancel subscription",
+      "noDownload": "Not available"
     },
     "usage": {
       "title": "Usage & Billing",
@@ -3586,6 +3058,7 @@
       "teamMembers": "Team Members",
       "team_members": "Team Members",
       "social_accounts": "Social Accounts",
+      "external_integrations": "External Integrations",
       "unlimited": "Unlimited",
       "remaining": "remaining",
       "limit": "Limit",
@@ -3618,7 +3091,6 @@
       "pending": "Pending"
     },
     "actions": {
-      "title": "Quick Actions",
       "upgrade": "Upgrade Plan",
       "manageBilling": "Manage Billing",
       "viewPlans": "View All Plans"
@@ -3627,18 +3099,11 @@
       "planUsage": "Plan Usage",
       "monitorMonthlyUsage": "Monitor your monthly consumption",
       "powerUpWorkspace": "Power Up Your Workspace",
-      "monitorUsage": "Monitor Your Usage",
-      "highUsageMessage": "You're using a lot of your plan. Expand your capacity!",
-      "trackUsageMessage": "Keep control of your resources and expand when you need it",
       "publications": "Publications",
       "aiCredits": "AI Credits",
       "socialAccounts": "Social Accounts",
       "teamMembers": "Team Members",
-      "critical": "Critical!",
-      "high": "Very High",
-      "warning": "High",
       "remaining": "remaining",
-      "free": "free",
       "noLimits": "No limits",
       "buyMore": "Buy More",
       "upgradePlan": "Upgrade Plan",
@@ -3649,35 +3114,16 @@
       "noCommitment": "No commitments • Cancel anytime",
       "storage": "Storage",
       "title": "Additional Packages",
-      "subtitle": "Extend your capacity with AI credits, storage, publications, and team members",
       "buyCredits": "Buy Credits",
       "totalSpent": "Total Spent",
-      "activeAddons": "active add-on",
       "activeAddonsPlural": "active add-ons",
-      "purchaseHistory": "Purchase History",
-      "purchaseHistoryDescription": "Your add-on purchases and their current status",
       "noPurchases": "You haven't made any add-on purchases yet",
-      "date": "Date",
-      "package": "Package",
-      "quantity": "Quantity",
       "total": "Total",
       "used": "Used",
-      "status": "Status",
-      "actions": "Actions",
       "active": "Active",
-      "inactive": "Inactive",
-      "refund": "Refund",
-      "refundConfirm": "Are you sure you want to request a refund?",
-      "refundSuccess": "Refund processed",
-      "refundSuccessDescription": "The refund has been processed successfully",
-      "refundError": "Error processing refund",
-      "purchaseError": "Error starting purchase process",
       "loadingError": "Error loading add-ons",
       "howItWorks": "How do add-ons work?",
       "howItWorksPoint1": "Add-ons are used automatically when you exceed your plan limit",
-      "howItWorksPoint2": "Your plan limit is used first, then add-ons",
-      "howItWorksPoint3": "Credits don't expire and accumulate if you buy multiple packages",
-      "howItWorksPoint4": "You can request a refund within 7 days if you haven't used the add-on",
       "newTrackingSystem": {
         "title": "New Plan-Based Tracking System",
         "independentUsage": "Independent usage per plan",
@@ -3708,7 +3154,6 @@
       "posts": "posts",
       "members": "members",
       "buyNow": "Buy Now",
-      "noPackages": "No packages available in this category",
       "additionalPackages": "Additional Packages",
       "basePlan": "Base Plan",
       "usedFromPlan": "used from plan",
@@ -3717,9 +3162,7 @@
       "usedFromAddons": "used from addons",
       "usingAddons": "Using addons:",
       "exceededPlanBy": "You have exceeded your base plan by",
-      "addonsConsumingAutomatically": "Addons are being consumed automatically.",
       "addonsAvailable": "Addons available:",
-      "addonsWillActivateWhenExceeding": "Your addons will activate automatically when you exceed your base plan limit",
       "totalAvailableUsage": "Total Available Usage",
       "planLabel": "Plan:",
       "addonsLabel": "Addons:",
@@ -3790,11 +3233,17 @@
           "name": "25 Additional Members",
           "description": "Add 25 more members to your team"
         }
-      }
+      },
+      "currencyBanner": {
+        "title": "Prices in Your Local Currency",
+        "automatic": "Automatic conversion",
+        "noHiddenFees": "No hidden fees"
+      },
+      "currentUsage": "Current Usage",
+      "showingUsage": "Showing current usage",
+      "multiplePurchases": "{{count}} purchases",
+      "unlimited": "Unlimited"
     },
-    "socialAccounts": "Social Accounts",
-    "limitReached": "You have reached your plan limit",
-    "downloadAll": "Download",
     "success": {
       "title": "Payment Successful",
       "heading": "Payment Successful!",
@@ -3832,6 +3281,9 @@
       "backToDashboard": "Go to Dashboard",
       "needHelp": "Need help with the payment process?",
       "contactSupport": "Contact our support team"
+    },
+    "enterprise": {
+      "title": "Enterprise Features"
     }
   },
   "twoFactor": {
@@ -3845,8 +3297,7 @@
       "step1": {
         "title": "Step 1: Scan QR Code",
         "description": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
-        "manualEntry": "Can't scan? Enter this code manually:",
-        "troubleshooting": "If you're having trouble, make sure your device's time is synchronized correctly."
+        "manualEntry": "Can't scan? Enter this code manually:"
       },
       "step2": {
         "title": "Step 2: Save Backup Codes",
@@ -3867,24 +3318,9 @@
       "copy": "Copy",
       "copied": "Copied!"
     },
-    "verify": {
-      "title": "Two-Factor Verification",
-      "description": "Enter the 6-digit code from your authenticator app",
-      "verificationCode": "Verification Code",
-      "placeholder": "000000",
-      "verifyButton": "Verify",
-      "verifying": "Verifying...",
-      "useBackupCode": "Use backup code",
-      "hint": "This verification will be valid for 30 days on this device."
-    },
     "errors": {
-      "invalidCode": "Invalid verification code. Check your authenticator app and try again.",
       "codeMustBe6Digits": "Code must be 6 digits",
-      "codeOnlyNumbers": "Code must contain only numbers",
-      "sessionExpired": "Session expired. Refresh the page and try again.",
-      "alreadyConfigured": "2FA is already configured for your account",
-      "notConfigured": "2FA is not configured for your account",
-      "verificationExpired": "Your 2FA verification has expired. Verify again."
+      "codeOnlyNumbers": "Code must contain only numbers"
     }
   },
   "validation": {
@@ -3905,6 +3341,12 @@
     "phoneNotValid": "The number is not valid for the selected country.",
     "phoneInvalid": "Invalid phone number.",
     "phoneValid": "Valid number.",
+    "after": "The {{attribute}} must be a date after {{date}}.",
+    "after_or_equal": "The {{attribute}} must be a date after or equal to {{date}}.",
+    "before": "The {{attribute}} must be a date before {{date}}.",
+    "before_or_equal": "The {{attribute}} must be a date before or equal to {{date}}.",
+    "date": "The {{attribute}} must be a valid date.",
+    "validationError": "Please fix the errors in the form",
     "auth": {
       "failed": "These credentials do not match our records.",
       "password": "The provided password is incorrect.",
@@ -3914,35 +3356,91 @@
     "api_token_name_max": "Token name must not exceed 255 characters.",
     "api_token_name_chars": "Token name may only contain letters, numbers, spaces, hyphens, underscores and dots."
   },
+  "verification": {
+    "title": "Verify your email",
+    "security": "For your security, verify your email address.",
+    "banner": {
+      "title": "Verify your email address",
+      "message": "We sent a verification link to your email. Please verify to unlock all features.",
+      "resendButton": "Resend email",
+      "sending": "Sending...",
+      "successMessage": "Verification email sent"
+    },
+    "didNotReceive": "Didn't receive the email?",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "logout": "Log out"
+  },
+  "videoValidation": {
+    "platformNotSupported": "Platform {{platform}} not supported",
+    "durationTooLong": "{{type}}: Duration too long. Maximum {{max}}, current {{current}}",
+    "durationTooShort": "{{type}}: Duration too short. Minimum {{min}}, current {{current}}",
+    "invalidAspectRatio": "{{type}}: Invalid aspect ratio. Expected {{expected}}, current {{current}}",
+    "lowResolution": "{{type}}: Low resolution. Minimum recommended {{min}}, current {{current}}",
+    "valid": "Valid video for publication",
+    "invalid": "Video does not meet requirements",
+    "warnings": "Quality warnings",
+    "readyToPublish": "Ready to publish on {{platform}} as {{type}}",
+    "suggestion": "Configuration suggestion",
+    "suggestedType": "This video is better suited for type: {{type}}",
+    "changeTo": "Change to {{type}}",
+    "requirements": "Platform requirements",
+    "maxDuration": "Maximum duration",
+    "aspectRatio": "Aspect ratio",
+    "minResolution": "Minimum resolution",
+    "anyAspectRatio": "Any aspect ratio",
+    "videoInfo": "Video information",
+    "duration": "Duration",
+    "resolution": "Resolution",
+    "orientation": "Orientation",
+    "vertical": "Vertical",
+    "horizontal": "Horizontal"
+  },
+  "welcome": {
+    "title": "Manage your content",
+    "titleHighlight": "with artificial intelligence",
+    "subtitle": "Organize, optimize, and schedule your multimedia content with AI-powered tools to maximize your social media presence.",
+    "startFree": "Start Free",
+    "beta": "Beta",
+    "featuresTitle": "Features",
+    "featuresSubtitle": "Manage your content with AI-powered tools",
+    "login": "Login",
+    "getStarted": "Get Started",
+    "readyToStart": "Ready to start",
+    "joinNow": "Join Now",
+    "createAccount": "Create Account",
+    "demoAccess": "30-day demo available",
+    "viewPricing": "View Plans",
+    "viewAllPlans": "View all plans and features",
+    "pricingTitle": "Plans for every need",
+    "pricingSubtitle": "From free plans to enterprise solutions",
+    "continue": "Continue to Dashboard",
+    "goToDashboard": "Go to Dashboard",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "contact": "Contact",
+    "connectsWith": "Connects seamlessly with"
+  },
   "workspace": {
     "my_workspaces": "My Workspaces",
     "create_new": "Create New Workspace",
     "manage_workspaces": "Manage Workspaces",
     "create_new_workspace": "Create a New Workspace",
-    "workspaces_one": "Workspace",
-    "workspaces_other": "Workspaces",
     "workspaces": "Workspaces",
     "select_workspace": "Select Workspace",
     "settings": "Workspace Settings",
     "public_workspace": "Public Workspace",
     "private_workspace": "Private Workspace",
     "active": "Active",
-    "switch": "Switch",
     "switched_successfully": "Switched successfully",
     "active_context": "Active Workspace",
-    "role": "Role",
-    "settings_description": "Manage your workspace members and configurations.",
     "no_description": "No description provided.",
     "member": "Member",
     "workspace_members": "Workspace Members",
-    "members": "Members",
     "members_one": "member",
     "members_other": "members",
-    "team_members": "Team Members",
     "invite_member": "Invite Member",
     "invite": "Invite",
-    "role_permissions": "Role & Permissions",
-    "permissions_preview": "Full Access",
     "name": "Workspace Name",
     "name_placeholder": "e.g. My Agency",
     "description": "Description",
@@ -3957,21 +3455,10 @@
     "delete_confirmation_message": "Are you sure you want to delete this workspace? All data including content, campaigns, and team members will be permanently removed. This action cannot be undone.",
     "confirm_delete": "Yes, delete workspace",
     "general_settings": "General Settings",
-    "manage_workspace": "Manage {{name}} workspace",
     "owners": "Owners",
-    "admins": "Admins",
-    "editors": "Editors",
-    "creator": "Creator",
-    "total_in_workspace": "Total in workspace",
-    "viewers": "Viewers",
     "loading": "Loading members...",
-    "you": "You",
     "remove_member": "Remove Member",
     "remove_confirm": "Are you sure you want to remove this member from the workspace?",
-    "remove_success": "Member removed successfully",
-    "remove_error": "Error removing member",
-    "owner_required": "At least one owner is required",
-    "owner_note": "Note: Integration settings can only be fully managed by workspace owners.",
     "invite_modal": {
       "title": "Invite Member",
       "subtitle": "Add a member to {{name}}",
@@ -3994,14 +3481,6 @@
     },
     "integrations": {
       "title": "Integrations",
-      "webhooks_title": "Webhook Integrations",
-      "webhooks_description": "Configure Slack or Discord webhooks to receive real-time notifications about publishing failures, approval requests, and more.",
-      "slack_webhook": "Slack Webhook URL",
-      "discord_webhook": "Discord Webhook URL",
-      "test_slack": "Test Slack",
-      "test_discord": "Test Discord",
-      "save_integrations": "Save Integration Settings",
-      "owner_note": "Note: Integration settings can only be fully managed by workspace owners.",
       "messages": {
         "success": "Integrations updated successfully",
         "test_success": "Connection tested successfully",
@@ -4014,7 +3493,6 @@
       "discord_description": "Send updates to your Discord server",
       "webhook_url": "Webhook URL",
       "slack_placeholder": "https://hooks.slack.com/services/...",
-      "discord_placeholder": "https://discord.com/api/webhooks/...",
       "test_connection": "Test Connection",
       "webhook_security": "Webhook Security",
       "webhook_security_description": "Configure security settings for incoming webhooks",
@@ -4026,7 +3504,6 @@
       "owner_exclusive_description": "Only workspace owners can manage integrations."
     },
     "activity": {
-      "title": "Notification Activity",
       "time": "Time",
       "channel": "Channel",
       "event": "Event",
@@ -4046,15 +3523,12 @@
       "usage": "Usage",
       "roles": "Roles",
       "integrations": "Integrations",
-      "notifications": "Notifications",
       "white_label": "White-label",
-      "api": "API Access",
-      "support": "Enterprise Support"
+      "api": "API Access"
     },
     "roles_management": {
       "title": "Roles & Permissions",
       "description": "Summary of available roles and their associated permissions in Intellipost.",
-      "no_permissions": "No permissions assigned.",
       "create_role": "Create New Role",
       "create_role_subtitle": "Define a new role and its permissions for the workspace.",
       "role_name": "Role Name",
@@ -4062,50 +3536,15 @@
       "role_description": "Description",
       "role_description_placeholder": "Describe the responsibilities of this role...",
       "key_permissions_label": "Key Permissions",
-      "can_approve_content": "Can approve content in workflows",
       "role_created_success": "Role created successfully",
-      "role_created_error": "Error creating role",
-      "name_required": "Name is required",
-      "loading_permissions": "Loading permissions..."
-    },
-    "permissions": {
-      "publish": {
-        "name": "Publish",
-        "description": "Allow publishing content to social media"
-      },
-      "approve": {
-        "name": "Approve",
-        "description": "Allow approving content for publication"
-      },
-      "view-analytics": {
-        "name": "View Analytics",
-        "description": "Allow viewing workspace analytics"
-      },
-      "manage-accounts": {
-        "name": "Manage Accounts",
-        "description": "Allow adding/removing social accounts"
-      },
-      "manage-team": {
-        "name": "Manage Team",
-        "description": "Allow inviting/removing members"
-      },
-      "manage-content": {
-        "name": "Manage Content",
-        "description": "Allow creating and editing publications"
-      },
-      "manage-campaigns": {
-        "name": "Manage Campaigns",
-        "description": "Allow creating and editing campaigns"
-      },
-      "view-content": {
-        "name": "View Content",
-        "description": "Allow viewing workspace content (read-only)"
-      }
+      "role_created_error": "Error creating role"
     },
     "messages": {
       "update_success": "Workspace created successfully",
       "delete_success": "Workspace deleted successfully",
-      "delete_error": "Failed to delete workspace"
+      "delete_error": "Failed to delete workspace",
+      "member_removed": "Member removed successfully",
+      "member_remove_error": "Failed to remove the member"
     },
     "subtitle": "Manage and switch between your workspaces",
     "create_button_subtitle": "Get Started",
@@ -4124,22 +3563,14 @@
     },
     "tooltips": {
       "public": "Public Workspace",
-      "private": "Private Workspace",
-      "manage": "Manage Workspace",
-      "view": "View Details"
+      "private": "Private Workspace"
     },
     "modal": {
       "subtitle": "Set up a new space for your team to collaborate",
-      "name_label": "Workspace Name",
-      "description_hint": "A good description helps members understand the purpose of the space",
       "footer_note": "You can customize settings and invite members after creating the workspace"
     },
-    "settings_title": "Workspace Settings",
-    "manage_general_settings": "Configure your workspace's basic information and visibility",
     "configure_basic_info": "Configure your workspace's basic information and visibility",
     "visibility": "Workspace Visibility",
-    "public": "Public Workspace",
-    "private": "Private Workspace",
     "public_description": "Visible to anyone with the link",
     "private_description": "Only invited members can access",
     "public_invites": "Public Invites",
@@ -4147,32 +3578,20 @@
     "workspace_id": "Workspace ID",
     "id_copied": "Workspace ID copied!",
     "id_description": "Use this ID for API integrations and support requests",
-    "save_changes": "Save Changes",
-    "saving": "Saving Changes...",
     "active_integrations": "Active Integrations",
     "total_notifications": "Total Notifications",
-    "webhook_security": "Webhook Security",
-    "webhook_security_description": "Configure security settings for incoming webhooks",
-    "webhook_secret": "Webhook Secret",
     "secret_generated": "New secret generated!",
-    "secret_description": "This secret will be used to verify incoming webhook requests",
     "activity_log": "Notification Activity Log",
     "recent_webhook_activity": "Recent webhook delivery attempts",
-    "showing_activities": "Showing {{count}} recent activities",
     "failed_to_fetch_activity": "Failed to load activity log",
     "no_activity": "No activity yet",
     "activity_will_appear": "Notifications will appear here once sent",
     "your_role": "Your Role",
-    "key_permissions": "Key Permissions",
-    "more": "more",
     "permissions_required": "Permissions Required",
     "owner_admin_required": "You need owner or admin permissions to modify role settings",
-    "workspace_updated_by": "Workspace updated by {{name}}",
     "stats": {
       "total_members": "Total Members",
-      "projects": "Projects",
-      "active_integrations": "Active Integrations",
-      "workspace_age": "Workspace Age"
+      "active_integrations": "Active Integrations"
     },
     "quick_actions": {
       "title": "Quick Actions",
@@ -4185,12 +3604,6 @@
       "integrations": "Integrations",
       "integrations_description": "Connect apps & services"
     },
-    "show_advanced": "Show Advanced",
-    "hide_advanced": "Hide Advanced",
-    "generate": "Generate",
-    "refresh": "Refresh",
-    "recent_activity": "Recent Activity",
-    "workspace_age": "Workspace Age",
     "timezone": {
       "title": "Workspace Timezone",
       "description": "All dates and times in this workspace will be displayed in this timezone. This affects scheduled posts, analytics, and calendar events.",
@@ -4230,8 +3643,6 @@
       "color_help": "This color will be used for buttons, links, and reports.",
       "update_success": "Branding updated successfully",
       "update_error": "Failed to update branding",
-      "enterprise_exclusive": "Enterprise-exclusive Feature",
-      "enterprise_description": "These branding settings are applied workspace-wide and will be visible to all members and in generated reports.",
       "live_preview": "Live Preview",
       "buttons_actions": "BUTTONS & ACTIONS",
       "primary_button": "Primary Button",
@@ -4334,135 +3745,10 @@
         "description": "Need to connect Intellipost with your own CRM or ERP? Our team can build custom integrations tailored to your workflow.",
         "action": "Request Integration"
       }
+    },
+    "roles": {
+      "owners": "Owners",
+      "admins": "Admins"
     }
-  },
-  "welcome": {
-    "title": "Manage your content",
-    "titleHighlight": "with artificial intelligence",
-    "subtitle": "Organize, optimize, and schedule your multimedia content with AI-powered tools to maximize your social media presence.",
-    "featured": "Featured",
-    "featuredCollection": "Featured Collection",
-    "startFree": "Start Free",
-    "demo": "Demo",
-    "beta": "Beta",
-    "featuresTitle": "Features",
-    "featuresSubtitle": "Manage your content with AI-powered tools",
-    "login": "Login",
-    "getStarted": "Get Started",
-    "readyToStart": "Ready to start",
-    "joinNow": "Join Now",
-    "createAccount": "Create Account",
-    "noCreditCard": "No credit card required",
-    "noCreditCardRequired": "No credit card required",
-    "freePlanForever": "Free plan forever",
-    "demoAccess": "30-day demo available",
-    "viewPricing": "View Plans",
-    "viewAllPlans": "View all plans and features",
-    "pricingTitle": "Plans for every need",
-    "pricingSubtitle": "From free plans to enterprise solutions",
-    "continue": "Continue to Dashboard",
-    "goToDashboard": "Go to Dashboard",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "contact": "Contact",
-    "aiOrganization": {
-      "title": "AI Organization",
-      "description": "Easily categorize, tag, and search your multimedia files with AI-powered organization",
-      "tags": {
-        "smartAlbums": "Smart Albums",
-        "autoOrganization": "Auto-Organization",
-        "customTags": "Custom Tags"
-      }
-    },
-    "multiPlatform": {
-      "title": "Multi-Platform Publishing",
-      "description": "Optimize and seamlessly share content across multiple social media platforms"
-    },
-    "analytics": {
-      "title": "Performance Analytics",
-      "description": "Get insights into your content engagement and optimize your strategy accordingly"
-    },
-    "pricing": {
-      "title": "Pricing",
-      "description": "Get information about your content engagement and optimize your strategy accordingly"
-    },
-    "connectsWith": "Connects seamlessly with",
-    "goViral": "go viral",
-    "watchDemo": "Watch Demo",
-    "contentManagement": {
-      "title": "Smart Content Hub",
-      "description": "Centralize your creative assets with AI-powered filtering and tagging."
-    },
-    "socialIntegration": {
-      "title": "Multi-Platform Sync",
-      "description": "Publish directly to Instagram, TikTok, YouTube, and more from one place."
-    },
-    "scheduling": {
-      "title": "Auto-Scheduling",
-      "description": "AI predicts the best times to post for maximum engagement."
-    },
-    "aiTools": {
-      "title": "AI Optimization",
-      "description": "Generate hashtags, captions, and improvements instantly."
-    },
-    "tags": {
-      "multimedia": "Multimedia",
-      "organization": "Organization",
-      "advanced_search": "Advanced Search",
-      "tags": "Tags",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "tiktok": "TikTok",
-      "youtube": "YouTube",
-      "twitter": "Twitter",
-      "calendar": "Calendar",
-      "scheduling": "Scheduling",
-      "ai": "AI",
-      "optimal_times": "Optimal Times",
-      "hashtags": "Hashtags",
-      "recommendations": "Recommendations",
-      "optimization": "Optimization",
-      "ai_analysis": "AI Analysis",
-      "collections": "Collections",
-      "filters": "Filters",
-      "auto_post": "Auto-Post",
-      "time_zones": "Time Zones",
-      "search": "Search",
-      "queue": "Queue"
-    }
-  },
-  "videoValidation": {
-    "platformNotSupported": "Platform {{platform}} not supported",
-    "durationTooLong": "{{type}}: Duration too long. Maximum {{max}}, current {{current}}",
-    "durationTooShort": "{{type}}: Duration too short. Minimum {{min}}, current {{current}}",
-    "invalidAspectRatio": "{{type}}: Invalid aspect ratio. Expected {{expected}}, current {{current}}",
-    "lowResolution": "{{type}}: Low resolution. Minimum recommended {{min}}, current {{current}}",
-    "valid": "Valid video for publication",
-    "invalid": "Video does not meet requirements",
-    "warnings": "Quality warnings",
-    "readyToPublish": "Ready to publish on {{platform}} as {{type}}",
-    "suggestion": "Configuration suggestion",
-    "suggestedType": "This video is better suited for type: {{type}}",
-    "changeTo": "Change to {{type}}",
-    "requirements": "Platform requirements",
-    "maxDuration": "Maximum duration",
-    "minDuration": "Minimum duration",
-    "aspectRatio": "Aspect ratio",
-    "minResolution": "Minimum resolution",
-    "anyAspectRatio": "Any aspect ratio",
-    "videoInfo": "Video information",
-    "duration": "Duration",
-    "resolution": "Resolution",
-    "orientation": "Orientation",
-    "vertical": "Vertical",
-    "horizontal": "Horizontal",
-    "configureManually": "Configure publication type manually",
-    "autoDetected": "Auto-detected",
-    "manualOverride": "Manual configuration required",
-    "incompatibleFormat": "Format incompatible with {{type}}",
-    "recommendedSettings": "Recommended settings",
-    "currentSettings": "Current settings",
-    "mustConfigureBeforePublish": "You must configure the publication type before publishing",
-    "videoDoesNotMeetRequirements": "Video does not meet {{type}} requirements for {{platform}}"
   }
 }

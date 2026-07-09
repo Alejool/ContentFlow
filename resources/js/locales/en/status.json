@@ -1,0 +1,14 @@
+{
+  "status": {
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "publishing": "Publishing",
+    "processing": "Processing",
+    "pending_review": "Pending Review",
+    "approved": "Approved",
+    "published": "Published",
+    "rejected": "Rejected",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
+  }
+}

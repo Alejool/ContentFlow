@@ -1,0 +1,17 @@
+{
+  "verification": {
+    "title": "Verifica tu correo",
+    "security": "Por tu seguridad, verifica tu dirección de correo.",
+    "banner": {
+      "title": "Verifica tu dirección de correo",
+      "message": "Enviamos un enlace de verificación a tu correo. Verifícalo para desbloquear todas las funciones.",
+      "resendButton": "Reenviar correo",
+      "sending": "Enviando...",
+      "successMessage": "Correo de verificación enviado"
+    },
+    "didNotReceive": "¿No recibiste el correo?",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contactar soporte",
+    "logout": "Cerrar sesión"
+  }
+}
