@@ -4,7 +4,7 @@ import Button from '@/Components/common/Modern/Button';
 import Input from '@/Components/common/Modern/Input';
 import { TabNavigation } from '@/Components/common/TabNavigation';
 import { formatCurrency } from '@/Utils/formatters/number';
-import { FileText, HardDrive, Info, Sparkles, Users } from 'lucide-react';
+import { FileText, HardDrive, Info, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AddonPriceDisplay } from '@/Components/Subscription/AddonPriceDisplay';
@@ -27,10 +27,6 @@ interface AddonPackage {
 }
 
 interface AddonsConfig {
-  ai_credits: {
-    enabled: boolean;
-    packages: Record<string, AddonPackage>;
-  };
   storage: {
     enabled: boolean;
     packages: Record<string, AddonPackage>;
@@ -54,20 +50,18 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
 
   // Encontrar el primer tab habilitado
   const firstEnabledTab = (
-    addons.ai_credits?.enabled
-      ? 'ai_credits'
-      : addons.storage?.enabled
-        ? 'storage'
-        : addons.publications?.enabled
-          ? 'publications'
-          : addons.team_members?.enabled
-            ? 'team_members'
-            : 'ai_credits'
-  ) as 'ai_credits' | 'storage' | 'publications' | 'team_members';
+    addons.storage?.enabled
+      ? 'storage'
+      : addons.publications?.enabled
+        ? 'publications'
+        : addons.team_members?.enabled
+          ? 'team_members'
+          : 'storage'
+  ) as 'storage' | 'publications' | 'team_members';
 
-  const [activeTab, setActiveTab] = useState<
-    'ai_credits' | 'storage' | 'publications' | 'team_members'
-  >(firstEnabledTab);
+  const [activeTab, setActiveTab] = useState<'storage' | 'publications' | 'team_members'>(
+    firstEnabledTab,
+  );
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [currentPackageSlide, setCurrentPackageSlide] = useState(0);
   const [selectedGateway, setSelectedGateway] = useState<string>('');
@@ -115,12 +109,6 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
   };
 
   const tabs = [
-    {
-      key: 'ai_credits' as const,
-      label: t('subscription.addons.aiCredits', 'Créditos IA'),
-      icon: Sparkles,
-      enabled: addons.ai_credits?.enabled ?? false,
-    },
     {
       key: 'storage' as const,
       label: t('subscription.addons.storage', 'Almacenamiento'),
@@ -217,7 +205,6 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
         )}
 
         <div className="mb-4 flex justify-center">
-          {activeTab === 'ai_credits' && <Sparkles className="text-primary-500 h-12 w-12" />}
           {activeTab === 'storage' && <HardDrive className="text-primary-500 h-12 w-12" />}
           {activeTab === 'publications' && <FileText className="text-primary-500 h-12 w-12" />}
           {activeTab === 'team_members' && <Users className="text-primary-500 h-12 w-12" />}
@@ -236,7 +223,6 @@ export function AddonsPurchaseSection({ addons }: AddonsPurchaseSectionProps) {
             {pkg.amount.toLocaleString()}
           </div>
           <div className="text-sm text-gray-600 dark:text-neutral-400">
-            {activeTab === 'ai_credits' && t('subscription.addons.credits', 'créditos')}
             {activeTab === 'storage' && 'GB'}
             {activeTab === 'publications' && t('subscription.addons.posts', 'publicaciones')}
             {activeTab === 'team_members' && t('subscription.addons.members', 'miembros')}

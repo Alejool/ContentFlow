@@ -27,12 +27,10 @@ export interface VisibleUsageMetrics {
   publications: boolean;
   social_accounts: boolean;
   storage: boolean;
-  ai_requests: boolean;
   team_members: boolean;
 }
 
 export interface SystemAddons {
-  ai_credits: boolean;
   storage: boolean;
   team_members: boolean;
   publications: boolean;

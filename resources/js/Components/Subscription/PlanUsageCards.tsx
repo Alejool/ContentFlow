@@ -6,7 +6,7 @@ import { UsageCard } from '@/Components/Subscription/UsageCard';
 import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, HardDrive, Share2, Sparkles, Users, Zap } from 'lucide-react';
+import { FileText, HardDrive, Share2, Users, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatBytesAsGB, gbToBytes } from '@/Utils/formatters/storage';
@@ -85,26 +85,6 @@ export function PlanUsageCards({ showCarousel = false, showTitle = true }: PlanU
         remaining: usage.publications.remaining,
         canBuy: systemAddons?.publications !== false,
         upgradeUrl: '/pricing',
-      },
-    },
-    {
-      key: 'ai_requests',
-      show: visibleUsageMetrics?.ai_requests !== false,
-      cardProps: {
-        label: t('subscription.addons.aiCredits'),
-        icon: Sparkles,
-        accent: 'violet',
-        percentage: usage.ai_requests.percentage ?? 0,
-        used: usage.ai_requests.used,
-        limit: usage.ai_requests.limit ?? '∞',
-        total_available: usage.ai_requests.total_available ?? usage.ai_requests.limit ?? '∞',
-        remaining: usage.ai_requests.remaining ?? '∞',
-        addon_info: usage.ai_requests.addon_info,
-        canBuy:
-          usage.ai_requests.limit !== null &&
-          usage.ai_requests.limit !== -1 &&
-          systemAddons?.ai_credits !== false,
-        addonType: 'ai_credits',
       },
     },
     {

@@ -58,11 +58,7 @@ export function AddonsPromotionCard({
 
   // Calcular si alguna métrica está alta (>70%)
   const hasHighUsage =
-    usage.publications.percentage > 70 ||
-    usage.storage.percentage > 70 ||
-    (usage.ai_requests.limit &&
-      usage.ai_requests.limit > 0 &&
-      (usage.ai_requests.used / usage.ai_requests.limit) * 100 > 70);
+    usage.publications.percentage > 70 || usage.storage.percentage > 70;
 
   return (
     <div className="space-y-4">

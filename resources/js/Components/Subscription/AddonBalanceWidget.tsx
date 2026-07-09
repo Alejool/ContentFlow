@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
 import type { AddonSummary } from '@/types/Addons/addon';
 import { Link } from '@inertiajs/react';
-import { HardDrive, Plus, Sparkles } from 'lucide-react';
+import { HardDrive, Plus } from 'lucide-react';
 import React from 'react';
 import { formatCurrency } from '@/Utils/formatters/number';
 
@@ -19,10 +19,9 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
 
   // Solo mostrar si tiene add-ons activos o si está cerca del límite
   const hasAddons = summary.active_addons_count > 0;
-  const aiLowBalance = summary.ai_credits.percentage_used >= 70 && summary.ai_credits.total > 0;
   const storageLowBalance = summary.storage.percentage_used >= 70 && summary.storage.total > 0;
 
-  if (!hasAddons && !aiLowBalance && !storageLowBalance) {
+  if (!hasAddons && !storageLowBalance) {
     return null;
   }
 
@@ -38,32 +37,6 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* AI Credits */}
-        {summary.ai_credits.total > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-blue-600" />
-                <span className="font-medium">Créditos IA</span>
-              </div>
-              <span className="text-muted-foreground">
-                {summary.ai_credits.remaining} / {summary.ai_credits.total}
-              </span>
-            </div>
-            <Progress
-              value={summary.ai_credits.percentage_used}
-              className="h-2"
-              indicatorClassName={
-                summary.ai_credits.percentage_used >= 90
-                  ? 'bg-red-500'
-                  : summary.ai_credits.percentage_used >= 70
-                    ? 'bg-yellow-500'
-                    : 'bg-blue-500'
-              }
-            />
-          </div>
-        )}
-
         {/* Storage */}
         {summary.storage.total > 0 && (
           <div className="space-y-2">
@@ -91,10 +64,10 @@ export const AddonBalanceWidget: React.FC<AddonBalanceWidgetProps> = ({ summary,
         )}
 
         {/* Low Balance Warning */}
-        {(aiLowBalance || storageLowBalance) && (
+        {storageLowBalance && (
           <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20">
             <p className="text-xs text-yellow-800 dark:text-yellow-200">
-              ⚠️ Saldo bajo. Considera comprar más créditos.
+              ⚠️ Saldo bajo. Considera ampliar tu almacenamiento.
             </p>
           </div>
         )}

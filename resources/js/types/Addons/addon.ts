@@ -23,10 +23,6 @@ export interface AddonPackage {
 }
 
 export interface AddonsConfig {
-  ai_credits: {
-    enabled: boolean;
-    packages: Record<string, AddonPackage>;
-  };
   storage: {
     enabled: boolean;
     packages: Record<string, AddonPackage>;
@@ -83,7 +79,6 @@ export interface AddonSummaryItem {
 
 export interface AddonsSummaryData {
   summary: {
-    ai_credits: AddonSummaryItem;
     storage: AddonSummaryItem;
     publications: AddonSummaryItem;
     team_members: AddonSummaryItem;

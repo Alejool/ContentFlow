@@ -55,19 +55,6 @@ interface UsageData {
     percentage: number;
     limit_reached: boolean;
   };
-  ai_requests: {
-    used: number;
-    limit: number | null;
-    total_available: number | null;
-    remaining: number | null;
-    percentage: number;
-    limit_reached: boolean;
-    addon_info?: {
-      total: number;
-      used: number;
-      remaining: number;
-    };
-  };
   limits_reached: boolean;
   limits_reached_at: string | null;
 }
