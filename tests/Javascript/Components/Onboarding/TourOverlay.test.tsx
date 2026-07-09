@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import fc from "fast-check";
 import TourOverlay from "@/Components/Onboarding/TourOverlay";
-import type { TourStep } from "@/types/onboarding";
+import type { TourStep } from "@/types/Onboarding/onboarding";
+
+// Accessible names and rendered text collapse whitespace runs, so compare
+// generated strings the same way to avoid false negatives on random input
+const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
 
 describe("TourOverlay Property Tests", () => {
   let mockElement: HTMLDivElement;
@@ -76,14 +80,14 @@ describe("TourOverlay Property Tests", () => {
             // Verify property: title should be present in the rendered output
             // Use heading role to specifically target the title element
             const titleElement = screen.getByRole("heading", {
-              name: (name) => name.trim() === tourStep.title.trim(),
+              name: (name) => normalize(name) === normalize(tourStep.title),
             });
             expect(titleElement).toBeInTheDocument();
 
             // Verify property: description should be present in the rendered output
             // The description is in a paragraph, so we need to find it by text content
             const allParagraphs = screen.getAllByText((content, element) => {
-              return element?.tagName === "P" && element?.textContent?.trim() === tourStep.description.trim();
+              return element?.tagName === "P" && normalize(element?.textContent ?? "") === normalize(tourStep.description);
             });
             expect(allParagraphs.length).toBeGreaterThan(0);
             expect(allParagraphs[0]).toBeInTheDocument();
@@ -130,13 +134,13 @@ describe("TourOverlay Property Tests", () => {
 
             // Verify property: exact title text should be rendered
             const titleElement = screen.getByRole("heading", {
-              name: (name) => name.trim() === title.trim(),
+              name: (name) => normalize(name) === normalize(title),
             });
             expect(titleElement).toBeInTheDocument();
 
             // Verify property: exact description text should be rendered
             const allParagraphs = screen.getAllByText((content, element) => {
-              return element?.tagName === "P" && element?.textContent?.trim() === description.trim();
+              return element?.tagName === "P" && normalize(element?.textContent ?? "") === normalize(description);
             });
             expect(allParagraphs.length).toBeGreaterThan(0);
             expect(allParagraphs[0]).toBeInTheDocument();
@@ -182,12 +186,12 @@ describe("TourOverlay Property Tests", () => {
 
             // Verify property: content is displayed regardless of position
             const titleElement = screen.getByRole("heading", {
-              name: (name) => name.trim() === title.trim(),
+              name: (name) => normalize(name) === normalize(title),
             });
             expect(titleElement).toBeInTheDocument();
-            
+
             const allParagraphs = screen.getAllByText((content, element) => {
-              return element?.tagName === "P" && element?.textContent?.trim() === description.trim();
+              return element?.tagName === "P" && normalize(element?.textContent ?? "") === normalize(description);
             });
             expect(allParagraphs.length).toBeGreaterThan(0);
             expect(allParagraphs[0]).toBeInTheDocument();
