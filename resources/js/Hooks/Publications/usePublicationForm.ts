@@ -1148,9 +1148,14 @@ export const usePublicationForm = ({
     const publishNow = publishNowRef.current;
     publishNowRef.current = false;
 
-    // Skip media validation for polls (they don't require media)
-    if (data.content_type !== 'poll' && mediaFiles.length === 0) {
-      setImageError(t('publications.modal.validation.imageRequired'));
+    // Media is only mandatory for inherently visual formats (mirrors
+    // config/content_types.php, where post/poll have required=false) —
+    // a text-only post or draft is perfectly valid.
+    const mediaRequiredTypes = ['reel', 'story', 'carousel'];
+    if (mediaRequiredTypes.includes(data.content_type || 'post') && mediaFiles.length === 0) {
+      setImageError(
+        t('publications.modal.validation.mediaRequired') || t('publications.modal.validation.imageRequired'),
+      );
       return;
     }
 
