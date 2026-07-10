@@ -43,7 +43,8 @@
         "errors": {
           "svgNotAllowed": "Los archivos SVG no son compatibles con las redes sociales"
         },
-        "uploadingInBackground": "{{count}} archivo(s) se están subiendo en segundo plano. Se vincularán automáticamente cuando se completen."
+        "uploadingInBackground": "{{count}} archivo(s) se están subiendo en segundo plano. Se vincularán automáticamente cuando se completen.",
+        "uploadingBackground": "Subiendo archivos en segundo plano — puedes guardar sin esperar"
       },
       "show": {
         "title": "Vista Detallada"

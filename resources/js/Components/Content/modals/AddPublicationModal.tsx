@@ -114,37 +114,19 @@ export default function AddPublicationModal({
   const handleUploadAndSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const filesToUpload = mediaFiles.filter(
-      (m) => m.file instanceof File && m.status !== 'failed' && !uploadErrors?.[m.tempId],
+    // Uploads start as soon as files are added (usePublicationForm.handleFileChange),
+    // so here we only retry the ones that failed and submit right away — in-flight
+    // uploads are linked to the publication in background by useS3Upload.
+    const failedFiles = mediaFiles.filter(
+      (m) => m.file instanceof File && (m.status === 'failed' || uploadErrors?.[m.tempId]),
     );
+    failedFiles.forEach((m) => {
+      uploadFile(m.file as File, m.tempId).catch(() => {
+        // UI reflects the error via store status update
+      });
+    });
 
-    if (filesToUpload.length > 0) {
-      // Upload all files
-      try {
-        // Upload files and get metadata
-        // Use Promise.allSettled to avoid one failure blocking all, though here we want them all ready
-        // But for our purpose, we'll just await all and catch individual errors.
-        await Promise.all(
-          filesToUpload.map(async (m) => {
-            try {
-              await uploadFile(m.file!, m.tempId);
-            } catch {
-              // UI reflects error via store status update
-            }
-          }),
-        );
-
-        // Small delay to ensure state update propagates from the uploads
-        await new Promise((resolve) => setTimeout(resolve, 150));
-
-        // Proceed with normal submit
-        handleSubmit(e);
-      } catch {
-        handleSubmit(e); // Proceed anyway if possible, usePublicationForm will handle missing keys
-      }
-    } else {
-      handleSubmit(e);
-    }
+    handleSubmit(e);
   };
 
   const { register } = form; // Keep existing destructuring
@@ -657,12 +639,10 @@ export default function AddPublicationModal({
         <div>
           <ModalFooter
             onClose={handleClose}
-            isSubmitting={isSubmitting || uploading} // Block on upload too
+            isSubmitting={isSubmitting} // Uploads keep running in background — saving is allowed
             disableSubmit={!isTextValid}
             formId="add-publication-form"
-            submitText={
-              uploading ? `Uploading...` : t('publications.button.add') || 'Save Publication'
-            }
+            submitText={t('publications.button.add') || 'Save Publication'}
             submitIcon={<Save className="h-4 w-4" />}
             cancelText={t('common.cancel') || 'Close'}
             showSecondarySubmit={showPublishNow}
@@ -673,13 +653,24 @@ export default function AddPublicationModal({
             disableSecondarySubmit={!isTextValid}
             onSecondarySubmit={handlePublishNow}
           />
-          {/* Progress bar could go here */}
           {uploading && (
             <div className="px-6 pb-2">
               <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-neutral-700">
-                <div className="h-2.5 rounded-full bg-blue-600" style={{ width: '50%' }}></div>
+                <div
+                  className="h-2.5 rounded-full bg-blue-600 transition-all duration-300"
+                  style={{
+                    width: `${(() => {
+                      const values = Object.values(uploadProgress || {});
+                      if (values.length === 0) return 0;
+                      return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+                    })()}%`,
+                  }}
+                ></div>
               </div>
-              <p className="mt-1 text-center text-xs text-gray-500">Uploading to S3...</p>
+              <p className="mt-1 text-center text-xs text-gray-500">
+                {t('publications.modal.upload.uploadingBackground') ||
+                  'Subiendo archivos en segundo plano — puedes guardar sin esperar'}
+              </p>
             </div>
           )}
 

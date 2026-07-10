@@ -43,7 +43,8 @@
         "errors": {
           "svgNotAllowed": "SVG files are not supported by social media platforms"
         },
-        "uploadingInBackground": "{{count}} file(s) are uploading in the background. They will be linked automatically when complete."
+        "uploadingInBackground": "{{count}} file(s) are uploading in the background. They will be linked automatically when complete.",
+        "uploadingBackground": "Uploading files in background — you can save without waiting"
       },
       "show": {
         "title": "Detailed View"
