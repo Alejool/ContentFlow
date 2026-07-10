@@ -33,6 +33,7 @@ import ApprovalHistory from '@/Components/Content/ApprovalHistory';
 import ApprovalList from '@/Components/Content/ApprovalList';
 import ApprovalStats from '@/Components/Content/ApprovalStats';
 import ContentList from '@/Components/Content/ContentList';
+import QuickComposer from '@/Components/Content/Publication/QuickComposer';
 import ModernCalendar from '@/Components/Content/Partials/ModernCalendar';
 import Button from '@/Components/common/Modern/Button';
 import TabNavigation from '@/Components/common/TabNavigation';
@@ -662,6 +663,13 @@ export default function ManageContentPage() {
 
             {(activeTab === 'publications' || activeTab === 'campaigns') && (
               <div className="animate-in fade-in zoom-in duration-300">
+                {activeTab === 'publications' && permissions.includes('manage-content') && (
+                  <QuickComposer
+                    onCreated={handleRefreshWrapped}
+                    onOpenAdvanced={() => openAddModal('publication')}
+                    canPublish={permissions.includes('publish')}
+                  />
+                )}
                 <ContentList
                   title={
                     activeTab === 'publications'

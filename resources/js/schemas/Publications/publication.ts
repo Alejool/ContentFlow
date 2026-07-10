@@ -375,3 +375,15 @@ export const publicationSchema = (
 };
 
 export type PublicationFormData = z.infer<ReturnType<typeof publicationSchema>>;
+
+// Minimal schema for the QuickComposer: just the content and target accounts.
+export const quickComposerSchema = (t: (key: string, ...args: unknown[]) => string) =>
+  z.object({
+    description: z
+      .string()
+      .min(1, t('publications.modal.validation.descMin') || 'Content is required')
+      .max(700, t('publications.modal.validation.descMax', { max: 700 })),
+    social_accounts: z.array(z.number()).default([]),
+  });
+
+export type QuickComposerData = z.infer<ReturnType<typeof quickComposerSchema>>;

@@ -429,6 +429,14 @@
       "reel_requires_video_only": "Un reel solo permite video",
       "story_requires_one": "Una historia requiere exactamente un archivo multimedia",
       "videoTooLong": "El video supera la duración máxima para {{platform}} ({{max}})"
+    },
+    "quickComposer": {
+      "title": "Publicación rápida",
+      "placeholder": "¿Qué quieres publicar hoy?",
+      "draft": "Borrador",
+      "advanced": "Opciones avanzadas",
+      "noAccounts": "Sin redes conectadas",
+      "accountsRequired": "Selecciona al menos una red para publicar"
     }
   }
 }

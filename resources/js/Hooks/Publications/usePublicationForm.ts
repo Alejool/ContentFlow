@@ -17,6 +17,7 @@ import { useMediaStore } from '@/stores/Upload/mediaStore';
 import { useUploadQueue } from '@/stores/Upload/uploadQueueStore';
 import type { PageProps } from '@/types';
 import type { Publication } from '@/types/Publications/Publication';
+import { readLastAccounts, saveLastAccounts } from '@/Utils/Publications/lastAccounts';
 import { validateVideoDuration } from '@/Utils/common/validationUtils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePage } from '@inertiajs/react';
@@ -33,31 +34,6 @@ interface UsePublicationFormProps {
   onSubmitSuccess?: (success: boolean) => void;
   isOpen?: boolean;
 }
-
-// Last accounts the user published with, per workspace, so a new publication
-// starts with them preselected instead of forcing re-selection every time.
-const lastAccountsKey = (workspaceId: number | string) =>
-  `contentflow:lastAccounts:${workspaceId}`;
-
-const readLastAccounts = (workspaceId: number | string | undefined): number[] => {
-  if (!workspaceId) return [];
-  try {
-    const raw = localStorage.getItem(lastAccountsKey(workspaceId));
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'number') : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveLastAccounts = (workspaceId: number | string | undefined, ids: number[]) => {
-  if (!workspaceId || ids.length === 0) return;
-  try {
-    localStorage.setItem(lastAccountsKey(workspaceId), JSON.stringify(ids));
-  } catch {
-    // Storage full/blocked — preselection is best-effort
-  }
-};
 
 export const usePublicationForm = ({
   publication,

@@ -2869,6 +2869,14 @@
       "reel_requires_video_only": "A reel only allows video",
       "story_requires_one": "A story requires exactly one media file",
       "videoTooLong": "The video exceeds the maximum duration for {{platform}} ({{max}})"
+    },
+    "quickComposer": {
+      "title": "Quick post",
+      "placeholder": "What do you want to publish today?",
+      "draft": "Draft",
+      "advanced": "Advanced options",
+      "noAccounts": "No connected accounts",
+      "accountsRequired": "Select at least one account to publish"
     }
   },
   "publish": {
