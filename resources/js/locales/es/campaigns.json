@@ -88,7 +88,8 @@
         "goalRequired": "El objetivo es requerido",
         "budgetRequired": "El presupuesto es requerido",
         "startDateRequired": "La fecha de inicio es requerida",
-        "endDateRequired": "La fecha de fin es requerida"
+        "endDateRequired": "La fecha de fin es requerida",
+        "endDateAfterStart": "La fecha de fin debe ser posterior a la de inicio"
       }
     },
     "button": {
