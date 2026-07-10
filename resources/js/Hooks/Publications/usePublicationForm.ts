@@ -34,6 +34,31 @@ interface UsePublicationFormProps {
   isOpen?: boolean;
 }
 
+// Last accounts the user published with, per workspace, so a new publication
+// starts with them preselected instead of forcing re-selection every time.
+const lastAccountsKey = (workspaceId: number | string) =>
+  `contentflow:lastAccounts:${workspaceId}`;
+
+const readLastAccounts = (workspaceId: number | string | undefined): number[] => {
+  if (!workspaceId) return [];
+  try {
+    const raw = localStorage.getItem(lastAccountsKey(workspaceId));
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'number') : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveLastAccounts = (workspaceId: number | string | undefined, ids: number[]) => {
+  if (!workspaceId || ids.length === 0) return;
+  try {
+    localStorage.setItem(lastAccountsKey(workspaceId), JSON.stringify(ids));
+  } catch {
+    // Storage full/blocked — preselection is best-effort
+  }
+};
+
 export const usePublicationForm = ({
   publication,
   onClose,
@@ -335,6 +360,20 @@ export const usePublicationForm = ({
       clearMedia();
       setContentTypeSuggested(new Set()); // Clear content type suggestions
       setIsDataReady(true);
+
+      // Preselect the accounts used on the last publication (only those still
+      // connected in this workspace).
+      const stored = readLastAccounts(user?.current_workspace_id);
+      if (stored.length > 0) {
+        const { accounts } = useAccountsStore.getState();
+        const validIds =
+          accounts.length > 0
+            ? stored.filter((id) => accounts.some((a: any) => a.id === id))
+            : stored;
+        if (validIds.length > 0) {
+          setValue('social_accounts', validIds, { shouldDirty: false });
+        }
+      }
     }
   }, [isOpen, publication?.id, publication?.scheduled_at, reset]);
 
@@ -1446,6 +1485,9 @@ export const usePublicationForm = ({
         // Reset dirty state after successful save so next time modal opens with fresh data
         if (publication) {
           reset(undefined, { keepValues: true, keepDirty: false });
+        } else {
+          // Remember accounts for next time (preselected on the next new publication)
+          saveLastAccounts(user?.current_workspace_id, socialAccounts);
         }
       }
 
