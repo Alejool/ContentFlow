@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Locale;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Locale\UpdateLocaleRequest;
+use Illuminate\Support\Facades\Auth;
 
 class LocaleController extends Controller
 {
