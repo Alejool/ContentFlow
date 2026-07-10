@@ -2877,7 +2877,8 @@
       "draft": "Draft",
       "advanced": "Advanced options",
       "noAccounts": "No connected accounts",
-      "accountsRequired": "Select at least one account to publish"
+      "accountsRequired": "Select at least one account to publish",
+      "connectAccounts": "Connect your accounts to publish →"
     }
   },
   "publish": {

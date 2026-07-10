@@ -78,9 +78,12 @@ export default function QuickComposer({
             );
           })}
           {socialAccounts.length === 0 && (
-            <span className="text-xs text-gray-400 dark:text-neutral-500">
-              {t('publications.quickComposer.noAccounts') || 'Sin redes conectadas'}
-            </span>
+            <a
+              href="?section=social"
+              className="text-xs font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400"
+            >
+              {t('publications.quickComposer.connectAccounts') || 'Conecta tus redes para publicar →'}
+            </a>
           )}
         </div>
 

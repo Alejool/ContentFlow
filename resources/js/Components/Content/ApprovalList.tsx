@@ -1,4 +1,3 @@
-﻿import ApprovalSuccessModal from '@/Components/Content/modals/ApprovalSuccessModal';
 import RejectionReasonModal from '@/Components/Content/modals/RejectionReasonModal';
 import AlertCard from '@/Components/common/Modern/AlertCard';
 import Button from '@/Components/common/Modern/Button';
@@ -285,12 +284,7 @@ export default function ApprovalList({
   const locale = getDateFnsLocale(i18n.language);
   const { approveRequest, rejectRequest } = useApprovalActions();
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
-  const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<ApprovalRequest | null>(null);
-  const [approvalData, setApprovalData] = useState<{
-    approverName: string;
-    approvedAt: string;
-  } | null>(null);
 
   // Get store methods
   const updatePublication = usePublicationStore((s) => s.updatePublication);
@@ -317,13 +311,12 @@ export default function ApprovalList({
 
       if (updatedRequest) {
         if (updatedRequest.status === 'approved') {
+          // Toast is feedback enough — a blocking success modal per approval
+          // adds one extra click to every item in the review queue.
           toast.success(t('approvals.approvedSuccess'));
-          setSelectedRequest(updatedRequest);
-          setApprovalData({
-            approverName: updatedRequest.completedBy?.name || auth.user.name,
-            approvedAt: updatedRequest.completed_at || '',
-          });
-          setApprovalModalOpen(true);
+          if (updatedRequest.publication && updatedRequest.publication_id) {
+            updatePublication(updatedRequest.publication_id, updatedRequest.publication as Record<string, unknown>);
+          }
         } else {
           toast.success(t('approvals.levelApproved', { level: updatedRequest.currentStep?.level_name || 'Siguiente nivel' }));
           if (updatedRequest.publication && updatedRequest.publication_id) {
@@ -504,20 +497,6 @@ export default function ApprovalList({
         />
       )}
 
-      {/* Approval Success Modal */}
-      {selectedRequest && approvalData && (
-        <ApprovalSuccessModal
-          isOpen={approvalModalOpen}
-          onClose={() => {
-            setApprovalModalOpen(false);
-            setSelectedRequest(null);
-            setApprovalData(null);
-          }}
-          publicationTitle={selectedRequest.publication?.title || ''}
-          approverName={approvalData.approverName}
-          approvedAt={approvalData.approvedAt}
-        />
-      )}
     </>
   );
 }

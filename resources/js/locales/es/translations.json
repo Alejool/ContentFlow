@@ -2877,7 +2877,8 @@
       "draft": "Borrador",
       "advanced": "Opciones avanzadas",
       "noAccounts": "Sin redes conectadas",
-      "accountsRequired": "Selecciona al menos una red para publicar"
+      "accountsRequired": "Selecciona al menos una red para publicar",
+      "connectAccounts": "Conecta tus redes para publicar →"
     }
   },
   "publish": {
