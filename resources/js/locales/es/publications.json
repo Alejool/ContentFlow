@@ -68,7 +68,11 @@
           "select_accounts_desc": "Selecciona qué redes publicarán de forma recurrente. Las demás solo publicarán una vez.",
           "all_accounts": "Aplicar a todas",
           "single_account_note": "Esta red publicará de forma recurrente según la configuración."
-        }
+        },
+        "title": "Fecha para todas las redes",
+        "useGlobal": "Global",
+        "description": "Define una sola fecha para publicar en todas las redes seleccionadas a la vez.",
+        "placeholder": "Selecciona fecha y hora"
       },
       "add": {
         "titleField": "título",
@@ -262,7 +266,17 @@
         "media_required": "Se requieren archivos multimedia para este tipo de contenido",
         "media_min_count": "Se requieren al menos :min archivos multimedia",
         "media_max_count": "Máximo :max archivos multimedia permitidos",
-        "mediaRequired": "Se requieren archivos multimedia"
+        "mediaRequired": "Se requieren archivos multimedia",
+        "checking": "Validando video...",
+        "checkingLimits": "Verificando límites de las plataformas seleccionadas",
+        "allValid": "Video válido",
+        "allValidMessage": "Tu video cumple con los límites de todas las plataformas seleccionadas",
+        "cannotPublish": "No se puede publicar en algunas plataformas",
+        "videoExceedsLimits": "Tu video excede los límites de las siguientes cuentas:",
+        "warnings": "Advertencias",
+        "warningsMessage": "Tu video está cerca de los límites en algunas plataformas",
+        "revalidate": "Revalidar",
+        "recurrenceEndDateRequired": "La fecha de fin es obligatoria para publicaciones recurrentes"
       },
       "cancel_confirmation": {
         "title": "Cancelar publicación",
@@ -311,7 +325,11 @@
       "completed": "Completado",
       "processing": "Procesando",
       "waiting": "Esperando",
-      "retrying": "Reintentando"
+      "retrying": "Reintentando",
+      "publishingProgress": "{{current}}/{{total}}",
+      "retryingProgress": "Reintentando {{current}}/{{total}}",
+      "partialSuccess": "{{success}}/{{total}} publicado",
+      "allPublished": "{{total}}/{{total}} publicado"
     },
     "scheduled_for": "Programado para",
     "button": {
@@ -403,7 +421,8 @@
     },
     "platformValidation": {
       "title": "Compatibilidad de Plataformas",
-      "publishedWarning": "Publicación Activa"
+      "publishedWarning": "Publicación Activa",
+      "publishedWarningDesc": "No puedes cambiar el tipo de contenido de una publicación activa o agendada."
     },
     "publish": {
       "button": {

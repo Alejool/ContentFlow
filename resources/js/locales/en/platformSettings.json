@@ -103,6 +103,16 @@
       "disable_duet": "Disable Duet",
       "disable_stitch": "Disable Stitch",
       "poll_duration": "Poll Duration"
+    },
+    "threads": {
+      "type": "Content type",
+      "text": "Text",
+      "image": "Image",
+      "video": "Video",
+      "replyControl": "Who can reply",
+      "everyone": "Everyone",
+      "accountsYouFollow": "Accounts you follow",
+      "mentionedOnly": "Mentioned accounts only"
     }
   }
 }

@@ -29,7 +29,16 @@
       "cancelPoint2": "No se realizarán más cobros automáticos",
       "cancelling": "Cancelando...",
       "confirmCancel": "Sí, cancelar suscripción",
-      "noDownload": "No disponible"
+      "noDownload": "No disponible",
+      "workspaceNote": "Este plan aplica a todos los miembros de este espacio de trabajo",
+      "activeSubscriptionNote": "Tienes una suscripción activa. Puedes cambiar a cualquier plan de pago desde la página de Precios. Para pasar a Free, primero cancela tu suscripción.",
+      "freePlanNote": "Estás en el plan gratuito. Para acceder al portal de facturación, necesitas suscribirte a un plan de pago.",
+      "invoiceHistoryDescription": "Todas tus facturas anteriores",
+      "noInvoicesDescription": "Las facturas de Stripe aparecerán aquí una vez que tengas una suscripción activa",
+      "downloadInvoice": "Descargar factura de Stripe",
+      "cancelConfirm": "¿Estás seguro de que deseas cancelar tu suscripción? Tendrás acceso hasta el final del período de facturación actual.",
+      "cancelPoint1": "Mantendrás acceso hasta el final del período pagado",
+      "cancelPoint3": "Podrás reactivar tu suscripción en cualquier momento"
     },
     "usage": {
       "title": "Uso y Facturación",
@@ -221,12 +230,26 @@
       "currencyBanner": {
         "title": "Precios en tu Moneda Local",
         "automatic": "Conversión automática",
-        "noHiddenFees": "Sin cargos ocultos"
+        "noHiddenFees": "Sin cargos ocultos",
+        "description": "Los precios se muestran automáticamente en tu moneda local para tu comodidad. El equivalente en USD se muestra como referencia.",
+        "transparent": "Precios transparentes"
       },
       "currentUsage": "Uso Actual",
       "showingUsage": "Mostrando uso actual",
       "multiplePurchases": "{{count}} compras",
-      "unlimited": "Ilimitado"
+      "unlimited": "Ilimitado",
+      "addonsConsumingAutomatically": "Los addons se están consumiendo automáticamente.",
+      "addonsWillActivateWhenExceeding": "Tus addons se activarán automáticamente cuando excedas el límite de tu plan base",
+      "highUsageMessage": "Estás usando mucho tu plan. ¡Expande tu capacidad!",
+      "howItWorksPoint2": "Primero se usa el límite de tu plan, luego los add-ons",
+      "howItWorksPoint3": "Los créditos no expiran y se acumulan si compras múltiples paquetes",
+      "howItWorksPoint4": "Puedes solicitar reembolso dentro de los 7 días si no has usado el add-on",
+      "currencyInfo": "Los precios se muestran en tu moneda local según tu ubicación. El equivalente en USD se muestra como referencia.",
+      "noPackages": "No hay paquetes disponibles en esta categoría",
+      "purchaseSuccess": "¡Compra exitosa! Tu addon se activará en unos momentos.",
+      "purchaseCanceled": "Compra cancelada. No se realizó ningún cargo.",
+      "purchasePending": "Pago pendiente. Te notificaremos cuando se confirme.",
+      "subtitle": "Extiende tu capacidad con créditos de IA, almacenamiento, publicaciones y miembros del equipo"
     },
     "success": {
       "title": "Pago Exitoso",
@@ -267,7 +290,8 @@
       "contactSupport": "Contacta a nuestro equipo de soporte"
     },
     "enterprise": {
-      "title": "Características Enterprise"
+      "title": "Características Enterprise",
+      "description": "Gestiona las funciones exclusivas de tu plan corporativo"
     }
   }
 }

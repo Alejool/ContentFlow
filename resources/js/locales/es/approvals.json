@@ -44,7 +44,8 @@
       "submitted": "Enviado a revisión",
       "cancelled": "Cancelado",
       "reassigned": "Reasignado",
-      "auto_advanced": "Avanzado automáticamente"
+      "auto_advanced": "Avanzado automáticamente",
+      "inReview": "En Revisión"
     },
     "historyTable": {
       "publication": "Publicación",

@@ -145,6 +145,7 @@
     "remove_photo": "Remove Photo",
     "uploading": "Uploading...",
     "using_initials": "Using initials",
-    "using_photo": "Using custom photo"
+    "using_photo": "Using custom photo",
+    "invalid_file_type": "Only image files are allowed (JPG, PNG, GIF, WebP, SVG)"
   }
 }

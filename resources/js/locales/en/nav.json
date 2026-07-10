@@ -1,27 +1,50 @@
 {
   "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
     "profile": "Profile",
+    "analytics": "Analytics",
+    "socialNetworks": "Social Networks",
+    "billing": "Billing",
+    "addons": "Add-ons",
+    "adminDashboard": "Admin Dashboard",
+    "adminSettings": "System Settings",
     "logout": "Log Out",
     "notifications": "Notifications",
     "search": "Search routes...",
+    "searchClear": "Clear search",
     "noResults": "No routes found",
-    "search.clear": "Clear search",
-    "menu.open": "Open menu",
-    "menu.close": "Close menu",
-    "sidebar.collapse": "Collapse sidebar",
-    "sidebar.expand": "Expand sidebar",
-    "menu.navigation": "Navigation menu",
     "mainNavigation": "Main navigation",
-    "content.records": "Records",
-    "content.publications": "Publications",
-    "content.campaigns": "Campaigns",
-    "content.approvals": "Approvals",
-    "workspaces.overview": "Overview",
-    "workspaces.usage": "Usage",
-    "workspaces.general": "General",
-    "workspaces.members": "Members",
-    "workspaces.integrations": "Integrations",
+    "menu": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "navigation": "Navigation menu"
+    },
+    "sidebar": {
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
+    },
+    "content": {
+      "records": "Records",
+      "publications": "Publications",
+      "campaigns": "Campaigns",
+      "approvals": "Approvals"
+    },
+    "workspaces": {
+      "overview": "Overview",
+      "usage": "Usage",
+      "general": "General",
+      "members": "Members",
+      "integrations": "Integrations"
+    },
     "section": {
+      "dashboard": "Dashboard",
+      "content": "Content",
+      "analytics": "Analytics",
+      "workspaces": "Workspaces",
+      "subscription": "Subscription",
+      "settings": "Settings",
+      "admin": "Administration",
       "quickNavHint": "to navigate"
     }
   }

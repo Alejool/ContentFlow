@@ -33,7 +33,8 @@
     "showLess": "Ver menos",
     "activeSubscription": {
       "title": "Ya tienes una suscripción activa",
-      "manageBilling": "Gestionar Facturación"
+      "manageBilling": "Gestionar Facturación",
+      "prorationExplanation": "Puedes cambiar a cualquier plan disponible. El cambio se aplicará inmediatamente y la facturación se ajustará automáticamente de forma prorrateada según el tiempo restante de tu suscripción."
     },
     "plans": {
       "demo": {
@@ -128,7 +129,15 @@
       "historyDays90": "Historial de 90 días",
       "historyDays365": "Historial de 1 año",
       "exportHistoryLimit": "Tu plan permite exportar hasta {{days}} días de historial",
-      "exportHistoryLimitYear": "Tu plan permite exportar hasta {{days}} días de historial (1 año)"
+      "exportHistoryLimitYear": "Tu plan permite exportar hasta {{days}} días de historial (1 año)",
+      "publications": "publicaciones",
+      "socialAccounts": "cuentas sociales",
+      "storage": "de almacenamiento",
+      "withWatermark": "Con marca de agua",
+      "noWatermark": "Sin marca de agua",
+      "aiRequests": "solicitudes de IA",
+      "teamMembers": "miembros de equipo",
+      "teamMembersUnlimited": "Miembros de equipo ilimitados"
     },
     "billing": {
       "month": "mes"
@@ -147,6 +156,7 @@
       "professional": "Escala tu contenido con tu equipo",
       "starter": "Para creadores individuales"
     },
-    "timeAvailable": "Tiempo disponible"
+    "timeAvailable": "Tiempo disponible",
+    "cancelRequired": "Debes cancelar tu suscripción actual para cambiar a este plan."
   }
 }

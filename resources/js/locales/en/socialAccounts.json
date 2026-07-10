@@ -23,7 +23,8 @@
     "reconnectButton": "Reconnect account",
     "reconnecting": "Verifying…",
     "demoMode": {
-      "title": "Demo Data"
+      "title": "Demo Data",
+      "description": "You don't have any social accounts connected. The data shown is sample data so you can explore the interface."
     }
   }
 }

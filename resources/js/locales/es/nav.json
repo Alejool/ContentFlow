@@ -1,27 +1,50 @@
 {
   "nav": {
+    "dashboard": "Panel",
+    "calendar": "Calendario",
     "profile": "Perfil",
+    "analytics": "Analíticas",
+    "socialNetworks": "Redes Sociales",
+    "billing": "Facturación",
+    "addons": "Complementos",
+    "adminDashboard": "Admin Panel",
+    "adminSettings": "Config. Sistema",
     "logout": "Cerrar Sesión",
     "notifications": "Notificaciones",
     "search": "Buscar rutas...",
+    "searchClear": "Limpiar búsqueda",
     "noResults": "No se encontraron rutas",
-    "search.clear": "Limpiar búsqueda",
-    "menu.open": "Abrir menú",
-    "menu.close": "Cerrar menú",
-    "sidebar.collapse": "Colapsar menú",
-    "sidebar.expand": "Expandir menú",
-    "menu.navigation": "Menú de navegación",
     "mainNavigation": "Navegación principal",
-    "content.records": "Registros",
-    "content.publications": "Publicaciones",
-    "content.campaigns": "Campañas",
-    "content.approvals": "Aprobaciones",
-    "workspaces.overview": "Vista general",
-    "workspaces.usage": "Uso",
-    "workspaces.general": "Configuración",
-    "workspaces.members": "Miembros",
-    "workspaces.integrations": "Integraciones",
+    "menu": {
+      "open": "Abrir menú",
+      "close": "Cerrar menú",
+      "navigation": "Menú de navegación"
+    },
+    "sidebar": {
+      "collapse": "Colapsar menú",
+      "expand": "Expandir menú"
+    },
+    "content": {
+      "records": "Registros",
+      "publications": "Publicaciones",
+      "campaigns": "Campañas",
+      "approvals": "Aprobaciones"
+    },
+    "workspaces": {
+      "overview": "Vista general",
+      "usage": "Uso",
+      "general": "Configuración",
+      "members": "Miembros",
+      "integrations": "Integraciones"
+    },
     "section": {
+      "dashboard": "Panel",
+      "content": "Contenido",
+      "analytics": "Analíticas",
+      "workspaces": "Espacios",
+      "subscription": "Suscripción",
+      "settings": "Configuración",
+      "admin": "Administración",
       "quickNavHint": "para navegar"
     }
   }

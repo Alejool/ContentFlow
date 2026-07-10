@@ -33,7 +33,8 @@
     "showLess": "Show less",
     "activeSubscription": {
       "title": "You already have an active subscription",
-      "manageBilling": "Manage Billing"
+      "manageBilling": "Manage Billing",
+      "prorationExplanation": "You can switch to any available plan. The change applies immediately and billing is prorated automatically for the remaining time of your subscription."
     },
     "plans": {
       "demo": {
@@ -128,7 +129,15 @@
       "historyDays90": "90-day history",
       "historyDays365": "1-year history",
       "exportHistoryLimit": "Your plan allows exporting up to {{days}} days of history",
-      "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)"
+      "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)",
+      "publications": "publications",
+      "socialAccounts": "social accounts",
+      "storage": "of storage",
+      "withWatermark": "With watermark",
+      "noWatermark": "No watermark",
+      "aiRequests": "AI requests",
+      "teamMembers": "team members",
+      "teamMembersUnlimited": "Unlimited team members"
     },
     "billing": {
       "month": "month"
@@ -147,6 +156,7 @@
       "professional": "Scale your content with your team",
       "starter": "For individual creators"
     },
-    "timeAvailable": "Time available"
+    "timeAvailable": "Time available",
+    "cancelRequired": "You must cancel your current subscription to switch to this plan."
   }
 }

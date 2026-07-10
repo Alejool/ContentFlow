@@ -29,7 +29,16 @@
       "cancelPoint2": "No more automatic charges will be made",
       "cancelling": "Cancelling...",
       "confirmCancel": "Yes, cancel subscription",
-      "noDownload": "Not available"
+      "noDownload": "Not available",
+      "workspaceNote": "This plan applies to all members of this workspace",
+      "activeSubscriptionNote": "You have an active subscription. You can change to any paid plan from the Pricing page. To change to Free, first cancel your subscription.",
+      "freePlanNote": "You are on the free plan. To access the billing portal you need to subscribe to a paid plan.",
+      "invoiceHistoryDescription": "All your previous invoices",
+      "noInvoicesDescription": "Stripe invoices will appear here once you have an active subscription",
+      "downloadInvoice": "Download Stripe invoice",
+      "cancelConfirm": "Are you sure you want to cancel your subscription? You will keep access until the end of the current billing period.",
+      "cancelPoint1": "You will keep access until the end of the paid period",
+      "cancelPoint3": "You can reactivate your subscription at any time"
     },
     "usage": {
       "title": "Usage & Billing",
@@ -221,12 +230,26 @@
       "currencyBanner": {
         "title": "Prices in Your Local Currency",
         "automatic": "Automatic conversion",
-        "noHiddenFees": "No hidden fees"
+        "noHiddenFees": "No hidden fees",
+        "description": "Prices are automatically shown in your local currency for convenience. The USD equivalent is shown as a reference.",
+        "transparent": "Transparent pricing"
       },
       "currentUsage": "Current Usage",
       "showingUsage": "Showing current usage",
       "multiplePurchases": "{{count}} purchases",
-      "unlimited": "Unlimited"
+      "unlimited": "Unlimited",
+      "addonsConsumingAutomatically": "Add-ons are being consumed automatically.",
+      "addonsWillActivateWhenExceeding": "Your add-ons will activate automatically when you exceed your base plan limit",
+      "highUsageMessage": "You're using most of your plan. Expand your capacity!",
+      "howItWorksPoint2": "Your plan limit is used first, then your add-ons",
+      "howItWorksPoint3": "Credits don't expire and stack if you buy multiple packages",
+      "howItWorksPoint4": "You can request a refund within 7 days if you haven't used the add-on",
+      "currencyInfo": "Prices are shown in your local currency based on your location. The USD equivalent is shown as a reference.",
+      "noPackages": "No packages available in this category",
+      "purchaseSuccess": "Purchase successful! Your add-on will activate in a few moments.",
+      "purchaseCanceled": "Purchase canceled. No charge was made.",
+      "purchasePending": "Payment pending. We will notify you once it is confirmed.",
+      "subtitle": "Extend your capacity with AI credits, storage, publications and team members"
     },
     "success": {
       "title": "Payment Successful",
@@ -267,7 +290,8 @@
       "contactSupport": "Contact our support team"
     },
     "enterprise": {
-      "title": "Enterprise Features"
+      "title": "Enterprise Features",
+      "description": "Manage the exclusive features of your corporate plan"
     }
   }
 }

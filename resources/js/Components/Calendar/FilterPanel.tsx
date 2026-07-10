@@ -113,7 +113,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <div className="flex items-center gap-3">
           <FaFilter className="text-gray-500 dark:text-neutral-400" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {t('calendar.filters', 'Filters')}
+            {t('calendar.filters.title', 'Filters')}
           </h3>
           {hasActiveFilters && (
             <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">

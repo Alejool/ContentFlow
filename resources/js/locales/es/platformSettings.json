@@ -103,6 +103,16 @@
       "disable_duet": "Desactivar Dúos",
       "disable_stitch": "Desactivar Pegar",
       "poll_duration": "Duración de Encuesta"
+    },
+    "threads": {
+      "type": "Tipo de contenido",
+      "text": "Texto",
+      "image": "Imagen",
+      "video": "Video",
+      "replyControl": "Quién puede responder",
+      "everyone": "Todos",
+      "accountsYouFollow": "Cuentas que sigues",
+      "mentionedOnly": "Solo cuentas mencionadas"
     }
   }
 }

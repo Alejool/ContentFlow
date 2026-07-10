@@ -429,7 +429,8 @@
       "submitted": "Submitted for Review",
       "cancelled": "Cancelled",
       "reassigned": "Reassigned",
-      "auto_advanced": "Auto Advanced"
+      "auto_advanced": "Auto Advanced",
+      "inReview": "In Review"
     },
     "historyTable": {
       "publication": "Publication",
@@ -740,7 +741,8 @@
       "events": "Events Only",
       "platform": "Platform",
       "status": "Status",
-      "campaign": "Campaign"
+      "campaign": "Campaign",
+      "title": "Filters"
     },
     "bulkActions": {
       "moveSuccess": "Events moved successfully",
@@ -854,7 +856,8 @@
       "title": "Something went wrong",
       "retry": "Try again",
       "retry_button": "Retry",
-      "persist": "If the problem persists contact support."
+      "persist": "If the problem persists contact support.",
+      "description": "Something went wrong while displaying the calendar. Reload the page or try again."
     },
     "validation": {
       "invalid_date": "Invalid Date",
@@ -878,7 +881,10 @@
         "retry_button": "Retry",
         "local_saved": "Your changes have been saved locally.",
         "multiple": "{count} sync errors",
-        "dismiss_all": "Dismiss all"
+        "dismiss_all": "Dismiss all",
+        "failed": "Calendar sync failed",
+        "token_expired": "The calendar connection expired. Please reconnect it.",
+        "unavailable": "The calendar service is currently unavailable"
       }
     },
     "conflict": {
@@ -900,7 +906,9 @@
         "status": "Status",
         "platform": "Platform",
         "campaign": "Campaign"
-      }
+      },
+      "description": "This event was modified elsewhere while you were editing it.",
+      "info": "Choose which version to keep for each conflicting field."
     },
     "clear_all": "Clear All",
     "filter_by_campaign": "Campaign",
@@ -1013,7 +1021,8 @@
       "activating": "We're activating your subscription...",
       "goToDashboard": "Go to Dashboard",
       "title": "Payment Successful",
-      "updating": "Updating your account..."
+      "updating": "Updating your account...",
+      "pleaseWait": "Please wait while we activate your subscription..."
     }
   },
   "colors": {
@@ -1721,28 +1730,51 @@
     }
   },
   "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
     "profile": "Profile",
+    "analytics": "Analytics",
+    "socialNetworks": "Social Networks",
+    "billing": "Billing",
+    "addons": "Add-ons",
+    "adminDashboard": "Admin Dashboard",
+    "adminSettings": "System Settings",
     "logout": "Log Out",
     "notifications": "Notifications",
     "search": "Search routes...",
+    "searchClear": "Clear search",
     "noResults": "No routes found",
-    "search.clear": "Clear search",
-    "menu.open": "Open menu",
-    "menu.close": "Close menu",
-    "sidebar.collapse": "Collapse sidebar",
-    "sidebar.expand": "Expand sidebar",
-    "menu.navigation": "Navigation menu",
     "mainNavigation": "Main navigation",
-    "content.records": "Records",
-    "content.publications": "Publications",
-    "content.campaigns": "Campaigns",
-    "content.approvals": "Approvals",
-    "workspaces.overview": "Overview",
-    "workspaces.usage": "Usage",
-    "workspaces.general": "General",
-    "workspaces.members": "Members",
-    "workspaces.integrations": "Integrations",
+    "menu": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "navigation": "Navigation menu"
+    },
+    "sidebar": {
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
+    },
+    "content": {
+      "records": "Records",
+      "publications": "Publications",
+      "campaigns": "Campaigns",
+      "approvals": "Approvals"
+    },
+    "workspaces": {
+      "overview": "Overview",
+      "usage": "Usage",
+      "general": "General",
+      "members": "Members",
+      "integrations": "Integrations"
+    },
     "section": {
+      "dashboard": "Dashboard",
+      "content": "Content",
+      "analytics": "Analytics",
+      "workspaces": "Workspaces",
+      "subscription": "Subscription",
+      "settings": "Settings",
+      "admin": "Administration",
       "quickNavHint": "to navigate"
     }
   },
@@ -2084,6 +2116,16 @@
       "disable_duet": "Disable Duet",
       "disable_stitch": "Disable Stitch",
       "poll_duration": "Poll Duration"
+    },
+    "threads": {
+      "type": "Content type",
+      "text": "Text",
+      "image": "Image",
+      "video": "Video",
+      "replyControl": "Who can reply",
+      "everyone": "Everyone",
+      "accountsYouFollow": "Accounts you follow",
+      "mentionedOnly": "Mentioned accounts only"
     }
   },
   "portal": {
@@ -2176,7 +2218,8 @@
     "showLess": "Show less",
     "activeSubscription": {
       "title": "You already have an active subscription",
-      "manageBilling": "Manage Billing"
+      "manageBilling": "Manage Billing",
+      "prorationExplanation": "You can switch to any available plan. The change applies immediately and billing is prorated automatically for the remaining time of your subscription."
     },
     "plans": {
       "demo": {
@@ -2271,7 +2314,15 @@
       "historyDays90": "90-day history",
       "historyDays365": "1-year history",
       "exportHistoryLimit": "Your plan allows exporting up to {{days}} days of history",
-      "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)"
+      "exportHistoryLimitYear": "Your plan allows exporting up to {{days}} days of history (1 year)",
+      "publications": "publications",
+      "socialAccounts": "social accounts",
+      "storage": "of storage",
+      "withWatermark": "With watermark",
+      "noWatermark": "No watermark",
+      "aiRequests": "AI requests",
+      "teamMembers": "team members",
+      "teamMembersUnlimited": "Unlimited team members"
     },
     "billing": {
       "month": "month"
@@ -2290,7 +2341,8 @@
       "professional": "Scale your content with your team",
       "starter": "For individual creators"
     },
-    "timeAvailable": "Time available"
+    "timeAvailable": "Time available",
+    "cancelRequired": "You must cancel your current subscription to switch to this plan."
   },
   "profile": {
     "tabs": {
@@ -2438,7 +2490,8 @@
     "remove_photo": "Remove Photo",
     "uploading": "Uploading...",
     "using_initials": "Using initials",
-    "using_photo": "Using custom photo"
+    "using_photo": "Using custom photo",
+    "invalid_file_type": "Only image files are allowed (JPG, PNG, GIF, WebP, SVG)"
   },
   "publications": {
     "title": "Publications",
@@ -2509,7 +2562,11 @@
           "select_accounts_desc": "Select which networks will publish recurrently. The others will only publish once.",
           "all_accounts": "Apply to all",
           "single_account_note": "This network will publish recurrently according to the configuration."
-        }
+        },
+        "title": "Date for all networks",
+        "useGlobal": "Global",
+        "description": "Set a single date to publish on all selected social networks at once.",
+        "placeholder": "Select date and time"
       },
       "add": {
         "titleField": "Title",
@@ -2703,7 +2760,17 @@
         "media_required": "Media files are required for this content type",
         "media_min_count": "At least :min media files are required",
         "media_max_count": "Maximum :max media files allowed",
-        "mediaRequired": "Media files are required"
+        "mediaRequired": "Media files are required",
+        "checking": "Validating video...",
+        "checkingLimits": "Checking the limits of the selected platforms",
+        "allValid": "Video is valid",
+        "allValidMessage": "Your video meets the limits of every selected platform",
+        "cannotPublish": "Can't publish to some platforms",
+        "videoExceedsLimits": "Your video exceeds the limits of these accounts:",
+        "warnings": "Warnings",
+        "warningsMessage": "Your video is close to the limits on some platforms",
+        "revalidate": "Revalidate",
+        "recurrenceEndDateRequired": "End date is required for recurring publications"
       },
       "cancel_confirmation": {
         "title": "Cancel Publication",
@@ -2752,7 +2819,11 @@
       "completed": "Completed",
       "processing": "Processing",
       "waiting": "waiting",
-      "retrying": "Retrying"
+      "retrying": "Retrying",
+      "publishingProgress": "{{current}}/{{total}}",
+      "retryingProgress": "Retrying {{current}}/{{total}}",
+      "partialSuccess": "{{success}}/{{total}} published",
+      "allPublished": "{{total}}/{{total}} published"
     },
     "scheduled_for": "Scheduled for",
     "button": {
@@ -2844,7 +2915,8 @@
     },
     "platformValidation": {
       "title": "Platform Compatibility",
-      "publishedWarning": "Active Publication"
+      "publishedWarning": "Active Publication",
+      "publishedWarningDesc": "You can't change the content type of an active or scheduled publication."
     },
     "publish": {
       "button": {
@@ -3015,7 +3087,8 @@
     "reconnectButton": "Reconnect account",
     "reconnecting": "Verifying…",
     "demoMode": {
-      "title": "Demo Data"
+      "title": "Demo Data",
+      "description": "You don't have any social accounts connected. The data shown is sample data so you can explore the interface."
     }
   },
   "status": {
@@ -3060,7 +3133,16 @@
       "cancelPoint2": "No more automatic charges will be made",
       "cancelling": "Cancelling...",
       "confirmCancel": "Yes, cancel subscription",
-      "noDownload": "Not available"
+      "noDownload": "Not available",
+      "workspaceNote": "This plan applies to all members of this workspace",
+      "activeSubscriptionNote": "You have an active subscription. You can change to any paid plan from the Pricing page. To change to Free, first cancel your subscription.",
+      "freePlanNote": "You are on the free plan. To access the billing portal you need to subscribe to a paid plan.",
+      "invoiceHistoryDescription": "All your previous invoices",
+      "noInvoicesDescription": "Stripe invoices will appear here once you have an active subscription",
+      "downloadInvoice": "Download Stripe invoice",
+      "cancelConfirm": "Are you sure you want to cancel your subscription? You will keep access until the end of the current billing period.",
+      "cancelPoint1": "You will keep access until the end of the paid period",
+      "cancelPoint3": "You can reactivate your subscription at any time"
     },
     "usage": {
       "title": "Usage & Billing",
@@ -3252,12 +3334,26 @@
       "currencyBanner": {
         "title": "Prices in Your Local Currency",
         "automatic": "Automatic conversion",
-        "noHiddenFees": "No hidden fees"
+        "noHiddenFees": "No hidden fees",
+        "description": "Prices are automatically shown in your local currency for convenience. The USD equivalent is shown as a reference.",
+        "transparent": "Transparent pricing"
       },
       "currentUsage": "Current Usage",
       "showingUsage": "Showing current usage",
       "multiplePurchases": "{{count}} purchases",
-      "unlimited": "Unlimited"
+      "unlimited": "Unlimited",
+      "addonsConsumingAutomatically": "Add-ons are being consumed automatically.",
+      "addonsWillActivateWhenExceeding": "Your add-ons will activate automatically when you exceed your base plan limit",
+      "highUsageMessage": "You're using most of your plan. Expand your capacity!",
+      "howItWorksPoint2": "Your plan limit is used first, then your add-ons",
+      "howItWorksPoint3": "Credits don't expire and stack if you buy multiple packages",
+      "howItWorksPoint4": "You can request a refund within 7 days if you haven't used the add-on",
+      "currencyInfo": "Prices are shown in your local currency based on your location. The USD equivalent is shown as a reference.",
+      "noPackages": "No packages available in this category",
+      "purchaseSuccess": "Purchase successful! Your add-on will activate in a few moments.",
+      "purchaseCanceled": "Purchase canceled. No charge was made.",
+      "purchasePending": "Payment pending. We will notify you once it is confirmed.",
+      "subtitle": "Extend your capacity with AI credits, storage, publications and team members"
     },
     "success": {
       "title": "Payment Successful",
@@ -3298,7 +3394,8 @@
       "contactSupport": "Contact our support team"
     },
     "enterprise": {
-      "title": "Enterprise Features"
+      "title": "Enterprise Features",
+      "description": "Manage the exclusive features of your corporate plan"
     }
   },
   "twoFactor": {

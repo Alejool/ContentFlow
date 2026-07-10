@@ -23,7 +23,8 @@
     "reconnectButton": "Reconectar cuenta",
     "reconnecting": "Verificando…",
     "demoMode": {
-      "title": "Datos de Demostración"
+      "title": "Datos de Demostración",
+      "description": "No tienes cuentas sociales conectadas. Los datos mostrados son ejemplos para que conozcas la interfaz."
     }
   }
 }

@@ -68,7 +68,11 @@
           "select_accounts_desc": "Select which networks will publish recurrently. The others will only publish once.",
           "all_accounts": "Apply to all",
           "single_account_note": "This network will publish recurrently according to the configuration."
-        }
+        },
+        "title": "Date for all networks",
+        "useGlobal": "Global",
+        "description": "Set a single date to publish on all selected social networks at once.",
+        "placeholder": "Select date and time"
       },
       "add": {
         "titleField": "Title",
@@ -262,7 +266,17 @@
         "media_required": "Media files are required for this content type",
         "media_min_count": "At least :min media files are required",
         "media_max_count": "Maximum :max media files allowed",
-        "mediaRequired": "Media files are required"
+        "mediaRequired": "Media files are required",
+        "checking": "Validating video...",
+        "checkingLimits": "Checking the limits of the selected platforms",
+        "allValid": "Video is valid",
+        "allValidMessage": "Your video meets the limits of every selected platform",
+        "cannotPublish": "Can't publish to some platforms",
+        "videoExceedsLimits": "Your video exceeds the limits of these accounts:",
+        "warnings": "Warnings",
+        "warningsMessage": "Your video is close to the limits on some platforms",
+        "revalidate": "Revalidate",
+        "recurrenceEndDateRequired": "End date is required for recurring publications"
       },
       "cancel_confirmation": {
         "title": "Cancel Publication",
@@ -311,7 +325,11 @@
       "completed": "Completed",
       "processing": "Processing",
       "waiting": "waiting",
-      "retrying": "Retrying"
+      "retrying": "Retrying",
+      "publishingProgress": "{{current}}/{{total}}",
+      "retryingProgress": "Retrying {{current}}/{{total}}",
+      "partialSuccess": "{{success}}/{{total}} published",
+      "allPublished": "{{total}}/{{total}} published"
     },
     "scheduled_for": "Scheduled for",
     "button": {
@@ -403,7 +421,8 @@
     },
     "platformValidation": {
       "title": "Platform Compatibility",
-      "publishedWarning": "Active Publication"
+      "publishedWarning": "Active Publication",
+      "publishedWarningDesc": "You can't change the content type of an active or scheduled publication."
     },
     "publish": {
       "button": {

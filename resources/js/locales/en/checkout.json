@@ -5,7 +5,8 @@
       "activating": "We're activating your subscription...",
       "goToDashboard": "Go to Dashboard",
       "title": "Payment Successful",
-      "updating": "Updating your account..."
+      "updating": "Updating your account...",
+      "pleaseWait": "Please wait while we activate your subscription..."
     }
   }
 }

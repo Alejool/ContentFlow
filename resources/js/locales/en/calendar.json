@@ -11,7 +11,8 @@
       "events": "Events Only",
       "platform": "Platform",
       "status": "Status",
-      "campaign": "Campaign"
+      "campaign": "Campaign",
+      "title": "Filters"
     },
     "bulkActions": {
       "moveSuccess": "Events moved successfully",
@@ -125,7 +126,8 @@
       "title": "Something went wrong",
       "retry": "Try again",
       "retry_button": "Retry",
-      "persist": "If the problem persists contact support."
+      "persist": "If the problem persists contact support.",
+      "description": "Something went wrong while displaying the calendar. Reload the page or try again."
     },
     "validation": {
       "invalid_date": "Invalid Date",
@@ -149,7 +151,10 @@
         "retry_button": "Retry",
         "local_saved": "Your changes have been saved locally.",
         "multiple": "{count} sync errors",
-        "dismiss_all": "Dismiss all"
+        "dismiss_all": "Dismiss all",
+        "failed": "Calendar sync failed",
+        "token_expired": "The calendar connection expired. Please reconnect it.",
+        "unavailable": "The calendar service is currently unavailable"
       }
     },
     "conflict": {
@@ -171,7 +176,9 @@
         "status": "Status",
         "platform": "Platform",
         "campaign": "Campaign"
-      }
+      },
+      "description": "This event was modified elsewhere while you were editing it.",
+      "info": "Choose which version to keep for each conflicting field."
     },
     "clear_all": "Clear All",
     "filter_by_campaign": "Campaign",

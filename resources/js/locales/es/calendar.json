@@ -11,7 +11,8 @@
       "events": "Solo Eventos",
       "platform": "Plataforma",
       "status": "Estado",
-      "campaign": "Campaña"
+      "campaign": "Campaña",
+      "title": "Filtros"
     },
     "bulkActions": {
       "moveSuccess": "Eventos movidos exitosamente",
@@ -125,7 +126,8 @@
       "title": "Algo salió mal",
       "retry": "Intentar de nuevo",
       "retry_button": "Reintentar",
-      "persist": "Si el problema persiste contacta con soporte."
+      "persist": "Si el problema persiste contacta con soporte.",
+      "description": "Ocurrió un error al mostrar el calendario. Recarga la página o inténtalo de nuevo."
     },
     "validation": {
       "invalid_date": "Fecha Inválida",
@@ -149,7 +151,10 @@
         "retry_button": "Reintentar",
         "local_saved": "Tus cambios se han guardado localmente.",
         "multiple": "{count} errores de sincronización",
-        "dismiss_all": "Descartar todos"
+        "dismiss_all": "Descartar todos",
+        "failed": "Falló la sincronización del calendario",
+        "token_expired": "La conexión con el calendario expiró. Vuelve a conectarlo.",
+        "unavailable": "El servicio de calendario no está disponible en este momento"
       }
     },
     "conflict": {
@@ -171,7 +176,9 @@
         "status": "Estado",
         "platform": "Plataforma",
         "campaign": "Campaña"
-      }
+      },
+      "description": "Este evento fue modificado en otro lugar mientras lo editabas.",
+      "info": "Elige qué versión conservar para cada campo en conflicto."
     },
     "clear_all": "Limpiar todo",
     "filter_by_campaign": "Campaña",
