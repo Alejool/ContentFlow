@@ -8,6 +8,7 @@ use App\Models\Publications\PublicationComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Http\Requests\Publications\StoreCommentRequest;
 class PublicationCommentController extends Controller
 {
     public function index(Publication $publication)

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Logs\ApprovalLog;
 
+use App\Http\Requests\Approval\SubmitForApprovalRequest;
 class ApprovalWorkflowController extends Controller
 {
     use ApiResponse;

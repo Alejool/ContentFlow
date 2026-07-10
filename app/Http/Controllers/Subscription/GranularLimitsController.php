@@ -7,6 +7,7 @@ use App\Services\Subscription\GranularLimitValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+use App\Http\Requests\Subscription\CheckMediaLimitsRequest;
 /**
  * Controlador para consultar límites granulares del workspace.
  */

@@ -10,6 +10,7 @@ use Aws\S3\Exception\S3Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Requests\Media\DownloadMediaRequest;
 /**
  * Media Download Controller
  * 

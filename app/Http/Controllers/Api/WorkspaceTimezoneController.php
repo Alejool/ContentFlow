@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\System\ApiResponse;
 
+use App\Http\Requests\Calendar\UpdateTimezoneRequest;
 class WorkspaceTimezoneController extends Controller
 {
     use ApiResponse;

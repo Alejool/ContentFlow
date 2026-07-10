@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
+use App\Http\Requests\Media\GenerateReelRequest;
 class ReelGeneratorController extends Controller
 {
   use ApiResponse;

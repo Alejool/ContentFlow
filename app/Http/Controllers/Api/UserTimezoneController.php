@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+use App\Http\Requests\Calendar\UpdateTimezoneRequest;
 class UserTimezoneController extends Controller
 {
     /**

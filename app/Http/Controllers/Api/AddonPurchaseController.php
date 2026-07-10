@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Stripe\StripeClient;
 
+use App\Http\Requests\Subscription\ConfirmAddonPurchaseRequest;
 class AddonPurchaseController extends Controller
 {
     private StripeClient $stripe;

@@ -9,6 +9,7 @@ use App\Services\Workspace\WorkspaceAddonService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use App\Http\Requests\Subscription\UpdatePlanLimitsRequest;
 class SubscriptionLimitController extends Controller
 {
     public function __construct(

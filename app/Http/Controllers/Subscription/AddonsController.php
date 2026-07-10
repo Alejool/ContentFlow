@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use App\Http\Requests\Subscription\PurchaseAddonRequest;
 class AddonsController extends Controller
 {
     /**

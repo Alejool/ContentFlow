@@ -8,6 +8,7 @@ use App\Services\SocialPlatforms\PlatformCapabilitiesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+use App\Http\Requests\Social\AccountCapabilitiesRequest;
 class SocialAccountCapabilitiesController extends Controller
 {
     public function __construct(

@@ -6,6 +6,7 @@ use App\Services\Social\SocialManager;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+use App\Http\Requests\Social\SchedulePostRequest;
 class SocialPostController extends Controller
 {
   protected $socialManager;

@@ -22,6 +22,7 @@ use App\Helpers\System\LogHelper;
 use Inertia\Inertia;
 
 
+use App\Http\Requests\Social\StoreSocialAccountRequest;
 class SocialAccountController extends Controller
 {
   public function index(Request $request)

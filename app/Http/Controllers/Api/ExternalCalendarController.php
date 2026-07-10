@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Requests\Calendar\UpdateExternalCalendarRequest;
 class ExternalCalendarController extends Controller
 {
     /**

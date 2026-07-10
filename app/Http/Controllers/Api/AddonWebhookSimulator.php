@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 
+use App\Http\Requests\Subscription\SimulateAddonWebhookRequest;
 class AddonWebhookSimulator extends Controller
 {
     /**

@@ -7,6 +7,7 @@ use App\Services\Subscription\SubscriptionTrackingService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+use App\Http\Requests\Subscription\UsageSummaryRequest;
 class SubscriptionHistoryController extends Controller
 {
     public function __construct(

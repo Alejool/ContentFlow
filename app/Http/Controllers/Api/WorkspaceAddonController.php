@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Requests\Subscription\WorkspaceAddonPurchaseRequest;
 class WorkspaceAddonController extends Controller
 {
     public function __construct(

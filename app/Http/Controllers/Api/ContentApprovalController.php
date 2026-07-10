@@ -11,6 +11,7 @@ use App\Traits\System\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+use App\Http\Requests\Approval\ProcessApprovalRequest;
 class ContentApprovalController extends Controller
 {
     use ApiResponse;

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Requests\Publications\SuggestContentTypeByMediaRequest;
 class ContentTypeController extends Controller
 {
     public function __construct(
