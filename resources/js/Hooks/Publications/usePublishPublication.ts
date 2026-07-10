@@ -285,8 +285,30 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     async (publicationId: number) => {
       setCurrentPublicationId(publicationId);
       await fetchPublishedPlatformsFromStore(publicationId);
+
+      // Preselect every account that can actually be published to, so the user
+      // doesn't have to re-check each network on every open. Runs after the
+      // fetch so published/scheduled/publishing accounts are known and excluded.
+      // Never overrides a selection the user already made.
+      const state = usePublicationStore.getState();
+      const retrying = Object.entries(state.retryInfo[publicationId] || {})
+        .filter(([, info]) => (info as { is_retrying?: boolean }).is_retrying)
+        .map(([id]) => parseInt(id));
+      const unavailable = new Set([
+        ...(state.publishedPlatforms[publicationId] || []),
+        ...(state.scheduledPlatforms[publicationId] || []),
+        ...(state.publishingPlatforms[publicationId] || []),
+        ...(state.duplicatePlatforms[publicationId] || []),
+        ...retrying,
+      ]);
+      setSelectedPlatforms((prev) => {
+        if (prev.length > 0) return prev;
+        return accounts
+          .filter((account) => account.is_active && !unavailable.has(account.id))
+          .map((account) => account.id);
+      });
     },
-    [fetchPublishedPlatformsFromStore],
+    [fetchPublishedPlatformsFromStore, accounts],
   );
 
   /* ------------------------------- Unpublish -------------------------------- */
