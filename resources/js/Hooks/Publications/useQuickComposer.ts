@@ -57,13 +57,16 @@ export const useQuickComposer = ({ onCreated }: UseQuickComposerProps = {}) => {
     );
   };
 
-  const buildFormData = (data: QuickComposerData): FormData => {
+  const buildFormData = (data: QuickComposerData, scheduledAt?: string): FormData => {
     const fd = new FormData();
     // Backend derives the title from the description when empty
     fd.append('title', '');
     fd.append('description', data.description);
     fd.append('content_type', 'post');
-    fd.append('status', 'draft');
+    fd.append('status', scheduledAt ? 'scheduled' : 'draft');
+    if (scheduledAt) {
+      fd.append('scheduled_at', scheduledAt);
+    }
     fd.append('social_accounts_sync', 'true');
     if (data.social_accounts.length === 0) {
       fd.append('clear_social_accounts', '1');
@@ -74,9 +77,9 @@ export const useQuickComposer = ({ onCreated }: UseQuickComposerProps = {}) => {
     return fd;
   };
 
-  const submit = (publishNow: boolean) =>
+  const submit = (mode: 'draft' | 'publish' | 'schedule', scheduledAt?: string) =>
     handleSubmit(async (data: QuickComposerData) => {
-      if (publishNow && data.social_accounts.length === 0) {
+      if (mode !== 'draft' && data.social_accounts.length === 0) {
         toast.error(
           t('publications.quickComposer.accountsRequired') ||
             'Selecciona al menos una red para publicar',
@@ -86,17 +89,23 @@ export const useQuickComposer = ({ onCreated }: UseQuickComposerProps = {}) => {
 
       setIsSubmitting(true);
       try {
-        const result = await publicationService.create(buildFormData(data));
+        const result = await publicationService.create(
+          buildFormData(data, mode === 'schedule' ? scheduledAt : undefined),
+        );
         const pubId = (result as any)?.id || (result as any)?.publication?.id;
 
         saveLastAccounts(workspaceId, data.social_accounts);
 
-        if (publishNow && pubId) {
+        if (mode === 'publish' && pubId) {
           const publishFd = new FormData();
           data.social_accounts.forEach((id) => publishFd.append('platforms[]', id.toString()));
           await publicationService.publish(pubId, publishFd);
           toast.success(
             t('publications.messages.publishStarted') || 'Publicando en las redes seleccionadas…',
+          );
+        } else if (mode === 'schedule') {
+          toast.success(
+            t('publications.quickComposer.scheduled') || 'Publicación programada',
           );
         } else {
           toast.success(t('publications.messages.createSuccess'));
@@ -125,7 +134,8 @@ export const useQuickComposer = ({ onCreated }: UseQuickComposerProps = {}) => {
     isSubmitting,
     isValid: formState.isValid,
     toggleAccount,
-    saveDraft: () => submit(false),
-    publishNow: () => submit(true),
+    saveDraft: () => submit('draft'),
+    publishNow: () => submit('publish'),
+    scheduleAt: (iso: string) => submit('schedule', iso),
   };
 };

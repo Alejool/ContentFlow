@@ -113,6 +113,15 @@ return [
         'temperature' => (float) env('ANTHROPIC_TEMPERATURE', 0.7),
         'base_url' => env('ANTHROPIC_BASE_URL', 'https://api.anthropic.com'),
     ],
+    'openrouter' => [
+        'enabled' => env('OPENROUTER_ENABLED', false),
+        'api_key' => env('OPENROUTER_API_KEY'),
+        'model' => env('OPENROUTER_MODEL', 'meta-llama/llama-3.1-8b-instruct'),
+        'temperature' => (float) env('OPENROUTER_TEMPERATURE', 0.7),
+        'max_tokens' => (int) env('OPENROUTER_MAX_TOKENS', 1000),
+        'timeout' => (int) env('OPENROUTER_TIMEOUT', 60),
+        'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
+    ],
     'stripe' => [
         'secret' => env('STRIPE_SECRET'),
         'public' => env('STRIPE_PUBLISH'),

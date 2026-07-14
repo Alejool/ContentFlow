@@ -456,7 +456,9 @@
       "advanced": "Advanced options",
       "noAccounts": "No connected accounts",
       "accountsRequired": "Select at least one account to publish",
-      "connectAccounts": "Connect your accounts to publish →"
+      "connectAccounts": "Connect your accounts to publish →",
+      "scheduled": "Publication scheduled",
+      "scheduleFor": "Schedule"
     }
   }
 }

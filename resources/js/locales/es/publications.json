@@ -456,7 +456,9 @@
       "advanced": "Opciones avanzadas",
       "noAccounts": "Sin redes conectadas",
       "accountsRequired": "Selecciona al menos una red para publicar",
-      "connectAccounts": "Conecta tus redes para publicar →"
+      "connectAccounts": "Conecta tus redes para publicar →",
+      "scheduled": "Publicación programada",
+      "scheduleFor": "Programar"
     }
   }
 }

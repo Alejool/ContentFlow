@@ -13,7 +13,23 @@ export interface ChatProcessResponse {
   suggestion?: { data: Record<string, unknown> };
 }
 
+export interface ComposerSuggestion {
+  headline: string;
+  tip: string;
+  cta: string;
+  suggested_time: string;
+  source: 'ai' | 'heuristic';
+}
+
 export const aiAssistantService = {
+  composerAssistant: (payload: {
+    platforms: string[];
+    draft?: string;
+    timezone?: string;
+    locale?: string;
+  }): Promise<{ success: boolean; data: ComposerSuggestion }> =>
+    axios.post(route('api.v1.ai.composer-assistant'), payload).then((r) => r.data),
+
   suggestFields: (payload: {
     fields: Record<string, unknown>;
     type: string;
