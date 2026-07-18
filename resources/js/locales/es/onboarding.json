@@ -37,7 +37,8 @@
       "sizeRequired": "Selecciona el tamaño de tu equipo"
     },
     "optional": "Opcional",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "skip": "Omitir por ahora"
   },
   "planSelection": {
     "title": "Elige el plan perfecto para ti",

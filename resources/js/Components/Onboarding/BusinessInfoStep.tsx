@@ -31,7 +31,7 @@ const BUSINESS_SIZES = ['solo', 'small', 'medium', 'large'];
 
 export default function BusinessInfoStep({
   onComplete,
-  onSkip: _onSkip,
+  onSkip,
   initialData,
 }: BusinessInfoStepProps) {
   const { t } = useTranslation();
@@ -161,7 +161,10 @@ export default function BusinessInfoStep({
         />
 
         {/* Actions */}
-        <div className="flex justify-end pt-4">
+        <div className="flex items-center justify-between pt-4">
+          <Button type="button" variant="ghost" size="lg" onClick={onSkip}>
+            {t('businessInfo.skip', 'Skip for now')}
+          </Button>
           <Button type="submit" variant="primary" size="lg" className="px-8">
             {t('businessInfo.continue')}
           </Button>

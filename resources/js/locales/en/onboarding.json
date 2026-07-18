@@ -37,7 +37,8 @@
       "sizeRequired": "Select your team size"
     },
     "optional": "Optional",
-    "continue": "Continue"
+    "continue": "Continue",
+    "skip": "Skip for now"
   },
   "planSelection": {
     "title": "Choose the perfect plan for you",
