@@ -24,6 +24,7 @@
       }
     },
     "subtitle": "Estadísticas generales del sistema.",
+    "welcome": "¡Bienvenido, {{name}}!",
     "tabs": {
       "overview": "Resumen",
       "engagement": "Interacción",

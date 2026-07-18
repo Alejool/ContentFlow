@@ -163,7 +163,7 @@ export default function Dashboard({
         >
           <div>
             <h1 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">
-              ¡Bienvenido, {auth.user.name}!
+              {t('dashboard.welcome', { name: auth.user.name })}
             </h1>
             <p className="text-lg text-gray-600 dark:text-neutral-400">
               {t('dashboard.subtitle', 'Estadísticas generales del sistema.')}

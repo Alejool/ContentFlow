@@ -138,8 +138,8 @@ export default function PlanCard({
         features.forEach((f) => {
           // Excluir límites numéricos
           if (
-            !/^(publications|socialAccounts|storage|aiRequests)\d/.test(f) &&
-            !/^(publications|socialAccounts|storage|aiRequests)Unlimited/.test(f) &&
+            !/^(publications|socialAccounts|storage)\d/.test(f) &&
+            !/^(publications|socialAccounts|storage)Unlimited/.test(f) &&
             !/^(storage)1TB/.test(f) &&
             f !== 'fullAccessDays'
           ) {
@@ -615,7 +615,7 @@ export default function PlanCard({
               </p>
 
               <CardDescription className="min-h-[2rem] text-xs text-gray-600 dark:text-neutral-400">
-                {plan.description}
+                {t(`pricing.plans.${plan.id}.description`, plan.description)}
               </CardDescription>
             </div>
           </div>

@@ -39,28 +39,28 @@
     "plans": {
       "demo": {
         "name": "Demo",
-        "description": "Temporary plan for demos and testing. Full access for 30 days.",
+        "description": "Full platform access for 30 days: publications, advanced analytics and approvals to evaluate the whole product.",
         "trialDays": "days of full access"
       },
       "free": {
         "name": "Free",
-        "description": "Perfect to start and try the platform"
+        "description": "Start free: 3 publications per month, 1 social account and 1 GB of storage to get to know the platform."
       },
       "starter": {
         "name": "Starter",
-        "description": "Ideal for individual content creators"
+        "description": "For entrepreneurs and small teams: 50 publications per month, 3 social accounts, advanced scheduling and calendar sync."
       },
       "growth": {
         "name": "Growth",
-        "description": "Perfect for growing teams that need advanced features and higher limits"
+        "description": "For growing teams: 100 publications per month, 5 social accounts, advanced analytics, recurrence and optimal times."
       },
       "professional": {
         "name": "Professional",
-        "description": "For growing teams and businesses"
+        "description": "For professional teams: 200 publications per month, 8 social accounts, publishing queue, bulk operations, custom branding and approvals."
       },
       "enterprise": {
         "name": "Enterprise",
-        "description": "Complete solution for large organizations"
+        "description": "For large organizations: unlimited publications and accounts, 1 TB of storage, white label, API, SLA and multi-level approvals."
       }
     },
     "features": {
@@ -84,11 +84,6 @@
       "storage50": "50 GB storage",
       "storage100": "100 GB storage",
       "storage1TB": "1 TB storage",
-      "aiRequests10": "10 AI requests/month",
-      "aiRequests100": "100 AI requests/month",
-      "aiRequests300": "300 AI requests/month",
-      "aiRequests500": "500 AI requests/month",
-      "aiRequestsUnlimited": "Unlimited AI requests",
       "teamMembers5": "5 team members",
       "basicAnalytics": "Basic analytics",
       "advancedAnalytics": "Advanced analytics",
@@ -135,7 +130,6 @@
       "storage": "of storage",
       "withWatermark": "With watermark",
       "noWatermark": "No watermark",
-      "aiRequests": "AI requests",
       "teamMembers": "team members",
       "teamMembersUnlimited": "Unlimited team members"
     },

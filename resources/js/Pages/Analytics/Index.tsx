@@ -163,7 +163,7 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
         <div className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-white/70 bg-gradient-to-r from-white/90 to-white/95 p-8 shadow-sm transition-colors duration-300 dark:border-black/70 dark:from-black/90 dark:to-black/95 md:flex-row">
           <div>
             <h1 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">
-              ¡Bienvenido, {auth.user.name}!
+              {t('dashboard.welcome', { name: auth.user.name })}
               {isFetching && (
                 <span className="ml-3 inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-400 border-t-transparent align-middle" />
               )}

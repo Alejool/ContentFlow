@@ -1389,6 +1389,7 @@
       }
     },
     "subtitle": "Estadísticas generales del sistema.",
+    "welcome": "¡Bienvenido, {{name}}!",
     "tabs": {
       "overview": "Resumen",
       "engagement": "Interacción",
@@ -2006,7 +2007,6 @@
       "support": "¿Tienes alguna pregunta? Contáctanos en",
       "addonTypes": {
         "storage": "Almacenamiento",
-        "ai_credits": "Créditos IA",
         "publications": "Publicaciones",
         "team_members": "Miembros del Equipo"
       }
@@ -2224,28 +2224,28 @@
     "plans": {
       "demo": {
         "name": "Demo",
-        "description": "Plan temporal para demos y pruebas. Acceso completo por 30 días.",
+        "description": "Acceso completo a la plataforma durante 30 días: publicaciones, analytics avanzados y aprobaciones para evaluar todo el producto.",
         "trialDays": "días de acceso completo"
       },
       "free": {
         "name": "Gratis",
-        "description": "Perfecto para empezar y probar la plataforma"
+        "description": "Empieza gratis: 3 publicaciones al mes, 1 cuenta social y 1 GB de almacenamiento para conocer la plataforma."
       },
       "starter": {
         "name": "Starter",
-        "description": "Ideal para creadores de contenido individuales"
+        "description": "Para emprendedores y equipos pequeños: 50 publicaciones al mes, 3 cuentas sociales, programación avanzada y sincronización de calendario."
       },
       "growth": {
         "name": "Growth",
-        "description": "Perfecto para equipos en crecimiento que necesitan funciones avanzadas y límites más altos"
+        "description": "Para equipos en crecimiento: 100 publicaciones al mes, 5 cuentas sociales, analytics avanzados, recurrencia y horarios óptimos."
       },
       "professional": {
         "name": "Professional",
-        "description": "Para equipos y negocios en crecimiento"
+        "description": "Para equipos profesionales: 200 publicaciones al mes, 8 cuentas sociales, cola de publicación, operaciones masivas, branding propio y aprobaciones."
       },
       "enterprise": {
         "name": "Enterprise",
-        "description": "Solución completa para grandes organizaciones"
+        "description": "Para grandes organizaciones: publicaciones y cuentas ilimitadas, 1 TB de almacenamiento, white label, API, SLA y aprobaciones multinivel."
       }
     },
     "features": {
@@ -2269,11 +2269,6 @@
       "storage50": "50 GB almacenamiento",
       "storage100": "100 GB almacenamiento",
       "storage1TB": "1 TB almacenamiento",
-      "aiRequests10": "10 solicitudes IA/mes",
-      "aiRequests100": "100 solicitudes IA/mes",
-      "aiRequests300": "300 solicitudes IA/mes",
-      "aiRequests500": "500 solicitudes IA/mes",
-      "aiRequestsUnlimited": "Solicitudes IA ilimitadas",
       "teamMembers5": "5 miembros del equipo",
       "basicAnalytics": "Analytics básicos",
       "advancedAnalytics": "Analytics avanzados",
@@ -2320,7 +2315,6 @@
       "storage": "de almacenamiento",
       "withWatermark": "Con marca de agua",
       "noWatermark": "Sin marca de agua",
-      "aiRequests": "solicitudes de IA",
       "teamMembers": "miembros de equipo",
       "teamMembersUnlimited": "Miembros de equipo ilimitados"
     },
@@ -3152,8 +3146,6 @@
       "currentUsage": "Uso Actual",
       "publications": "Posts Publicados",
       "storage": "Almacenamiento",
-      "aiRequests": "Solicitudes IA",
-      "ai_requests": "Solicitudes IA",
       "teamMembers": "Miembros del Equipo",
       "team_members": "Miembros del Equipo",
       "social_accounts": "Cuentas Sociales",
@@ -3199,7 +3191,6 @@
       "monitorMonthlyUsage": "Monitorea tu consumo mensual",
       "powerUpWorkspace": "Potencia tu Workspace",
       "publications": "Publicaciones",
-      "aiCredits": "Créditos IA",
       "socialAccounts": "Cuentas Sociales",
       "teamMembers": "Miembros del Equipo",
       "remaining": "restantes",
