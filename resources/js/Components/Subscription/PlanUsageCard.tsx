@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
-import { FileText, HardDrive, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { FileText, HardDrive, TrendingUp, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface UsageMetric {
@@ -25,8 +25,6 @@ export default function PlanUsageCard({ usage, className = '' }: PlanUsageCardPr
         return <FileText className="h-4 w-4" />;
       case 'storage':
         return <HardDrive className="h-4 w-4" />;
-      case 'ai_requests':
-        return <Sparkles className="h-4 w-4" />;
       case 'team_members':
         return <Users className="h-4 w-4" />;
       default:

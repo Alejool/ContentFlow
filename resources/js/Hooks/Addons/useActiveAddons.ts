@@ -5,7 +5,7 @@ export interface ActiveAddon {
   id?: number;
   sku: string;
   name: string;
-  type: 'ai_credits' | 'storage' | 'publications' | 'team_members';
+  type: 'storage' | 'publications' | 'team_members';
   amount: number;
   used: number;
   remaining: number;

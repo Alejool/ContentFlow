@@ -21,7 +21,7 @@ class WorkspaceAddonController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $type = $request->query('type'); // 'ai_credits' or 'storage'
+            $type = $request->query('type'); // 'storage', 'publications' or 'team_members'
             $workspace = $request->user()->currentWorkspace;
             $user = $request->user();
 
@@ -93,7 +93,7 @@ class WorkspaceAddonController extends Controller
                 ], 400);
             }
 
-            if (!in_array($type, ['ai_credits', 'storage'])) {
+            if (!in_array($type, ['storage', 'publications', 'team_members'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid addon type',

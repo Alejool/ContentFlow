@@ -165,10 +165,9 @@ class SubscriptionController extends Controller
     {
         $limits = config("plans.{$plan}.limits");
 
-        foreach (['publications', 'storage', 'ai_requests'] as $metric) {
+        foreach (['publications', 'storage'] as $metric) {
             $limitKey = match ($metric) {
                 'publications' => 'publications_per_month',
-                'ai_requests' => 'ai_requests_per_month',
                 'storage' => 'storage_gb',
             };
 
@@ -1035,10 +1034,9 @@ class SubscriptionController extends Controller
     {
         $limits = config("plans.{$plan}.limits");
 
-        foreach (['publications', 'storage', 'ai_requests'] as $metric) {
+        foreach (['publications', 'storage'] as $metric) {
             $limitKey = match ($metric) {
                 'publications' => 'publications_per_month',
-                'ai_requests' => 'ai_requests_per_month',
                 'storage' => 'storage_gb',
             };
 

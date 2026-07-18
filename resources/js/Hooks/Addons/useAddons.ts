@@ -9,7 +9,7 @@ interface UseAddonsReturn {
   error: string | null;
   refreshBalance: () => Promise<void>;
   purchaseAddon: (sku: string, quantity?: number) => Promise<void>;
-  getBalanceByType: (type: 'ai_credits' | 'storage') => Promise<AddonBalance | null>;
+  getBalanceByType: (type: 'storage') => Promise<AddonBalance | null>;
 }
 
 export const useAddons = (): UseAddonsReturn => {
@@ -64,7 +64,7 @@ export const useAddons = (): UseAddonsReturn => {
     }
   };
 
-  const getBalanceByType = async (type: 'ai_credits' | 'storage'): Promise<AddonBalance | null> => {
+  const getBalanceByType = async (type: 'storage'): Promise<AddonBalance | null> => {
     try {
       const response = await axios.get(`/api/v1/addons/balance/${type}`);
       return response.data.data;

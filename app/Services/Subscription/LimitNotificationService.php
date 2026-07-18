@@ -48,7 +48,6 @@ class LimitNotificationService
             'publications' => "Te quedan solo {$remaining} publicaciones este mes.",
             'social_accounts' => "Puedes conectar solo {$remaining} cuentas más.",
             'storage' => "Te quedan {$remaining}GB de almacenamiento.",
-            'ai_requests' => "Te quedan {$remaining} solicitudes de IA este mes.",
             'team_members' => "Puedes agregar {$remaining} miembros más al equipo.",
         ];
 

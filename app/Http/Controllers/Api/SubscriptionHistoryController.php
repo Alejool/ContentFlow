@@ -103,10 +103,6 @@ class SubscriptionHistoryController extends Controller
                     'used' => $usage->social_accounts_used,
                     'limit' => $usage->social_accounts_limit,
                 ],
-                'ai_requests' => [
-                    'used' => $usage->ai_requests_used,
-                    'limit' => $usage->ai_requests_limit,
-                ],
                 'additional_metrics' => [
                     'reels_generated' => $usage->reels_generated,
                     'scheduled_posts' => $usage->scheduled_posts,
@@ -157,7 +153,6 @@ class SubscriptionHistoryController extends Controller
                 'total_publications' => $stats['total_publications'],
                 'total_storage_bytes' => $stats['total_storage_bytes'],
                 'total_storage_gb' => round($stats['total_storage_bytes'] / (1024 * 1024 * 1024), 2),
-                'total_ai_requests' => $stats['total_ai_requests'],
                 'total_reels_generated' => $stats['total_reels_generated'],
                 'total_scheduled_posts' => $stats['total_scheduled_posts'],
                 'months_tracked' => $stats['months_tracked'],

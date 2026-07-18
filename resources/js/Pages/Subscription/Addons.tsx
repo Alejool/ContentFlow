@@ -26,10 +26,6 @@ interface AddonPackage {
 }
 
 interface AddonsConfig {
-  ai_credits: {
-    enabled: boolean;
-    packages: Record<string, AddonPackage>;
-  };
   storage: {
     enabled: boolean;
     packages: Record<string, AddonPackage>;
@@ -50,7 +46,6 @@ interface Props {
 
 interface PageProps extends Props {
   systemAddons: {
-    ai_credits: boolean;
     storage: boolean;
     team_members: boolean;
     publications: boolean;
@@ -69,10 +64,6 @@ export default function Addons({ addons }: Props) {
 
   // Filtrar addons según configuración del sistema
   const filteredAddons: AddonsConfig = {
-    ai_credits: {
-      ...addons.ai_credits,
-      enabled: addons.ai_credits.enabled && systemAddons?.ai_credits !== false,
-    },
     storage: {
       ...addons.storage,
       enabled: addons.storage.enabled && systemAddons?.storage !== false,
@@ -224,7 +215,7 @@ export default function Addons({ addons }: Props) {
             <p className="text-gray-600 dark:text-neutral-400">
               {t(
                 'subscription.addons.subtitle',
-                'Extiende tu capacidad con créditos de IA, almacenamiento, publicaciones y miembros del equipo',
+                'Extiende tu capacidad con almacenamiento, publicaciones y miembros del equipo',
               )}
             </p>
           </div>

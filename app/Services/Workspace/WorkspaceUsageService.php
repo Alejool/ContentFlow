@@ -48,8 +48,6 @@ class WorkspaceUsageService
             
             // Mapear metricType a addon type
             $addonTypeMap = [
-                'ai_requests_per_month' => 'ai_credits',
-                'ai_requests' => 'ai_credits',
                 'storage_gb' => 'storage',
                 'storage_bytes' => 'storage',
                 'storage' => 'storage',
@@ -146,7 +144,6 @@ class WorkspaceUsageService
         // Métricas que se resetean mensualmente
         $monthlyMetrics = [
             'publications_per_month',
-            'ai_requests_per_month',
         ];
 
         $plan = $workspace->getPlanName();
@@ -189,7 +186,6 @@ class WorkspaceUsageService
             'usage' => [
                 'publications' => $this->getMetricSummary($workspace, 'publications_per_month'),
                 'storage' => $this->getStorageSummary($workspace, $limits['storage_gb']),
-                'ai_requests' => $this->getMetricSummary($workspace, 'ai_requests_per_month'),
                 'social_accounts' => $this->getSocialAccountsSummary($workspace, $limits['social_accounts']),
                 'team_members' => $this->getTeamMembersSummary($workspace, $limits['team_members']),
                 'external_integrations' => $this->getIntegrationsSummary($workspace, $limits['external_integrations'] ?? 0),
@@ -320,21 +316,15 @@ class WorkspaceUsageService
         }
 
         // Para métricas mensuales con add-ons
-        if (in_array($limitType, ['publications_per_month', 'ai_requests_per_month'])) {
+        if (in_array($limitType, ['publications_per_month'])) {
             $usage = $this->getCurrentUsageMetric($workspace, $limitType);
             $current = $usage?->current_usage ?? 0;
-            
+
             // Si está dentro del límite del plan, permitir
             if ($current < $limit) {
                 return true;
             }
-            
-            // Si excede el plan, verificar si tiene add-ons disponibles
-            if ($limitType === 'ai_requests_per_month') {
-                $addonService = app(\App\Services\Workspace\WorkspaceAddonService::class);
-                return $addonService->hasSufficientBalance($workspace, 'ai_credits', 1);
-            }
-            
+
             return false;
         }
 
@@ -386,7 +376,6 @@ class WorkspaceUsageService
 
         $messages = [
             'publications_per_month' => "Has alcanzado el límite de {$limit} publicaciones por mes del plan {$plan}. Actualiza tu plan para continuar publicando.",
-            'ai_requests_per_month' => "Has alcanzado el límite de {$limit} solicitudes de IA por mes del plan {$plan}. Actualiza tu plan para continuar usando IA.",
             'storage_gb' => "Has alcanzado el límite de {$limit}GB de almacenamiento del plan {$plan}. Actualiza tu plan para subir más archivos.",
             'social_accounts' => "Has alcanzado el límite de {$limit} cuentas sociales del plan {$plan}. Actualiza tu plan para conectar más cuentas.",
             'team_members' => "Has alcanzado el límite de {$limit} miembros del plan {$plan}. Actualiza tu plan para agregar más miembros.",
@@ -405,9 +394,7 @@ class WorkspaceUsageService
         $frontendMetricType = match ($metricType) {
             'storage_bytes' => 'storage',
             'publications_per_month' => 'publications',
-            'ai_requests_per_month' => 'ai_requests',
             'publications' => 'publications',
-            'ai_requests' => 'ai_requests',
             'storage' => 'storage',
             default => $metricType,
         };

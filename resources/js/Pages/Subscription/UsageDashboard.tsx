@@ -76,8 +76,6 @@ export default function UsageDashboard({ subscription, usage }: Props) {
         return '📝';
       case 'storage':
         return '💾';
-      case 'ai_requests':
-        return '🤖';
       default:
         return '📊';
     }
@@ -89,8 +87,6 @@ export default function UsageDashboard({ subscription, usage }: Props) {
         return t('subscription.usage.publications');
       case 'storage':
         return t('subscription.usage.storage');
-      case 'ai_requests':
-        return t('subscription.usage.aiRequests');
       default:
         return type;
     }

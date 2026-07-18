@@ -44,11 +44,6 @@ export default function AddonsSummary() {
 
   const addonTypes = [
     {
-      key: 'ai_credits',
-      name: t('subscription.addons.aiCredits'),
-      unit: t('subscription.addons.credits'),
-    },
-    {
       key: 'storage',
       name: t('subscription.addons.storage'),
       unit: 'GB',

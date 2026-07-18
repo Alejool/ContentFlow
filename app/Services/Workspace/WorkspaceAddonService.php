@@ -34,7 +34,7 @@ class WorkspaceAddonService
 
         // Convertir precios de todos los tipos
         $result = [];
-        foreach (['ai_credits', 'storage', 'publications', 'team_members'] as $addonType) {
+        foreach (['storage', 'publications', 'team_members'] as $addonType) {
             if (isset($addons[$addonType]['packages'])) {
                 $packages = $addons[$addonType]['packages'];
                 $convertedPackages = [];
@@ -251,7 +251,6 @@ class WorkspaceAddonService
 
         // Mapear limitType a addon type
         $addonTypeMap = [
-            'ai_requests_per_month' => 'ai_credits',
             'storage_gb' => 'storage',
         ];
 
@@ -332,19 +331,16 @@ class WorkspaceAddonService
         $limits = $workspace->getPlanLimits();
         
         // Get addon balances
-        $aiCreditsAddons = $this->getAddonBalance($workspace, 'ai_credits');
         $storageAddons = $this->getAddonBalance($workspace, 'storage');
-        
+
         // Get current usage using PlanLimitValidator
         $validator = app(\App\Services\Subscription\PlanLimitValidator::class);
-        
-        $aiUsed = $validator->getCurrentUsage($workspace, 'ai_requests');
+
         $storageUsed = $validator->getCurrentUsage($workspace, 'storage');
         $teamMembersUsed = $validator->getCurrentUsage($workspace, 'team_members');
         $publicationsUsed = $validator->getCurrentUsage($workspace, 'publications');
-        
+
         // Calculate totals (plan limit + addons)
-        $aiLimit = $limits['ai_requests_per_month'] ?? 0;
         $storageLimit = $limits['storage_gb'] ?? 0;
         $teamMembersLimit = $limits['team_members'] ?? 0;
         $publicationsLimit = $limits['publications_per_month'] ?? 0;
@@ -353,12 +349,6 @@ class WorkspaceAddonService
         $storageLimitBytes = $storageLimit === -1 ? -1 : ($storageLimit * 1024 * 1024 * 1024);
         
         return [
-            'ai_credits' => [
-                'used' => $aiUsed,
-                'limit' => $aiLimit,
-                'addons' => $aiCreditsAddons['remaining'],
-                'percentage' => $this->calculatePercentage($aiUsed, $aiLimit + $aiCreditsAddons['remaining']),
-            ],
             'storage' => [
                 'used' => round($storageUsed / (1024 * 1024 * 1024), 2), // Convert bytes to GB
                 'limit' => $storageLimit,
@@ -439,7 +429,6 @@ class WorkspaceAddonService
     {
         // Map addon types to frontend metric types
         $frontendMetricType = match ($addonType) {
-            'ai_credits' => 'ai_requests',
             'storage' => 'storage',
             'publications' => 'publications',
             'team_members' => 'team_members',

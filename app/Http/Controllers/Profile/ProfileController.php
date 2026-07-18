@@ -74,8 +74,6 @@ class ProfileController extends Controller
         'publications_limit' => $summary['usage']['publications']['limit'],
         'storage_used' => $summary['usage']['storage']['current'],
         'storage_limit' => $summary['usage']['storage']['limit'],
-        'ai_requests_used' => $summary['usage']['ai_requests']['current'],
-        'ai_requests_limit' => $summary['usage']['ai_requests']['limit'],
         'social_accounts_used' => $summary['usage']['social_accounts']['current'],
         'social_accounts_limit' => $summary['usage']['social_accounts']['limit'],
         'team_members_used' => $summary['usage']['team_members']['current'],

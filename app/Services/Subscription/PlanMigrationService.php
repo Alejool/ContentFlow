@@ -71,7 +71,6 @@ class PlanMigrationService
 
         $metricTypes = [
             'publications' => $limits['publications_per_month'] ?? 0,
-            'ai_requests' => $limits['ai_requests_per_month'] ?? 0,
             'storage' => $limits['storage_gb'] ?? 0,
         ];
 

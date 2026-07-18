@@ -49,8 +49,6 @@ interface SubscriptionSectionProps {
     publications_limit: number;
     storage_used: number;
     storage_limit: number;
-    ai_requests_used: number;
-    ai_requests_limit: number;
     social_accounts_used?: number;
     social_accounts_limit?: number;
     team_members_used?: number;
@@ -106,23 +104,6 @@ function UsageStatsWithAddons({ usage: legacyUsage }: { usage?: any }) {
       percentage: usage.storage.percentage,
       addon_info: usage.storage.addon_info,
       show: true,
-    },
-    {
-      key: 'ai_requests',
-      label: t('subscription.addons.aiCredits', 'Créditos IA'),
-      icon: Sparkles,
-      used: usage.ai_requests.used,
-      limit:
-        usage.ai_requests.limit === -1 || usage.ai_requests.limit === null
-          ? '∞'
-          : usage.ai_requests.limit,
-      total_available:
-        usage.ai_requests.total_available === -1 || usage.ai_requests.total_available === null
-          ? '∞'
-          : usage.ai_requests.total_available,
-      percentage: usage.ai_requests.percentage || 0,
-      addon_info: usage.ai_requests.addon_info,
-      show: usage.ai_requests.limit !== null && usage.ai_requests.limit !== -1,
     },
     {
       key: 'social_accounts',

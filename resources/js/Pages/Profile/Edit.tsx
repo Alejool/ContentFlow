@@ -31,8 +31,6 @@ interface EditProps {
     publications_limit: number;
     storage_used: number;
     storage_limit: number;
-    ai_requests_used: number;
-    ai_requests_limit: number;
     social_accounts_used?: number;
     social_accounts_limit?: number;
     team_members_used?: number;

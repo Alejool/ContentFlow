@@ -1,5 +1,5 @@
 import type { ActiveAddon } from '@/Hooks/Addons/useActiveAddons';
-import { FileText, HardDrive, Package, Sparkles, Users } from 'lucide-react';
+import { FileText, HardDrive, Package, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency, formatPercent, formatNumber } from '@/Utils/formatters/number';
 import { formatBytesAsGB, gbToBytes } from '@/Utils/formatters/storage';
@@ -14,8 +14,6 @@ export function AddonCard({ addon }: AddonCardProps) {
 
   const getIcon = (type: ActiveAddon['type']) => {
     switch (type) {
-      case 'ai_credits':
-        return Sparkles;
       case 'storage':
         return HardDrive;
       case 'publications':

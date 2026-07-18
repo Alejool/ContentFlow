@@ -14,14 +14,15 @@ class AddonHelper
     {
         $addonsConfig = config('addons', []);
         
-        // Buscar en todas las categorías (ai_credits, storage, publications, team_members)
+        // Buscar en todas las categorías (storage, publications, team_members)
         foreach ($addonsConfig as $category => $categoryData) {
             if ($category === 'settings') {
                 continue; // Saltar la configuración general
             }
             
             if (isset($categoryData['packages'][$sku])) {
-                return $categoryData['packages'][$sku];
+                // La categoria es el tipo de addon (igual que WorkspaceAddonService::getPackageBySku)
+                return array_merge($categoryData['packages'][$sku], ['type' => $category]);
             }
         }
         

@@ -25,10 +25,6 @@ class AddonsController extends Controller
 
             // Asegurar que la estructura existe con valores por defecto
             $addonsData = [
-                'ai_credits' => [
-                    'enabled' => $addons['ai_credits']['enabled'] ?? true,
-                    'packages' => $addons['ai_credits']['packages'] ?? [],
-                ],
                 'storage' => [
                     'enabled' => $addons['storage']['enabled'] ?? true,
                     'packages' => $addons['storage']['packages'] ?? [],
@@ -52,7 +48,6 @@ class AddonsController extends Controller
             // Retornar estructura vacía en caso de error
             return Inertia::render('Subscription/Addons', [
                 'addons' => [
-                    'ai_credits' => ['enabled' => false, 'packages' => []],
                     'storage' => ['enabled' => false, 'packages' => []],
                     'publications' => ['enabled' => false, 'packages' => []],
                     'team_members' => ['enabled' => false, 'packages' => []],
@@ -90,7 +85,7 @@ class AddonsController extends Controller
     {
         $addons = config('addons');
 
-        foreach (['ai_credits', 'storage', 'publications', 'team_members'] as $type) {
+        foreach (['storage', 'publications', 'team_members'] as $type) {
             if (isset($addons[$type]['packages'][$sku])) {
                 return $addons[$type]['packages'][$sku];
             }

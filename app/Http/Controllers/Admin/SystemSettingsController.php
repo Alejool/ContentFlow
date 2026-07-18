@@ -35,7 +35,6 @@ class SystemSettingsController extends Controller
                 'demo' => SystemSetting::isPlanEnabled('demo'),
             ],
             'addons' => [
-                'ai_credits' => SystemSetting::isAddonEnabled('ai_credits'),
                 'storage' => SystemSetting::isAddonEnabled('storage'),
                 'team_members' => SystemSetting::isAddonEnabled('team_members'),
                 'publications' => SystemSetting::isAddonEnabled('publications'),
@@ -366,7 +365,6 @@ class SystemSettingsController extends Controller
                 'demo' => SystemSetting::isPlanEnabled('demo'),
             ],
             'addons' => [
-                'ai_credits' => SystemSetting::isAddonEnabled('ai_credits'),
                 'storage' => SystemSetting::isAddonEnabled('storage'),
                 'team_members' => SystemSetting::isAddonEnabled('team_members'),
                 'publications' => SystemSetting::isAddonEnabled('publications'),

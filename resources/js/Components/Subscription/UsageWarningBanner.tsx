@@ -6,7 +6,7 @@ import { useState } from 'react';
 interface UsageWarningBannerProps {
   usage: number;
   limit: number;
-  type: 'ai_credits' | 'storage' | 'publications';
+  type: 'storage' | 'publications';
   typeName?: string;
 }
 
@@ -19,7 +19,6 @@ export function UsageWarningBanner({ usage, limit, type, typeName }: UsageWarnin
   if (percentage < 80 || dismissed) return null;
 
   const typeNames = {
-    ai_credits: 'Créditos de IA',
     storage: 'Almacenamiento',
     publications: 'Publicaciones',
   };

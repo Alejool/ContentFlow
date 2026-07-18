@@ -253,7 +253,7 @@ class AddonUsageService
      */
     public function getUsageSummary(Workspace $workspace): array
     {
-        $types = ['ai_credits', 'storage', 'publications', 'team_members'];
+        $types = ['storage', 'publications', 'team_members'];
         $summary = [];
 
         foreach ($types as $type) {

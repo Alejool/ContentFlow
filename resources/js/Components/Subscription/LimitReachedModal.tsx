@@ -6,7 +6,7 @@ import { AlertCircle, Sparkles, TrendingUp } from 'lucide-react';
 interface LimitReachedModalProps {
   isOpen: boolean;
   onClose: () => void;
-  limitType: 'ai_credits' | 'storage' | 'publications' | 'social_accounts';
+  limitType: 'storage' | 'publications' | 'social_accounts';
   currentPlan: string;
 }
 
@@ -17,14 +17,6 @@ export function LimitReachedModal({
   currentPlan,
 }: LimitReachedModalProps) {
   const messages = {
-    ai_credits: {
-      title: 'Créditos de IA Agotados',
-      description: 'Has usado todos tus créditos de IA este mes.',
-      planLimit: '10 créditos/mes',
-      suggestion: '500 créditos adicionales',
-      price: '$39.99',
-      savings: 'Ahorra 20%',
-    },
     storage: {
       title: 'Almacenamiento Lleno',
       description: 'Has alcanzado tu límite de almacenamiento.',
@@ -52,7 +44,7 @@ export function LimitReachedModal({
   };
 
   const msg = messages[limitType];
-  const canBuyAddon = limitType === 'ai_credits' || limitType === 'storage';
+  const canBuyAddon = limitType === 'storage';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -153,7 +145,7 @@ export function LimitReachedModal({
             </div>
 
             {/* Opción 3: Esperar (solo para límites mensuales) */}
-            {(limitType === 'ai_credits' || limitType === 'publications') && (
+            {limitType === 'publications' && (
               <button
                 onClick={onClose}
                 className="w-full py-2 text-sm text-gray-500 transition-colors hover:text-gray-700"

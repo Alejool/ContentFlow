@@ -14,10 +14,8 @@ class PlanFilterService
     {
         $filtered = $limits;
 
-        // Si IA está deshabilitada, remover límite de IA
-        if (!SystemSetting::isFeatureEnabled('ai')) {
-            unset($filtered['ai_requests_per_month']);
-        }
+        // La IA es una capacidad nativa del sistema: los planes no definen
+        // límites de IA, así que no hay nada que filtrar aquí.
 
         // Si Analytics está deshabilitado, remover límite de analytics
         if (!SystemSetting::isFeatureEnabled('analytics')) {
@@ -48,13 +46,6 @@ class PlanFilterService
     public function filterPlanFeatures(array $features): array
     {
         $filtered = $features;
-
-        // Si IA está deshabilitada, remover características de IA
-        if (!SystemSetting::isFeatureEnabled('ai')) {
-            unset($filtered['ai_content_generation']);
-            unset($filtered['ai_suggestions']);
-            unset($filtered['ai_optimization']);
-        }
 
         // Si Analytics está deshabilitado, remover características de analytics
         if (!SystemSetting::isFeatureEnabled('analytics')) {
@@ -133,9 +124,6 @@ class PlanFilterService
             'storage' => true, // Siempre visible
         ];
 
-        // IA solo visible si está habilitada
-        $metrics['ai_requests'] = SystemSetting::isFeatureEnabled('ai');
-
         // Team members solo visible si el addon está habilitado
         $metrics['team_members'] = SystemSetting::isAddonEnabled('team_members');
 
@@ -148,7 +136,6 @@ class PlanFilterService
     public function shouldShowLimit(string $limitKey): bool
     {
         $limitFeatureMap = [
-            'ai_requests_per_month' => 'ai',
             'analytics_reports' => 'analytics',
             'reels_per_month' => 'reels',
             'approval_workflows' => 'approval_workflows',
@@ -169,9 +156,6 @@ class PlanFilterService
     public function shouldShowFeature(string $featureKey): bool
     {
         $featureMap = [
-            'ai_content_generation' => 'ai',
-            'ai_suggestions' => 'ai',
-            'ai_optimization' => 'ai',
             'analytics_type' => 'analytics',
             'advanced_analytics' => 'analytics',
             'reels_generation' => 'reels',

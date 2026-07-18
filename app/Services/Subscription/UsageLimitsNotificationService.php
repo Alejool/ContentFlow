@@ -55,10 +55,6 @@ class UsageLimitsNotificationService
         Cache::forget("workspace.{$workspaceId}.storage.usage_bytes");
         Cache::forget("workspace.{$workspaceId}.storage.current_plan_usage");
         
-        // Clear AI requests caches
-        Cache::forget("workspace.{$workspaceId}.ai_requests.monthly_count");
-        Cache::forget("workspace.{$workspaceId}.ai_requests.current_plan_usage");
-        
         // Clear social accounts cache
         Cache::forget("workspace.{$workspaceId}.social_accounts.count");
         
@@ -92,7 +88,7 @@ class UsageLimitsNotificationService
             ]
         ];
 
-        $metricTypes = ['publications', 'social_accounts', 'storage', 'ai_requests', 'team_members'];
+        $metricTypes = ['publications', 'social_accounts', 'storage', 'team_members'];
         $limitsReached = false;
 
         foreach ($metricTypes as $metricType) {
@@ -117,7 +113,6 @@ class UsageLimitsNotificationService
             // Get addon information
             $addonInfo = null;
             $addonTypeMap = [
-                'ai_requests' => 'ai_credits',
                 'storage' => 'storage',
                 'publications' => 'publications',
                 'team_members' => 'team_members',

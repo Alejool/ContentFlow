@@ -282,7 +282,6 @@ class HandleInertiaRequests extends Middleware
         try {
           $systemConfig = app(SystemConfigService::class);
           return [
-            'ai_credits' => $systemConfig->isAddonAvailable('ai_credits'),
             'storage' => $systemConfig->isAddonAvailable('storage'),
             'team_members' => $systemConfig->isAddonAvailable('team_members'),
             'publications' => $systemConfig->isAddonAvailable('publications'),
@@ -290,7 +289,6 @@ class HandleInertiaRequests extends Middleware
         } catch (\Exception $e) {
           Log::error('Inertia System Addons Share Error: ' . $e->getMessage());
           return [
-            'ai_credits' => true,
             'storage' => true,
             'team_members' => true,
             'publications' => true,
@@ -308,7 +306,6 @@ class HandleInertiaRequests extends Middleware
             'publications' => true,
             'social_accounts' => true,
             'storage' => true,
-            'ai_requests' => true,
             'team_members' => true,
           ];
         }

@@ -55,7 +55,6 @@ class UsageLimitWarningNotification extends Notification implements ShouldQueue
         return match($this->metricType) {
             'publications' => 'publicaciones',
             'storage' => 'almacenamiento',
-            'ai_requests' => 'solicitudes de IA',
             default => $this->metricType,
         };
     }

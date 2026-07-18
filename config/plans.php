@@ -68,42 +68,12 @@ return [
             'approval_workflows'    => 'basic',   // demo gets basic approvals
             'history_days'          => 90,         // 90 days for demo
         ],
-        'description' => 'Plan temporal para demos y pruebas. Acceso completo por 30 días.',
+        'description' => 'Acceso completo a la plataforma durante 30 días: publicaciones, analytics avanzados y aprobaciones para evaluar todo el producto.',
     ],
 
     // ========================================
     // PLAN FREE - Gratis para siempre
     // ========================================
-    // COMENTAR TODO ESTE BLOQUE PARA OCULTAR EL PLAN FREE
-    // free: [
-    //     'name' => 'Free',
-    //     'price' => 0,
-    //     'stripe_price_id' => null,
-    //     'enabled' => false, // ← Plan oculto
-    //     'billing_cycle' => 'monthly',
-    //     'limits' => [
-    //         'publications_per_month' => 3,
-    //         'social_accounts' => 2,
-    //         'storage_gb' => 1,
-    //         'ai_requests_per_month' => 10,
-    //         'team_members' => 1,
-    //         'external_integrations' => 0,
-    //         'reels_watermark' => true,
-    //     ],
-    //     'features' => [
-    //         'analytics_type' => 'basic',
-    //         'advanced_scheduling' => false,
-    //         'calendar_sync' => false,
-    //         'bulk_operations' => false,
-    //         'custom_branding' => false,
-    //         'white_label' => false,
-    //         'api_access' => false,
-    //         'support_type' => 'email',
-    //     ],
-    //     'description' => 'Plan gratuito para comenzar.',
-    // ],
-
-    // O SIMPLEMENTE CAMBIAR enabled A false:
     'free' => [
         'name' => 'Free',
         'price' => 0,
@@ -134,7 +104,7 @@ return [
             'approval_workflows'    => false,
             'history_days'          => 30,
         ],
-        'description' => 'Plan gratuito para comenzar.',
+        'description' => 'Empieza gratis: 3 publicaciones al mes, 1 cuenta social y 1 GB de almacenamiento para conocer la plataforma.',
     ],
 
     'starter' => [
@@ -167,7 +137,7 @@ return [
             'approval_workflows'    => false,  // no approvals on starter
             'history_days'          => 30,
         ],
-        'description' => 'Perfecto para pequeños equipos y emprendedores.',
+        'description' => 'Para emprendedores y equipos pequeños: 50 publicaciones al mes, 3 cuentas sociales, programación avanzada y sincronización de calendario.',
     ],
 
     'growth' => [
@@ -200,7 +170,7 @@ return [
             'approval_workflows'    => false,  // Growth NO tiene aprobaciones
             'history_days'          => 60,
         ],
-        'description' => 'Perfect for growing teams that need advanced features and higher limits.',
+        'description' => 'Para equipos en crecimiento: 100 publicaciones al mes, 5 cuentas sociales, analytics avanzados, recurrencia y horarios óptimos.',
     ],
 
     'professional' => [
@@ -233,7 +203,7 @@ return [
             'approval_workflows'    => 'basic',   // single-level approvals
             'history_days'          => 90,
         ],
-        'description' => 'Para equipos profesionales que necesitan más poder.',
+        'description' => 'Para equipos profesionales: 200 publicaciones al mes, 8 cuentas sociales, cola de publicación, operaciones masivas, branding propio y aprobaciones.',
     ],
 
     'enterprise' => [
@@ -268,6 +238,6 @@ return [
             'approval_workflows'    => 'advanced', // multi-level approvals
             'history_days'          => 365,
         ],
-        'description' => 'Solución completa para grandes organizaciones.',
+        'description' => 'Para grandes organizaciones: publicaciones y cuentas ilimitadas, 1 TB de almacenamiento, white label, API, SLA y aprobaciones multinivel.',
     ],
 ];

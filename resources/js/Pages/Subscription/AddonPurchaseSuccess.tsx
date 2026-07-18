@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatDate } from '@/Utils/formatters/date';
 import { formatCurrency } from '@/Utils/formatters/number';
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle, FileText, HardDrive, Home, Package, Sparkles, Users } from 'lucide-react';
+import { CheckCircle, FileText, HardDrive, Home, Package, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface AddonPurchaseData {
@@ -29,8 +29,6 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
     switch (type) {
       case 'storage':
         return HardDrive;
-      case 'ai_credits':
-        return Sparkles;
       case 'publications':
         return FileText;
       case 'team_members':
@@ -44,8 +42,6 @@ export default function AddonPurchaseSuccess({ purchase }: Props) {
     switch (type) {
       case 'storage':
         return `${amount} GB`;
-      case 'ai_credits':
-        return `${amount.toLocaleString()} ${t('payment.addonPurchaseSuccess.addonTypes.ai_credits')}`;
       case 'publications':
         return `${amount.toLocaleString()} ${t('payment.addonPurchaseSuccess.addonTypes.publications')}`;
       case 'team_members':

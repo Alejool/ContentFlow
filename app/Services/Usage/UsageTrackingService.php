@@ -32,8 +32,8 @@ class UsageTrackingService
             [
                 'workspace_id' => $workspace->id,
                 'metric_type'  => $metricType,
-                'period_start' => now()->startOfMonth()->toDateString(),
-                'period_end'   => now()->endOfMonth()->toDateString(),
+                'period_start' => now()->startOfMonth(),
+                'period_end'   => now()->endOfMonth()->startOfDay(),
             ],
             [
                 'current_usage' => 0,
@@ -133,7 +133,7 @@ class UsageTrackingService
 
         $metrics = [];
 
-        foreach (['publications', 'storage', 'ai_requests', 'social_accounts', 'team_members', 'external_integrations'] as $type) {
+        foreach (['publications', 'storage', 'social_accounts', 'team_members', 'external_integrations'] as $type) {
             if (isset($summary['usage'][$type])) {
                 $data = $summary['usage'][$type];
 
@@ -142,7 +142,7 @@ class UsageTrackingService
                 // interface UsageMetric { type: string; current: number; limit: number; percentage: number; remaining: number; }
 
                 $metrics[] = [
-                    'type'       => $type === 'publications' ? 'publications_per_month' : ($type === 'ai_requests' ? 'ai_requests_per_month' : ($type === 'storage' ? 'storage_gb' : $type)),
+                    'type'       => $type === 'publications' ? 'publications_per_month' : ($type === 'storage' ? 'storage_gb' : $type),
                     'current'    => $data['current'],
                     'limit'      => $data['limit'],
                     'percentage' => $data['percentage'],
@@ -158,8 +158,8 @@ class UsageTrackingService
     {
         $limits = $this->getWorkspacePlanLimits($workspace);
 
-        // Metrics that reset monthly (publications, ai_requests)
-        $monthlyMetrics = ['publications', 'ai_requests'];
+        // Metrics that reset monthly
+        $monthlyMetrics = ['publications'];
 
         foreach ($monthlyMetrics as $metricType) {
             $limit = $this->getMetricLimit($limits, $metricType);
@@ -168,8 +168,8 @@ class UsageTrackingService
                 [
                     'workspace_id' => $workspace->id,
                     'metric_type'  => $metricType,
-                    'period_start' => now()->startOfMonth()->toDateString(),
-                    'period_end'   => now()->endOfMonth()->toDateString(),
+                    'period_start' => now()->startOfMonth(),
+                    'period_end'   => now()->endOfMonth()->startOfDay(),
                 ],
                 [
                     'current_usage' => 0,
@@ -188,8 +188,8 @@ class UsageTrackingService
             [
                 'workspace_id' => $workspace->id,
                 'metric_type'  => 'storage_bytes',
-                'period_start' => now()->startOfMonth()->toDateString(),
-                'period_end'   => now()->endOfMonth()->toDateString(),
+                'period_start' => now()->startOfMonth(),
+                'period_end'   => now()->endOfMonth()->startOfDay(),
             ],
             [
                 'current_usage' => $actualStorageBytes,
@@ -201,8 +201,8 @@ class UsageTrackingService
 
         LogHelper::billing('usage.monthly_reset', [
             'workspace_id'   => $workspace->id,
-            'period_start'   => now()->startOfMonth()->toDateString(),
-            'period_end'     => now()->endOfMonth()->toDateString(),
+            'period_start'   => now()->startOfMonth(),
+            'period_end'     => now()->endOfMonth()->startOfDay(),
             'storage_bytes'  => $actualStorageBytes,
         ]);
     }
@@ -211,7 +211,6 @@ class UsageTrackingService
     {
         return match ($metricType) {
             'publications'  => $limits['publications_per_month'] ?? 0,
-            'ai_requests'   => $limits['ai_requests_per_month'] ?? 0,
             'storage_bytes' => ($limits['storage_gb'] ?? 0) === -1
                 ? -1
                 : (($limits['storage_gb'] ?? 0) * 1024 * 1024 * 1024),
@@ -254,9 +253,7 @@ class UsageTrackingService
         $frontendMetricType = match ($metricType) {
             'storage_bytes' => 'storage',
             'publications_per_month' => 'publications',
-            'ai_requests_per_month' => 'ai_requests',
             'publications' => 'publications',
-            'ai_requests' => 'ai_requests',
             'storage' => 'storage',
             default => $metricType,
         };
