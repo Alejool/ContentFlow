@@ -1,11 +1,19 @@
-import { ErrorNotification } from '@/Components/Onboarding/ErrorNotification';
 import { OfflineIndicator } from '@/Components/Onboarding/OfflineIndicator';
 import { OnboardingErrorBoundary } from '@/Components/Onboarding/OnboardingErrorBoundary';
 import { useOnboardingStore } from '@/stores/Onboarding/onboardingStore';
 import type { OnboardingState } from '@/types/Onboarding/onboarding';
 import { usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, lazy, Suspense, useContext, useEffect } from 'react';
+
+// Imported lazily to break the static import cycle
+// ErrorNotification -> useOnboarding (this file) -> ErrorNotification,
+// which deadlocks ESM evaluation in Vite dev and blanks whole pages.
+const ErrorNotification = lazy(() =>
+  import('@/Components/Onboarding/ErrorNotification').then((m) => ({
+    default: m.ErrorNotification,
+  })),
+);
 
 /**
  * OnboardingContextValue defines the interface for the onboarding context.
@@ -173,7 +181,9 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       <OnboardingContext.Provider value={contextValue}>
         {children}
         <OfflineIndicator />
-        <ErrorNotification />
+        <Suspense fallback={null}>
+          <ErrorNotification />
+        </Suspense>
       </OnboardingContext.Provider>
     </OnboardingErrorBoundary>
   );
