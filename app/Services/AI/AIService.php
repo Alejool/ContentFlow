@@ -17,7 +17,13 @@ class AIService
   /**
    * Available AI providers in order of preference
    */
-  protected array $providers = ['deepseek', 'gemini', 'openai', 'anthropic'];
+  protected array $providers = ['openrouter', 'deepseek', 'gemini', 'openai', 'anthropic'];
+
+  /**
+   * Providers funded and configured by the company (platform-level API key).
+   * These ignore per-user ai_settings and always use config/services.php.
+   */
+  protected array $companyProviders = ['openrouter'];
 
   /**
    * Main chat method
@@ -88,25 +94,33 @@ class AIService
   {
     $user = $user ?? Auth::user();
     $enabled = [];
-    
+
+    // Company-managed providers come first: they are the platform's base AI
+    // and are always available when configured, independent of user settings.
+    foreach ($this->companyProviders as $provider) {
+      if ($this->isProviderEnabled($provider, $user)) {
+        $enabled[] = $provider;
+      }
+    }
+
     // If user has ai_settings, use the order from their settings
     if ($user && !empty($user->ai_settings)) {
       foreach ($user->ai_settings as $provider => $settings) {
-        if (in_array($provider, $this->providers) && $this->isProviderEnabled($provider, $user)) {
+        if (in_array($provider, $this->providers) && !in_array($provider, $enabled, true) && $this->isProviderEnabled($provider, $user)) {
           $enabled[] = $provider;
         }
       }
     }
-    
-    // If no enabled providers from user settings, check global config in default order
-    if (empty($enabled)) {
+
+    // If still nothing beyond company providers, check global config in default order
+    if (empty($enabled) || $enabled === array_intersect($enabled, $this->companyProviders)) {
       foreach ($this->providers as $provider) {
-        if ($this->isProviderEnabled($provider, $user)) {
+        if (!in_array($provider, $enabled, true) && $this->isProviderEnabled($provider, $user)) {
           $enabled[] = $provider;
         }
       }
     }
-    
+
     return $enabled;
   }
 
@@ -166,6 +180,13 @@ class AIService
    */
   public function isProviderEnabled(string $provider, User $user = null): bool
   {
+    // Company-managed providers always run on the platform's own credentials,
+    // regardless of any per-user ai_settings.
+    if (in_array($provider, $this->companyProviders, true)) {
+      return config("services.{$provider}.enabled", false)
+        && !empty(config("services.{$provider}.api_key"));
+    }
+
     $user = $user ?? Auth::user();
 
     // If user is logged in, prioritize THEIR settings
@@ -258,6 +279,56 @@ class AIService
         'content' => $context['message']
       ]
     ];
+  }
+
+  /**
+   * Call OpenRouter API (OpenAI-compatible chat completions)
+   */
+  protected function callOpenrouter(array $context, User $user = null): array
+  {
+    // OpenRouter is company-funded: always the platform key, never a user key.
+    $apiKey = config('services.openrouter.api_key');
+
+    if (!$apiKey) {
+      throw new \Exception('OpenRouter API key not configured');
+    }
+
+    $model = config('services.openrouter.model', 'meta-llama/llama-3.1-8b-instruct');
+
+    $response = $this->llmClient->postJson(
+      rtrim(config('services.openrouter.base_url', 'https://openrouter.ai/api/v1'), '/') . '/chat/completions',
+      [
+        'Authorization' => 'Bearer ' . $apiKey,
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+        // OpenRouter attribution headers (optional but recommended)
+        'HTTP-Referer' => config('app.url'),
+        'X-Title' => config('app.name', 'ContentFlow'),
+      ],
+      [
+        'model' => $model,
+        'messages' => [
+          ['role' => 'system', 'content' => $this->getSystemPrompt($context)],
+          ['role' => 'user', 'content' => $context['message']],
+        ],
+        'temperature' => (float) config('services.openrouter.temperature', 0.7),
+        'max_tokens' => (int) config('services.openrouter.max_tokens', 1000),
+        'response_format' => ['type' => 'json_object'],
+      ],
+      config('services.openrouter.timeout', 60)
+    );
+
+    if (!$response['successful']) {
+      Log::error('OpenRouter API Error', [
+        'status' => $response['status'],
+        'body' => $response['json'] ?: $response['body'],
+      ]);
+      throw new \Exception('OpenRouter API error: ' . ($response['json']['error']['message'] ?? 'Request failed'));
+    }
+
+    $content = $response['json']['choices'][0]['message']['content'] ?? '{}';
+
+    return $this->parseAIResponse($content, 'openrouter', $model);
   }
 
   /**
