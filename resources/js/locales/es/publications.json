@@ -459,6 +459,31 @@
       "connectAccounts": "Conecta tus redes para publicar →",
       "scheduled": "Publicación programada",
       "scheduleFor": "Programar"
+    },
+    "timeline": {
+      "title": "Estado de publicación",
+      "error": "No se pudo cargar el estado de publicación.",
+      "empty": "Aún no hay intentos de publicación. El historial aparece cuando la publicación se envía.",
+      "publishedAt": "Publicado",
+      "attemptedAt": "Último intento",
+      "retries": "Reintentos",
+      "retrying": "Reintentando…",
+      "viewPost": "Ver post",
+      "status": {
+        "published": "Publicado",
+        "publishing": "Publicando",
+        "pending": "Pendiente",
+        "failed": "Fallido",
+        "orphaned": "Huérfano",
+        "removed_on_platform": "Eliminado en plataforma",
+        "draft": "Borrador",
+        "scheduled": "Programado",
+        "retrying": "Reintentando",
+        "partially_published": "Parcialmente publicado",
+        "published_with_errors": "Publicado con errores",
+        "pending_review": "Pendiente de revisión",
+        "approved": "Aprobado"
+      }
     }
   }
 }

@@ -459,6 +459,31 @@
       "connectAccounts": "Connect your accounts to publish →",
       "scheduled": "Publication scheduled",
       "scheduleFor": "Schedule"
+    },
+    "timeline": {
+      "title": "Publish status",
+      "error": "Could not load the publish status.",
+      "empty": "No publish attempts yet. The timeline appears once the publication is sent.",
+      "publishedAt": "Published",
+      "attemptedAt": "Last attempt",
+      "retries": "Retries",
+      "retrying": "Retrying…",
+      "viewPost": "View post",
+      "status": {
+        "published": "Published",
+        "publishing": "Publishing",
+        "pending": "Pending",
+        "failed": "Failed",
+        "orphaned": "Orphaned",
+        "removed_on_platform": "Removed on platform",
+        "draft": "Draft",
+        "scheduled": "Scheduled",
+        "retrying": "Retrying",
+        "partially_published": "Partially published",
+        "published_with_errors": "Published with errors",
+        "pending_review": "Pending review",
+        "approved": "Approved"
+      }
     }
   }
 }

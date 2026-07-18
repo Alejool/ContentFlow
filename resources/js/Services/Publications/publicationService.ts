@@ -47,6 +47,11 @@ export const publicationService = {
       .get(route('api.v1.publications.published-platforms', publicationId))
       .then((r) => r.data),
 
+  getPublishTimeline: (publicationId: number) =>
+    axios
+      .get(route('api.v1.publications.publish-timeline', publicationId))
+      .then((r) => r.data),
+
   create: (formData: FormData) =>
     axios
       .post(route('api.v1.publications.store'), formData, {

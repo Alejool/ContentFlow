@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status')->whereNumber('publication');
             Route::get('/{publication}/comments', [PublicationCommentController::class, 'index'])->name('comments.index')->whereNumber('publication');
             Route::get('/{publication}/activities', [PublicationController::class, 'activities'])->name('activities')->whereNumber('publication');
+            Route::get('/{publication}/publish-timeline', [PublicationController::class, 'publishTimeline'])->name('publish-timeline')->whereNumber('publication');
         });
 
         // ── Create ────────────────────────────────────────────────────────────

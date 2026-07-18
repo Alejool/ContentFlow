@@ -16,6 +16,7 @@ import {
   isVideoMedia,
 } from '@/Utils/Publications/publicationHelpers';
 import {
+  Activity,
   Calendar,
   Clock,
   Copy,
@@ -31,7 +32,14 @@ import {
   Users,
   Video,
 } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const PublicationTimelineModal = lazy(() =>
+  import('@/Components/Content/modals/PublicationTimelineModal').then((m) => ({
+    default: m.PublicationTimelineModal,
+  })),
+);
 
 interface ContentCardProps {
   item: any;
@@ -70,6 +78,7 @@ export default function ContentCard({
   onPreviewMedia,
 }: ContentCardProps) {
   const { t } = useTranslation();
+  const [timelineOpen, setTimelineOpen] = useState(false);
 
   // Hook centralizado - SIN lógica en el componente
   const {
@@ -495,6 +504,21 @@ export default function ContentCard({
             </Button>
           )}
 
+          {type !== 'campaign' && (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                setTimelineOpen(true);
+              }}
+              variant="secondary"
+              buttonStyle="icon"
+              size="md"
+              icon={Activity}
+            >
+              <span className="sr-only">{t('publications.timeline.title', 'Publish status')}</span>
+            </Button>
+          )}
+
           {canManageContent && (
             <Button
               onClick={(e) => {
@@ -547,6 +571,16 @@ export default function ContentCard({
           )}
         </div>
       </div>
+
+      {type !== 'campaign' && timelineOpen && (
+        <Suspense fallback={null}>
+          <PublicationTimelineModal
+            publicationId={item?.id ?? null}
+            isOpen={timelineOpen}
+            onClose={() => setTimelineOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -2039,6 +2039,44 @@ class PublicationController extends Controller
   /**
    * Get activities for a publication
    */
+  /**
+   * Per-platform publish timeline: every social post attempt with its
+   * status, timestamps, error and retry info. Powers the status modal.
+   */
+  public function publishTimeline(Publication $publication)
+  {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id) && !Auth::user()->hasPermission('view-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to view this publication.', 403);
+    }
+
+    $timeline = $publication->socialPostLogs()
+      ->orderBy('created_at')
+      ->get([
+        'id',
+        'platform',
+        'account_name',
+        'status',
+        'published_at',
+        'post_url',
+        'error_message',
+        'retry_count',
+        'last_retry_at',
+        'is_retrying',
+        'created_at',
+        'updated_at',
+      ]);
+
+    return $this->successResponse([
+      'publication' => [
+        'id' => $publication->id,
+        'title' => $publication->title,
+        'status' => $publication->status,
+        'scheduled_at' => $publication->scheduled_at,
+      ],
+      'timeline' => $timeline,
+    ]);
+  }
+
   public function activities(Publication $publication)
   {
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id) && !Auth::user()->hasPermission('view-content', $publication->workspace_id)) {
