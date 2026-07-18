@@ -178,7 +178,7 @@ export default function OnboardingFlow({
   }
 
   const currentTourStep =
-    tourSteps[Math.min(/* state.tourCurrentStep */ 0, tourSteps.length - 1)] ?? tourSteps[0];
+    tourSteps[Math.min(state.tourCurrentStep ?? 0, tourSteps.length - 1)] ?? tourSteps[0];
 
   return (
     <OnboardingErrorBoundary>

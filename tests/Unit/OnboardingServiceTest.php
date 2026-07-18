@@ -178,6 +178,9 @@ class OnboardingServiceTest extends TestCase
         // Create state with all stages completed
         OnboardingState::create([
             'user_id' => $user->id,
+            'business_info_completed' => true,
+            'plan_selected' => true,
+            'selected_plan' => 'basic',
             'tour_completed' => true,
             'tour_skipped' => false,
             'tour_current_step' => 5,
@@ -203,6 +206,9 @@ class OnboardingServiceTest extends TestCase
         // Create state with stages skipped
         OnboardingState::create([
             'user_id' => $user->id,
+            'business_info_completed' => true,
+            'plan_selected' => true,
+            'selected_plan' => 'basic',
             'tour_completed' => false,
             'tour_skipped' => true,
             'tour_current_step' => 0,

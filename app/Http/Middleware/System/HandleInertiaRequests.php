@@ -323,14 +323,14 @@ class HandleInertiaRequests extends Middleware
           $state = $onboardingService->getOnboardingState($user);
 
           // Only return onboarding data if not complete
-          // TEMP DISABLE: return null para deshabilitar el tour
-          return null;
-          
           if ($state->completed_at) {
             return null;
           }
 
           return [
+            'businessInfoCompleted' => $state->business_info_completed,
+            'planSelected' => $state->plan_selected,
+            'selectedPlan' => $state->selected_plan,
             'tourCompleted' => $state->tour_completed,
             'tourSkipped' => $state->tour_skipped,
             'tourCurrentStep' => $state->tour_current_step,
@@ -362,9 +362,6 @@ class HandleInertiaRequests extends Middleware
           $state = $onboardingService->getOnboardingState($user);
 
           // Only return tour steps if onboarding is not complete
-          // TEMP DISABLE: retornar array vacio siempre
-          return [];
-          
           if ($state->completed_at) {
             return [];
           }

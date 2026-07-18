@@ -92,8 +92,6 @@ class OnboardingService implements OnboardingServiceInterface
         }
 
         // Create new onboarding state with default values.
-        // tour_skipped / wizard_skipped están en true temporalmente mientras
-        // se mejora el flujo — reverter a false cuando el tour esté listo.
         $data = [
             'business_info_completed' => false,
             'business_name'           => null,
@@ -102,14 +100,12 @@ class OnboardingService implements OnboardingServiceInterface
             'business_size'           => null,
             'plan_selected'           => false,
             'selected_plan'           => null,
-            // Tour omitido por defecto hasta que se corrija el flujo
             'tour_completed'          => false,
-            'tour_skipped'            => true,
+            'tour_skipped'            => false,
             'tour_current_step'       => 0,
             'tour_completed_steps'    => [],
-            // Wizard omitido por defecto
             'wizard_completed'        => false,
-            'wizard_skipped'          => true,
+            'wizard_skipped'          => false,
             'wizard_current_step'     => 0,
             // Template por defecto para no bloquear el flujo
             'template_selected'       => true,

@@ -68,11 +68,13 @@ class OnboardingRestartTest extends TestCase
         $this->assertFalse($state['wizardCompleted']);
         $this->assertFalse($state['wizardSkipped']);
         $this->assertEquals(0, $state['wizardCurrentStep']);
-        $this->assertFalse($state['templateSelected']);
-        $this->assertNull($state['templateId']);
+        // Template preseleccionado por defecto para no bloquear el flujo
+        $this->assertTrue($state['templateSelected']);
+        $this->assertEquals('default', $state['templateId']);
         $this->assertEmpty($state['dismissedTooltips']);
         $this->assertNull($state['completedAt']);
-        $this->assertEquals(0, $state['completionPercentage']);
+        // 1 de 5 etapas (template default) => 20%
+        $this->assertEquals(20, $state['completionPercentage']);
     }
 
     /**
