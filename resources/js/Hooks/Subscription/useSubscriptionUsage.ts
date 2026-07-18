@@ -1,12 +1,11 @@
+import { queryClient } from '@/providers/common/QueryProvider';
 import { usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
-// Declare Echo globally
-declare global {
-  interface Window {
-    Echo: any;
-  }
-}
+// window.Echo is declared in bootstrap.ts; cast locally to keep this hook
+// independent of the concrete broadcaster generic.
+const echo = () => (window as any).Echo;
 
 interface UsageData {
   team_members: any;
@@ -66,105 +65,108 @@ interface UseSubscriptionUsageReturn {
   refetch: () => void;
 }
 
-export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
-  const [usage, setUsage] = useState<UsageData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const usageQueryKey = (workspaceId: number) => ['subscription-usage', workspaceId];
 
+async function fetchUsage(): Promise<UsageData | null> {
+  const response = await fetch('/api/v1/subscription/limits/usage', {
+    headers: {
+      Accept: 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.success && data.data ? data.data : null;
+}
+
+// One Echo channel per workspace shared by every hook instance. Without the
+// refcount, the first unmounting component would Echo.leave() the channel
+// while other subscribers still need it.
+const channelRefs = new Map<number, number>();
+
+function subscribeToUsageChannel(workspaceId: number): () => void {
+  const key = usageQueryKey(workspaceId);
+  const refs = channelRefs.get(workspaceId) ?? 0;
+  channelRefs.set(workspaceId, refs + 1);
+
+  if (refs === 0 && echo()) {
+    const channel = echo().private(`workspace.${workspaceId}.limits`);
+
+    channel.listen('.usage.limits.updated', (data: any) => {
+      let usageData = null;
+
+      if (data.limits?.success && data.limits.data) {
+        usageData = data.limits.data;
+      } else if (data.success && data.data) {
+        usageData = data.data;
+      } else if (data.plan && data.publications) {
+        usageData = data;
+      }
+
+      if (usageData) {
+        queryClient.setQueryData(key, usageData);
+      } else {
+        queryClient.invalidateQueries({ queryKey: key });
+      }
+    });
+
+    channel.error(() => {
+      // silently ignore channel errors — a refetch runs on next user action
+    });
+  }
+
+  return () => {
+    const current = (channelRefs.get(workspaceId) ?? 1) - 1;
+    if (current <= 0) {
+      channelRefs.delete(workspaceId);
+      if (echo()) {
+        echo().leave(`workspace.${workspaceId}.limits`);
+      }
+    } else {
+      channelRefs.set(workspaceId, current);
+    }
+  };
+}
+
+export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
   const { auth } = (usePage().props as any) || {};
   const currentWorkspaceId = auth?.user?.current_workspace_id;
 
-  // Fetch usage data from API
-  const fetchUsage = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/v1/subscription/limits/usage', {
-        headers: {
-          Accept: 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        setUsage(data.data);
-      }
-
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load usage data');
-      setLoading(false);
-    }
-  };
+  const query = useQuery({
+    queryKey: usageQueryKey(currentWorkspaceId ?? 0),
+    queryFn: fetchUsage,
+    enabled: !!currentWorkspaceId,
+    staleTime: 60 * 1000,
+  });
 
   useEffect(() => {
     if (!currentWorkspaceId) {
-      setLoading(false);
       return;
     }
 
-    // Initial fetch
-    fetchUsage();
+    const unsubscribe = subscribeToUsageChannel(currentWorkspaceId);
 
-    // Connect to WebSocket channel for real-time updates
-    if (window.Echo) {
-      const channel = window.Echo.private(`workspace.${currentWorkspaceId}.limits`);
+    const invalidate = () =>
+      queryClient.invalidateQueries({ queryKey: usageQueryKey(currentWorkspaceId) });
 
-      channel.listen('.usage.limits.updated', (data: any) => {
-        let usageData = null;
-
-        if (data.limits?.success && data.limits.data) {
-          usageData = data.limits.data;
-        } else if (data.success && data.data) {
-          usageData = data.data;
-        } else if (data.plan && data.publications) {
-          usageData = data;
-        }
-
-        if (usageData) {
-          setUsage(usageData);
-          setError(null);
-        } else {
-          fetchUsage();
-        }
-      });
-
-      channel.error(() => {
-        // silently ignore channel errors — fetchUsage runs on next user action
-      });
-    }
-
-    // Listen for plan change events
-    const handlePlanChanged = () => fetchUsage();
-
-    // Listen for addon purchase events
-    const handleAddonPurchased = () => fetchUsage();
-
-    window.addEventListener('subscription-plan-changed', handlePlanChanged);
-    window.addEventListener('addon-purchased', handleAddonPurchased);
+    window.addEventListener('subscription-plan-changed', invalidate);
+    window.addEventListener('addon-purchased', invalidate);
 
     return () => {
-      // Leave WebSocket channel
-      if (window.Echo) {
-        window.Echo.leave(`workspace.${currentWorkspaceId}.limits`);
-      }
-
-      window.removeEventListener('subscription-plan-changed', handlePlanChanged);
-      window.removeEventListener('addon-purchased', handleAddonPurchased);
+      unsubscribe();
+      window.removeEventListener('subscription-plan-changed', invalidate);
+      window.removeEventListener('addon-purchased', invalidate);
     };
   }, [currentWorkspaceId]);
 
   return {
-    usage,
-    loading,
-    error,
-    refetch: fetchUsage,
+    usage: query.data ?? null,
+    loading: currentWorkspaceId ? query.isPending : false,
+    error: query.error ? (query.error as Error).message : null,
+    refetch: query.refetch,
   };
 }
