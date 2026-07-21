@@ -171,7 +171,7 @@ const MediaUploadSection = memo(
         <div className={`space-y-4 ${disabled ? 'pointer-events-none select-none' : ''}`}>
           <div className="flex items-center justify-between">
             <Label htmlFor="media-upload" icon={FileImage} required variant="bold" size="lg">
-              Media
+              {t('publications.modal.media.label', 'Media')}
             </Label>
 
             {/* Indicador de límites */}

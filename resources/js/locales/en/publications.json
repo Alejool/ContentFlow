@@ -30,6 +30,7 @@
         "note": "Polls are only supported on Twitter and Facebook. Make sure to select compatible platforms."
       },
       "media": {
+        "label": "Media",
         "backgroundUpload": "Saved! Media is uploading in the background.",
         "attachFailed": "Failed to attach the file",
         "lockFailed": "Warning: Could not lock media for editing"
@@ -47,7 +48,8 @@
         "uploadingBackground": "Uploading files in background — you can save without waiting"
       },
       "show": {
-        "title": "Detailed View"
+        "title": "Detailed View",
+        "subtitle": "Publication details"
       },
       "schedule": {
         "instantWarning": "To publish now, use the Publish button after saving.",
@@ -75,6 +77,8 @@
         "placeholder": "Select date and time"
       },
       "add": {
+        "title": "New Publication",
+        "subtitle": "Create content for your social media",
         "titleField": "Title",
         "mediaSection": "Media Files",
         "contentSection": "Content",
@@ -93,6 +97,9 @@
         }
       },
       "edit": {
+        "title": "Edit Publication",
+        "subtitle": "Update your publication content",
+        "titleField": "Title",
         "mediaSection": "Media Files",
         "contentSection": "Content",
         "socialAccountsSection": "Social Networks",
@@ -110,6 +117,7 @@
           "title": "Drag and drop to sort"
         },
         "placeholders": {
+          "title": "Title",
           "description": "Description",
           "hashtags": "Hashtags",
           "goal": "Goal"

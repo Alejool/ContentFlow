@@ -2539,6 +2539,7 @@
         "note": "Las encuestas solo están disponibles en Twitter y Facebook. Asegúrate de seleccionar plataformas compatibles."
       },
       "media": {
+        "label": "Multimedia",
         "backgroundUpload": "Guardado! Los archivos multimedia se están subiendo en segundo plano.",
         "attachFailed": "No se pudo adjuntar el archivo",
         "lockFailed": "Advertencia: No se pudo bloquear el archivo para edición"
@@ -2556,7 +2557,8 @@
         "uploadingBackground": "Subiendo archivos en segundo plano — puedes guardar sin esperar"
       },
       "show": {
-        "title": "Vista Detallada"
+        "title": "Vista Detallada",
+        "subtitle": "Detalles de la publicación"
       },
       "schedule": {
         "instantWarning": "Para publicar inmediatamente, usa el botón Publicar del modal.",
@@ -2584,6 +2586,8 @@
         "placeholder": "Selecciona fecha y hora"
       },
       "add": {
+        "title": "Nueva Publicación",
+        "subtitle": "Crea contenido para tus redes sociales",
         "titleField": "título",
         "mediaSection": "Archivos Multimedia",
         "contentSection": "Contenido",
@@ -2602,6 +2606,9 @@
         }
       },
       "edit": {
+        "title": "Editar Publicación",
+        "subtitle": "Actualiza el contenido de tu publicación",
+        "titleField": "título",
         "mediaSection": "Archivos Multimedia",
         "contentSection": "Contenido",
         "socialAccountsSection": "Redes Sociales",
@@ -2619,6 +2626,7 @@
           "title": "Arrastra y suelta para ordenar"
         },
         "placeholders": {
+          "title": "título",
           "description": "descripción",
           "hashtags": "Hashtags",
           "goal": "Objetivo"

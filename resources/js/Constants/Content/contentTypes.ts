@@ -47,7 +47,7 @@ export const CONTENT_TYPE_CONFIG = {
       types: ['image', 'video'],
     },
     fields: {
-      title: { required: true, label: 'publications.modal.add.title' },
+      title: { required: true, label: 'publications.modal.add.titleField' },
       description: {
         required: true,
         label: 'publications.modal.add.description',
@@ -60,7 +60,7 @@ export const CONTENT_TYPE_CONFIG = {
     platforms: REEL_COMPATIBLE_PLATFORMS,
     media: { required: true, min_count: 1, max_count: 1, types: ['video'] },
     fields: {
-      title: { required: true, label: 'publications.modal.add.title' },
+      title: { required: true, label: 'publications.modal.add.titleField' },
       description: {
         required: true,
         label: 'publications.modal.add.description',
@@ -78,7 +78,7 @@ export const CONTENT_TYPE_CONFIG = {
       types: ['image', 'video'],
     },
     fields: {
-      title: { required: true, label: 'publications.modal.add.title' },
+      title: { required: true, label: 'publications.modal.add.titleField' },
       description: {
         required: false,
         label: 'publications.modal.add.description',
@@ -96,7 +96,7 @@ export const CONTENT_TYPE_CONFIG = {
       types: ['image', 'video'],
     },
     fields: {
-      title: { required: true, label: 'publications.modal.add.title' },
+      title: { required: true, label: 'publications.modal.add.titleField' },
       description: {
         required: true,
         label: 'publications.modal.add.description',
