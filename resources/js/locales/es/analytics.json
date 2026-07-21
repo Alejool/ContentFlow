@@ -80,6 +80,26 @@
       "emptyTitle": "Recopilando tendencias",
       "emptyDesc": "Continúa publicando para que el sistema encuentre el momento óptimo para tu audiencia."
     },
-    "lastSynced": "Última actualización"
+    "lastSynced": "Última actualización",
+    "insights": {
+      "title": "Recomendaciones para ti",
+      "basedOn": "Basado en tus últimas {{count}} publicaciones",
+      "bestHour": "Tu audiencia responde mejor cerca de las {{hour}} — programa tu próximo post a esa hora.",
+      "bestWeekday": "El {{day}} es tu día más fuerte en engagement.",
+      "bestPlatform": "{{platform}} genera tu mayor engagement por publicación.",
+      "bestFormat": "Tu formato con mejor rendimiento es {{format}} — aprovéchalo.",
+      "trendUp": "Publicaste {{percent}}% más que la semana pasada. ¡Mantén el ritmo!",
+      "trendDown": "Publicaste {{percent}}% menos que la semana pasada — un post hoy te mantiene visible.",
+      "weekdays": {
+        "monday": "lunes",
+        "tuesday": "martes",
+        "wednesday": "miércoles",
+        "thursday": "jueves",
+        "friday": "viernes",
+        "saturday": "sábado",
+        "sunday": "domingo"
+      }
+    },
+    "generalStats": "Estadísticas Generales del Sistema"
   }
 }

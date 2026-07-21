@@ -80,6 +80,26 @@
       "emptyTitle": "Collecting trends",
       "emptyDesc": "Keep publishing so the system can find the optimal time for your audience."
     },
-    "lastSynced": "Last synced"
+    "lastSynced": "Last synced",
+    "insights": {
+      "title": "Recommendations for you",
+      "basedOn": "Based on your last {{count}} posts",
+      "bestHour": "Your audience responds best around {{hour}} — schedule your next post then.",
+      "bestWeekday": "{{day}} is your strongest day for engagement.",
+      "bestPlatform": "{{platform}} drives your highest engagement per post.",
+      "bestFormat": "Your best-performing format is {{format}} — lean into it.",
+      "trendUp": "You published {{percent}}% more than last week. Keep the rhythm!",
+      "trendDown": "Publishing dropped {{percent}}% vs last week — a quick post today keeps you visible.",
+      "weekdays": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      }
+    },
+    "generalStats": "General System Statistics"
   }
 }

@@ -34,6 +34,7 @@ const ContentFormatPerformance = lazy(() => import('../../Components/Analytics/C
 const TopPostsList = lazy(() => import('../../Components/Analytics/TopPostsList'));
 const AudienceDemographics = lazy(() => import('../../Components/Analytics/AudienceDemographics'));
 const BestTimeToPostHeatmap = lazy(() => import('../../Components/Analytics/BestTimeToPostHeatmap'));
+const PublishingInsightsCard = lazy(() => import('../../Components/Analytics/PublishingInsightsCard'));
 
 interface OverviewStats {
   total_views: number;
@@ -241,9 +242,12 @@ export default function Index({ stats: initialStats, period }: AnalyticsProps) {
         {/* TAB CONTENT: GENERAL */}
         {activeTab === 'general' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Suspense fallback={null}>
+              <PublishingInsightsCard />
+            </Suspense>
             <div>
               <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
-                Estadísticas Generales del Sistema
+                {t('analytics.generalStats', 'Estadísticas Generales del Sistema')}
               </h2>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard title={t('analytics.stats.totalViews')} value={overview.total_views || 0} change={overview.changes?.views} icon={<Eye className="h-6 w-6" />} color="primary" variant={1} theme={theme} />

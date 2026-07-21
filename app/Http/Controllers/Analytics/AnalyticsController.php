@@ -23,6 +23,24 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * Actionable publishing insights (best hour/day/platform/format, trend)
+     * derived from the workspace's own publishing history.
+     */
+    public function getPublishingInsights(\App\Services\Analytics\PublishingInsightsService $insights): \Illuminate\Http\JsonResponse
+    {
+        $workspaceId = Auth::user()->current_workspace_id;
+
+        if (!$workspaceId) {
+            return response()->json(['success' => false, 'message' => 'No workspace selected.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $insights->forWorkspace($workspaceId),
+        ]);
+    }
+
+    /**
      * Display the dashboard with statistics
      */
     public function dashboard(Request $request): Response|RedirectResponse

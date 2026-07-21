@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', 'token.ability:analytics:read'])
     ->prefix('analytics')->name('analytics.')->group(function () {
         Route::get('/dashboard', [AnalyticsController::class, 'getDashboardStats'])->name('dashboard');
+        Route::get('/insights', [AnalyticsController::class, 'getPublishingInsights'])->name('insights');
         Route::get('/campaigns/{id}', [AnalyticsController::class, 'getCampaignAnalytics'])->name('campaigns.show');
         Route::get('/social-media', [AnalyticsController::class, 'getSocialMediaMetrics'])->name('social-media');
         Route::get('/engagement', [AnalyticsController::class, 'getEngagementData'])->name('engagement');
