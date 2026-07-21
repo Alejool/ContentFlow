@@ -14,9 +14,11 @@ export interface ChatProcessResponse {
 }
 
 export interface ComposerSuggestion {
-  headline: string;
-  tip: string;
-  cta: string;
+  headline?: string;
+  tip?: string;
+  cta?: string;
+  /** Only present when source is 'heuristic' — whether the workspace has publishing history. */
+  has_history?: boolean;
   suggested_time: string;
   source: 'ai' | 'heuristic';
 }

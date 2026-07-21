@@ -42,8 +42,6 @@ class ComposerAssistantService
       $timezone,
     );
 
-    $heuristic = $this->heuristicCopy($suggestedTime, $stats, $locale);
-
     try {
       $response = $this->ai->chat([
         'type' => 'composer_assistant',
@@ -54,7 +52,7 @@ class ComposerAssistantService
       if (!empty($data['headline']) && !empty($data['cta'])) {
         return [
           'headline' => $data['headline'],
-          'tip' => $data['tip'] ?? $heuristic['tip'],
+          'tip' => $data['tip'] ?? null,
           'cta' => $data['cta'],
           'suggested_time' => $this->sanitizeTime($data['suggested_time'] ?? null, $timezone)
             ?? $suggestedTime->toIso8601String(),
@@ -65,7 +63,12 @@ class ComposerAssistantService
       Log::warning('ComposerAssistant: AI unavailable, using heuristic', ['error' => $e->getMessage()]);
     }
 
-    return $heuristic + [
+    // Heuristic fallback carries no freeform copy: the frontend renders it
+    // through the app's own i18n keys (publications.quickComposer.*) so this
+    // fallback stays in the same translation system as the rest of the UI,
+    // instead of duplicating hardcoded strings per-locale in PHP.
+    return [
+      'has_history' => $stats['total'] > 0,
       'suggested_time' => $suggestedTime->toIso8601String(),
       'source' => 'heuristic',
     ];
@@ -133,30 +136,6 @@ class ComposerAssistantService
     } catch (\Throwable) {
       return null;
     }
-  }
-
-  private function heuristicCopy(Carbon $suggestedTime, array $stats, string $locale): array
-  {
-    $day = $suggestedTime->locale($locale)->isoFormat('dddd');
-    $hour = $suggestedTime->format('H:i');
-
-    if ($locale === 'en') {
-      return [
-        'headline' => $stats['total'] > 0
-          ? "Your audience responds best around {$hour} — {$day} looks great."
-          : "A strong slot to start: {$day} at {$hour}.",
-        'tip' => 'Posts with a question in the first line get more replies.',
-        'cta' => "Schedule it for {$hour}?",
-      ];
-    }
-
-    return [
-      'headline' => $stats['total'] > 0
-        ? "Tu audiencia responde mejor cerca de las {$hour} — el {$day} pinta bien."
-        : "Buen horario para empezar: {$day} a las {$hour}.",
-      'tip' => 'Los posts que abren con una pregunta reciben más respuestas.',
-      'cta' => "¿La programamos para las {$hour}?",
-    ];
   }
 
   private function buildPrompt(

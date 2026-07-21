@@ -2975,7 +2975,13 @@
       "accountsRequired": "Selecciona al menos una red para publicar",
       "connectAccounts": "Conecta tus redes para publicar →",
       "scheduled": "Publicación programada",
-      "scheduleFor": "Programar"
+      "scheduleFor": "Programar",
+      "heuristic": {
+        "headlineWithHistory": "Tu audiencia responde mejor cerca de las {{hour}} — el {{day}} pinta bien.",
+        "headlineNoHistory": "Buen horario para empezar: {{day}} a las {{hour}}.",
+        "tip": "Los posts que abren con una pregunta reciben más respuestas.",
+        "cta": "¿La programamos para las {{hour}}?"
+      }
     },
     "timeline": {
       "title": "Estado de publicación",

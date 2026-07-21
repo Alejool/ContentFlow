@@ -466,7 +466,13 @@
       "accountsRequired": "Select at least one account to publish",
       "connectAccounts": "Connect your accounts to publish →",
       "scheduled": "Publication scheduled",
-      "scheduleFor": "Schedule"
+      "scheduleFor": "Schedule",
+      "heuristic": {
+        "headlineWithHistory": "Your audience responds best around {{hour}} — {{day}} looks great.",
+        "headlineNoHistory": "A strong slot to start: {{day}} at {{hour}}.",
+        "tip": "Posts with a question in the first line get more replies.",
+        "cta": "Schedule it for {{hour}}?"
+      }
     },
     "timeline": {
       "title": "Publish status",

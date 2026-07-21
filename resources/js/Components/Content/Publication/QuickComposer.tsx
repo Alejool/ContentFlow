@@ -4,6 +4,7 @@ import { useComposerAssistant } from '@/Hooks/Publications/useComposerAssistant'
 import { useQuickComposer } from '@/Hooks/Publications/useQuickComposer';
 import { CalendarClock, Send, Save, Settings2, Sparkles, X, Zap } from 'lucide-react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface QuickComposerProps {
   onCreated?: () => void;
@@ -31,6 +32,7 @@ export default function QuickComposer({
     scheduleAt,
   } = useQuickComposer({ ...(onCreated ? { onCreated } : {}) });
 
+  const { i18n } = useTranslation();
   const { register, formState } = form;
   const charsLeft = MAX_CHARS - description.length;
 
@@ -53,12 +55,35 @@ export default function QuickComposer({
   const suggestedTimeLabel = useMemo(() => {
     if (!suggestion?.suggested_time) return '';
     const d = new Date(suggestion.suggested_time);
-    return d.toLocaleString(undefined, {
+    return d.toLocaleString(i18n.language, {
       weekday: 'short',
       hour: '2-digit',
       minute: '2-digit',
     });
-  }, [suggestion?.suggested_time]);
+  }, [suggestion?.suggested_time, i18n.language]);
+
+  // Heuristic fallback carries no freeform copy from the backend — it's
+  // rendered through the app's own i18n keys so it stays translated like
+  // everything else, instead of duplicating hardcoded strings server-side.
+  const heuristicCopy = useMemo(() => {
+    if (!suggestion || suggestion.source !== 'heuristic') return null;
+
+    const d = new Date(suggestion.suggested_time);
+    const day = d.toLocaleDateString(i18n.language, { weekday: 'long' });
+    const hour = d.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
+
+    return {
+      headline: suggestion.has_history
+        ? t('publications.quickComposer.heuristic.headlineWithHistory', { day, hour })
+        : t('publications.quickComposer.heuristic.headlineNoHistory', { day, hour }),
+      tip: t('publications.quickComposer.heuristic.tip'),
+      cta: t('publications.quickComposer.heuristic.cta', { hour }),
+    };
+  }, [suggestion, t, i18n.language]);
+
+  const headline = heuristicCopy?.headline ?? suggestion?.headline;
+  const tip = heuristicCopy?.tip ?? suggestion?.tip;
+  const cta = heuristicCopy?.cta ?? suggestion?.cta;
 
   return (
     <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-theme-bg-secondary">
@@ -84,10 +109,10 @@ export default function QuickComposer({
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-violet-900 dark:text-violet-200">
-              {suggestion.headline}
+              {headline}
             </p>
             <p className="mt-0.5 text-xs text-violet-700/80 dark:text-violet-300/70">
-              {suggestion.tip} · {suggestion.cta}
+              {tip} · {cta}
             </p>
           </div>
           <button
