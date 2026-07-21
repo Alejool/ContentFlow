@@ -34,12 +34,12 @@ class ApprovalWorkflowEngine
     public function submitForApproval(Publication $publication, User $submitter): ApprovalRequest
     {
         $workflow = $publication->workspace->approvalWorkflow;
-        
+
         if (!$workflow || !$workflow->is_enabled) {
             throw new \Exception('Approval workflow not enabled for this workspace');
         }
 
-        return DB::transaction(function () use ($publication, $submitter, $workflow) {
+        $result = DB::transaction(function () use ($publication, $submitter, $workflow) {
             // Pessimistic lock on the publication row to prevent duplicate simultaneous submissions.
             // This ensures only one submission can proceed at a time for the same publication.
             $lockedPublication = \App\Models\Publications\Publication::where('id', $publication->id)
@@ -135,6 +135,37 @@ class ApprovalWorkflowEngine
 
             return $request->load(['currentStep.role', 'workflow', 'submitter']);
         });
+
+        $this->notifyIntegrations(
+            $publication,
+            \App\Constants\IntegrationEvents::APPROVAL_SUBMITTED,
+            ['submitted_by' => $submitter->name]
+        );
+
+        return $result;
+    }
+
+    /**
+     * Fan approval lifecycle events out to workspace integrations
+     * (Discord/Slack/webhooks/...). Runs after the response is sent because
+     * delivery makes HTTP calls.
+     */
+    private function notifyIntegrations(Publication $publication, string $eventType, array $extra = []): void
+    {
+        if (!$publication->workspace_id) {
+            return;
+        }
+
+        $payload = array_merge([
+            'publication_id' => $publication->id,
+            'title' => $publication->title,
+        ], $extra);
+
+        $workspaceId = $publication->workspace_id;
+
+        dispatch(function () use ($workspaceId, $eventType, $payload) {
+            \App\Services\Integrations\IntegrationEventDispatcher::dispatch($workspaceId, $eventType, $payload);
+        })->afterResponse();
     }
 
     /**
@@ -270,7 +301,7 @@ class ApprovalWorkflowEngine
             throw new \Exception('User does not have permission to approve at this step');
         }
 
-        return DB::transaction(function () use ($request, $approver, $comment) {
+        $result = DB::transaction(function () use ($request, $approver, $comment) {
             $currentStep = $request->currentStep;
 
             // Create approval log entry (step may be null for simple approvals)
@@ -362,11 +393,21 @@ class ApprovalWorkflowEngine
 
             return $request->fresh()->load(['currentStep.role', 'workflow', 'submitter', 'publication']);
         });
+
+        if ($result->status === ApprovalRequest::STATUS_APPROVED && $result->publication) {
+            $this->notifyIntegrations(
+                $result->publication,
+                \App\Constants\IntegrationEvents::APPROVAL_APPROVED,
+                ['approved_by' => $approver->name]
+            );
+        }
+
+        return $result;
     }
 
     /**
      * Reject at current step
-     * 
+     *
      * @param ApprovalRequest $request
      * @param User $rejector
      * @param string $reason
@@ -383,7 +424,7 @@ class ApprovalWorkflowEngine
             throw new \Exception('User does not have permission to reject at this step');
         }
 
-        return DB::transaction(function () use ($request, $rejector, $reason) {
+        $result = DB::transaction(function () use ($request, $rejector, $reason) {
             $currentStep = $request->currentStep;
 
             // Create rejection log entry (step may be null for simple approvals)
@@ -432,6 +473,16 @@ class ApprovalWorkflowEngine
 
             return $request->fresh()->load(['currentStep.role', 'workflow', 'submitter', 'publication']);
         });
+
+        if ($result->publication) {
+            $this->notifyIntegrations(
+                $result->publication,
+                \App\Constants\IntegrationEvents::APPROVAL_REJECTED,
+                ['rejected_by' => $rejector->name, 'reason' => $reason]
+            );
+        }
+
+        return $result;
     }
 
     /**

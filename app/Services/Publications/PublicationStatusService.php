@@ -215,7 +215,7 @@ class PublicationStatusService
         }
 
         $oldStatus = $publication->status;
-        
+
         $publication->update([
             'status' => $result['status'],
             'publication_status_summary' => $result['summary']
@@ -228,7 +228,48 @@ class PublicationStatusService
             'summary' => $result['summary']
         ]);
 
+        $this->notifyIntegrations($publication, $oldStatus, $result['status'], $result['summary']);
+
         return true;
+    }
+
+    /**
+     * Fan the terminal publish states out to workspace integrations
+     * (Discord/Slack/Telegram/Teams/webhooks/email). Delivery makes HTTP
+     * calls, so it runs after the response is sent.
+     */
+    private function notifyIntegrations(Publication $publication, string $oldStatus, string $newStatus, array $summary): void
+    {
+        if ($oldStatus === $newStatus) {
+            return;
+        }
+
+        $eventType = match ($newStatus) {
+            self::STATUS_PUBLISHED => \App\Constants\IntegrationEvents::PUBLICATION_PUBLISHED,
+            self::STATUS_FAILED,
+            self::STATUS_PUBLISHED_WITH_ERRORS => \App\Constants\IntegrationEvents::PUBLICATION_FAILED,
+            default => null,
+        };
+
+        if ($eventType === null || !$publication->workspace_id) {
+            return;
+        }
+
+        $payload = [
+            'publication_id' => $publication->id,
+            'title' => $publication->title,
+            'status' => $newStatus,
+            'previous_status' => $oldStatus,
+            'summary' => $summary,
+        ];
+
+        dispatch(function () use ($publication, $eventType, $payload) {
+            \App\Services\Integrations\IntegrationEventDispatcher::dispatch(
+                $publication->workspace_id,
+                $eventType,
+                $payload,
+            );
+        })->afterResponse();
     }
 
     /**
